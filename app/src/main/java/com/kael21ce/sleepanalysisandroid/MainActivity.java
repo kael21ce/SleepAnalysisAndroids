@@ -27,7 +27,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         bottomNavigationView = findViewById(R.id.bottomNavigationView);
-        getSupportFragmentManager().beginTransaction().replace(R.id.mainFrame, homeFragment);
+        getSupportFragmentManager().beginTransaction().replace(R.id.mainFrame, homeFragment).commit();
         getSupportActionBar().setTitle(Html.fromHtml("<font color='#223047'>2Sleep</font>"));
 
         bottomNavigationView.setOnNavigationItemSelectedListener(

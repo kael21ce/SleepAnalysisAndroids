@@ -3,17 +3,136 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:foregroundTint="@color/black"
     tools:context=".HomeFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
-        android:id="@+id/HomeText"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center"
-        android:fontFamily="@font/pretendardvariable"
-        android:text="Home"
-        android:textColor="#000000"
-        android:textSize="24sp" />
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:id="@+id/HomeView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/gray_1"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:id="@+id/RecommendHomeView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="8dp"
+                android:layout_marginVertical="8dp"
+                android:background="@drawable/corner_16"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/ClockTitleView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="8dp"
+                    android:fontFamily="@font/pretendardvariable"
+                    android:text="수면 추천"
+                    android:textColor="@color/black"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:id="@+id/ClockView"
+                    android:layout_width="310dp"
+                    android:layout_height="280dp"
+                    android:layout_gravity="center"
+                    android:layout_marginVertical="8dp"
+                    android:background="@color/blue_1"
+                    android:orientation="vertical" />
+
+                <LinearLayout
+                    android:id="@+id/TimeDisplayingHomeView"
+                    android:layout_width="310dp"
+                    android:layout_height="93dp"
+                    android:layout_gravity="center"
+                    android:layout_marginVertical="8dp"
+                    android:background="@drawable/corner_8"
+                    android:orientation="vertical" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/AlertnessHomeView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="8dp"
+                android:layout_marginVertical="8dp"
+                android:background="@drawable/corner_16"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/AlertnessRecommend"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="8dp"
+                    android:text="잠시 바람 쐬는 건 어때요?"
+                    android:textColor="@color/black"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/AlertnessDescription"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="8dp"
+                    android:text="\(userName)님의 각성도가 낮아요"
+                    android:textColor="@color/black" />
+
+                <LinearLayout
+                    android:id="@+id/GraphView"
+                    android:layout_width="310dp"
+                    android:layout_height="228dp"
+                    android:layout_gravity="center"
+                    android:layout_margin="30dp"
+                    android:background="@drawable/corner_16"
+                    android:backgroundTint="@color/gray_1"
+                    android:orientation="vertical"></LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/ChartHomeView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="68dp"
+                android:background="@drawable/corner_16"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/ChartTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="8dp"
+                    android:text="주간 각성도"
+                    android:textColor="@color/black"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/ChartDescription"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="8dp"
+                    android:text="이번주 \(userName)님의 각성도에요"
+                    android:textColor="@color/black" />
+
+                <LinearLayout
+                    android:id="@+id/ChartView"
+                    android:layout_width="310dp"
+                    android:layout_height="270dp"
+                    android:layout_gravity="center"
+                    android:layout_margin="30dp"
+                    android:background="@color/green_2"
+                    android:orientation="vertical"></LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
 
 </FrameLayout>
