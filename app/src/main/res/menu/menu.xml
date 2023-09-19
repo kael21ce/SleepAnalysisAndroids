@@ -5,7 +5,8 @@
         android:id="@+id/tabHome"
         app:showAsAction="ifRoom"
         android:enabled="true"
-        android:icon="@android:drawable/ic_dialog_email"
+        android:icon="@drawable/home_icon"
+        android:fontFamily="@font/pretendardvariable"
         android:title="홈"
         />
 
@@ -13,7 +14,8 @@
         android:id="@+id/tabSchedule"
         app:showAsAction="ifRoom"
         android:enabled="true"
-        android:icon="@android:drawable/ic_dialog_info"
+        android:icon="@drawable/schedule_icon"
+        android:fontFamily="@font/pretendardvariable"
         android:title="수면 기록"
         />
 
@@ -21,7 +23,8 @@
         android:id="@+id/tabRecommend"
         app:showAsAction="ifRoom"
         android:enabled="true"
-        android:icon="@android:drawable/ic_dialog_map"
+        android:icon="@drawable/moon"
+        android:fontFamily="@font/pretendardvariable"
         android:title="추천 수면"
         />
 
@@ -29,7 +32,8 @@
         android:id="@+id/tabSetting"
         app:showAsAction="ifRoom"
         android:enabled="true"
-        android:icon="@android:drawable/ic_dialog_alert"
+        android:icon="@drawable/setting_icon"
+        android:fontFamily="@font/pretendardvariable"
         android:title="설정"
         />
 

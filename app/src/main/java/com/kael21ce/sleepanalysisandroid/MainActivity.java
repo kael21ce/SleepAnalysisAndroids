@@ -2,7 +2,9 @@ package com.kael21ce.sleepanalysisandroid;
 
 
 import android.annotation.SuppressLint;
+import android.app.ActionBar;
 import android.os.Bundle;
+import android.text.Html;
 import android.view.MenuItem;
 
 import androidx.annotation.NonNull;
@@ -26,6 +28,7 @@ public class MainActivity extends AppCompatActivity {
 
         bottomNavigationView = findViewById(R.id.bottomNavigationView);
         getSupportFragmentManager().beginTransaction().replace(R.id.mainFrame, homeFragment);
+        getSupportActionBar().setTitle(Html.fromHtml("<font color='#223047'>2Sleep</font>"));
 
         bottomNavigationView.setOnNavigationItemSelectedListener(
                 new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -34,18 +37,22 @@ public class MainActivity extends AppCompatActivity {
                         if (item.getItemId() == R.id.tabHome) {
                             getSupportFragmentManager().beginTransaction()
                                     .replace(R.id.mainFrame, homeFragment).commit();
+                            getSupportActionBar().setTitle(Html.fromHtml("<font color='#223047'>2Sleep</font>"));
                             return true;
                         } else if (item.getItemId() == R.id.tabSchedule) {
                             getSupportFragmentManager().beginTransaction()
                                     .replace(R.id.mainFrame, scheduleFragment).commit();
+                            getSupportActionBar().setTitle(Html.fromHtml("<font color='#223047'>수면 기록</font>"));
                             return true;
                         } else if (item.getItemId() == R.id.tabRecommend) {
                             getSupportFragmentManager().beginTransaction()
                                     .replace(R.id.mainFrame, recommendFragment).commit();
+                            getSupportActionBar().setTitle(Html.fromHtml("<font color='#223047'>추천 수면</font>"));
                             return true;
                         } else if (item.getItemId() == R.id.tabSetting) {
                             getSupportFragmentManager().beginTransaction()
                                     .replace(R.id.mainFrame, settingFragment).commit();
+                            getSupportActionBar().setTitle(Html.fromHtml("<font color='#223047'>설정</font>"));
                             return true;
                         } else {
                             return false;
