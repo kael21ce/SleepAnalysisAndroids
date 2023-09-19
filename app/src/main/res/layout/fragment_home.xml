@@ -7,6 +7,7 @@
     tools:context=".HomeFragment">
 
     <ScrollView
+        android:id="@+id/HomeScrollView"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -31,11 +32,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_margin="8dp"
-                    android:fontFamily="@font/pretendardvariable"
+                    android:fontFamily="@font/pretendardbold"
                     android:text="수면 추천"
                     android:textColor="@color/black"
-                    android:textSize="20sp"
-                    android:textStyle="bold" />
+                    android:textSize="20sp" />
 
                 <LinearLayout
                     android:id="@+id/ClockView"
@@ -74,7 +74,7 @@
                     android:text="잠시 바람 쐬는 건 어때요?"
                     android:textColor="@color/black"
                     android:textSize="20sp"
-                    android:textStyle="bold" />
+                    android:fontFamily="@font/pretendardbold" />
 
                 <TextView
                     android:id="@+id/AlertnessDescription"
@@ -113,7 +113,7 @@
                     android:text="주간 각성도"
                     android:textColor="@color/black"
                     android:textSize="20sp"
-                    android:textStyle="bold" />
+                    android:fontFamily="@font/pretendardbold" />
 
                 <TextView
                     android:id="@+id/ChartDescription"
