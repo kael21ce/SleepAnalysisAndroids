@@ -28,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
 
         bottomNavigationView = findViewById(R.id.bottomNavigationView);
         getSupportFragmentManager().beginTransaction().replace(R.id.mainFrame, homeFragment).commit();
-        getSupportActionBar().setTitle(Html.fromHtml("<font color='#223047'>2Sleep</font>"));
+        getSupportActionBar().setTitle(Html.fromHtml("<font color='#223047'>Sleepwake</font>"));
 
         bottomNavigationView.setOnNavigationItemSelectedListener(
                 new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -37,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
                         if (item.getItemId() == R.id.tabHome) {
                             getSupportFragmentManager().beginTransaction()
                                     .replace(R.id.mainFrame, homeFragment).commit();
-                            getSupportActionBar().setTitle(Html.fromHtml("<font color='#223047'>2Sleep</font>"));
+                            getSupportActionBar().setTitle(Html.fromHtml("<font color='#223047'>Sleepwake</font>"));
                             return true;
                         } else if (item.getItemId() == R.id.tabSchedule) {
                             getSupportFragmentManager().beginTransaction()
