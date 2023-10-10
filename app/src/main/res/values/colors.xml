@@ -15,4 +15,6 @@
     <color name="green_2">#DFF7E0</color>
     <color name="black">#223047</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="orange_1">#FF9500</color>
+    <color name="orange_2">#33FF9500</color>
 </resources>
