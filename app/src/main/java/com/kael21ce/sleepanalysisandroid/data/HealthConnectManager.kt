@@ -2,6 +2,7 @@ package com.kael21ce.sleepanalysisandroid.data
 
 import android.content.Context
 import android.os.Build
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContract
 import androidx.compose.runtime.mutableStateOf
@@ -104,13 +105,21 @@ class HealthConnectManager(private val context: Context) {
     /**
      * TODO: Reads in existing [WeightRecord]s.
      */
-    suspend fun readWeightInputs(start: Instant, end: Instant): List<WeightRecord> {
+    suspend fun readSleepInputs(start: Instant, end: Instant){
         val request = ReadRecordsRequest(
-                recordType = WeightRecord::class,
+                recordType = SleepSessionRecord::class,
                 timeRangeFilter = TimeRangeFilter.between(start, end)
         )
         val response = healthConnectClient.readRecords(request)
-        return response.records
+
+        for(sleepRecord in response.records){
+            Log.v("test", sleepRecord.startTime.toString());
+            Log.v("test", sleepRecord.endTime.toString());
+        }
+    }
+
+    fun javReadSleepInputs(start: Instant, end: Instant){
+        GlobalScope.future { readSleepInputs(start, end); }
     }
 
     /**

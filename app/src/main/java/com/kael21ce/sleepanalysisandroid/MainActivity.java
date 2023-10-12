@@ -19,12 +19,19 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.compose.runtime.MutableState;
 import androidx.health.connect.client.permission.HealthPermission;
 import androidx.health.connect.client.records.SleepSessionRecord;
+import androidx.room.Room;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.kael21ce.sleepanalysisandroid.data.AppDatabase;
 import com.kael21ce.sleepanalysisandroid.data.HealthConnectAvailability;
 import com.kael21ce.sleepanalysisandroid.data.HealthConnectManager;
 import com.kael21ce.sleepanalysisandroid.data.HealthConnectManagerKt;
+import com.kael21ce.sleepanalysisandroid.data.User;
+import com.kael21ce.sleepanalysisandroid.data.UserDao;
 
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -49,23 +56,25 @@ public class MainActivity extends AppCompatActivity {
 
         context = getApplicationContext();
         HealthConnectManager healthConnectManager = new HealthConnectManager(context);
-        CompletableFuture<Boolean> javHasPermissions = healthConnectManager.javHasAllPermissions();
-        Boolean hasPermissions = true;
-        try {
-            hasPermissions = javHasPermissions.get();
-        } catch (ExecutionException e) {
-            throw new RuntimeException(e);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
 
         MutableState
                 <HealthConnectAvailability> availability = healthConnectManager.getAvailability();
+        Boolean hasPermissions = true;
 
-        if(availability.getValue() == HealthConnectAvailability.INSTALLED){
+        if((availability.getValue() == HealthConnectAvailability.INSTALLED) && (android.os.Build.VERSION.SDK_INT >= 34)){
             Log.v("test", "test1");
-        }else{
+            Log.v("test", String.valueOf(android.os.Build.VERSION.SDK_INT));
+            CompletableFuture<Boolean> javHasPermissions = healthConnectManager.javHasAllPermissions();
+            try {
+                hasPermissions = javHasPermissions.get();
+            } catch (ExecutionException e) {
+                throw new RuntimeException(e);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }else if(availability.getValue() != HealthConnectAvailability.INSTALLED){
             Log.v("test2", "test2");
+            startActivity(new Intent(MainActivity.this, PermissionsActivity.class));
         }
 
         if(hasPermissions){
@@ -74,6 +83,20 @@ public class MainActivity extends AppCompatActivity {
             Log.v("no permission", "no permission");
             requestPermissionLauncher.launch(HealthConnectManagerKt.getJAVPERMISSIONS());
         }
+        Instant now = Instant.now();
+        Instant yesterday = now.minusSeconds(60*60*24*7);
+        healthConnectManager.javReadSleepInputs(yesterday, now);
+
+        //database configuration
+//        AppDatabase db = Room.databaseBuilder(getApplicationContext(),
+//                AppDatabase.class, "database-name").allowMainThreadQueries().build();
+//        UserDao userDao = db.userDao();
+//        User test = new User();
+//        test.firstName = "test";
+//        test.lastName = "test";
+//        userDao.insertAll(test);
+//        List<User> users = userDao.getAll();
+//        Log.v("tag", users.get(0).firstName);
 
         bottomNavigationView = findViewById(R.id.bottomNavigationView);
         getSupportFragmentManager().beginTransaction().replace(R.id.mainFrame, homeFragment).commit();
