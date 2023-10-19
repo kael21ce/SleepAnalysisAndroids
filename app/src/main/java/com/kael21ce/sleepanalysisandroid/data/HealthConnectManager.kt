@@ -25,15 +25,21 @@ import androidx.health.connect.client.request.ReadRecordsRequest
 import androidx.health.connect.client.time.TimeRangeFilter
 import androidx.health.connect.client.units.Energy
 import androidx.health.connect.client.units.Mass
+import androidx.room.Room
 import kotlinx.coroutines.GlobalScope
-import java.io.IOException
-import java.time.Instant
-import java.time.ZonedDateTime
-import kotlin.random.Random
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.future.future
+import java.io.IOException
+import java.text.SimpleDateFormat
+import java.time.Instant
+import java.time.ZonedDateTime
+import java.time.temporal.ChronoField
+import java.util.Date
+import java.util.Locale
 import java.util.concurrent.CompletableFuture
+import kotlin.random.Random
+import kotlin.time.Duration.Companion.milliseconds
 
 // The minimum android level that can use Health Connect
 const val MIN_SUPPORTED_SDK = Build.VERSION_CODES.O_MR1
@@ -111,11 +117,21 @@ class HealthConnectManager(private val context: Context) {
                 timeRangeFilter = TimeRangeFilter.between(start, end)
         )
         val response = healthConnectClient.readRecords(request)
-
+        val db = Room.databaseBuilder(context, AppDatabase::class.java, "sleep_wake").build()
+        val userDao = db.sleepDao()
+        val sleepList = mutableListOf<Sleep>()
         for(sleepRecord in response.records){
-            Log.v("test", sleepRecord.startTime.toString());
-            Log.v("test", sleepRecord.endTime.toString());
+            val sleepStart = Date.from(sleepRecord.startTime).time
+            val sleepEnd = Date.from(sleepRecord.endTime).time
+            //save everything in the database
+            val sleep = Sleep()
+            sleep.sleepStart = sleepStart
+            sleep.sleepEnd = sleepEnd
+            Log.v("sleeprecord", sleep.sleepStart.toString())
+            Log.v("sleeprecord2", sleep.sleepEnd.toString())
+            sleepList.add(sleep)
         }
+        userDao.insertAll(sleepList)
     }
 
     fun javReadSleepInputs(start: Instant, end: Instant){

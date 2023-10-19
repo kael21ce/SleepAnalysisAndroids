@@ -3,7 +3,9 @@ package com.kael21ce.sleepanalysisandroid.data;
 import androidx.room.Database;
 import androidx.room.RoomDatabase;
 
-@Database(entities = {User.class}, version = 1)
+@Database(entities = {Sleep.class, V0.class}, version = 1)
 public abstract class AppDatabase extends RoomDatabase {
-    public abstract UserDao userDao();
+    public abstract SleepDao sleepDao();
+    public abstract V0Dao v0Dao();
+
 }
