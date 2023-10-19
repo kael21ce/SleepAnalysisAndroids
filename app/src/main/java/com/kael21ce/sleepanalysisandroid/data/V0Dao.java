@@ -17,4 +17,7 @@ public interface V0Dao {
 
     @Delete
     void delete(V0 v0);
+
+    @Query("DELETE FROM V0 WHERE :startTime <= time AND time <= :endTime")
+    abstract void deleteRange(long startTime, long endTime);
 }

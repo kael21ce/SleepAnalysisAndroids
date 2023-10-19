@@ -37,6 +37,7 @@ import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -94,6 +95,7 @@ public class MainActivity extends AppCompatActivity {
 
         //get the shared preferences variable
         SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
         long twoWeeks = (1000*60*60*24*14);
         long fiveMinutesToMil = (1000*60*50);
 
@@ -133,7 +135,6 @@ public class MainActivity extends AppCompatActivity {
         }
         if(check){
             //edit lastSleepUpdate to match current time
-            SharedPreferences.Editor editor = sharedPref.edit();
             editor.putLong("lastSleepUpdate", System.currentTimeMillis());
             editor.apply();
         }
@@ -159,6 +160,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         }
+        v0Dao.deleteRange(startProcess, endProcess);
 
         //get the sleep model & simulation result
         SleepModel sleepModel = new SleepModel();
@@ -166,11 +168,32 @@ public class MainActivity extends AppCompatActivity {
         ArrayList<double[]> simulationResult = sleepModel.pcr_simulation(initV0, sleepPattern, 5/60.0);
 
         //update V0 from the simulation
+        List<V0> newV0 = Collections.emptyList();
+        for(int i = 0; i <= simulationResult.size(); i ++){
+            double[] res = simulationResult.get(i);
+            V0 v0 = new V0();
+            v0.y_val = res[0];
+            v0.x_val = res[1];
+            v0.n_val = res[2];
+            v0.H_val = res[3];
+            v0.time = startProcess + (i*fiveMinutesToMil);
+            newV0.add(v0);
+
+            if(v0.time >= (System.currentTimeMillis()-(1000*60*6)) && (v0.time <= System.currentTimeMillis())){
+                initV0 = res;
+            }
+        }
+        v0Dao.insertAll(newV0);
 
         //process sleep prediction
+        int[] sleepSuggestion = sleepModel.Sleep_pattern_suggestion(initV0, (int)sleepOnset, (int)workOnset, (int)workOffset, 5/60.0);
 
         //update shared preferences
-
+        editor.putLong("mainSleepStart", sleepSuggestion[0]);
+        editor.putLong("mainSleepEnd", sleepSuggestion[1]);
+        editor.putLong("napSleepStart", sleepSuggestion[2]);
+        editor.putLong("napSleepEnd", sleepSuggestion[3]);
+        editor.apply();
 
         bottomNavigationView = findViewById(R.id.bottomNavigationView);
         getSupportFragmentManager().beginTransaction().replace(R.id.mainFrame, homeFragment).commit();
