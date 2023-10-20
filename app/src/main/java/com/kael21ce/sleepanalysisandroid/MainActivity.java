@@ -149,7 +149,7 @@ public class MainActivity extends AppCompatActivity {
         long startProcess = Long.min(yesterday, lastSleepUpdate);
         long endProcess = System.currentTimeMillis();
         long processDuration = (endProcess - startProcess) / fiveMinutesToMil;
-        Boolean gotInitV0 = false;
+        boolean gotInitV0 = false;
         double[] initV0 = {-0.8590, -0.6837, 0.1140, 14.2133};
         //get init V0
         for(V0 v0: v0s){
@@ -168,8 +168,8 @@ public class MainActivity extends AppCompatActivity {
         ArrayList<double[]> simulationResult = sleepModel.pcr_simulation(initV0, sleepPattern, 5/60.0);
 
         //update V0 from the simulation
-        List<V0> newV0 = Collections.emptyList();
-        for(int i = 0; i <= simulationResult.size(); i ++){
+        List<V0> newV0 = new ArrayList<>();
+        for(int i = 0; i < simulationResult.size(); i ++){
             double[] res = simulationResult.get(i);
             V0 v0 = new V0();
             v0.y_val = res[0];
@@ -185,6 +185,8 @@ public class MainActivity extends AppCompatActivity {
         }
         v0Dao.insertAll(newV0);
 
+        Log.v("done", "SUPER DONE");
+
         //process sleep prediction
         int[] sleepSuggestion = sleepModel.Sleep_pattern_suggestion(initV0, (int)sleepOnset, (int)workOnset, (int)workOffset, 5/60.0);
 
@@ -194,6 +196,10 @@ public class MainActivity extends AppCompatActivity {
         editor.putLong("napSleepStart", sleepSuggestion[2]);
         editor.putLong("napSleepEnd", sleepSuggestion[3]);
         editor.apply();
+
+        Log.v("done", "SUPER DONE2");
+
+        //do another simulation for the updated data
 
         bottomNavigationView = findViewById(R.id.bottomNavigationView);
         getSupportFragmentManager().beginTransaction().replace(R.id.mainFrame, homeFragment).commit();
