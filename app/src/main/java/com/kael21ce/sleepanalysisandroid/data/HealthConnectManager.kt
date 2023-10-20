@@ -111,7 +111,7 @@ class HealthConnectManager(private val context: Context) {
     /**
      * TODO: Reads in existing [WeightRecord]s.
      */
-    suspend fun readSleepInputs(start: Instant, end: Instant){
+    suspend fun readSleepInputs(start: Instant, end: Instant): Boolean{
         val request = ReadRecordsRequest(
                 recordType = SleepSessionRecord::class,
                 timeRangeFilter = TimeRangeFilter.between(start, end)
@@ -132,10 +132,11 @@ class HealthConnectManager(private val context: Context) {
             sleepList.add(sleep)
         }
         userDao.insertAll(sleepList)
+        return true
     }
 
-    fun javReadSleepInputs(start: Instant, end: Instant){
-        GlobalScope.future { readSleepInputs(start, end); }
+    fun javReadSleepInputs(start: Instant, end: Instant): CompletableFuture<Boolean>{
+        return GlobalScope.future { readSleepInputs(start, end); }
     }
 
     /**

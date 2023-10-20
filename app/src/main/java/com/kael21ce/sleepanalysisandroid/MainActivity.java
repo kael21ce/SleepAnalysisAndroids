@@ -44,6 +44,7 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -117,6 +118,17 @@ public class MainActivity extends AppCompatActivity {
         Instant now = Instant.now();
         Instant ILastSleepUpdate = Instant.ofEpochMilli(lastSleepUpdate);
 
+        //sync health connect data
+        Future<Boolean> healthSyncDone = healthConnectManager.javReadSleepInputs(ILastSleepUpdate, now);
+        try {
+            Boolean result = healthSyncDone.get();
+            Log.v("DONE", result.toString());
+        } catch (ExecutionException e) {
+            throw new RuntimeException(e);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
         //database configuration
         AppDatabase db = Room.databaseBuilder(getApplicationContext(),
                 AppDatabase.class, "sleep_wake").allowMainThreadQueries().build();
@@ -133,12 +145,12 @@ public class MainActivity extends AppCompatActivity {
                 check = true;
             }
         }
+        Log.v("SLEEP DATA", "GOT SLEEP DATA");
         if(check){
             //edit lastSleepUpdate to match current time
             editor.putLong("lastSleepUpdate", System.currentTimeMillis());
             editor.apply();
         }
-        healthConnectManager.javReadSleepInputs(ILastSleepUpdate, now);
 
         //get V0 data
         V0Dao v0Dao = db.v0Dao();
@@ -185,8 +197,6 @@ public class MainActivity extends AppCompatActivity {
         }
         v0Dao.insertAll(newV0);
 
-        Log.v("done", "SUPER DONE");
-
         //process sleep prediction
         int[] sleepSuggestion = sleepModel.Sleep_pattern_suggestion(initV0, (int)sleepOnset, (int)workOnset, (int)workOffset, 5/60.0);
 
@@ -196,8 +206,6 @@ public class MainActivity extends AppCompatActivity {
         editor.putLong("napSleepStart", sleepSuggestion[2]);
         editor.putLong("napSleepEnd", sleepSuggestion[3]);
         editor.apply();
-
-        Log.v("done", "SUPER DONE2");
 
         //do another simulation for the updated data
 
