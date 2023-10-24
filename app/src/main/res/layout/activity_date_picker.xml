@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/DatePickerLayout"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/corner_16"
+    >
+
+    <LinearLayout
+        android:id="@+id/BackButtonPopDateLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="right"
+        android:orientation="horizontal">
+
+        <ImageButton
+            android:id="@+id/backPopButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/white"
+            android:src="@drawable/close" />
+    </LinearLayout>
+
+    <DatePicker
+        android:id="@+id/datePicker"
+        android:layout_width="320dp"
+        android:layout_height="430dp"
+        android:calendarTextColor="@color/black"
+        android:calendarViewShown="false"
+        android:datePickerMode="calendar"
+        android:yearListSelectorColor="@color/blue_1" />
+
+    <Button
+        android:id="@+id/checkDateButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:backgroundTint="@color/blue_1"
+        android:fontFamily="@font/pretendardvariable"
+        android:padding="8dp"
+        android:text="확인"
+        android:textSize="16sp"
+        app:cornerRadius="28dp" />
+
+</LinearLayout>
