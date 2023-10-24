@@ -1,8 +1,6 @@
 package com.kael21ce.sleepanalysisandroid;
 
 
-import static androidx.activity.compose.ActivityResultRegistryKt.rememberLauncherForActivityResult;
-
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
@@ -13,13 +11,10 @@ import android.util.Log;
 import android.view.MenuItem;
 
 import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContract;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.compose.runtime.MutableState;
-import androidx.health.connect.client.permission.HealthPermission;
-import androidx.health.connect.client.records.SleepSessionRecord;
 import androidx.room.Room;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -37,11 +32,9 @@ import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -56,13 +49,17 @@ public class MainActivity extends AppCompatActivity {
     SimpleDateFormat sdfDateTime = new SimpleDateFormat("dd/MM/yyyy"+ "HH:mm", Locale.KOREA);
     //health connect
     private static Context context;
+    SharedPreferences sharedPref;
+    SharedPreferences.Editor editor;
+
+    //for fragment too
+    private long mainSleepStart, mainSleepEnd, napSleepStart, napSleepEnd;
+    private long sleepOnset, workOnset, workOffset;
+    private long lastSleepUpdate, lastDataUpdate;
 
     @SuppressLint("NonConstantResourceId")
     @Override
     protected void onCreate(Bundle saveInstanceState) {
-        super.onCreate(saveInstanceState);
-
-        setContentView(R.layout.activity_main);
 
         context = getApplicationContext();
         HealthConnectManager healthConnectManager = new HealthConnectManager(getApplicationContext());
@@ -95,25 +92,28 @@ public class MainActivity extends AppCompatActivity {
         }
 
         //get the shared preferences variable
-        SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPref.edit();
+        sharedPref = getPreferences(Context.MODE_PRIVATE);
+        editor = sharedPref.edit();
         long twoWeeks = (1000*60*60*24*14);
         long fiveMinutesToMil = (1000*60*50);
 
         //update variables
-        long lastSleepUpdate = sharedPref.getLong("lastSleepUpdate", System.currentTimeMillis() - twoWeeks);
-        long lastDataUpdate = sharedPref.getLong("lastUpdate", System.currentTimeMillis() - twoWeeks);
+        lastSleepUpdate = sharedPref.getLong("lastSleepUpdate", System.currentTimeMillis() - twoWeeks);
+        lastDataUpdate = sharedPref.getLong("lastUpdate", System.currentTimeMillis() - twoWeeks);
 
         //user sleep variables
-        long sleepOnset = sharedPref.getLong("sleepOnset", System.currentTimeMillis());
-        long workOnset = sharedPref.getLong("workOnset", System.currentTimeMillis());
-        long workOffset = sharedPref.getLong("workOffset", System.currentTimeMillis());
+        sleepOnset = sharedPref.getLong("sleepOnset", System.currentTimeMillis());
+        workOnset = sharedPref.getLong("workOnset", System.currentTimeMillis());
+        workOffset = sharedPref.getLong("workOffset", System.currentTimeMillis());
 
         //sleep result variables
-        long mainSleepStart = sharedPref.getLong("lastUpdate", System.currentTimeMillis() - twoWeeks);
-        long mainSleepEnd = sharedPref.getLong("mainSleepEnd", System.currentTimeMillis() - twoWeeks);
-        long napSleepStart = sharedPref.getLong("napSleepStart", System.currentTimeMillis() - twoWeeks);
-        long napSleepEnd = sharedPref.getLong("napSleepEnd", System.currentTimeMillis() - twoWeeks);
+        mainSleepStart = sharedPref.getLong("mainSleepStart", System.currentTimeMillis() - twoWeeks);
+        mainSleepEnd = sharedPref.getLong("mainSleepEnd", System.currentTimeMillis() - twoWeeks);
+        napSleepStart = sharedPref.getLong("napSleepStart", System.currentTimeMillis() - twoWeeks);
+        napSleepEnd = sharedPref.getLong("napSleepEnd", System.currentTimeMillis() - twoWeeks);
+
+        Log.v("napSleepStart not this", String.valueOf(napSleepStart));
+        Log.v("napSleepStart this", String.valueOf(this.napSleepStart));
 
         Instant now = Instant.now();
         Instant ILastSleepUpdate = Instant.ofEpochMilli(lastSleepUpdate);
@@ -209,6 +209,9 @@ public class MainActivity extends AppCompatActivity {
 
         //do another simulation for the updated data
 
+        super.onCreate(saveInstanceState);
+        setContentView(R.layout.activity_main);
+
         bottomNavigationView = findViewById(R.id.bottomNavigationView);
         getSupportFragmentManager().beginTransaction().replace(R.id.mainFrame, homeFragment).commit();
         getSupportActionBar().setTitle(Html.fromHtml("<font color='#223047'>SleepWake</font>"));
@@ -282,6 +285,89 @@ public class MainActivity extends AppCompatActivity {
                 // app.
             }
         });
+
+
+    public long getMainSleepStart() {
+        return mainSleepStart;
+    }
+
+    public void setMainSleepStart(long mainSleepStart) {
+        this.mainSleepStart = mainSleepStart;
+        editor.putLong("mainSleepStart", mainSleepStart);
+        editor.apply();
+    }
+
+    public long getMainSleepEnd() {
+        return mainSleepEnd;
+    }
+
+    public void setMainSleepEnd(long mainSleepEnd) {
+        this.mainSleepEnd = mainSleepEnd;
+        editor.putLong("mainSleepEnd", mainSleepEnd);
+        editor.apply();
+    }
+
+    public long getNapSleepStart() {
+        Log.v("function nap sleep start", String.valueOf(napSleepStart));
+        return napSleepStart;
+    }
+
+    public void setNapSleepStart(long napSleepStart) {
+        this.napSleepStart = napSleepStart;
+        editor.putLong("napSleepStart", napSleepStart);
+        editor.apply();
+    }
+
+    public long getNapSleepEnd() {
+        return napSleepEnd;
+    }
+
+    public void setNapSleepEnd(long napSleepEnd) {
+        this.napSleepEnd = napSleepEnd;
+        editor.putLong("napSleepEnd", napSleepEnd);
+        editor.apply();
+    }
+
+    public long getSleepOnset() {
+        return sleepOnset;
+    }
+
+    public void setSleepOnset(long napSleepEnd) {
+        this.sleepOnset = sleepOnset;
+        editor.putLong("sleepOnset", sleepOnset);
+        editor.apply();
+    }
+
+    public long getWorkOnset(){
+        return workOnset;
+    }
+
+    public void setWorkOnset(long workOnset){
+        this.workOnset = workOnset;
+        editor.putLong("workOnset", workOnset);
+        editor.apply();
+    }
+
+    public long getWorkOffset() {
+        return workOffset;
+    }
+
+    public void setWorkOffset(long workOffset) {
+        this.workOffset = workOffset;
+        editor.putLong("workOffset", workOffset);
+        editor.apply();
+    }
+
+    public long getLastSleepUpdate() {
+        return lastSleepUpdate;
+    }
+
+    public void setLastSleepUpdate(long lastSleepUpdate) {
+        this.lastSleepUpdate = lastSleepUpdate;
+        editor.putLong("lastSleepUpdate", lastSleepUpdate);
+        editor.apply();
+    }
+
 }
 
 //        long sleepOnset = AppDatabase.sleepOnset;
