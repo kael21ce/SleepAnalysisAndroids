@@ -130,7 +130,7 @@ class HealthConnectManager(private val context: Context) {
                 val midnight = sleepEndDay.toLong() * (1000*60*60*24)
                 val additionalSleep = Sleep()
                 additionalSleep.sleepStart = sleepStart
-                additionalSleep.sleepEnd = midnight
+                additionalSleep.sleepEnd = midnight-1
                 sleepList.add(additionalSleep)
                 sleepStart = midnight
             }

@@ -23,7 +23,6 @@ public class HomeFragment extends Fragment {
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_home, container, false);
         MainActivity mainActivity = (MainActivity)getActivity();
-        Log.v("Created home", "HOMMMEE");
 
         TextView startTime = (TextView) v.findViewById(R.id.StartTimeHome);
         TextView endTime = (TextView) v.findViewById(R.id.EndTimeHome);

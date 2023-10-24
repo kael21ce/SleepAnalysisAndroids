@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,12 +36,25 @@ public class IntervalFragment extends Fragment {
         intervalRecyclerView.setLayoutManager(layoutManager);
         IntervalAdapter intervalAdapter = new IntervalAdapter();
 
+        //get the bundle arguments
+        Bundle bundle = this.getArguments();
+        if(bundle == null){
+            Log.v("bundle", "bundle failed to be fetched");
+        }
+
         //Add time interval to intervalRecyclerView (info about interval is get from ScheduleFragment!)
+        int count = bundle.getInt("count");
+        for(int i = 0; i < count; i ++){
+            long sleepStart = bundle.getLong("sleepStart"+i);
+            long sleepEnd = bundle.getLong("sleepEnd"+i);
+            long duration = (sleepEnd - sleepStart)/1000;
+            intervalAdapter.addItem(new Interval(String.valueOf(duration), 2));
+        }
         //Just example
-        intervalAdapter.addItem(new Interval("1시간 0분", 2));
-        intervalAdapter.addItem(new Interval("5시간 0분", 3));
-        intervalAdapter.addItem(new Interval("8시간 58분", 2));
-        intervalAdapter.addItem(new Interval("0시간 15분", 1));
+//        intervalAdapter.addItem(new Interval("1시간 0분", 2));
+//        intervalAdapter.addItem(new Interval("5시간 0분", 3));
+//        intervalAdapter.addItem(new Interval("8시간 58분", 2));
+//        intervalAdapter.addItem(new Interval("0시간 15분", 1));
         //
         intervalRecyclerView.setAdapter(intervalAdapter);
 
