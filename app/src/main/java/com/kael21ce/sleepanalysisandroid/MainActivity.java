@@ -57,6 +57,11 @@ public class MainActivity extends AppCompatActivity {
     private long sleepOnset, workOnset, workOffset;
     private long lastSleepUpdate, lastDataUpdate;
 
+    private List<Sleep> sleeps;
+    private List<V0> v0s;
+    SleepDao sleepDao;
+    V0Dao v0Dao;
+
     @SuppressLint("NonConstantResourceId")
     @Override
     protected void onCreate(Bundle saveInstanceState) {
@@ -133,10 +138,10 @@ public class MainActivity extends AppCompatActivity {
         AppDatabase db = Room.databaseBuilder(getApplicationContext(),
                 AppDatabase.class, "sleep_wake").allowMainThreadQueries().build();
 
-        SleepDao sleepDao = db.sleepDao();
+        sleepDao = db.sleepDao();
 
         //get sleep data
-        List<Sleep> sleeps = sleepDao.getAll();
+        sleeps = sleepDao.getAll();
         boolean check = false;
         for(Sleep sleep: sleeps){
             String sleepStart = sdfDateTime.format(new Date(sleep.sleepStart));
@@ -153,8 +158,8 @@ public class MainActivity extends AppCompatActivity {
         }
 
         //get V0 data
-        V0Dao v0Dao = db.v0Dao();
-        List<V0> v0s = v0Dao.getAll();
+        v0Dao = db.v0Dao();
+        v0s = v0Dao.getAll();
 
         //do pcr simulation
         long yesterday = System.currentTimeMillis() - (1000*60*60*24);
@@ -198,7 +203,7 @@ public class MainActivity extends AppCompatActivity {
         v0Dao.insertAll(newV0);
 
         //process sleep prediction
-        int[] sleepSuggestion = sleepModel.Sleep_pattern_suggestion(initV0, (int)sleepOnset, (int)workOnset, (int)workOffset, 5/60.0);
+        int[] sleepSuggestion = sleepModel.Sleep_pattern_suggestion(initV0, (int)sleepOnset/1000, (int)workOnset/1000, (int)workOffset/1000, 5/60.0);
 
         //update shared preferences
         editor.putLong("mainSleepStart", sleepSuggestion[0]);
@@ -286,6 +291,54 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+    public boolean isOverlap(List<Sleep> sleeps, Sleep sleepX, int sleepEx){
+        for(Sleep sleep: sleeps){
+            if(sleepEx == sleep.sleep_id){
+                continue;
+            }
+            if(!(sleepX.sleepEnd < sleep.sleepStart || sleepX.sleepStart > sleep.sleepEnd)){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public List<Sleep> getSleeps(){
+        return sleeps;
+    }
+
+    public boolean addSleep(Sleep sleep){
+        //check if the sleep is already there
+        boolean isOverlap = isOverlap(sleeps, sleep, -1);
+        if(!isOverlap) {
+            this.sleeps.add(sleep);
+            List<Sleep> listSleep = new ArrayList<>();
+            listSleep.add(sleep);
+            this.sleepDao.insertAll(listSleep);
+            return true;
+        }else{
+            return false;
+        }
+
+    }
+
+    public boolean editSleep(Sleep prevSleep, Sleep updatedSleep){
+
+        for(Sleep sleep: this.sleeps){
+            if(sleep.sleepStart == prevSleep.sleepStart && sleep.sleepEnd == prevSleep.sleepEnd){
+                int sleepId = sleep.sleep_id;
+                if(!isOverlap(this.sleeps, updatedSleep, sleepId)) {
+                    updatedSleep.sleep_id = sleepId;
+                    this.sleeps.set(sleepId, updatedSleep);
+                    sleepDao.updateSleep(sleepId, updatedSleep.sleepStart, updatedSleep.sleepEnd);
+                    return true;
+                }else{
+                    return false;
+                }
+            }
+        }
+        return false;
+    }
 
     public long getMainSleepStart() {
         return mainSleepStart;

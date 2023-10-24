@@ -17,12 +17,13 @@ import java.util.Date;
 import java.util.Locale;
 
 public class HomeFragment extends Fragment {
-    SimpleDateFormat sdfDateTime = new SimpleDateFormat("dd/MM/yyyy"+ "HH:mm", Locale.KOREA);
+    SimpleDateFormat sdfDateTime = new SimpleDateFormat( "hh:mm a", Locale.KOREA);
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_home, container, false);
         MainActivity mainActivity = (MainActivity)getActivity();
+        Log.v("Created home", "HOMMMEE");
 
         TextView startTime = (TextView) v.findViewById(R.id.StartTimeHome);
         TextView endTime = (TextView) v.findViewById(R.id.EndTimeHome);

@@ -34,12 +34,10 @@ import java.io.IOException
 import java.text.SimpleDateFormat
 import java.time.Instant
 import java.time.ZonedDateTime
-import java.time.temporal.ChronoField
 import java.util.Date
 import java.util.Locale
 import java.util.concurrent.CompletableFuture
 import kotlin.random.Random
-import kotlin.time.Duration.Companion.milliseconds
 
 // The minimum android level that can use Health Connect
 const val MIN_SUPPORTED_SDK = Build.VERSION_CODES.O_MR1
@@ -116,13 +114,26 @@ class HealthConnectManager(private val context: Context) {
                 recordType = SleepSessionRecord::class,
                 timeRangeFilter = TimeRangeFilter.between(start, end)
         )
+        val sdfDateTime = SimpleDateFormat("HH:mm", Locale.KOREA)
+
         val response = healthConnectClient.readRecords(request)
         val db = Room.databaseBuilder(context, AppDatabase::class.java, "sleep_wake").build()
         val userDao = db.sleepDao()
         val sleepList = mutableListOf<Sleep>()
         for(sleepRecord in response.records){
-            val sleepStart = Date.from(sleepRecord.startTime).time
-            val sleepEnd = Date.from(sleepRecord.endTime).time
+            var sleepStart = Date.from(sleepRecord.startTime).time/1000
+            val sleepEnd = Date.from(sleepRecord.endTime).time/1000
+            //check whether we need to divide the sleep to two
+            val sleepStartDay = (sleepStart/(1000*60*60*24)).toInt()
+            val sleepEndDay = (sleepEnd/(1000*60*60*24)).toInt()
+            if(sleepStartDay != sleepEndDay){
+                val midnight = sleepEndDay.toLong() * (1000*60*60*24)
+                val additionalSleep = Sleep()
+                additionalSleep.sleepStart = sleepStart
+                additionalSleep.sleepEnd = midnight
+                sleepList.add(additionalSleep)
+                sleepStart = midnight
+            }
             //save everything in the database
             val sleep = Sleep()
             sleep.sleepStart = sleepStart
