@@ -17,9 +17,7 @@ import android.widget.ImageButton;
 public class ScheduleFragment extends Fragment {
 
     public CalendarView calendarView;
-    public ImageButton plusButton;
     public Fragment intervalFragment;
-    public Fragment addIntervalFragment;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -32,10 +30,8 @@ public class ScheduleFragment extends Fragment {
         calendarView = v.findViewById(R.id.CalendarView);
         getChildFragmentManager().beginTransaction().replace(R.id.IntervalFrame, intervalFragment).commit();
 
-        //Add sleep interval to specific date
+        //Load sleep intervals and send to IntervalFragment
         calendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
-            //Set Fragment
-
             @Override
             public void onSelectedDayChange(@NonNull CalendarView calendarView, int year, int month, int dayOfMonth) {
                 //Load save data for specific time
