@@ -57,6 +57,7 @@ public class MainActivity extends AppCompatActivity {
     private long sleepOnset, workOnset, workOffset;
     private long lastSleepUpdate, lastDataUpdate;
 
+    AppDatabase db;
     private List<Sleep> sleeps;
     private List<V0> v0s;
     SleepDao sleepDao;
@@ -124,18 +125,20 @@ public class MainActivity extends AppCompatActivity {
         Instant ILastSleepUpdate = Instant.ofEpochMilli(lastSleepUpdate);
 
         //sync health connect data
-        Future<Boolean> healthSyncDone = healthConnectManager.javReadSleepInputs(ILastSleepUpdate, now);
-        try {
-            Boolean result = healthSyncDone.get();
-            Log.v("DONE", result.toString());
-        } catch (ExecutionException e) {
-            throw new RuntimeException(e);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+        healthConnectManager.javReadSleepInputs(ILastSleepUpdate, now);
+//        try {
+//            Boolean result = healthSyncDone.get();
+//            Log.v("DONE", result.toString());
+//        } catch (ExecutionException e) {
+//            throw new RuntimeException(e);
+//        } catch (InterruptedException e) {
+//            throw new RuntimeException(e);
+//        }
+
+        Log.v("CONTINUE", "CONTINUE");
 
         //database configuration
-        AppDatabase db = Room.databaseBuilder(getApplicationContext(),
+        db = Room.databaseBuilder(getApplicationContext(),
                 AppDatabase.class, "sleep_wake").allowMainThreadQueries().build();
 
         sleepDao = db.sleepDao();
@@ -146,6 +149,8 @@ public class MainActivity extends AppCompatActivity {
         for(Sleep sleep: sleeps){
             String sleepStart = sdfDateTime.format(new Date(sleep.sleepStart));
             String sleepEnd = sdfDateTime.format(new Date(sleep.sleepEnd));
+            Log.v("SLEEP REAL", sleepStart);
+            Log.v("SLEEP REAL", sleepEnd);
             if(ILastSleepUpdate.isBefore(Instant.ofEpochMilli(sleep.sleepStart))){
                 check = true;
             }
@@ -186,6 +191,7 @@ public class MainActivity extends AppCompatActivity {
 
         //update V0 from the simulation
         List<V0> newV0 = new ArrayList<>();
+        Log.v("SIZE", String.valueOf(simulationResult.size()));
         for(int i = 0; i < simulationResult.size(); i ++){
             double[] res = simulationResult.get(i);
             V0 v0 = new V0();
@@ -252,6 +258,12 @@ public class MainActivity extends AppCompatActivity {
                 }
         );
     }
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
+        db.close();
+    }
+
     public static Context getAppContext() {
         return MainActivity.context;
     }
@@ -266,10 +278,14 @@ public class MainActivity extends AppCompatActivity {
         for(Sleep sleep: sleeps){
             long tempSleepStart = sleep.sleepStart / fiveMinutesToMil;
             long tempSleepEnd = sleep.sleepEnd / fiveMinutesToMil;
-            int idx = (int)(tempSleepStart - sleepStart);
-            int offset = (int)(tempSleepEnd - sleepStart);
-            for(int i = idx; i <= offset; i ++){
-                sleepPattern[i] = 1.0;
+            if(sleepStart/fiveMinutesToMil < tempSleepStart) {
+                int idx = (int) (tempSleepStart - sleepStart / fiveMinutesToMil);
+                int offset = (int) (tempSleepEnd - sleepStart / fiveMinutesToMil);
+                Log.v("index", String.valueOf(idx));
+                Log.v("offset", String.valueOf(offset));
+                for (int i = idx; i <= offset; i++) {
+                    sleepPattern[i] = 1.0;
+                }
             }
         }
         return sleepPattern;

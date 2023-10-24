@@ -5,6 +5,7 @@ import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,8 +39,15 @@ public class AddIntervalFragment extends Fragment {
         endDateButton = v.findViewById(R.id.endDateButton);
         endTimeButton = v.findViewById(R.id.endTimeButton);
 
+
         //Return to IntervalFragment if backButton is clicked
         intervalFragment = new IntervalFragment();
+        //get bundle and give it back
+        Bundle bundle = this.getArguments();
+        if(bundle == null){
+            Log.v("bundle", "bundle failed to be fetched");
+        }
+        intervalFragment.setArguments(bundle);
         backButton = v.findViewById(R.id.backButton);
         backButton.setOnClickListener(view -> getParentFragmentManager().beginTransaction().replace(R.id.IntervalFrame, intervalFragment).commit());
 

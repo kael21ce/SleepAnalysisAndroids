@@ -48,6 +48,8 @@ public class IntervalFragment extends Fragment {
             long sleepStart = bundle.getLong("sleepStart"+i);
             long sleepEnd = bundle.getLong("sleepEnd"+i);
             long duration = (sleepEnd - sleepStart)/1000;
+            Log.v("DURATION", String.valueOf(sleepStart));
+            Log.v("DURAIONT2", String.valueOf(sleepEnd));
             intervalAdapter.addItem(new Interval(String.valueOf(duration), 2));
         }
         //Just example
@@ -55,14 +57,15 @@ public class IntervalFragment extends Fragment {
 //        intervalAdapter.addItem(new Interval("5시간 0분", 3));
 //        intervalAdapter.addItem(new Interval("8시간 58분", 2));
 //        intervalAdapter.addItem(new Interval("0시간 15분", 1));
-        //
         intervalRecyclerView.setAdapter(intervalAdapter);
 
         //Add sleep interval if plus button is clicked
         addIntervalFragment = new AddIntervalFragment();
+        addIntervalFragment.setArguments(bundle);
         intervalPlusButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
                 getParentFragmentManager().beginTransaction().replace(R.id.IntervalFrame, addIntervalFragment).commit();
             }
         });
