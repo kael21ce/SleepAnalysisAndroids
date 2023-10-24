@@ -6,9 +6,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.Html;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -46,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
     ScheduleFragment scheduleFragment = new ScheduleFragment();
     RecommendFragment recommendFragment = new RecommendFragment();
     SettingFragment settingFragment = new SettingFragment();
+    private RelativeLayout loadingScreenLayout;
     SimpleDateFormat sdfDateTime = new SimpleDateFormat("dd/MM/yyyy"+ "HH:mm", Locale.KOREA);
     //health connect
     private static Context context;
@@ -67,11 +72,14 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle saveInstanceState) {
 
+        super.onCreate(saveInstanceState);
+        setContentView(R.layout.activity_main);
+
         context = getApplicationContext();
         HealthConnectManager healthConnectManager = new HealthConnectManager(getApplicationContext());
-
         MutableState
                 <HealthConnectAvailability> availability = healthConnectManager.getAvailability();
+        loadingScreenLayout = findViewById(R.id.loadingScreenLayout);
         boolean hasPermissions = true;
 
         //get the availability of health connect and make sure that the build version is 34 to check for permissions
@@ -118,25 +126,24 @@ public class MainActivity extends AppCompatActivity {
         napSleepStart = sharedPref.getLong("napSleepStart", System.currentTimeMillis() - twoWeeks);
         napSleepEnd = sharedPref.getLong("napSleepEnd", System.currentTimeMillis() - twoWeeks);
 
-        Log.v("napSleepStart not this", String.valueOf(napSleepStart));
-        Log.v("napSleepStart this", String.valueOf(this.napSleepStart));
-
         Instant now = Instant.now();
         Instant ILastSleepUpdate = Instant.ofEpochMilli(lastSleepUpdate);
 
         //sync health connect data
         healthConnectManager.javReadSleepInputs(ILastSleepUpdate, now);
-//        try {
-//            Boolean result = healthSyncDone.get();
-//            Log.v("DONE", result.toString());
-//        } catch (ExecutionException e) {
-//            throw new RuntimeException(e);
-//        } catch (InterruptedException e) {
-//            throw new RuntimeException(e);
-//        }
+        //I cannot get await function for this global future, so we will sleep the main thread by 2 second
+        //which is plenty for 14 days worth of sleep data
 
-        Log.v("CONTINUE", "CONTINUE");
+        Log.v("PAUSING", "PAUSING");
+        try {
+            Thread.sleep(2000);
+            // call some methods here
 
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        Log.v("FINISHED", "FINISHED PAUSING");
+        
         //database configuration
         db = Room.databaseBuilder(getApplicationContext(),
                 AppDatabase.class, "sleep_wake").allowMainThreadQueries().build();
@@ -220,9 +227,6 @@ public class MainActivity extends AppCompatActivity {
 
         //do another simulation for the updated data
 
-        super.onCreate(saveInstanceState);
-        setContentView(R.layout.activity_main);
-
         bottomNavigationView = findViewById(R.id.bottomNavigationView);
         getSupportFragmentManager().beginTransaction().replace(R.id.mainFrame, homeFragment).commit();
         getSupportActionBar().setTitle(Html.fromHtml("<font color='#223047'>SleepWake</font>"));
@@ -262,6 +266,13 @@ public class MainActivity extends AppCompatActivity {
     public void onDestroy(){
         super.onDestroy();
         db.close();
+    }
+
+    private void showLoadingScreen() {
+        loadingScreenLayout.setVisibility(View.VISIBLE);
+    }
+    private void hideLoadingScreen(){
+        loadingScreenLayout.setVisibility(View.GONE);
     }
 
     public static Context getAppContext() {
