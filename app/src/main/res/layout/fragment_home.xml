@@ -173,7 +173,7 @@
                         android:text="각성도가 낮아요!\n이 시간엔 꼭 주무세요"
                         android:textAlignment="center"
                         android:textColor="@color/black"
-                        android:textSize="20dp" />
+                        android:textSize="20sp" />
                 </LinearLayout>
 
             </LinearLayout>
