@@ -65,11 +65,6 @@ public class SplashActivity extends AppCompatActivity {
 
         healthConnectManager.javReadSleepInputs(ILastSleepUpdate, now);
 
-        //sync health connect data
-        //I cannot get await function for this global future, so we will sleep the main thread by 5 second
-        //which is plenty for 14 days worth of sleep data
-        healthConnectManager.javReadSleepInputs(ILastSleepUpdate, now);
-
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             @Override
