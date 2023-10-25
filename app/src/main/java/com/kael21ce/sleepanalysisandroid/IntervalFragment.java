@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 
 public class IntervalFragment extends Fragment {
@@ -19,6 +20,8 @@ public class IntervalFragment extends Fragment {
     public ImageButton intervalPlusButton;
     public AddIntervalFragment addIntervalFragment;
     public RecyclerView intervalRecyclerView;
+    public TextView AlertnessHighTimeText;
+    public TextView AlertnessLowTimeText;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -41,6 +44,12 @@ public class IntervalFragment extends Fragment {
         if(bundle == null){
             Log.v("bundle", "bundle failed to be fetched");
         }
+
+        //update the awareness
+        AlertnessHighTimeText = v.findViewById(R.id.AlertnessHighTimeText);
+        AlertnessLowTimeText = v.findViewById(R.id.AlertnessLowTimeText);
+        AlertnessHighTimeText.setText(String.valueOf(bundle.getLong("goodDuration")));
+        AlertnessLowTimeText.setText(String.valueOf(bundle.getLong("badDuration")));
 
         //Add time interval to intervalRecyclerView (info about interval is get from ScheduleFragment!)
         int count = bundle.getInt("count");

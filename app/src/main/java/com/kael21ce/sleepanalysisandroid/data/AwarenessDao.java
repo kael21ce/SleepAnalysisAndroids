@@ -16,7 +16,7 @@ public interface AwarenessDao {
     List<Awareness> loadAllByIds(int[] userIds);
 
     @Query("SELECT * FROM awareness WHERE awarenessDay = :awarenessDay")
-    Awareness findByDay(Long awarenessDay);
+    Awareness findByDay(long awarenessDay);
 
     @Query("UPDATE awareness SET good_duration = :goodDuration AND bad_duration = :badDuration "+
             "WHERE awarenessDay = :awarenessDay")

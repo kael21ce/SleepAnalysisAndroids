@@ -137,6 +137,7 @@ public class ScheduleFragment extends Fragment {
                 long badDuration = 0;
                 for(Awareness awareness: awarenesses){
                     if(awareness.awarenessDay == selectedDay){
+                        Log.v("SELECTED", "SELECTED");
                         goodDuration = awareness.goodDuration;
                         badDuration = awareness.badDuration;
                         break;

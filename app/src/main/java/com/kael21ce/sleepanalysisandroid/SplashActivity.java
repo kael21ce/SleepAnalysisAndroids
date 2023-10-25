@@ -55,11 +55,11 @@ public class SplashActivity extends AppCompatActivity {
             requestPermissionLauncher.launch(HealthConnectManagerKt.getJAVPERMISSIONS());
         }
 
-        SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences sharedPref = getSharedPreferences("SleepWake", Context.MODE_PRIVATE);
         long twoWeeks = (1000*60*60*24*14);
 
         long lastSleepUpdate = sharedPref.getLong("lastSleepUpdate", System.currentTimeMillis() - twoWeeks);
-
+        Log.v("LAST SLEEP UPDATE", String.valueOf(lastSleepUpdate));
         Instant now = Instant.now();
         Instant ILastSleepUpdate = Instant.ofEpochMilli(lastSleepUpdate);
 

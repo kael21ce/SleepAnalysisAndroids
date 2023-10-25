@@ -34,6 +34,7 @@ import com.kael21ce.sleepanalysisandroid.data.SleepModel;
 import com.kael21ce.sleepanalysisandroid.data.V0;
 import com.kael21ce.sleepanalysisandroid.data.V0Dao;
 
+import java.sql.Array;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -86,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
         healthConnectManager = new HealthConnectManager(getApplicationContext());
 
         //get the shared preferences variable
-        sharedPref = getPreferences(Context.MODE_PRIVATE);
+        sharedPref = getSharedPreferences("SleepWake", Context.MODE_PRIVATE);
         editor = sharedPref.edit();
         long twoWeeks = (1000*60*60*24*14);
         long fiveMinutesToMil = (1000*60*50);
@@ -126,6 +127,8 @@ public class MainActivity extends AppCompatActivity {
                 check = true;
             }
         }
+        Log.v("CHECK", String.valueOf(check));
+        Log.v("LAST SLEEP UPDATE", String.valueOf(lastSleepUpdate));
         Log.v("SLEEP DATA", "GOT SLEEP DATA");
         if(check){
             //edit lastSleepUpdate to match current time
@@ -146,7 +149,7 @@ public class MainActivity extends AppCompatActivity {
         double[] initV0 = {-0.8590, -0.6837, 0.1140, 14.2133};
         //get init V0
         for(V0 v0: v0s){
-            Log.v("V0", "H: "+ v0.H_val + ", n: " + v0.n_val + ", y: "+v0.y_val + ", x: " + v0.x_val);
+//            Log.v("V0", "H: "+ v0.H_val + ", n: " + v0.n_val + ", y: "+v0.y_val + ", x: " + v0.x_val);
             if(v0.time >= startProcess){
                 if(!gotInitV0 && v0.time <= startProcess + (1000*60*6)){
                     initV0 = new double[]{v0.y_val, v0.x_val, v0.n_val, v0.H_val};
@@ -161,18 +164,20 @@ public class MainActivity extends AppCompatActivity {
         if(!gotInitV0 && sleeps.size() > 0){
             Sleep firstSleep = sleeps.get(0);
             long firstSleepDayStart = firstSleep.sleepStart / (1000*60*60*24);
-            long firstSleepNoon = firstSleepDayStart + (1000*60*60*12);
+            long firstSleepNoon = (firstSleepDayStart*(1000*60*60*24)) + (1000*60*60*12);
             if(firstSleep.sleepStart > firstSleepNoon){
                 startProcess = firstSleepNoon;
                 initV0=new double[]{0.8958, 0.5219, 0.5792, 12.4225};
             }else{
-                startProcess = firstSleepDayStart;
+                startProcess = firstSleepDayStart * (1000*60*60*24);
             }
         }
+        Log.v("START PROCESS", sdfDateTime.format(new Date(startProcess)));
 
         //get the sleep model & simulation result
         SleepModel sleepModel = new SleepModel();
         double[] sleepPattern = sleepToArray(startProcess, endProcess, sleeps);
+        Log.v("SLEEP SIZE", String.valueOf(sleepPattern.length));
         ArrayList<double[]> simulationResult = sleepModel.pcr_simulation(initV0, sleepPattern, 5/60.0);
 
         //update V0 from the simulation
@@ -196,7 +201,7 @@ public class MainActivity extends AppCompatActivity {
 
         //process sleep prediction
         int[] sleepSuggestion = sleepModel.Sleep_pattern_suggestion(initV0, (int)sleepOnset/1000, (int)workOnset/1000, (int)workOffset/1000, 5/60.0);
-
+        Log.v("SLEEP SUGGESTION", String.valueOf(sleepSuggestion[0]));
         //update shared preferences
         editor.putLong("mainSleepStart", sleepSuggestion[0]);
         editor.putLong("mainSleepEnd", sleepSuggestion[1]);
@@ -215,7 +220,21 @@ public class MainActivity extends AppCompatActivity {
                 long v0StartDay = v0.time/oneDayToMils;
                 double awareness = getAwarenessValue(v0.H_val, v0.n_val, v0.y_val, v0.x_val);
                 if(startDay != v0StartDay){
-                    awarenessDao.updateAwareness(startDay, goodDuration, badDuration);
+                    //if it is not in database, add, if yes, update
+                    Awareness awarenessDb = awarenessDao.findByDay(startDay);
+                    Awareness addAwareness = new Awareness();
+                    addAwareness.awarenessDay = startDay;
+                    addAwareness.goodDuration = goodDuration;
+                    addAwareness.badDuration = badDuration;
+                    if(awarenessDb == null){
+                        //insert
+                        List<Awareness> awarenessList = new ArrayList<>();
+                        awarenessList.add(addAwareness);
+                        awarenessDao.insertAll(awarenessList);
+                    }else {
+                        awarenessDao.updateAwareness(startDay, goodDuration, badDuration);
+                    }
+                    Log.v("AWARENESS", String.valueOf(startDay)+' '+ goodDuration + ' ' + badDuration);
 
                     goodDuration = 0;
                     badDuration = 0;
@@ -286,7 +305,7 @@ public class MainActivity extends AppCompatActivity {
     //convert sleep from long value to integers array value
     public static double[] sleepToArray(Long sleepStart, Long sleepEnd, List<Sleep> sleeps){
         //for every 1000*60*5 we add a value to the array list
-        long fiveMinutesToMil = 1000*60*50;
+        long fiveMinutesToMil = 1000*60*5;
         int duration = (int)((sleepEnd - sleepStart)/fiveMinutesToMil);
         double[] sleepPattern = new double[duration + 5];
         Arrays.fill(sleepPattern, 0);
