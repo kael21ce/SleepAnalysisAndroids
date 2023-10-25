@@ -12,18 +12,18 @@ public class V0 {
     public int v0_id;
 
     @ColumnInfo(name = "y_val")
-    public Double y_val;
+    public double y_val;
 
     @ColumnInfo(name = "x_val")
-    public Double x_val;
+    public double x_val;
 
     @ColumnInfo(name = "n_val")
-    public Double n_val;
+    public double n_val;
 
     @ColumnInfo(name = "H_val")
-    public Double H_val;
+    public double H_val;
 
     @ColumnInfo(name = "time")
-    public Long time;
+    public long time;
 
 }

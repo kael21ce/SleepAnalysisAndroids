@@ -9,7 +9,7 @@ import java.util.List;
 
 @Dao
 public interface SleepDao {
-    @Query("SELECT * FROM sleep")
+    @Query("SELECT * FROM sleep ORDER BY sleep_start ASC")
     List<Sleep> getAll();
 
     @Query("SELECT * FROM sleep WHERE sleep_id IN (:userIds)")

@@ -15,6 +15,7 @@ import android.widget.CalendarView;
 import android.widget.ImageButton;
 
 import com.kael21ce.sleepanalysisandroid.data.Sleep;
+import com.kael21ce.sleepanalysisandroid.data.Awareness;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -62,9 +63,26 @@ public class ScheduleFragment extends Fragment {
             }
         }
 
-        Bundle bundle = new Bundle();
         //get today's day
         long todayDate = System.currentTimeMillis()/oneDayToMils;
+
+        //get awareness
+        List<Awareness> awarenesses = mainActivity.getAwarenesses();
+        long goodDuration = 0;
+        long badDuration = 0;
+        for(Awareness awareness: awarenesses){
+            if(awareness.awarenessDay == todayDate){
+                goodDuration = awareness.goodDuration;
+                badDuration = awareness.badDuration;
+                break;
+            }
+        }
+
+        Bundle bundle = new Bundle();
+        //put awareness
+        bundle.putLong("goodDuration", goodDuration);
+        bundle.putLong("badDuration", badDuration);
+
         List<Sleep> initSleepData = sleepsData.get(todayDate);
         if(initSleepData == null){
             initSleepData = new ArrayList<>();
@@ -108,11 +126,28 @@ public class ScheduleFragment extends Fragment {
                 } catch (ParseException e) {
                     throw new RuntimeException(e);
                 }
+                assert date != null;
                 long dayInMillis = date.getTime();
                 long selectedDay = dayInMillis / oneDayToMils;
                 Log.v("day", String.valueOf(selectedDay));
 
+                //get awareness
+                List<Awareness> awarenesses = mainActivity.getAwarenesses();
+                long goodDuration = 0;
+                long badDuration = 0;
+                for(Awareness awareness: awarenesses){
+                    if(awareness.awarenessDay == selectedDay){
+                        goodDuration = awareness.goodDuration;
+                        badDuration = awareness.badDuration;
+                        break;
+                    }
+                }
+
                 Bundle bundle = new Bundle();
+                //put awareness
+                bundle.putLong("goodDuration", goodDuration);
+                bundle.putLong("badDuration", badDuration);
+
                 List<Sleep> initSleepData = sleepsData.get(selectedDay);
                 if(initSleepData == null){
                     initSleepData = new ArrayList<>();

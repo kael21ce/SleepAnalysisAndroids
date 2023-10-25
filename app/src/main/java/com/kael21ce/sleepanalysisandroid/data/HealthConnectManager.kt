@@ -98,20 +98,27 @@ class HealthConnectManager(private val context: Context) {
     /**
      * TODO: Writes [WeightRecord] to Health Connect.
      */
-    suspend fun writeWeightInput(weightInput: Double) {
+    suspend fun writeSleepInput(sleepStartMilli: Long, sleepEndMilli: Long) {
+        val sleepStart = Instant.ofEpochMilli(sleepStartMilli)
+        val sleepEnd = Instant.ofEpochMilli(sleepEndMilli)
         val time = ZonedDateTime.now().withNano(0)
-        val weightRecord = WeightRecord(
-                weight = Mass.kilograms(weightInput),
-                time = time.toInstant(),
-                zoneOffset = time.offset
+        val sleepRecord = SleepSessionRecord(
+                startTime = sleepStart,
+                endTime = sleepEnd,
+                startZoneOffset = time.offset,
+                endZoneOffset = time.offset
         )
-        val records = listOf(weightRecord)
+        val records = listOf(sleepRecord)
         try {
             healthConnectClient.insertRecords(records)
             Toast.makeText(context, "Successfully insert records", Toast.LENGTH_SHORT).show()
         } catch (e: Exception) {
             Toast.makeText(context, e.message.toString(), Toast.LENGTH_SHORT).show()
         }
+    }
+
+    fun javWriteSleepInput(sleepStart: Long, sleepEnd: Long){
+        GlobalScope.future{writeSleepInput(sleepStart, sleepEnd)}
     }
 
     /**

@@ -9,7 +9,7 @@ import java.util.List;
 
 @Dao
 public interface V0Dao {
-    @Query("SELECT * FROM V0")
+    @Query("SELECT * FROM V0 ORDER BY time ASC")
     List<V0> getAll();
 
     @Insert

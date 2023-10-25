@@ -23,6 +23,8 @@ import androidx.room.Room;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.kael21ce.sleepanalysisandroid.data.AppDatabase;
+import com.kael21ce.sleepanalysisandroid.data.Awareness;
+import com.kael21ce.sleepanalysisandroid.data.AwarenessDao;
 import com.kael21ce.sleepanalysisandroid.data.HealthConnectAvailability;
 import com.kael21ce.sleepanalysisandroid.data.HealthConnectManager;
 import com.kael21ce.sleepanalysisandroid.data.HealthConnectManagerKt;
@@ -37,8 +39,10 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -54,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
     SettingFragment settingFragment = new SettingFragment();
     private RelativeLayout loadingScreenLayout;
     SimpleDateFormat sdfDateTime = new SimpleDateFormat("dd/MM/yyyy"+ "HH:mm", Locale.KOREA);
+    HealthConnectManager healthConnectManager;
     //health connect
     private static Context context;
     SharedPreferences sharedPref;
@@ -66,6 +71,7 @@ public class MainActivity extends AppCompatActivity {
 
     AppDatabase db;
     private List<Sleep> sleeps;
+    private List<Awareness> awarenesses;
     private List<V0> v0s;
     SleepDao sleepDao;
     V0Dao v0Dao;
@@ -76,6 +82,8 @@ public class MainActivity extends AppCompatActivity {
 
         super.onCreate(saveInstanceState);
         setContentView(R.layout.activity_main);
+
+        healthConnectManager = new HealthConnectManager(getApplicationContext());
 
         //get the shared preferences variable
         sharedPref = getPreferences(Context.MODE_PRIVATE);
@@ -101,35 +109,13 @@ public class MainActivity extends AppCompatActivity {
         Instant now = Instant.now();
         Instant ILastSleepUpdate = Instant.ofEpochMilli(lastSleepUpdate);
 
-        //sync health connect data
-        //I cannot get await function for this global future, so we will sleep the main thread by 5 second
-        //which is plenty for 14 days worth of sleep data
-        //database configuration
         db = Room.databaseBuilder(getApplicationContext(),
                 AppDatabase.class, "sleep_wake").allowMainThreadQueries().build();
 
         sleepDao = db.sleepDao();
 
         //get sleep data
-        //wait loop until we get the data (in 5 seconds)
         sleeps = sleepDao.getAll();
-//        int size = sleeps.size();
-//        int tempSize = -1;
-//        long curTime = System.currentTimeMillis();
-//        Log.v("SIZE", String.valueOf(size));
-//        Log.v("TEMP SIZE", String.valueOf(tempSize));
-//        while(size >= tempSize){
-//            Log.v("SIZE", String.valueOf(size));
-//            Log.v("TEMP SIZE", String.valueOf(tempSize));
-//            long updatedTime = System.currentTimeMillis();
-//            Log.v("TIME", String.valueOf(curTime));
-//            Log.v("Cur Time", String.valueOf(updatedTime));
-//            if(updatedTime-curTime > (1000*15)){
-//                break;
-//            }
-//            List<Sleep> checkSleep = sleepDao.getAll();
-//            tempSize = checkSleep.size();
-//        }
         boolean check = false;
         for(Sleep sleep: sleeps){
             String sleepStart = sdfDateTime.format(new Date(sleep.sleepStart));
@@ -160,6 +146,7 @@ public class MainActivity extends AppCompatActivity {
         double[] initV0 = {-0.8590, -0.6837, 0.1140, 14.2133};
         //get init V0
         for(V0 v0: v0s){
+            Log.v("V0", "H: "+ v0.H_val + ", n: " + v0.n_val + ", y: "+v0.y_val + ", x: " + v0.x_val);
             if(v0.time >= startProcess){
                 if(!gotInitV0 && v0.time <= startProcess + (1000*60*6)){
                     initV0 = new double[]{v0.y_val, v0.x_val, v0.n_val, v0.H_val};
@@ -168,6 +155,20 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         v0Dao.deleteRange(startProcess, endProcess);
+
+        //if we don't have the initV0, then something went wrong in the previous calculation
+        //or it is the first time we get sleep data, recalculate everything from the first sleep
+        if(!gotInitV0 && sleeps.size() > 0){
+            Sleep firstSleep = sleeps.get(0);
+            long firstSleepDayStart = firstSleep.sleepStart / (1000*60*60*24);
+            long firstSleepNoon = firstSleepDayStart + (1000*60*60*12);
+            if(firstSleep.sleepStart > firstSleepNoon){
+                startProcess = firstSleepNoon;
+                initV0=new double[]{0.8958, 0.5219, 0.5792, 12.4225};
+            }else{
+                startProcess = firstSleepDayStart;
+            }
+        }
 
         //get the sleep model & simulation result
         SleepModel sleepModel = new SleepModel();
@@ -203,7 +204,31 @@ public class MainActivity extends AppCompatActivity {
         editor.putLong("napSleepEnd", sleepSuggestion[3]);
         editor.apply();
 
-        //do another simulation for the updated data
+        //calculate the awareness
+        AwarenessDao awarenessDao = db.awarenessDao();
+        long oneDayToMils = 1000*60*60*24;
+        if(v0s.size() > 0){
+            long startDay = v0s.get(0).time/oneDayToMils;
+            long goodDuration = 0;
+            long badDuration = 0;
+            for(V0 v0: v0s){
+                long v0StartDay = v0.time/oneDayToMils;
+                double awareness = getAwarenessValue(v0.H_val, v0.n_val, v0.y_val, v0.x_val);
+                if(startDay != v0StartDay){
+                    awarenessDao.updateAwareness(startDay, goodDuration, badDuration);
+
+                    goodDuration = 0;
+                    badDuration = 0;
+                    startDay = v0StartDay;
+                }
+                if(awareness > 0){
+                    goodDuration += 5;
+                }else{
+                    badDuration += 5;
+                }
+            }
+        }
+        awarenesses = awarenessDao.getAll();
 
         bottomNavigationView = findViewById(R.id.bottomNavigationView);
         getSupportFragmentManager().beginTransaction().replace(R.id.mainFrame, homeFragment).commit();
@@ -246,6 +271,14 @@ public class MainActivity extends AppCompatActivity {
         db.close();
     }
 
+    public double getAwarenessValue(double H, double n, double y, double x){
+        double coef_y = 0.8, coef_x = -0.16, v_vh = 1.01;
+        double C = 3.37*0.5*(1+coef_y*x + coef_x * y);
+        double D_up = (2.46+10.2+C)/v_vh;
+        double awareness = D_up - H;
+        return awareness;
+    }
+
     public static Context getAppContext() {
         return MainActivity.context;
     }
@@ -285,6 +318,10 @@ public class MainActivity extends AppCompatActivity {
         return false;
     }
 
+    public List<Awareness> getAwarenesses(){
+        return awarenesses;
+    }
+
     public List<Sleep> getSleeps(){
         return sleeps;
     }
@@ -297,6 +334,7 @@ public class MainActivity extends AppCompatActivity {
             List<Sleep> listSleep = new ArrayList<>();
             listSleep.add(sleep);
             this.sleepDao.insertAll(listSleep);
+            healthConnectManager.javWriteSleepInput(sleep.sleepStart, sleep.sleepEnd);
             return true;
         }else{
             return false;
