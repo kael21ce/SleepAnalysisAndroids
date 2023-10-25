@@ -2,6 +2,7 @@ package com.kael21ce.sleepanalysisandroid.data
 
 import android.content.Context
 import android.os.Build
+import android.provider.Settings.Global
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContract
@@ -30,6 +31,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.future.future
@@ -115,7 +117,7 @@ class HealthConnectManager(private val context: Context) {
     /**
      * TODO: Reads in existing [WeightRecord]s.
      */
-    suspend fun readSleepInputs(start: Instant, end: Instant) {
+    suspend fun readSleepInputs(start: Instant, end: Instant){
         val sdfDateTime = SimpleDateFormat("yyyy/MM/dd HH:mm", Locale.KOREA)
         Log.v("start", start.toString())
         Log.v("end", end.toString())
@@ -123,39 +125,51 @@ class HealthConnectManager(private val context: Context) {
                 recordType = SleepSessionRecord::class,
                 timeRangeFilter = TimeRangeFilter.between(start, end)
         )
-        val response = healthConnectClient.readRecords(request)
-        Log.v("got it", "got irr")
-        val db = Room.databaseBuilder(context, AppDatabase::class.java, "sleep_wake").build()
-        val userDao = db.sleepDao()
-        val sleepList = mutableListOf<Sleep>()
-        Log.v("got it", "got i")
-        for (sleepRecord in response.records) {
-            var sleepStart = Date.from(sleepRecord.startTime).time
-            val sleepEnd = Date.from(sleepRecord.endTime).time
-            //check whether we need to divide the sleep to two
-            val sleepStartDay = (sleepStart / (1000 * 60 * 60 * 24)).toLong()
-            val sleepEndDay = (sleepEnd / (1000 * 60 * 60 * 24)).toLong()
-            if (sleepStartDay != sleepEndDay) {
-                val midnight = sleepEndDay.toLong() * (1000 * 60 * 60 * 24)
-                val additionalSleep = Sleep()
-                additionalSleep.sleepStart = sleepStart
-                additionalSleep.sleepEnd = midnight
-                sleepList.add(additionalSleep)
-                sleepStart = midnight
+        runBlocking {
+            val response = healthConnectClient.readRecords(request)
+            Log.v("got it", "got irr")
+            val db = Room.databaseBuilder(context, AppDatabase::class.java, "sleep_wake").build()
+            val userDao = db.sleepDao()
+            val sleepList = mutableListOf<Sleep>()
+            for (sleepRecord in response.records) {
+                var sleepStart = Date.from(sleepRecord.startTime).time
+                val sleepEnd = Date.from(sleepRecord.endTime).time
+                //check whether we need to divide the sleep to two
+                val sleepStartDay = (sleepStart / (1000 * 60 * 60 * 24))
+                val sleepEndDay = (sleepEnd / (1000 * 60 * 60 * 24))
+                if (sleepStartDay != sleepEndDay) {
+                    val midnight = sleepEndDay * (1000 * 60 * 60 * 24)
+                    val additionalSleep = Sleep()
+                    additionalSleep.sleepStart = sleepStart
+                    additionalSleep.sleepEnd = midnight
+                    sleepList.add(additionalSleep)
+                    sleepStart = midnight
+                }
+                //save everything in the database
+                val sleep = Sleep()
+                sleep.sleepStart = sleepStart
+                sleep.sleepEnd = sleepEnd
+                Log.v("sleeprecord", sdfDateTime.format(Date(sleep.sleepStart)))
+                Log.v("sleeprecord2", sdfDateTime.format(Date(sleep.sleepEnd)))
+                sleepList.add(sleep)
             }
-            //save everything in the database
-            val sleep = Sleep()
-            sleep.sleepStart = sleepStart
-            sleep.sleepEnd = sleepEnd
-            Log.v("sleeprecord", sdfDateTime.format( Date(sleep.sleepStart)))
-            Log.v("sleeprecord2", sdfDateTime.format(Date(sleep.sleepEnd)))
-            sleepList.add(sleep)
+            userDao.insertAll(sleepList)
         }
-        userDao.insertAll(sleepList)
     }
 
-    fun javReadSleepInputs(start: Instant, end: Instant) {
-        GlobalScope.future{readSleepInputs(start, end);}
+    suspend fun tempReadSleep(start: Instant, end: Instant){
+        val test = ""
+        val value = GlobalScope.async{
+            withContext(Dispatchers.Default){
+                readSleepInputs(start, end)
+            }
+        }
+        value.await()
+        Log.v("HAHA", "HAHA")
+    }
+
+    fun javReadSleepInputs(start: Instant, end: Instant){
+        GlobalScope.launch(Dispatchers.Default){tempReadSleep(start, end)}
     }
 
     /**

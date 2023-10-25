@@ -43,6 +43,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
+import kotlinx.coroutines.Dispatchers;
+
 public class MainActivity extends AppCompatActivity {
 
     BottomNavigationView bottomNavigationView;
@@ -75,36 +77,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(saveInstanceState);
         setContentView(R.layout.activity_main);
 
-        context = getApplicationContext();
-        HealthConnectManager healthConnectManager = new HealthConnectManager(getApplicationContext());
-        MutableState
-                <HealthConnectAvailability> availability = healthConnectManager.getAvailability();
-        loadingScreenLayout = findViewById(R.id.loadingScreenLayout);
-        boolean hasPermissions = true;
-
-        //get the availability of health connect and make sure that the build version is 34 to check for permissions
-        if((availability.getValue() == HealthConnectAvailability.INSTALLED) && (android.os.Build.VERSION.SDK_INT >= 34)){
-            Log.v("ANDROID SDK VERSION", String.valueOf(android.os.Build.VERSION.SDK_INT));
-            CompletableFuture<Boolean> javHasPermissions = healthConnectManager.javHasAllPermissions();
-            try {
-                hasPermissions = javHasPermissions.get();
-            } catch (ExecutionException e) {
-                throw new RuntimeException(e);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-        //if we have lower android API level then just check if it is installed, user needs to make sure that they give permissions
-        }else if(availability.getValue() != HealthConnectAvailability.INSTALLED){
-            startActivity(new Intent(MainActivity.this, PermissionsActivity.class));
-        }
-
-        if(hasPermissions){
-            Log.v("PERMISSION", "PERMISSION GRANTED");
-        }else{
-            Log.v("PERMISSION", "PERMISSION HAS NOT BEEN GRANTED, ASKING FOR PERMISSION...");
-            requestPermissionLauncher.launch(HealthConnectManagerKt.getJAVPERMISSIONS());
-        }
-
         //get the shared preferences variable
         sharedPref = getPreferences(Context.MODE_PRIVATE);
         editor = sharedPref.edit();
@@ -130,20 +102,8 @@ public class MainActivity extends AppCompatActivity {
         Instant ILastSleepUpdate = Instant.ofEpochMilli(lastSleepUpdate);
 
         //sync health connect data
-        healthConnectManager.javReadSleepInputs(ILastSleepUpdate, now);
-        //I cannot get await function for this global future, so we will sleep the main thread by 2 second
+        //I cannot get await function for this global future, so we will sleep the main thread by 5 second
         //which is plenty for 14 days worth of sleep data
-
-        Log.v("PAUSING", "PAUSING");
-        try {
-            Thread.sleep(2000);
-            // call some methods here
-
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        Log.v("FINISHED", "FINISHED PAUSING");
-        
         //database configuration
         db = Room.databaseBuilder(getApplicationContext(),
                 AppDatabase.class, "sleep_wake").allowMainThreadQueries().build();
@@ -151,7 +111,25 @@ public class MainActivity extends AppCompatActivity {
         sleepDao = db.sleepDao();
 
         //get sleep data
+        //wait loop until we get the data (in 5 seconds)
         sleeps = sleepDao.getAll();
+//        int size = sleeps.size();
+//        int tempSize = -1;
+//        long curTime = System.currentTimeMillis();
+//        Log.v("SIZE", String.valueOf(size));
+//        Log.v("TEMP SIZE", String.valueOf(tempSize));
+//        while(size >= tempSize){
+//            Log.v("SIZE", String.valueOf(size));
+//            Log.v("TEMP SIZE", String.valueOf(tempSize));
+//            long updatedTime = System.currentTimeMillis();
+//            Log.v("TIME", String.valueOf(curTime));
+//            Log.v("Cur Time", String.valueOf(updatedTime));
+//            if(updatedTime-curTime > (1000*15)){
+//                break;
+//            }
+//            List<Sleep> checkSleep = sleepDao.getAll();
+//            tempSize = checkSleep.size();
+//        }
         boolean check = false;
         for(Sleep sleep: sleeps){
             String sleepStart = sdfDateTime.format(new Date(sleep.sleepStart));
@@ -268,13 +246,6 @@ public class MainActivity extends AppCompatActivity {
         db.close();
     }
 
-    private void showLoadingScreen() {
-        loadingScreenLayout.setVisibility(View.VISIBLE);
-    }
-    private void hideLoadingScreen(){
-        loadingScreenLayout.setVisibility(View.GONE);
-    }
-
     public static Context getAppContext() {
         return MainActivity.context;
     }
@@ -301,22 +272,6 @@ public class MainActivity extends AppCompatActivity {
         }
         return sleepPattern;
     }
-
-    private ActivityResultLauncher<String[]> requestPermissionLauncher =
-        registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), isGranted -> {
-            if (isGranted.containsValue(false)) {
-                Log.v("permission not allowed", "permission not allowed");
-                // Explain to the user that the feature is unavailable because the
-                // feature requires a permission that the user has denied. At the
-                // same time, respect the user's decision. Don't link to system
-                // settings in an effort to convince the user to change their
-                // decision.
-            } else {
-                Log.v("ok", "permission granted");
-                // Permission is granted. Continue the action or workflow in your
-                // app.
-            }
-        });
 
     public boolean isOverlap(List<Sleep> sleeps, Sleep sleepX, int sleepEx){
         for(Sleep sleep: sleeps){
