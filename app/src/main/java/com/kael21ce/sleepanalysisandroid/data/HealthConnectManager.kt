@@ -62,6 +62,15 @@ val JAVPERMISSIONS = arrayOf(
 class HealthConnectManager(private val context: Context) {
     private val healthConnectClient by lazy { HealthConnectClient.getOrCreate(context) }
 
+    var isSleepDone = false
+    public fun getIsSleepDone(): Boolean{
+        return isSleepDone
+    }
+
+    public fun setIsSleepDone(isSleepDone1: Boolean){
+        this.isSleepDone = isSleepDone1
+    }
+
     var availability = mutableStateOf(HealthConnectAvailability.NOT_SUPPORTED)
         private set
 
@@ -134,7 +143,6 @@ class HealthConnectManager(private val context: Context) {
         )
 
         val response = healthConnectClient.readRecords(request)
-        Log.v("got it", "got it")
         val db = Room.databaseBuilder(context, AppDatabase::class.java, "sleep_wake").build()
         val userDao = db.sleepDao()
         val sleepList = mutableListOf<Sleep>()
@@ -163,7 +171,7 @@ class HealthConnectManager(private val context: Context) {
             sleepList.add(sleep)
         }
         userDao.insertAll(sleepList)
-
+        isSleepDone = true
     }
 
     fun javReadSleepInputs(start: Instant, end: Instant){

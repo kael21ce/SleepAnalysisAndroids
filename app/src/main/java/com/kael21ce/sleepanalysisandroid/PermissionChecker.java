@@ -23,10 +23,8 @@ public class PermissionChecker extends AppCompatActivity {
     @Override
     public void onResume(){
         super.onResume();
-        Log.v("CREATED", "CREATED");
+        Log.v("ON RESUME", "ON RESUME");
 
-        healthConnectManager = new HealthConnectManager(getApplicationContext());
-        availability = healthConnectManager.getAvailability();
         boolean hasPermissions = true;
 
         //get the availability of health connect and make sure that the build version is 34 to check for permissions

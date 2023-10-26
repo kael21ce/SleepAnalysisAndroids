@@ -39,6 +39,12 @@ public class SplashActivity extends AppCompatActivity {
 
         healthConnectManager.javReadSleepInputs(ILastSleepUpdate, now);
 
+        while(!healthConnectManager.getIsSleepDone()){
+//            Log.v("loading", "loading");
+
+        }
+        healthConnectManager.setIsSleepDone(false);
+
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             @Override
@@ -46,6 +52,6 @@ public class SplashActivity extends AppCompatActivity {
                 startActivity(new Intent(SplashActivity.this, MainActivity.class));
                 finish();
             }
-        }, 4000);
+        }, 1000);
     }
 }
