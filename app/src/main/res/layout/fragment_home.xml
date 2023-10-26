@@ -49,40 +49,51 @@
                 <!--Buttons for changing time-->
                 <LinearLayout
                     android:id="@+id/ClockButtonHomeView"
-                    android:layout_width="310dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
+                    android:layout_marginHorizontal="24dp"
                     android:gravity="center"
                     android:orientation="horizontal">
 
                     <ImageButton
                         android:id="@+id/sleepButtonHome"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
                         android:layout_weight="1"
-                        android:backgroundTint="@color/white"
+                        android:background="@drawable/corner_8"
+                        android:paddingTop="8dp"
+                        android:layout_marginRight="4dp"
+                        android:paddingBottom="8dp"
                         android:scaleType="fitCenter"
-                        android:src="@drawable/sleep_button"
+                        android:src="@drawable/moon_flip"
                         tools:ignore="SpeakableTextPresentCheck" />
 
                     <ImageButton
                         android:id="@+id/napButtonHome"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
                         android:layout_weight="1"
-                        android:backgroundTint="@color/white"
+                        android:background="@drawable/corner_8"
+                        android:paddingTop="8dp"
+                        android:layout_marginRight="4dp"
+                        android:layout_marginLeft="4dp"
+                        android:paddingBottom="8dp"
                         android:scaleType="fitCenter"
-                        android:src="@drawable/nap_button"
+                        android:src="@drawable/sun_gray"
                         tools:ignore="SpeakableTextPresentCheck" />
 
                     <ImageButton
                         android:id="@+id/workButtonHome"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
                         android:layout_weight="1"
-                        android:backgroundTint="@color/white"
+                        android:background="@drawable/corner_8"
+                        android:paddingTop="8dp"
+                        android:paddingBottom="8dp"
+                        android:layout_marginLeft="4dp"
                         android:scaleType="fitCenter"
-                        android:src="@drawable/work_button"
+                        android:src="@drawable/building"
                         tools:ignore="SpeakableTextPresentCheck" />
 
                 </LinearLayout>
@@ -104,6 +115,7 @@
                         android:orientation="horizontal">
 
                         <TextView
+                            android:id="@+id/sleepImprotanceHomeText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:background="@drawable/important_caption"
@@ -115,6 +127,7 @@
                             android:textSize="10sp" />
 
                         <TextView
+                            android:id="@+id/sleepTypeHomeText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="8dp"

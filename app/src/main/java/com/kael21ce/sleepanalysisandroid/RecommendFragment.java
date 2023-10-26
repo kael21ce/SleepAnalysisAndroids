@@ -2,8 +2,10 @@ package com.kael21ce.sleepanalysisandroid;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 
+import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 import androidx.room.Room;
 
@@ -11,10 +13,14 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
+import android.widget.TextView;
 
 import com.kael21ce.sleepanalysisandroid.data.AppDatabase;
 import com.kael21ce.sleepanalysisandroid.data.Sleep;
 import com.kael21ce.sleepanalysisandroid.data.SleepDao;
+
+import org.w3c.dom.Text;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -22,6 +28,13 @@ import java.util.List;
 import java.util.Locale;
 
 public class RecommendFragment extends Fragment {
+
+    public ImageButton sleepButton;
+    public ImageButton napButton;
+    public ImageButton workButton;
+    private TextView sleepImportanceText;
+    private TextView sleepTypeText;
+    private TextView stateDescriptionText;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -49,6 +62,65 @@ public class RecommendFragment extends Fragment {
 
 
         View v = inflater.inflate(R.layout.fragment_recommend, container, false);
+
+        sleepButton = v.findViewById(R.id.sleepButton);
+        napButton = v.findViewById(R.id.napButton);
+        workButton = v.findViewById(R.id.workButton);
+        sleepTypeText = v.findViewById(R.id.sleepTypeText);
+        sleepImportanceText = v.findViewById(R.id.sleepImportanceText);
+        stateDescriptionText = v.findViewById(R.id.StateDescriptionText);
+
+        //Initial Button Setting
+        sleepButton.setBackground(ResourcesCompat
+                .getDrawable(getResources(), R.drawable.corner_8_clicked, null));
+
+        //Change the text for recommend time if each button is clicked
+        sleepButton.setOnClickListener(view -> {
+            //Change the color of buttons
+            sleepButton.setBackground(ResourcesCompat
+                    .getDrawable(getResources(), R.drawable.corner_8_clicked, null));
+            napButton.setBackground(ResourcesCompat
+                    .getDrawable(getResources(), R.drawable.corner_8, null));
+            workButton.setBackground(ResourcesCompat
+                    .getDrawable(getResources(), R.drawable.corner_8, null));
+            //Change the content of displaying text
+            sleepTypeText.setText("밤잠");
+            sleepImportanceText.setText("중요");
+            sleepImportanceText.setBackground(ResourcesCompat
+                    .getDrawable(getResources(), R.drawable.important_caption, null));
+            stateDescriptionText.setText("각성도가 낮아요!\n이 시간엔 꼭 주무세요");
+        });
+        napButton.setOnClickListener(view -> {
+            //Change the color of buttons
+            sleepButton.setBackground(ResourcesCompat
+                    .getDrawable(getResources(), R.drawable.corner_8, null));
+            napButton.setBackground(ResourcesCompat
+                    .getDrawable(getResources(), R.drawable.corner_8_clicked, null));
+            workButton.setBackground(ResourcesCompat
+                    .getDrawable(getResources(), R.drawable.corner_8, null));
+            //Change the content of displaying text
+            sleepTypeText.setText("낮잠");
+            sleepImportanceText.setText("권장");
+            sleepImportanceText.setBackground(ResourcesCompat
+                    .getDrawable(getResources(), R.drawable.recommend_caption, null));
+            stateDescriptionText.setText("이때 주무시면 덜 피곤할거에요");
+        });
+        workButton.setOnClickListener(view -> {
+            //Change the color of buttons
+            sleepButton.setBackground(ResourcesCompat
+                    .getDrawable(getResources(), R.drawable.corner_8, null));
+            napButton.setBackground(ResourcesCompat
+                    .getDrawable(getResources(), R.drawable.corner_8, null));
+            workButton.setBackground(ResourcesCompat
+                    .getDrawable(getResources(), R.drawable.corner_8_clicked, null));
+            //Change the content of displaying text
+            sleepTypeText.setText("활동");
+            sleepImportanceText.setText("중요");
+            sleepImportanceText.setBackground(ResourcesCompat
+                    .getDrawable(getResources(), R.drawable.important_caption, null));
+            stateDescriptionText.setText("가장 각성도가 높은 시간이에요");
+        });
+
         return v;
     }
 }

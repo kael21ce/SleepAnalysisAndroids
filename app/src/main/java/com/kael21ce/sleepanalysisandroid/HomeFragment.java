@@ -1,16 +1,14 @@
 package com.kael21ce.sleepanalysisandroid;
 
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
+
+import androidx.core.content.res.ResourcesCompat;
+import androidx.fragment.app.Fragment;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -30,9 +28,20 @@ public class HomeFragment extends Fragment {
         ImageButton sleepButton = v.findViewById(R.id.sleepButtonHome);
         ImageButton napButton = v.findViewById(R.id.napButtonHome);
         ImageButton workButton = v.findViewById(R.id.workButtonHome);
-        sleepButton.setOnClickListener(v1 -> sleepButtonClick(v1, mainActivity, startTime, endTime));
-        napButton.setOnClickListener(v1 -> napButtonClick(v1, mainActivity, startTime, endTime));
-        workButton.setOnClickListener(v1 -> workButtonClick(v1, mainActivity, startTime, endTime));
+        TextView sleepImportanceText = v.findViewById(R.id.sleepImprotanceHomeText);
+        TextView sleepTypeText = v.findViewById(R.id.sleepTypeHomeText);
+        TextView stateDescriptionText = v.findViewById(R.id.StateDescriptionHomeText);
+
+        //Initial button color setting
+        sleepButton.setBackground(ResourcesCompat
+                .getDrawable(getResources(), R.drawable.corner_8_clicked, null));
+
+        sleepButton.setOnClickListener(v1 -> sleepButtonClick(v1, mainActivity, startTime, endTime,
+                sleepButton, napButton, workButton, sleepTypeText, sleepImportanceText, stateDescriptionText));
+        napButton.setOnClickListener(v1 -> napButtonClick(v1, mainActivity, startTime, endTime,
+                sleepButton, napButton, workButton, sleepTypeText, sleepImportanceText, stateDescriptionText));
+        workButton.setOnClickListener(v1 -> workButtonClick(v1, mainActivity, startTime, endTime,
+                sleepButton, napButton, workButton, sleepTypeText, sleepImportanceText, stateDescriptionText));
 
         //we use connection because fragment and activity is connected and we don't reuse fragment for other activity
         startTime.setText(sdfDateTime.format(new Date(mainActivity.getMainSleepStart())));
@@ -41,20 +50,69 @@ public class HomeFragment extends Fragment {
         return v;
     }
 
-    public void sleepButtonClick(View v, MainActivity mainActivity, TextView startTime, TextView endTime)
+    public void sleepButtonClick(View v, MainActivity mainActivity, TextView startTime, TextView endTime,
+                                 ImageButton sleepButton, ImageButton napButton, ImageButton workButton,
+                                 TextView sleepTypeText, TextView sleepImportanceText,
+                                 TextView stateDescriptionText)
     {
         startTime.setText(sdfDateTime.format(new Date(mainActivity.getMainSleepStart())));
         endTime.setText(sdfDateTime.format(new Date(mainActivity.getMainSleepStart())));
+        //Change the color of buttons
+        sleepButton.setBackground(ResourcesCompat
+                .getDrawable(getResources(), R.drawable.corner_8_clicked, null));
+        napButton.setBackground(ResourcesCompat
+                .getDrawable(getResources(), R.drawable.corner_8, null));
+        workButton.setBackground(ResourcesCompat
+                .getDrawable(getResources(), R.drawable.corner_8, null));
+        //Change the content of displaying text
+        sleepTypeText.setText("밤잠");
+        sleepImportanceText.setText("중요");
+        sleepImportanceText.setBackground(ResourcesCompat
+                .getDrawable(getResources(), R.drawable.important_caption, null));
+        stateDescriptionText.setText("각성도가 낮아요!\n이 시간엔 꼭 주무세요");
     }
-    public void napButtonClick(View v, MainActivity mainActivity, TextView startTime, TextView endTime)
+
+    public void napButtonClick(View v, MainActivity mainActivity, TextView startTime, TextView endTime,
+                               ImageButton sleepButton, ImageButton napButton, ImageButton workButton,
+                               TextView sleepTypeText, TextView sleepImportanceText,
+                               TextView stateDescriptionText)
     {
         startTime.setText(sdfDateTime.format(new Date(mainActivity.getNapSleepStart())));
         endTime.setText(sdfDateTime.format(new Date(mainActivity.getNapSleepEnd())));
+        //Change the color of buttons
+        sleepButton.setBackground(ResourcesCompat
+                .getDrawable(getResources(), R.drawable.corner_8, null));
+        napButton.setBackground(ResourcesCompat
+                .getDrawable(getResources(), R.drawable.corner_8_clicked, null));
+        workButton.setBackground(ResourcesCompat
+                .getDrawable(getResources(), R.drawable.corner_8, null));
+        //Change the content of displaying text
+        sleepTypeText.setText("낮잠");
+        sleepImportanceText.setText("권장");
+        sleepImportanceText.setBackground(ResourcesCompat
+                .getDrawable(getResources(), R.drawable.recommend_caption, null));
+        stateDescriptionText.setText("이때 주무시면 덜 피곤할거에요");
     }
 
-    public void workButtonClick(View v, MainActivity mainActivity, TextView startTime, TextView endTime)
+    public void workButtonClick(View v, MainActivity mainActivity, TextView startTime, TextView endTime,
+                                ImageButton sleepButton, ImageButton napButton, ImageButton workButton,
+                                TextView sleepTypeText, TextView sleepImportanceText,
+                                TextView stateDescriptionText)
     {
         startTime.setText(sdfDateTime.format(new Date(mainActivity.getWorkOnset())));
         endTime.setText(sdfDateTime.format(new Date(mainActivity.getWorkOffset())));
+        //Change the color of buttons
+        sleepButton.setBackground(ResourcesCompat
+                .getDrawable(getResources(), R.drawable.corner_8, null));
+        napButton.setBackground(ResourcesCompat
+                .getDrawable(getResources(), R.drawable.corner_8, null));
+        workButton.setBackground(ResourcesCompat
+                .getDrawable(getResources(), R.drawable.corner_8_clicked, null));
+        //Change the content of displaying text
+        sleepTypeText.setText("활동");
+        sleepImportanceText.setText("중요");
+        sleepImportanceText.setBackground(ResourcesCompat
+                .getDrawable(getResources(), R.drawable.important_caption, null));
+        stateDescriptionText.setText("가장 각성도가 높은 시간이에요");
     }
 }
