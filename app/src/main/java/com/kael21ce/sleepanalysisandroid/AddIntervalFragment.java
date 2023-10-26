@@ -19,7 +19,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-public class AddIntervalFragment extends Fragment {
+public class AddIntervalFragment extends Fragment implements ButtonTextUpdater {
 
     public ImageButton backButton;
     public Button startDateButton;
@@ -30,8 +30,6 @@ public class AddIntervalFragment extends Fragment {
     public IntervalFragment intervalFragment;
     public DatePickerDialog datePickerDialog;
     public TimePickerDialog timePickerDialog;
-    public String startTime;
-    public String endTime;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -64,25 +62,30 @@ public class AddIntervalFragment extends Fragment {
         String current_date = new SimpleDateFormat("yyyy.MM.dd").format(new Date());
         String current_time = new SimpleDateFormat("aaa hh:mm").format(new Date());
         startDateButton.setText(current_date);
-        startTimeButton.setText(current_time);
         endDateButton.setText(current_date);
+        startTimeButton.setText(current_time);
         endTimeButton.setText(current_time);
 
         //Open Picker when buttons about date are clicked
+        AddIntervalFragment addIntervalFragment = this;
         startDateButton.setOnClickListener(view -> {
-            datePickerDialog = new DatePickerDialog(v.getContext());
+            datePickerDialog = new DatePickerDialog(v.getContext(), addIntervalFragment);
+            datePickerDialog.setData(true);
             datePickerDialog.show();
         });
         endDateButton.setOnClickListener(view -> {
-            datePickerDialog = new DatePickerDialog(v.getContext());
+            datePickerDialog = new DatePickerDialog(v.getContext(), addIntervalFragment);
+            datePickerDialog.setData(false);
             datePickerDialog.show();
         });
         startTimeButton.setOnClickListener(view -> {
-            timePickerDialog = new TimePickerDialog(v.getContext());
+            timePickerDialog = new TimePickerDialog(v.getContext(), addIntervalFragment);
+            timePickerDialog.setData(true);
             timePickerDialog.show();
         });
         endTimeButton.setOnClickListener(view -> {
-            timePickerDialog = new TimePickerDialog(v.getContext());
+            timePickerDialog = new TimePickerDialog(v.getContext(), addIntervalFragment);
+            timePickerDialog.setData(false);
             timePickerDialog.show();
         });
         addButton.setOnClickListener(view -> {
@@ -111,5 +114,30 @@ public class AddIntervalFragment extends Fragment {
         });
 
         return  v;
+    }
+
+    //Change the text of Button
+    public void setDateButtonText(String text, Boolean isStartButton) {
+        if (isStartButton) {
+            if (startDateButton != null) {
+                startDateButton.setText(text);
+            }
+        } else {
+            if (endDateButton != null) {
+                endDateButton.setText(text);
+            }
+        }
+    }
+
+    public void setTimeButtonText(String text, Boolean isStartButton) {
+        if (isStartButton) {
+            if (startTimeButton != null) {
+                startTimeButton.setText(text);
+            }
+        } else {
+            if (endTimeButton != null) {
+                endTimeButton.setText(text);
+            }
+        }
     }
 }

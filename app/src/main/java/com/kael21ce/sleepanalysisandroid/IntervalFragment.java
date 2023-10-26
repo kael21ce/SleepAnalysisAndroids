@@ -66,6 +66,12 @@ public class IntervalFragment extends Fragment {
 //        intervalAdapter.addItem(new Interval("5시간 0분", 3));
 //        intervalAdapter.addItem(new Interval("8시간 58분", 2));
 //        intervalAdapter.addItem(new Interval("0시간 15분", 1));
+
+        //If there is no Item, not show IntervalListLayout
+        if (intervalAdapter.getItemCount() == 0) {
+            LinearLayout intervalListLayout = v.findViewById(R.id.IntervalListLayout);
+            intervalListLayout.setVisibility(View.INVISIBLE);
+        }
         intervalRecyclerView.setAdapter(intervalAdapter);
 
         //Add sleep interval if plus button is clicked
