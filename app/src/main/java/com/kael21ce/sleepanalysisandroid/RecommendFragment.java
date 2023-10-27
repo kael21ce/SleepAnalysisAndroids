@@ -2,13 +2,7 @@ package com.kael21ce.sleepanalysisandroid;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-
-import androidx.core.content.res.ResourcesCompat;
-import androidx.fragment.app.Fragment;
-import androidx.room.Room;
-
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,11 +10,13 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import androidx.core.content.res.ResourcesCompat;
+import androidx.fragment.app.Fragment;
+import androidx.room.Room;
+
 import com.kael21ce.sleepanalysisandroid.data.AppDatabase;
 import com.kael21ce.sleepanalysisandroid.data.Sleep;
 import com.kael21ce.sleepanalysisandroid.data.SleepDao;
-
-import org.w3c.dom.Text;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -74,17 +70,22 @@ public class RecommendFragment extends Fragment {
         sleepTypeText = v.findViewById(R.id.sleepTypeText);
         sleepImportanceText = v.findViewById(R.id.sleepImportanceText);
         stateDescriptionText = v.findViewById(R.id.StateDescriptionText);
+        ClockView clockView = v.findViewById(R.id.sweepingClockRecommend);
 
         //Initial Button Setting
         sleepButton.setBackground(ResourcesCompat
                 .getDrawable(getResources(), R.drawable.corner_8_clicked, null));
 
         sleepButton.setOnClickListener(v1 -> sleepButtonClick(v1, mainActivity, startTime, endTime,
-                sleepButton, napButton, workButton, sleepTypeText, sleepImportanceText, stateDescriptionText));
+                sleepButton, napButton, workButton, sleepTypeText, sleepImportanceText, stateDescriptionText,
+                clockView));
         napButton.setOnClickListener(v1 -> napButtonClick(v1, mainActivity, startTime, endTime,
-                sleepButton, napButton, workButton, sleepTypeText, sleepImportanceText, stateDescriptionText));
+                sleepButton, napButton, workButton, sleepTypeText, sleepImportanceText, stateDescriptionText,
+                clockView));
         workButton.setOnClickListener(v1 -> workButtonClick(v1, mainActivity, startTime, endTime,
-                sleepButton, napButton, workButton, sleepTypeText, sleepImportanceText, stateDescriptionText));
+                sleepButton, napButton, workButton, sleepTypeText, sleepImportanceText, stateDescriptionText,
+                clockView));
+        clockView.setTypeOfInterval(1);
 
         return v;
     }
@@ -92,7 +93,7 @@ public class RecommendFragment extends Fragment {
     public void sleepButtonClick(View v, MainActivity mainActivity, TextView startTime, TextView endTime,
                                  ImageButton sleepButton, ImageButton napButton, ImageButton workButton,
                                  TextView sleepTypeText, TextView sleepImportanceText,
-                                 TextView stateDescriptionText)
+                                 TextView stateDescriptionText, ClockView clockView)
     {
         //startTime.setText(sdfDateTime.format(new Date(mainActivity.getMainSleepStart())));
         //endTime.setText(sdfDateTime.format(new Date(mainActivity.getMainSleepStart())));
@@ -109,12 +110,15 @@ public class RecommendFragment extends Fragment {
         sleepImportanceText.setBackground(ResourcesCompat
                 .getDrawable(getResources(), R.drawable.important_caption, null));
         stateDescriptionText.setText("각성도가 낮아요!\n이 시간엔 꼭 주무세요");
+
+        //Change the clock angle using setAngle and color using setTypeOfInterval
+        clockView.setTypeOfInterval(1);
     }
 
     public void napButtonClick(View v, MainActivity mainActivity, TextView startTime, TextView endTime,
                                ImageButton sleepButton, ImageButton napButton, ImageButton workButton,
                                TextView sleepTypeText, TextView sleepImportanceText,
-                               TextView stateDescriptionText)
+                               TextView stateDescriptionText, ClockView clockView)
     {
         //startTime.setText(sdfDateTime.format(new Date(mainActivity.getNapSleepStart())));
         //endTime.setText(sdfDateTime.format(new Date(mainActivity.getNapSleepEnd())));
@@ -131,12 +135,13 @@ public class RecommendFragment extends Fragment {
         sleepImportanceText.setBackground(ResourcesCompat
                 .getDrawable(getResources(), R.drawable.recommend_caption, null));
         stateDescriptionText.setText("이때 주무시면 덜 피곤할거에요");
+        clockView.setTypeOfInterval(2);
     }
 
     public void workButtonClick(View v, MainActivity mainActivity, TextView startTime, TextView endTime,
                                 ImageButton sleepButton, ImageButton napButton, ImageButton workButton,
                                 TextView sleepTypeText, TextView sleepImportanceText,
-                                TextView stateDescriptionText)
+                                TextView stateDescriptionText, ClockView clockView)
     {
         //startTime.setText(sdfDateTime.format(new Date(mainActivity.getWorkOnset())));
         //endTime.setText(sdfDateTime.format(new Date(mainActivity.getWorkOffset())));
@@ -153,5 +158,6 @@ public class RecommendFragment extends Fragment {
         sleepImportanceText.setBackground(ResourcesCompat
                 .getDrawable(getResources(), R.drawable.important_caption, null));
         stateDescriptionText.setText("가장 각성도가 높은 시간이에요");
+        clockView.setTypeOfInterval(3);
     }
 }
