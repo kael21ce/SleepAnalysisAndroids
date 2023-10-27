@@ -157,15 +157,15 @@ class HealthConnectManager(private val context: Context) {
             if (sleepStartDay != sleepEndDay) {
                 val midnight = sleepEndDay * (1000 * 60 * 60 * 24)
                 val additionalSleep = Sleep()
-                additionalSleep.sleepStart = sleepStart
-                additionalSleep.sleepEnd = midnight
+                additionalSleep.sleepStart = sleepStart - (1000*60*60*9)
+                additionalSleep.sleepEnd = midnight - (1000*60*60*9)
                 sleepList.add(additionalSleep)
                 sleepStart = midnight
             }
             //save everything in the database
             val sleep = Sleep()
-            sleep.sleepStart = sleepStart
-            sleep.sleepEnd = sleepEnd
+            sleep.sleepStart = sleepStart- (1000*60*60*9)
+            sleep.sleepEnd = sleepEnd- (1000*60*60*9)
             Log.v("sleeprecord", sdfDateTime.format(Date(sleep.sleepStart)))
             Log.v("sleeprecord2", sdfDateTime.format(Date(sleep.sleepEnd)))
             sleepList.add(sleep)
