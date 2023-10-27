@@ -86,6 +86,7 @@ public class RecommendFragment extends Fragment {
                 sleepButton, napButton, workButton, sleepTypeText, sleepImportanceText, stateDescriptionText,
                 clockView));
         clockView.setTypeOfInterval(1);
+        clockView.setAngleFromTime("00:00", "7:00");
 
         return v;
     }
@@ -113,6 +114,8 @@ public class RecommendFragment extends Fragment {
 
         //Change the clock angle using setAngle and color using setTypeOfInterval
         clockView.setTypeOfInterval(1);
+        //Just example
+        clockView.setAngleFromTime("00:00", "7:00");
     }
 
     public void napButtonClick(View v, MainActivity mainActivity, TextView startTime, TextView endTime,
@@ -136,6 +139,8 @@ public class RecommendFragment extends Fragment {
                 .getDrawable(getResources(), R.drawable.recommend_caption, null));
         stateDescriptionText.setText("이때 주무시면 덜 피곤할거에요");
         clockView.setTypeOfInterval(2);
+        //Just example
+        clockView.setAngleFromTime("19:00", "22:15");
     }
 
     public void workButtonClick(View v, MainActivity mainActivity, TextView startTime, TextView endTime,
@@ -159,5 +164,7 @@ public class RecommendFragment extends Fragment {
                 .getDrawable(getResources(), R.drawable.important_caption, null));
         stateDescriptionText.setText("가장 각성도가 높은 시간이에요");
         clockView.setTypeOfInterval(3);
+        //Just example
+        clockView.setAngleFromTime("9:00", "18:30");
     }
 }

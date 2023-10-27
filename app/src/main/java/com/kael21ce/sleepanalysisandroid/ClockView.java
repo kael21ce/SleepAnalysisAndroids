@@ -10,9 +10,9 @@ import androidx.annotation.NonNull;
 
 public class ClockView extends View {
 
-    private float startAngle = 0;
+    private float startAngle = 45;
     //Sweep clockwise
-    private float sweepAngle = 90;
+    private float sweepAngle = 270;
     private Paint arcPaint;
     private Paint circlePaint;
     //To distinguish the type of interval
@@ -61,17 +61,34 @@ public class ClockView extends View {
         int right = centerX + radius;
         int bottom = centerY + radius;
 
-        //Draw the arc and circle on the canvas
-        canvas.drawArc(left, top, right, bottom, startAngle, sweepAngle, true, arcPaint);
+        //Calculate the position of small circles in the sides of interval
+        double smallCircleRadius = Math.min(width, height) / 14;
+        double beta = Math.asin(smallCircleRadius/(radius - smallCircleRadius));
+        double betaDeg = beta * 180 / Math.PI;
+        float startAngleRad = (float) (startAngle * Math.PI / 180);
+        float sweepedAngleRad = (float) ((startAngle + sweepAngle) * Math.PI / 180);
+        float positionX1 = (float) (centerX + (radius - smallCircleRadius)*Math.cos(-startAngleRad - beta));
+        float positionY1 = (float) (centerY - (radius - smallCircleRadius)*Math.sin(-startAngleRad - beta));
+        float positionX2 = (float) (centerX + (radius - smallCircleRadius)*Math.cos(-sweepedAngleRad + beta));
+        float positionY2 = (float) (centerY - (radius - smallCircleRadius)*Math.sin(-sweepedAngleRad + beta));
+        //Draw the arc on the canvas
+        canvas.drawArc(left, top, right, bottom, startAngle + Math.abs((float) betaDeg),
+                sweepAngle - 2 * Math.abs((float) betaDeg), true, arcPaint);
+        //Draw small circles
+        canvas.drawCircle(positionX1, positionY1, (float) smallCircleRadius, arcPaint);
+        canvas.drawCircle(positionX2, positionY2, (float) smallCircleRadius, arcPaint);
+        //Draw circle on the canvas
         double circleRadius = Math.min(width, height) / 2.8;
         float CircleRadius = (float) circleRadius;
         canvas.drawCircle(centerX, centerY, CircleRadius, circlePaint);
     }
 
-    //Set the startAngle and sweepAngle
-    public void setAngle(float startAngle, float sweepAngle) {
+    //Set the start Time and end Time
+    public void setAngleFromTime(String startTime, String endTime) {
+        float startAngle = convertTimeToAngle(startTime);
         this.startAngle = startAngle;
-        this.sweepAngle = sweepAngle;
+        float endAngle = convertTimeToAngle(endTime);
+        this.sweepAngle = endAngle - startAngle;
         invalidate();
     }
 
@@ -79,5 +96,26 @@ public class ClockView extends View {
     public void setTypeOfInterval(int type) {
         this.typeOfInterval = type;
         invalidate();
+    }
+
+    //Change time to degree angle (e.g. 13:40 -> 115)
+    public Float convertTimeToAngle(String time) {
+        //Should be in format of "hh:mm"
+        if (time.length() > 5) {
+            return (float) 0;
+        } else {
+            int index = time.indexOf(":");
+            if (index == -1) {
+                return (float) 0;
+            }
+            String hour = time.substring(0, index);
+            String minute = time.substring(index + 1);
+            int intHour = Integer.parseInt(hour);
+            int intMinute = Integer.parseInt(minute);
+            if (intHour > 24 || intMinute > 60) {
+                return (float) 0;
+            }
+            return (float) (15*(intHour - 6) + 0.25*intMinute);
+        }
     }
 }
