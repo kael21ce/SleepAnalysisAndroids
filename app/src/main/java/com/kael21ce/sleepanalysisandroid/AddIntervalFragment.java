@@ -16,8 +16,11 @@ import com.kael21ce.sleepanalysisandroid.data.Sleep;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.Locale;
+import java.util.TimeZone;
 
 public class AddIntervalFragment extends Fragment implements ButtonTextUpdater {
 
@@ -56,7 +59,7 @@ public class AddIntervalFragment extends Fragment implements ButtonTextUpdater {
         backButton = v.findViewById(R.id.backButton);
         backButton.setOnClickListener(view -> getParentFragmentManager().beginTransaction().replace(R.id.IntervalFrame, intervalFragment).commit());
 
-        SimpleDateFormat sdf = new SimpleDateFormat("yyy.MM.dd aaa hh:mm", Locale.KOREA);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd aaa hh:mm");
 
         //Set the initial added time to current time
         String current_date = new SimpleDateFormat("yyyy.MM.dd").format(new Date());
@@ -103,13 +106,21 @@ public class AddIntervalFragment extends Fragment implements ButtonTextUpdater {
             try {
                 sleepStartDate = sdf.parse(startSDF);
                 sleepEndDate = sdf.parse(endSDF);
+                //translate to local date time
+                LocalDateTime ldt1 = LocalDateTime.ofInstant(sleepStartDate.toInstant(), ZoneId.systemDefault());
+                LocalDateTime ldt2 = LocalDateTime.ofInstant(sleepEndDate.toInstant(), ZoneId.systemDefault());
+                sleepStartDate = Date.from(ldt1.atZone(ZoneId.systemDefault()).toInstant());
+                sleepEndDate = Date.from(ldt2.atZone(ZoneId.systemDefault()).toInstant());
             } catch (ParseException e) {
                 throw new RuntimeException(e);
             }
+            Log.v("START DATE", sleepStartDate.toString());
+            Log.v("END DATE", sleepEndDate.toString());
             assert sleepStartDate != null;
             assert sleepEndDate != null;
             add_sleep.sleepStart = sleepStartDate.getTime();
             add_sleep.sleepEnd = sleepEndDate.getTime();
+            Log.v("GO TO MAIN ACTIVITY", "GO TO MAIN ACTIVITY");
             mainActivity.addSleep(add_sleep);
         });
 

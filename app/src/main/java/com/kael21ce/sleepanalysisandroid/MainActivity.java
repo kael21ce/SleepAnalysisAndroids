@@ -330,7 +330,7 @@ public class MainActivity extends AppCompatActivity {
             if(sleepEx == sleep.sleep_id){
                 continue;
             }
-            if(!(sleepX.sleepEnd < sleep.sleepStart || sleepX.sleepStart > sleep.sleepEnd)){
+            if(!(sleepX.sleepEnd <= sleep.sleepStart || sleepX.sleepStart >= sleep.sleepEnd)){
                 return true;
             }
         }
@@ -352,6 +352,7 @@ public class MainActivity extends AppCompatActivity {
             this.sleeps.add(sleep);
             List<Sleep> listSleep = new ArrayList<>();
             listSleep.add(sleep);
+            Log.v("SLEEP DATA ADDED", String.valueOf(sleep.sleepStart));
             this.sleepDao.insertAll(listSleep);
             healthConnectManager.javWriteSleepInput(sleep.sleepStart, sleep.sleepEnd);
             return true;

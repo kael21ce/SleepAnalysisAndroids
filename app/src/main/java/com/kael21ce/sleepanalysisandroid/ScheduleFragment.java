@@ -42,14 +42,18 @@ public class ScheduleFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_schedule, container, false);
         MainActivity mainActivity = (MainActivity)getActivity();
 
+        Log.v("FRAGMENT", "SCHEDULE FRAGMENT");
+
         //get sleep data and calculate map values
         List<Sleep> sleeps = mainActivity.getSleeps();
         long oneDayToMils = 1000*60*60*24;
         sleepsData = new HashMap<>();
         List<Sleep> listSleep = new ArrayList<>();
+        Log.v("SIZE OF SLEEP", String.valueOf(sleeps.size()));
         if(sleeps.size() > 0) {
             long curDate = sleeps.get(0).sleepStart / oneDayToMils;
             for (Sleep sleep : sleeps) {
+                Log.v("SLEEPSSS", String.valueOf(sleep.sleepStart));
                 long sleepStartDate = (sleep.sleepStart / oneDayToMils);
                 if (curDate != sleepStartDate) {
                     List<Sleep> putSleep = new ArrayList<>(listSleep);
@@ -61,7 +65,22 @@ public class ScheduleFragment extends Fragment {
                     listSleep.add(sleep);
                 }
             }
+            if(listSleep.size() > 0){
+                List<Sleep> putSleep = new ArrayList<>(listSleep);
+                sleepsData.put(curDate, putSleep);
+                listSleep.clear();
+            }
         }
+
+        //debug map
+//        for (Map.Entry<Long, List<Sleep>> entry : sleepsData.entrySet()) {
+//            Log.v("KEY", String.valueOf(entry.getKey()));
+//            for(Sleep sleep2 : entry.getValue()){
+//                Log.v("SLEEP START D", String.valueOf(sleep2.sleepStart));
+//                Log.v("SLEEP END D", String.valueOf(sleep2.sleepEnd));
+//            }
+//        }
+//        Log.v("THE MAP", String.valueOf(sleepsData.size()));
 
         //get today's day
         long todayDate = System.currentTimeMillis()/oneDayToMils;
@@ -101,15 +120,6 @@ public class ScheduleFragment extends Fragment {
 
         calendarView = v.findViewById(R.id.CalendarView);
         getChildFragmentManager().beginTransaction().replace(R.id.IntervalFrame, intervalFragment).commit();
-
-        //debug map
-//        for (Map.Entry<Long, List<Sleep>> entry : sleepsData.entrySet()) {
-//            Log.v("KEY", String.valueOf(entry.getKey()));
-//            for(Sleep sleep2 : entry.getValue()){
-//                Log.v("SLEEP START D", String.valueOf(sleep2.sleepStart));
-//                Log.v("SLEEP END D", String.valueOf(sleep2.sleepEnd));
-//            }
-//        }
 
         //Load sleep intervals and send to IntervalFragment
 
@@ -155,6 +165,7 @@ public class ScheduleFragment extends Fragment {
                 }
                 int count = 0;
                 for(Sleep sleep: initSleepData){
+                    Log.v("THE INTERVAL'S SLEEP", String.valueOf(sleep.sleepStart));
                     bundle.putLong("sleepStart"+count, sleep.sleepStart);
                     bundle.putLong("sleepEnd"+count, sleep.sleepEnd);
                     count++;
