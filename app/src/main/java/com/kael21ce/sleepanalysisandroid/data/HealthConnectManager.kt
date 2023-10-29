@@ -152,8 +152,8 @@ class HealthConnectManager(private val context: Context) {
             Log.v("THE RECORD START", sdfDateTime.format(Date.from(sleepRecord.startTime)))
             Log.v("THE RECORD END", sdfDateTime.format(Date.from(sleepRecord.endTime)))
             //check whether we need to divide the sleep to two
-            val sleepStartDay = (sleepStart / (1000 * 60 * 60 * 24))
-            val sleepEndDay = (sleepEnd / (1000 * 60 * 60 * 24))
+            val sleepStartDay = ((sleepStart + (1000*60*60*9)) / (1000 * 60 * 60 * 24))
+            val sleepEndDay = ((sleepEnd + (1000*60*60*9)) / (1000 * 60 * 60 * 24))
             if (sleepStartDay != sleepEndDay) {
                 val midnight = sleepEndDay * (1000 * 60 * 60 * 24)
                 val additionalSleep = Sleep()
@@ -164,8 +164,8 @@ class HealthConnectManager(private val context: Context) {
             }
             //save everything in the database
             val sleep = Sleep()
-            sleep.sleepStart = sleepStart- (1000*60*60*9)
-            sleep.sleepEnd = sleepEnd- (1000*60*60*9)
+            sleep.sleepStart = sleepStart
+            sleep.sleepEnd = sleepEnd
             Log.v("sleeprecord", sdfDateTime.format(Date(sleep.sleepStart)))
             Log.v("sleeprecord2", sdfDateTime.format(Date(sleep.sleepEnd)))
             sleepList.add(sleep)
