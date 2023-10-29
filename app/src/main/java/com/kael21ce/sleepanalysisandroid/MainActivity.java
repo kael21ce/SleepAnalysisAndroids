@@ -92,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
         sharedPref = getSharedPreferences("SleepWake", Context.MODE_PRIVATE);
         editor = sharedPref.edit();
         long twoWeeks = (1000*60*60*24*14);
-        long fiveMinutesToMil = (1000*60*50);
+        long fiveMinutesToMil = (1000*60*5);
 
         //dummy variable to test sleep onset, work onset, and work offset
         //"dd/MM/yyyy"+ "HH:mm"
@@ -218,6 +218,7 @@ public class MainActivity extends AppCompatActivity {
             v0.n_val = res[2];
             v0.H_val = res[3];
             v0.time = startProcess + (i*fiveMinutesToMil);
+            Log.v("VO TIME", sdfDateTime.format(new Date(v0.time)));
             newV0.add(v0);
 
             if(v0.time >= (System.currentTimeMillis()-(1000*60*6)) && (v0.time <= System.currentTimeMillis())){
@@ -250,7 +251,7 @@ public class MainActivity extends AppCompatActivity {
         editor.apply();
 
         //simulate another pcr for the graph
-        
+
 
         //calculate the awareness
         AwarenessDao awarenessDao = db.awarenessDao();
