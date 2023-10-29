@@ -14,6 +14,10 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
 
 public class IntervalFragment extends Fragment {
 
@@ -22,6 +26,8 @@ public class IntervalFragment extends Fragment {
     public RecyclerView intervalRecyclerView;
     public TextView AlertnessHighTimeText;
     public TextView AlertnessLowTimeText;
+
+    SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", Locale.KOREA);
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -59,7 +65,8 @@ public class IntervalFragment extends Fragment {
             long duration = (sleepEnd - sleepStart)/1000;
             Log.v("DURATION", String.valueOf(sleepStart));
             Log.v("DURAIONT2", String.valueOf(sleepEnd));
-            intervalAdapter.addItem(new Interval(String.valueOf(duration), 2));
+//            intervalAdapter.addItem(new Interval(String.valueOf(duration), 2));
+            intervalAdapter.addItem(new Interval(sdf.format(new Date(sleepStart)) + " " + sdf.format(new Date(sleepEnd)), 2));
         }
         //Just example
 //        intervalAdapter.addItem(new Interval("1시간 0분", 2));

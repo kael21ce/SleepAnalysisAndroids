@@ -1,9 +1,11 @@
 package com.kael21ce.sleepanalysisandroid;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -122,6 +124,12 @@ public class AddIntervalFragment extends Fragment implements ButtonTextUpdater {
             add_sleep.sleepEnd = sleepEndDate.getTime();
             Log.v("GO TO MAIN ACTIVITY", "GO TO MAIN ACTIVITY");
             mainActivity.addSleep(add_sleep);
+            FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+            if (Build.VERSION.SDK_INT >= 26) {
+                ft.setReorderingAllowed(false);
+            }
+            ft.detach(this).attach(this).commit();
+            getParentFragmentManager().beginTransaction().replace(R.id.IntervalFrame, intervalFragment).commit();
         });
 
         return  v;

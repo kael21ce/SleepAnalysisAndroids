@@ -38,8 +38,13 @@ public class SplashActivity extends AppCompatActivity {
         Instant ILastSleepUpdate = Instant.ofEpochMilli(lastSleepUpdate);
 
         healthConnectManager.javReadSleepInputs(ILastSleepUpdate, now);
+        Instant curTime = Instant.now();
 
         while(!healthConnectManager.getIsSleepDone()){
+            Instant curTimeUpdated = Instant.now();
+            if(curTime.plusMillis(1000*2).isAfter(curTimeUpdated)){
+                break;
+            }
 //            Log.v("loading", "loading");
 
         }
