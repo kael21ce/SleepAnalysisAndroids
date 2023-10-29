@@ -87,6 +87,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         healthConnectManager = new HealthConnectManager(getApplicationContext());
+        awarenesses = new ArrayList<>();
 
         //get the shared preferences variable
         sharedPref = getSharedPreferences("SleepWake", Context.MODE_PRIVATE);
