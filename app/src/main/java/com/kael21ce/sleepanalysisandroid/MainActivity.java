@@ -275,7 +275,15 @@ public class MainActivity extends AppCompatActivity {
                         List<Awareness> awarenessList = new ArrayList<>();
                         awarenessList.add(addAwareness);
                         awarenessDao.insertAll(awarenessList);
+                        awarenesses.add(addAwareness);
                     }else {
+                        //we can make it faster by using lazy loading, but this is okay for now
+                        for(int i = 0; i < awarenesses.size(); i ++){
+                            if(awarenesses.get(i).awarenessDay == addAwareness.awarenessDay){
+                                awarenesses.set(i, addAwareness);
+                                break;
+                            }
+                        }
                         awarenessDao.updateAwareness(startDay, goodDuration, badDuration);
                     }
                     Log.v("AWARENESS", String.valueOf(startDay)+' '+ goodDuration + ' ' + badDuration);
@@ -291,7 +299,6 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         }
-        awarenesses = awarenessDao.getAll();
 
         bottomNavigationView = findViewById(R.id.bottomNavigationView);
         getSupportFragmentManager().beginTransaction().replace(R.id.mainFrame, homeFragment).commit();
