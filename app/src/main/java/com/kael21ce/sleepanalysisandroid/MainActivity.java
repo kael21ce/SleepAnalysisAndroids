@@ -35,6 +35,7 @@ import com.kael21ce.sleepanalysisandroid.data.V0;
 import com.kael21ce.sleepanalysisandroid.data.V0Dao;
 
 import java.sql.Array;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -44,6 +45,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -92,6 +94,19 @@ public class MainActivity extends AppCompatActivity {
         long twoWeeks = (1000*60*60*24*14);
         long fiveMinutesToMil = (1000*60*50);
 
+        //dummy variable to test sleep onset, work onset, and work offset
+        //"dd/MM/yyyy"+ "HH:mm"
+        long sleepOnsetDummy = 0;
+        long workOnsetDummy = 0;
+        long workOffsetDummy = 0;
+        try {
+            sleepOnsetDummy = Objects.requireNonNull(sdfDateTime.parse("29/10/2023 22:00")).getTime();
+            workOnsetDummy = Objects.requireNonNull(sdfDateTime.parse("30/10/2023 09:00")).getTime();
+            workOffsetDummy = Objects.requireNonNull(sdfDateTime.parse("30/10/2023 17:00")).getTime();
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
+
         //update variables
         lastSleepUpdate = sharedPref.getLong("lastSleepUpdate", System.currentTimeMillis() - twoWeeks);
         lastDataUpdate = sharedPref.getLong("lastUpdate", System.currentTimeMillis() - twoWeeks);
@@ -101,13 +116,22 @@ public class MainActivity extends AppCompatActivity {
         workOnset = sharedPref.getLong("workOnset", System.currentTimeMillis());
         workOffset = sharedPref.getLong("workOffset", System.currentTimeMillis());
 
+        //for testing
+        sleepOnset = sleepOnsetDummy;
+        workOnset = workOnsetDummy;
+        workOffset = workOffsetDummy;
+        editor.putLong("sleepOnset", sleepOnsetDummy);
+        editor.putLong("workOnset", workOnsetDummy);
+        editor.putLong("workOffset", workOffsetDummy);
+        editor.apply();
+
         //sleep result variables
         mainSleepStart = sharedPref.getLong("mainSleepStart", System.currentTimeMillis() - twoWeeks);
         mainSleepEnd = sharedPref.getLong("mainSleepEnd", System.currentTimeMillis() - twoWeeks);
         napSleepStart = sharedPref.getLong("napSleepStart", System.currentTimeMillis() - twoWeeks);
         napSleepEnd = sharedPref.getLong("napSleepEnd", System.currentTimeMillis() - twoWeeks);
 
-        Instant now = Instant.now();
+        long now = System.currentTimeMillis();
         Instant ILastSleepUpdate = Instant.ofEpochMilli(lastSleepUpdate);
 
         db = Room.databaseBuilder(getApplicationContext(),
@@ -146,7 +170,7 @@ public class MainActivity extends AppCompatActivity {
         long endProcess = System.currentTimeMillis();
         long processDuration = (endProcess - startProcess) / fiveMinutesToMil;
         boolean gotInitV0 = false;
-        double[] initV0 = {-0.8590, -0.6837, 0.1140, 14.2133};
+        double[] initV0 = {-0.8283, 0.8413, 0.6758, 13.3336};
         //get init V0
         for(V0 v0: v0s){
 //            Log.v("V0", "H: "+ v0.H_val + ", n: " + v0.n_val + ", y: "+v0.y_val + ", x: " + v0.x_val);
@@ -178,6 +202,9 @@ public class MainActivity extends AppCompatActivity {
         SleepModel sleepModel = new SleepModel();
         double[] sleepPattern = sleepToArray(startProcess, endProcess, sleeps);
         Log.v("SLEEP SIZE", String.valueOf(sleepPattern.length));
+        for(double i: sleepPattern){
+            Log.v("I", String.valueOf(i));
+        }
         ArrayList<double[]> simulationResult = sleepModel.pcr_simulation(initV0, sleepPattern, 5/60.0);
 
         //update V0 from the simulation
@@ -198,16 +225,32 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         v0Dao.insertAll(newV0);
+        Log.v("V0 DONE", "V0 DONE");
+        Log.v("SLEEP ONSET", String.valueOf((int)(sleepOnset-now)/(1000*60*5)));
+        Log.v("WORK ONSET", String.valueOf((int)(workOnset-now)/(1000*60*5)));
+        Log.v("WORK OFFSET", String.valueOf((int)(workOffset-now)/(1000*60*5)));
+        Log.v("INIT V0", initV0[0] + " " + initV0[1] + " " + initV0[2] + " " + initV0[3]);
 
         //process sleep prediction
-        int[] sleepSuggestion = sleepModel.Sleep_pattern_suggestion(initV0, (int)sleepOnset/1000, (int)workOnset/1000, (int)workOffset/1000, 5/60.0);
+        int[] sleepSuggestion = sleepModel.Sleep_pattern_suggestion(initV0, (int)(sleepOnset-now)/(1000*60*5), (int)(workOnset-now)/(1000*60*5), (int)(workOffset-now)/(1000*60*5), 5/60.0);
         Log.v("SLEEP SUGGESTION", String.valueOf(sleepSuggestion[0]));
+        Log.v("MAIN SLEEP START", sdfDateTime.format(new Date(sleepSuggestion[0]*(1000*60*5)+now)));
+        Log.v("MAIN SLEEP END", sdfDateTime.format(new Date(sleepSuggestion[1]*(1000*60*5)+now)));
+        Log.v("NAP SLEEP START", sdfDateTime.format(new Date(sleepSuggestion[2]*(1000*60*5)+now)));
+        Log.v("NAP SLEEP END", sdfDateTime.format(new Date(sleepSuggestion[3]*(1000*60*5)+now)));
         //update shared preferences
-        editor.putLong("mainSleepStart", sleepSuggestion[0]);
-        editor.putLong("mainSleepEnd", sleepSuggestion[1]);
-        editor.putLong("napSleepStart", sleepSuggestion[2]);
-        editor.putLong("napSleepEnd", sleepSuggestion[3]);
+        mainSleepStart = sleepSuggestion[0]*(1000*60*5)+now;
+        mainSleepEnd = sleepSuggestion[1]*(1000*60*5)+now;
+        napSleepStart = sleepSuggestion[2]*(1000*60*5)+now;
+        napSleepEnd = sleepSuggestion[3]*(1000*60*5)+now;
+        editor.putLong("mainSleepStart", sleepSuggestion[0]*(1000*60*5)+now);
+        editor.putLong("mainSleepEnd", sleepSuggestion[1]*(1000*60*5)+now);
+        editor.putLong("napSleepStart", sleepSuggestion[2]*(1000*60*5)+now);
+        editor.putLong("napSleepEnd", sleepSuggestion[3]*(1000*60*5)+now);
         editor.apply();
+
+        //simulate another pcr for the graph
+        
 
         //calculate the awareness
         AwarenessDao awarenessDao = db.awarenessDao();

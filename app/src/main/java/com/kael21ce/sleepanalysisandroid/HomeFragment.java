@@ -64,7 +64,7 @@ public class HomeFragment extends Fragment {
                                  TextView stateDescriptionText, ClockView clockView)
     {
         startTime.setText(sdfDateTime.format(new Date(mainActivity.getMainSleepStart())));
-        endTime.setText(sdfDateTime.format(new Date(mainActivity.getMainSleepStart())));
+        endTime.setText(sdfDateTime.format(new Date(mainActivity.getMainSleepEnd())));
         //Change the color of buttons
         sleepButton.setBackground(ResourcesCompat
                 .getDrawable(getResources(), R.drawable.corner_8_clicked, null));
