@@ -101,9 +101,9 @@ public class MainActivity extends AppCompatActivity {
         long workOnsetDummy = 0;
         long workOffsetDummy = 0;
         try {
-            sleepOnsetDummy = Objects.requireNonNull(sdfDateTime.parse("29/10/2023 22:00")).getTime();
-            workOnsetDummy = Objects.requireNonNull(sdfDateTime.parse("30/10/2023 09:00")).getTime();
-            workOffsetDummy = Objects.requireNonNull(sdfDateTime.parse("30/10/2023 17:00")).getTime();
+            sleepOnsetDummy = Objects.requireNonNull(sdfDateTime.parse("1/11/2023 01:00")).getTime();
+            workOnsetDummy = Objects.requireNonNull(sdfDateTime.parse("1/11/2023 09:00")).getTime();
+            workOffsetDummy = Objects.requireNonNull(sdfDateTime.parse("1/11/2023 17:00")).getTime();
         } catch (ParseException e) {
             throw new RuntimeException(e);
         }
@@ -427,6 +427,17 @@ public class MainActivity extends AppCompatActivity {
                 }else{
                     return false;
                 }
+            }
+        }
+        return false;
+    }
+
+    public boolean deleteSleep(Sleep sleepDel){
+
+        for(Sleep sleep: this.sleeps){
+            if(sleep.sleepStart == sleepDel.sleepStart && sleep.sleepEnd == sleepDel.sleepEnd){
+                sleepDao.delete(sleep);
+                return true;
             }
         }
         return false;
