@@ -39,15 +39,15 @@ public class TimePickerDialog extends Dialog {
             }
             if (hour >= 12) {
                 if (hour - 12 < 10) {
-                    format = "PM " + "0" + (hour - 12) + ":" + minuteStr;
+                    format = "0" + (hour - 12) + ":" + minuteStr + " PM";
                 } else {
-                    format = "PM " + (hour - 12) + ":" + minuteStr;
+                    format = (hour - 12) + ":" + minuteStr + " PM";
                 }
             } else {
                 if (hour < 10) {
-                    format = "AM " + "0" + hour + ":" + minuteStr;
+                    format = "0" + hour + ":" + minuteStr + " AM";
                 } else {
-                    format = "AM " + hour + ":" + minuteStr;
+                    format = hour + ":" + minuteStr + " AM";
                 }
             }
             checkTimeButton.setOnClickListener(view -> {

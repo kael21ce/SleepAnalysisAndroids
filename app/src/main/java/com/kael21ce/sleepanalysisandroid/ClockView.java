@@ -8,6 +8,9 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class ClockView extends View {
 
     private float startAngle = 45;
@@ -63,14 +66,14 @@ public class ClockView extends View {
 
         //Calculate the position of small circles in the sides of interval
         double smallCircleRadius = Math.min(width, height) / 14;
-        double beta = Math.asin(smallCircleRadius/(radius - smallCircleRadius));
+        double beta = Math.asin(smallCircleRadius / (radius - smallCircleRadius));
         double betaDeg = beta * 180 / Math.PI;
         float startAngleRad = (float) (startAngle * Math.PI / 180);
         float sweepedAngleRad = (float) ((startAngle + sweepAngle) * Math.PI / 180);
-        float positionX1 = (float) (centerX + (radius - smallCircleRadius)*Math.cos(-startAngleRad - beta));
-        float positionY1 = (float) (centerY - (radius - smallCircleRadius)*Math.sin(-startAngleRad - beta));
-        float positionX2 = (float) (centerX + (radius - smallCircleRadius)*Math.cos(-sweepedAngleRad + beta));
-        float positionY2 = (float) (centerY - (radius - smallCircleRadius)*Math.sin(-sweepedAngleRad + beta));
+        float positionX1 = (float) (centerX + (radius - smallCircleRadius) * Math.cos(-startAngleRad - beta));
+        float positionY1 = (float) (centerY - (radius - smallCircleRadius) * Math.sin(-startAngleRad - beta));
+        float positionX2 = (float) (centerX + (radius - smallCircleRadius) * Math.cos(-sweepedAngleRad + beta));
+        float positionY2 = (float) (centerY - (radius - smallCircleRadius) * Math.sin(-sweepedAngleRad + beta));
         //Draw the arc on the canvas
         canvas.drawArc(left, top, right, bottom, startAngle + Math.abs((float) betaDeg),
                 sweepAngle - 2 * Math.abs((float) betaDeg), true, arcPaint);
@@ -101,21 +104,38 @@ public class ClockView extends View {
     //Change time to degree angle (e.g. 13:40 -> 115)
     public Float convertTimeToAngle(String time) {
         //Should be in format of "hh:mm"
-        if (time.length() > 5) {
+        List<Integer> HrMin = convertTimeFormat(time);
+        if (HrMin != null) {
+            int intHour = HrMin.get(0);
+            int intMinute = HrMin.get(1);
+            if (intHour > 24 || intMinute > 60) {
+                return (float) 0;
+            }
+            return (float) (15 * (intHour - 6) + 0.25 * intMinute);
+        } else {
             return (float) 0;
+        }
+    }
+
+    public List<Integer> convertTimeFormat(String time) {
+        //Should be in format of "hh:mm"
+        List<Integer> result = new ArrayList<Integer>();
+        if (time.length() > 5) {
+            return result;
         } else {
             int index = time.indexOf(":");
             if (index == -1) {
-                return (float) 0;
+                return result;
             }
             String hour = time.substring(0, index);
             String minute = time.substring(index + 1);
             int intHour = Integer.parseInt(hour);
             int intMinute = Integer.parseInt(minute);
-            if (intHour > 24 || intMinute > 60) {
-                return (float) 0;
-            }
-            return (float) (15*(intHour - 6) + 0.25*intMinute);
+            result.add(0, intHour);
+            result.add(1, intMinute);
+
+            return result;
         }
     }
 }
+

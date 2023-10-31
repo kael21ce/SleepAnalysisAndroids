@@ -3,6 +3,9 @@ package com.kael21ce.sleepanalysisandroid;
 public class Interval {
     String interval;
     Integer isNap;
+    public static final int Nap_Type = 1;
+    public static final int Activity_Type = 2;
+    public static final int Sleep_Type = 3;
 
     public Interval(String interval, Integer isNap) {
         this.interval = interval;
