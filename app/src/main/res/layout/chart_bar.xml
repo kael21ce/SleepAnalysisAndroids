@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="37dp"
+    android:layout_height="wrap_content"
+    android:layout_marginRight="2dp"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/PositiveBarLayout"
+        android:layout_width="match_parent"
+        android:layout_height="124dp"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@+id/PositiveCompetitor"
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:background="@color/white"
+            android:orientation="vertical"></LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/PositiveDisplayer"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/green_2"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:id="@+id/PositiveMeter"
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:background="@color/green_1"
+                android:orientation="vertical"></LinearLayout>
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/dateTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginVertical="4dp"
+        android:fontFamily="@font/pretendardbold"
+        android:gravity="center_horizontal"
+        android:text="12/24"
+        android:textColor="@color/black"
+        android:textSize="12sp" />
+
+    <LinearLayout
+        android:id="@+id/NegativeBarLayout"
+        android:layout_width="match_parent"
+        android:layout_height="124dp"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@+id/NegativeDisplayer"
+            android:layout_width="match_parent"
+            android:layout_height="120dp"
+            android:background="@color/red_2"
+            android:gravity="bottom"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:id="@+id/NegativeMeter"
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:background="@color/red_1"
+                android:orientation="vertical"></LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/NegativeCompetitor"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/white"
+            android:orientation="vertical"></LinearLayout>
+    </LinearLayout>
+
+</LinearLayout>

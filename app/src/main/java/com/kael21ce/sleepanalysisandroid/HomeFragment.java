@@ -9,6 +9,8 @@ import android.widget.TextView;
 
 import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -32,6 +34,7 @@ public class HomeFragment extends Fragment {
         TextView sleepTypeText = v.findViewById(R.id.sleepTypeHomeText);
         TextView stateDescriptionText = v.findViewById(R.id.StateDescriptionHomeText);
         ClockView clockView = v.findViewById(R.id.sweepingClockHome);
+        RecyclerView chartRecycler = v.findViewById(R.id.ChartRecyclerView);
 
         //Initial button color setting
         sleepButton.setBackground(ResourcesCompat
@@ -54,6 +57,26 @@ public class HomeFragment extends Fragment {
         //we use connection because fragment and activity is connected and we don't reuse fragment for other activity
         startTime.setText(sdfDateTime.format(new Date(mainActivity.getMainSleepStart())));
         endTime.setText(sdfDateTime.format(new Date(mainActivity.getMainSleepEnd())));
+
+        //Load LinearLayoutManager and BarAdapter for ChartRecyclerView
+        LinearLayoutManager chartLinearLayoutManager =
+                new LinearLayoutManager(v.getContext(), LinearLayoutManager.HORIZONTAL, false);
+        chartRecycler.setLayoutManager(chartLinearLayoutManager);
+        BarAdapter barAdapter = new BarAdapter();
+
+        //Set the bar items to BarAdapter (8 items)
+        //Just Examples
+        //You can convert the duration "HH:mm" to weight by using convertToWeight function in this fragment
+        barAdapter.addItem(new Bar("12/25", convertToWeight("12:00"), convertToWeight("3:00")));
+        barAdapter.addItem(new Bar("12/26", 124, 80));
+        barAdapter.addItem(new Bar("12/27", 50, 10));
+        barAdapter.addItem(new Bar("12/28", 20, 20));
+        barAdapter.addItem(new Bar("12/29", 80, 90));
+        barAdapter.addItem(new Bar("12/30", 10, 20));
+        barAdapter.addItem(new Bar("12/31", 60, 10));
+        barAdapter.addItem(new Bar("1/1", 80, 40));
+
+        chartRecycler.setAdapter(barAdapter);
 
         return v;
     }
@@ -132,5 +155,23 @@ public class HomeFragment extends Fragment {
         clockView.setTypeOfInterval(3);
         //Just example
         clockView.setAngleFromTime("9:00", "18:30");
+    }
+
+    //Convert "HH:mm" to weight
+    public int convertToWeight(String time) {
+        if (time.length() > 5) {
+            return 0;
+        }
+        int index = time.indexOf(":");
+        if (index == -1) {
+            return 0;
+        }
+        String hour = time.substring(0, index);
+        String minute = time.substring(index + 1);
+        int hourInt = Integer.parseInt(hour);
+        int minuteInt = Integer.parseInt(minute);
+        double totalTime = hourInt + (double) minuteInt / 60;
+
+        return (int) ((124/24)*totalTime);
     }
 }

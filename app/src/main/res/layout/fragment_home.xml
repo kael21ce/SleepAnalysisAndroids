@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:foregroundTint="@color/black"
-    tools:context=".HomeFragment">
+    tools:context=".HomeFragment" >
 
     <ScrollView
         android:id="@+id/HomeScrollView"
@@ -46,6 +46,7 @@
                     android:layout_marginVertical="16dp"
                     android:background="@drawable/clock_background"
                     android:orientation="vertical">
+
                     <com.kael21ce.sleepanalysisandroid.ClockView
                         android:id="@+id/sweepingClockHome"
                         android:layout_width="280dp"
@@ -66,10 +67,10 @@
                         android:id="@+id/sleepButtonHome"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
+                        android:layout_marginRight="4dp"
                         android:layout_weight="1"
                         android:background="@drawable/corner_8"
                         android:paddingTop="8dp"
-                        android:layout_marginRight="4dp"
                         android:paddingBottom="8dp"
                         android:scaleType="fitCenter"
                         android:src="@drawable/moon_flip"
@@ -79,11 +80,11 @@
                         android:id="@+id/napButtonHome"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
+                        android:layout_marginLeft="4dp"
+                        android:layout_marginRight="4dp"
                         android:layout_weight="1"
                         android:background="@drawable/corner_8"
                         android:paddingTop="8dp"
-                        android:layout_marginRight="4dp"
-                        android:layout_marginLeft="4dp"
                         android:paddingBottom="8dp"
                         android:scaleType="fitCenter"
                         android:src="@drawable/sun_gray"
@@ -93,11 +94,11 @@
                         android:id="@+id/workButtonHome"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
+                        android:layout_marginLeft="4dp"
                         android:layout_weight="1"
                         android:background="@drawable/corner_8"
                         android:paddingTop="8dp"
                         android:paddingBottom="8dp"
-                        android:layout_marginLeft="4dp"
                         android:scaleType="fitCenter"
                         android:src="@drawable/building"
                         tools:ignore="SpeakableTextPresentCheck" />
@@ -149,27 +150,30 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:orientation="horizontal">
+
                         <TextView
                             android:id="@+id/StartTimeHome"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:fontFamily="@font/pretendardbold"
                             android:text="7:15 PM"
                             android:textColor="@color/black"
-                            android:textSize="20sp"
-                            android:fontFamily="@font/pretendardbold"/>
+                            android:textSize="20sp" />
+
                         <ImageView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginHorizontal="4dp"
-                            android:src="@drawable/caret_right"/>
+                            android:src="@drawable/caret_right" />
+
                         <TextView
                             android:id="@+id/EndTimeHome"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:fontFamily="@font/pretendardbold"
                             android:text="3:10 AM"
                             android:textColor="@color/black"
-                            android:textSize="20sp"
-                            android:fontFamily="@font/pretendardbold"/>
+                            android:textSize="20sp" />
                     </LinearLayout>
                 </LinearLayout>
 
@@ -180,7 +184,7 @@
                     android:layout_gravity="center"
                     android:layout_marginVertical="16dp"
                     android:background="@drawable/corner_8"
-                    android:orientation="horizontal" >
+                    android:orientation="horizontal">
 
                     <TextView
                         android:id="@+id/StateDescriptionHomeText"
@@ -212,10 +216,10 @@
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="16dp"
                     android:layout_marginTop="16dp"
+                    android:fontFamily="@font/pretendardbold"
                     android:text="잠시 바람 쐬는 건 어때요?"
                     android:textColor="@color/black"
-                    android:textSize="20sp"
-                    android:fontFamily="@font/pretendardbold" />
+                    android:textSize="20sp" />
 
                 <TextView
                     android:id="@+id/AlertnessDescription"
@@ -252,10 +256,10 @@
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="16dp"
                     android:layout_marginTop="16dp"
+                    android:fontFamily="@font/pretendardbold"
                     android:text="주간 각성도"
                     android:textColor="@color/black"
-                    android:textSize="20sp"
-                    android:fontFamily="@font/pretendardbold" />
+                    android:textSize="20sp" />
 
                 <TextView
                     android:id="@+id/ChartDescription"
@@ -265,21 +269,13 @@
                     android:text="이번주 \(userName)님의 각성도에요"
                     android:textColor="@color/black" />
 
-                <LinearLayout
-                    android:id="@+id/ChartView"
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/ChartRecyclerView"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center_horizontal"
                     android:layout_marginHorizontal="24dp"
-                    android:layout_marginVertical="16dp"
-                    android:background="@color/green_2"
-                    android:orientation="vertical">
-
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/ChartRecyclerView"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent" />
-                </LinearLayout>
+                    android:layout_marginVertical="16dp" />
 
                 <LinearLayout
                     android:id="@+id/ChartTextLayout"
@@ -313,8 +309,7 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_gravity="center_vertical"
-                                    android:src="@tools:sample/avatars"
-                                    app:srcCompat="@drawable/bulb" />
+                                    android:src="@drawable/bulb" />
 
                                 <TextView
                                     android:id="@+id/positiveText"
@@ -349,8 +344,7 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_gravity="center_vertical"
-                                    android:src="@tools:sample/avatars"
-                                    app:srcCompat="@drawable/arrow_down" />
+                                    android:src="@drawable/arrow_down" />
 
                                 <TextView
                                     android:id="@+id/positiveNumberText"
@@ -389,8 +383,7 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_gravity="center_vertical"
-                                    android:src="@tools:sample/avatars"
-                                    app:srcCompat="@drawable/circle_warning" />
+                                    android:src="@drawable/circle_warning" />
 
                                 <TextView
                                     android:id="@+id/negativeText"
@@ -425,8 +418,7 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_gravity="center_vertical"
-                                    android:src="@tools:sample/avatars"
-                                    app:srcCompat="@drawable/arrow_up" />
+                                    android:src="@drawable/arrow_up" />
 
                                 <TextView
                                     android:id="@+id/negativeNumberText"
