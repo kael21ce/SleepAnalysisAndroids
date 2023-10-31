@@ -61,7 +61,7 @@ public class AddIntervalFragment extends Fragment implements ButtonTextUpdater {
         backButton = v.findViewById(R.id.backButton);
         backButton.setOnClickListener(view -> getParentFragmentManager().beginTransaction().replace(R.id.IntervalFrame, intervalFragment).commit());
 
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd aaa hh:mm");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd hh:mm aaa");
 
         //Set the initial added time to current time
         String current_date = new SimpleDateFormat("yyyy.MM.dd").format(new Date());
