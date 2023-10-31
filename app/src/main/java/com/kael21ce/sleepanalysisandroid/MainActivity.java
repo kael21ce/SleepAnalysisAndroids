@@ -76,6 +76,10 @@ public class MainActivity extends AppCompatActivity {
     private List<Sleep> sleeps;
     private List<Awareness> awarenesses;
     private List<V0> v0s;
+    long now;
+    long twoWeeks = (1000*60*60*24*14);
+    long fiveMinutesToMil = (1000*60*5);
+    Instant ILastSleepUpdate;
     SleepDao sleepDao;
     V0Dao v0Dao;
 
@@ -92,11 +96,10 @@ public class MainActivity extends AppCompatActivity {
         //get the shared preferences variable
         sharedPref = getSharedPreferences("SleepWake", Context.MODE_PRIVATE);
         editor = sharedPref.edit();
-        long twoWeeks = (1000*60*60*24*14);
-        long fiveMinutesToMil = (1000*60*5);
+
+        now = System.currentTimeMillis();
 
         //dummy variable to test sleep onset, work onset, and work offset
-        //"dd/MM/yyyy"+ "HH:mm"
         long sleepOnsetDummy = 0;
         long workOnsetDummy = 0;
         long workOffsetDummy = 0;
@@ -132,15 +135,67 @@ public class MainActivity extends AppCompatActivity {
         napSleepStart = sharedPref.getLong("napSleepStart", System.currentTimeMillis() - twoWeeks);
         napSleepEnd = sharedPref.getLong("napSleepEnd", System.currentTimeMillis() - twoWeeks);
 
-        long now = System.currentTimeMillis();
-        Instant ILastSleepUpdate = Instant.ofEpochMilli(lastSleepUpdate);
+        ILastSleepUpdate = Instant.ofEpochMilli(lastSleepUpdate);
 
         db = Room.databaseBuilder(getApplicationContext(),
                 AppDatabase.class, "sleep_wake").allowMainThreadQueries().build();
 
         sleepDao = db.sleepDao();
 
-        //get sleep data
+        getSleepData();
+        do_simulation();
+        calculateAwareness();
+
+        bottomNavigationView = findViewById(R.id.bottomNavigationView);
+        getSupportFragmentManager().beginTransaction().replace(R.id.mainFrame, homeFragment).commit();
+        getSupportActionBar().setTitle(Html.fromHtml("<font color='#223047'>SleepWake</font>"));
+
+        bottomNavigationView.setOnNavigationItemSelectedListener(
+                new BottomNavigationView.OnNavigationItemSelectedListener() {
+                    @Override
+                    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                        if (item.getItemId() == R.id.tabHome) {
+                            getSupportFragmentManager().beginTransaction()
+                                    .replace(R.id.mainFrame, homeFragment).commit();
+                            getSupportActionBar().setTitle(Html.fromHtml("<font color='#223047'>SleepWake</font>"));
+                            return true;
+                        } else if (item.getItemId() == R.id.tabSchedule) {
+                            getSupportFragmentManager().beginTransaction()
+                                    .replace(R.id.mainFrame, scheduleFragment).commit();
+                            getSupportActionBar().setTitle(Html.fromHtml("<font color='#223047'>수면 기록</font>"));
+                            return true;
+                        } else if (item.getItemId() == R.id.tabRecommend) {
+                            getSupportFragmentManager().beginTransaction()
+                                    .replace(R.id.mainFrame, recommendFragment).commit();
+                            getSupportActionBar().setTitle(Html.fromHtml("<font color='#223047'>추천 수면</font>"));
+                            return true;
+                        } else if (item.getItemId() == R.id.tabSetting) {
+                            getSupportFragmentManager().beginTransaction()
+                                    .replace(R.id.mainFrame, settingFragment).commit();
+                            getSupportActionBar().setTitle(Html.fromHtml("<font color='#223047'>설정</font>"));
+                            return true;
+                        } else {
+                            return false;
+                        }
+                    }
+                }
+        );
+    }
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
+        db.close();
+    }
+
+    public double getAwarenessValue(double H, double n, double y, double x){
+        double coef_y = 0.8, coef_x = -0.16, v_vh = 1.01;
+        double C = 3.37*0.5*(1+coef_y*x + coef_x * y);
+        double D_up = (2.46+10.2+C)/v_vh;
+        double awareness = D_up - H;
+        return awareness;
+    }
+
+    public void getSleepData(){
         sleeps = sleepDao.getAll();
         boolean check = false;
         for(Sleep sleep: sleeps){
@@ -160,7 +215,9 @@ public class MainActivity extends AppCompatActivity {
             editor.putLong("lastSleepUpdate", System.currentTimeMillis());
             editor.apply();
         }
+    }
 
+    public void do_simulation(){
         //get V0 data
         v0Dao = db.v0Dao();
         v0s = v0Dao.getAll();
@@ -250,10 +307,9 @@ public class MainActivity extends AppCompatActivity {
         editor.putLong("napSleepStart", sleepSuggestion[2]*(1000*60*5)+now);
         editor.putLong("napSleepEnd", sleepSuggestion[3]*(1000*60*5)+now);
         editor.apply();
+    }
 
-        //simulate another pcr for the graph
-
-
+    public void calculateAwareness(){
         //calculate the awareness
         AwarenessDao awarenessDao = db.awarenessDao();
         long oneDayToMils = 1000*60*60*24;
@@ -300,54 +356,6 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         }
-
-        bottomNavigationView = findViewById(R.id.bottomNavigationView);
-        getSupportFragmentManager().beginTransaction().replace(R.id.mainFrame, homeFragment).commit();
-        getSupportActionBar().setTitle(Html.fromHtml("<font color='#223047'>SleepWake</font>"));
-
-        bottomNavigationView.setOnNavigationItemSelectedListener(
-                new BottomNavigationView.OnNavigationItemSelectedListener() {
-                    @Override
-                    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                        if (item.getItemId() == R.id.tabHome) {
-                            getSupportFragmentManager().beginTransaction()
-                                    .replace(R.id.mainFrame, homeFragment).commit();
-                            getSupportActionBar().setTitle(Html.fromHtml("<font color='#223047'>SleepWake</font>"));
-                            return true;
-                        } else if (item.getItemId() == R.id.tabSchedule) {
-                            getSupportFragmentManager().beginTransaction()
-                                    .replace(R.id.mainFrame, scheduleFragment).commit();
-                            getSupportActionBar().setTitle(Html.fromHtml("<font color='#223047'>수면 기록</font>"));
-                            return true;
-                        } else if (item.getItemId() == R.id.tabRecommend) {
-                            getSupportFragmentManager().beginTransaction()
-                                    .replace(R.id.mainFrame, recommendFragment).commit();
-                            getSupportActionBar().setTitle(Html.fromHtml("<font color='#223047'>추천 수면</font>"));
-                            return true;
-                        } else if (item.getItemId() == R.id.tabSetting) {
-                            getSupportFragmentManager().beginTransaction()
-                                    .replace(R.id.mainFrame, settingFragment).commit();
-                            getSupportActionBar().setTitle(Html.fromHtml("<font color='#223047'>설정</font>"));
-                            return true;
-                        } else {
-                            return false;
-                        }
-                    }
-                }
-        );
-    }
-    @Override
-    public void onDestroy(){
-        super.onDestroy();
-        db.close();
-    }
-
-    public double getAwarenessValue(double H, double n, double y, double x){
-        double coef_y = 0.8, coef_x = -0.16, v_vh = 1.01;
-        double C = 3.37*0.5*(1+coef_y*x + coef_x * y);
-        double D_up = (2.46+10.2+C)/v_vh;
-        double awareness = D_up - H;
-        return awareness;
     }
 
     public static Context getAppContext() {
