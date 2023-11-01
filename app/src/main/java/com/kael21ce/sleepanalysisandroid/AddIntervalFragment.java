@@ -1,6 +1,8 @@
 package com.kael21ce.sleepanalysisandroid;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 
@@ -43,6 +45,12 @@ public class AddIntervalFragment extends Fragment implements ButtonTextUpdater {
         View v = inflater.inflate(R.layout.fragment_add_interval, container, false);
 
         MainActivity mainActivity = (MainActivity)getActivity();
+
+        SharedPreferences sharedPref = getActivity().getSharedPreferences("SleepWake", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+
+        editor.putBoolean("isSchedule", true);
+        editor.apply();
 
         startDateButton = v.findViewById(R.id.startDateButton);
         startTimeButton = v.findViewById(R.id.startTimeButton);

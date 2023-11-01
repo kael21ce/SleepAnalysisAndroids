@@ -64,7 +64,7 @@ public class IntervalFragment extends Fragment {
             long sleepEnd = bundle.getLong("sleepEnd"+i);
             long duration = (sleepEnd - sleepStart)/1000;
             Log.v("DURATION", String.valueOf(sleepStart));
-            Log.v("DURAIONT2", String.valueOf(sleepEnd));
+            Log.v("DURATION2", String.valueOf(sleepEnd));
 //            intervalAdapter.addItem(new Interval(String.valueOf(duration), 2));
             intervalAdapter.addItem(new Interval(sdf.format(new Date(sleepStart)) + " " + sdf.format(new Date(sleepEnd)), 2));
         }

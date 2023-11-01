@@ -147,7 +147,14 @@ public class MainActivity extends AppCompatActivity {
         calculateAwareness();
 
         bottomNavigationView = findViewById(R.id.bottomNavigationView);
-        getSupportFragmentManager().beginTransaction().replace(R.id.mainFrame, homeFragment).commit();
+        boolean isSchedule = sharedPref.getBoolean("isSchedule", false);
+        if(isSchedule == true){
+            editor.putBoolean("isSchedule", false);
+            editor.apply();
+            getSupportFragmentManager().beginTransaction().replace(R.id.mainFrame, scheduleFragment).commit();
+        }else {
+            getSupportFragmentManager().beginTransaction().replace(R.id.mainFrame, homeFragment).commit();
+        }
         getSupportActionBar().setTitle(Html.fromHtml("<font color='#223047'>SleepWake</font>"));
 
         bottomNavigationView.setOnNavigationItemSelectedListener(
