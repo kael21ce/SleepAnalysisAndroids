@@ -33,19 +33,11 @@ public class EditIntervalFragment extends Fragment implements ButtonTextUpdater 
         startTimeEditButton = v.findViewById(R.id.startTimeEditButton);
         endTimeEditButton = v.findViewById(R.id.endTimeEditButton);
 
+        MainActivity mainActivity = (MainActivity)getActivity();
+
         IntervalFragment intervalFragment = new IntervalFragment();
         //Back to intervalFragment if backButtonEdit is clicked
         backButtonEdit.setOnClickListener(view -> getParentFragmentManager().beginTransaction().replace(R.id.IntervalFrame, intervalFragment).commit());
-
-        //Delete interval if deleteButton is clicked
-        deleteButton.setOnClickListener(view -> {
-            //Delete
-        });
-
-        //Edit interval if editButton is clicked
-        editButton.setOnClickListener(view -> {
-            //Edit
-        });
 
         //Set the time picker to each timeEditButton
         EditIntervalFragment editIntervalFragment = this;
@@ -64,6 +56,16 @@ public class EditIntervalFragment extends Fragment implements ButtonTextUpdater 
         intervalTextView.setText("수면 시간: "
                + getInterval(v.getContext(), (String) startTimeEditButton.getText(), (String) endTimeEditButton.getText()));
 
+        //Delete interval if deleteButton is clicked
+        deleteButton.setOnClickListener(view -> {
+            //Delete
+        });
+
+        //Edit interval if editButton is clicked
+        editButton.setOnClickListener(view -> {
+
+            //Edit
+        });
 
         return v;
     }
