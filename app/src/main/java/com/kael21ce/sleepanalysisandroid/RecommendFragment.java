@@ -33,6 +33,7 @@ public class RecommendFragment extends Fragment {
     private TextView sleepImportanceText;
     private TextView sleepTypeText;
     private TextView stateDescriptionText;
+    SimpleDateFormat sdfDateTime = new SimpleDateFormat("dd/MM/yyyy"+ "HH:mm", Locale.KOREA);
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -96,8 +97,8 @@ public class RecommendFragment extends Fragment {
                                  TextView sleepTypeText, TextView sleepImportanceText,
                                  TextView stateDescriptionText, ClockView clockView)
     {
-        //startTime.setText(sdfDateTime.format(new Date(mainActivity.getMainSleepStart())));
-        //endTime.setText(sdfDateTime.format(new Date(mainActivity.getMainSleepStart())));
+        startTime.setText(sdfDateTime.format(new Date(mainActivity.getMainSleepStart())));
+        endTime.setText(sdfDateTime.format(new Date(mainActivity.getMainSleepStart())));
         //Change the color of buttons
         sleepButton.setBackground(ResourcesCompat
                 .getDrawable(getResources(), R.drawable.corner_8_clicked, null));
@@ -123,8 +124,8 @@ public class RecommendFragment extends Fragment {
                                TextView sleepTypeText, TextView sleepImportanceText,
                                TextView stateDescriptionText, ClockView clockView)
     {
-        //startTime.setText(sdfDateTime.format(new Date(mainActivity.getNapSleepStart())));
-        //endTime.setText(sdfDateTime.format(new Date(mainActivity.getNapSleepEnd())));
+        startTime.setText(sdfDateTime.format(new Date(mainActivity.getNapSleepStart())));
+        endTime.setText(sdfDateTime.format(new Date(mainActivity.getNapSleepEnd())));
         //Change the color of buttons
         sleepButton.setBackground(ResourcesCompat
                 .getDrawable(getResources(), R.drawable.corner_8, null));
@@ -148,8 +149,8 @@ public class RecommendFragment extends Fragment {
                                 TextView sleepTypeText, TextView sleepImportanceText,
                                 TextView stateDescriptionText, ClockView clockView)
     {
-        //startTime.setText(sdfDateTime.format(new Date(mainActivity.getWorkOnset())));
-        //endTime.setText(sdfDateTime.format(new Date(mainActivity.getWorkOffset())));
+        startTime.setText(sdfDateTime.format(new Date(mainActivity.getWorkOnset())));
+        endTime.setText(sdfDateTime.format(new Date(mainActivity.getWorkOffset())));
         //Change the color of buttons
         sleepButton.setBackground(ResourcesCompat
                 .getDrawable(getResources(), R.drawable.corner_8, null));
