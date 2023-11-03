@@ -34,6 +34,8 @@ public class RecommendFragment extends Fragment {
     private TextView sleepTypeText;
     private TextView stateDescriptionText;
     SimpleDateFormat sdfDateTime = new SimpleDateFormat("dd/MM/yyyy"+ "HH:mm", Locale.KOREA);
+    SimpleDateFormat sdfTime = new SimpleDateFormat("hh:mm", Locale.KOREA);
+    String mainSleepStartString, mainSleepEndString, workOnsetString, workOffsetString, napSleepStartString, napSleepEndString;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -59,6 +61,14 @@ public class RecommendFragment extends Fragment {
             Log.v("theSleepR2", sleepEnd);
         }
 
+        MainActivity mainActivity = (MainActivity)getActivity();
+
+        mainSleepStartString = sdfTime.format(new Date(mainActivity.getMainSleepStart()));
+        mainSleepEndString = sdfTime.format(new Date(mainActivity.getMainSleepEnd()));
+        napSleepStartString = sdfTime.format(new Date(mainActivity.getNapSleepStart()));
+        napSleepEndString = sdfTime.format(new Date(mainActivity.getNapSleepEnd()));
+        workOnsetString = sdfTime.format(new Date(mainActivity.getWorkOnset()));
+        workOffsetString = sdfTime.format(new Date(mainActivity.getWorkOffset()));
 
         View v = inflater.inflate(R.layout.fragment_recommend, container, false);
         MainActivity mainActivity = (MainActivity) getActivity();
@@ -116,7 +126,7 @@ public class RecommendFragment extends Fragment {
         //Change the clock angle using setAngle and color using setTypeOfInterval
         clockView.setTypeOfInterval(1);
         //Just example
-        clockView.setAngleFromTime("00:00", "7:00");
+        clockView.setAngleFromTime(mainSleepStartString, mainSleepEndString);
     }
 
     public void napButtonClick(View v, MainActivity mainActivity, TextView startTime, TextView endTime,
@@ -141,7 +151,7 @@ public class RecommendFragment extends Fragment {
         stateDescriptionText.setText("이때 주무시면 덜 피곤할거에요");
         clockView.setTypeOfInterval(2);
         //Just example
-        clockView.setAngleFromTime("19:00", "22:15");
+        clockView.setAngleFromTime(napSleepStartString, napSleepEndString);
     }
 
     public void workButtonClick(View v, MainActivity mainActivity, TextView startTime, TextView endTime,
@@ -166,6 +176,6 @@ public class RecommendFragment extends Fragment {
         stateDescriptionText.setText("가장 각성도가 높은 시간이에요");
         clockView.setTypeOfInterval(3);
         //Just example
-        clockView.setAngleFromTime("9:00", "18:30");
+        clockView.setAngleFromTime(workOnsetString, workOffsetString);
     }
 }

@@ -1,5 +1,7 @@
 package com.kael21ce.sleepanalysisandroid;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +20,8 @@ import java.util.Locale;
 
 public class HomeFragment extends Fragment {
     SimpleDateFormat sdfDateTime = new SimpleDateFormat( "hh:mm a", Locale.KOREA);
+    SimpleDateFormat sdfTime = new SimpleDateFormat("hh:mm", Locale.KOREA);
+    String mainSleepStartString, mainSleepEndString, workOnsetString, workOffsetString, napSleepStartString, napSleepEndString;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -51,12 +55,18 @@ public class HomeFragment extends Fragment {
                 sleepButton, napButton, workButton, sleepTypeText, sleepImportanceText, stateDescriptionText,
                 clockView));
         clockView.setTypeOfInterval(1);
+        mainSleepStartString = sdfTime.format(new Date(mainActivity.getMainSleepStart()));
+        mainSleepEndString = sdfTime.format(new Date(mainActivity.getMainSleepEnd()));
+        napSleepStartString = sdfTime.format(new Date(mainActivity.getNapSleepStart()));
+        napSleepEndString = sdfTime.format(new Date(mainActivity.getNapSleepEnd()));
+        workOnsetString = sdfTime.format(new Date(mainActivity.getWorkOnset()));
+        workOffsetString = sdfTime.format(new Date(mainActivity.getWorkOffset()));
         //Just Example
-        clockView.setAngleFromTime("00:00", "7:00");
+        clockView.setAngleFromTime(mainSleepStartString, mainSleepEndString);
 
         //we use connection because fragment and activity is connected and we don't reuse fragment for other activity
-        startTime.setText(sdfDateTime.format(new Date(mainActivity.getMainSleepStart())));
-        endTime.setText(sdfDateTime.format(new Date(mainActivity.getMainSleepEnd())));
+        startTime.setText(mainSleepStartString);
+        endTime.setText(mainSleepEndString);
 
         //Load LinearLayoutManager and BarAdapter for ChartRecyclerView
         LinearLayoutManager chartLinearLayoutManager =
@@ -104,7 +114,7 @@ public class HomeFragment extends Fragment {
         //Change the clock angle using setAngle and color using setTypeOfInterval
         clockView.setTypeOfInterval(1);
         //Just example
-        clockView.setAngleFromTime("00:00", "7:00");
+        clockView.setAngleFromTime(mainSleepStartString, mainSleepEndString);
     }
 
     public void napButtonClick(View v, MainActivity mainActivity, TextView startTime, TextView endTime,
@@ -129,7 +139,7 @@ public class HomeFragment extends Fragment {
         stateDescriptionText.setText("이때 주무시면 덜 피곤할거에요");
         clockView.setTypeOfInterval(2);
         //Just example
-        clockView.setAngleFromTime("19:00", "22:15");
+        clockView.setAngleFromTime(napSleepStartString, napSleepEndString);
     }
 
     public void workButtonClick(View v, MainActivity mainActivity, TextView startTime, TextView endTime,
@@ -154,7 +164,7 @@ public class HomeFragment extends Fragment {
         stateDescriptionText.setText("가장 각성도가 높은 시간이에요");
         clockView.setTypeOfInterval(3);
         //Just example
-        clockView.setAngleFromTime("9:00", "18:30");
+        clockView.setAngleFromTime(workOnsetString, workOffsetString);
     }
 
     //Convert "HH:mm" to weight
