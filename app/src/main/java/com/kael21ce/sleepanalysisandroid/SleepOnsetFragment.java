@@ -1,5 +1,7 @@
 package com.kael21ce.sleepanalysisandroid;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -7,58 +9,120 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link SleepOnsetFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
-public class SleepOnsetFragment extends Fragment {
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+public class SleepOnsetFragment extends Fragment implements ButtonTextUpdater{
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
-    public SleepOnsetFragment() {
-        // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment SleepOnsetFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static SleepOnsetFragment newInstance(String param1, String param2) {
-        SleepOnsetFragment fragment = new SleepOnsetFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-    }
+    private Button sleepOnsetDateButton;
+    private Button sleepOnsetTimeButton;
+    private Button workOnsetDateButton;
+    private Button workOnsetTimeButton;
+    private Button workOffsetDateButton;
+    private Button workOffsetTimeButton;
+    public DatePickerDialog datePickerDialog;
+    public TimePickerDialog timePickerDialog;
+    long sleepOnset, workOnset, workOffset;
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd hh:mm aaa");
+    SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy.MM.dd");
+    SimpleDateFormat sdfTime = new SimpleDateFormat("hh:mm aaa");
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        View v = inflater.inflate(R.layout.fragment_sleep_onset, container, false);
+        sleepOnsetDateButton = v.findViewById(R.id.sleepOnsetDateButton);
+        sleepOnsetTimeButton = v.findViewById(R.id.sleepOnsetTimeButton);
+        workOnsetDateButton = v.findViewById(R.id.workOnsetDateButton);
+        workOnsetTimeButton = v.findViewById(R.id.workOnsetTimeButton);
+        workOffsetDateButton = v.findViewById(R.id.workOffsetDateButton);
+        workOffsetTimeButton = v.findViewById(R.id.workOffsetTimeButton);
+
+        SharedPreferences sharedPref = getActivity().getSharedPreferences("SleepWake", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        sleepOnset = sharedPref.getLong("sleepOnset", System.currentTimeMillis());
+        workOnset = sharedPref.getLong("workOnset", System.currentTimeMillis());
+        workOffset = sharedPref.getLong("workOffset", System.currentTimeMillis());
+
+//        String sleepOnsetString = sdf.format(new Date(sleepOnset));
+//        String workOnsetString = sdf.format(new Date(workOnset));
+//        String workOffsetString = sdf.format(new Date(workOffset));
+
+        sleepOnsetDateButton.setText(sdfDate.format(new Date(sleepOnset)));
+        sleepOnsetTimeButton.setText(sdfTime.format(new Date(sleepOnset)));
+        workOnsetDateButton.setText(sdfDate.format(new Date(workOnset)));
+        workOnsetTimeButton.setText(sdfTime.format(new Date(workOnset)));
+        workOffsetDateButton.setText(sdfDate.format(new Date(workOffset)));
+        workOffsetTimeButton.setText(sdfTime.format(new Date(workOffset)));
+
+        SleepOnsetFragment sleepOnsetFragment = this;
+        sleepOnsetDateButton.setOnClickListener(view -> {
+            datePickerDialog = new DatePickerDialog(v.getContext(), sleepOnsetFragment);
+            datePickerDialog.setData(0);
+            datePickerDialog.show();
+        });
+        sleepOnsetTimeButton.setOnClickListener(view -> {
+            timePickerDialog = new TimePickerDialog(v.getContext(), sleepOnsetFragment);
+            timePickerDialog.setData(0);
+            timePickerDialog.show();
+        });
+        workOnsetDateButton.setOnClickListener(view -> {
+            datePickerDialog = new DatePickerDialog(v.getContext(), sleepOnsetFragment);
+            datePickerDialog.setData(1);
+            datePickerDialog.show();
+        });
+        workOnsetTimeButton.setOnClickListener(view -> {
+            timePickerDialog = new TimePickerDialog(v.getContext(), sleepOnsetFragment);
+            timePickerDialog.setData(1);
+            timePickerDialog.show();
+        });
+        workOffsetDateButton.setOnClickListener(view -> {
+            datePickerDialog = new DatePickerDialog(v.getContext(), sleepOnsetFragment);
+            datePickerDialog.setData(2);
+            datePickerDialog.show();
+        });
+        workOffsetTimeButton.setOnClickListener(view -> {
+            timePickerDialog = new TimePickerDialog(v.getContext(), sleepOnsetFragment);
+            timePickerDialog.setData(2);
+            timePickerDialog.show();
+        });
+
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_sleep_onset, container, false);
+        return v;
+    }
+
+    //Change the text of Button
+    public void setDateButtonText(String text, int isStartButton) {
+        if (isStartButton==0) {
+            if (sleepOnsetDateButton != null) {
+                sleepOnsetDateButton.setText(text);
+            }
+        } else if(isStartButton == 1) {
+            if (workOnsetDateButton != null) {
+                workOnsetDateButton.setText(text);
+            }
+        } else{
+            if (workOffsetDateButton != null) {
+                workOffsetDateButton.setText(text);
+            }
+        }
+    }
+
+    public void setTimeButtonText(String text, int isStartButton) {
+        if (isStartButton==0) {
+            if (sleepOnsetTimeButton != null) {
+                sleepOnsetTimeButton.setText(text);
+            }
+        } else if(isStartButton == 1) {
+            if (workOnsetTimeButton != null) {
+                workOnsetTimeButton.setText(text);
+            }
+        } else{
+            if (workOffsetTimeButton != null) {
+                workOffsetTimeButton.setText(text);
+            }
+        }
     }
 }

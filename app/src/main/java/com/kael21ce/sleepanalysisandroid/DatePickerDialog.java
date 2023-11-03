@@ -14,7 +14,7 @@ public class DatePickerDialog extends Dialog {
     public ImageButton backPopButton;
     public Button checkDateButton;
     public DatePicker datePicker;
-    public Boolean isStartButton;
+    public int isStartButton;
 
     public DatePickerDialog(@NonNull Context context, ButtonTextUpdater buttonTextUpdater) {
         super(context);
@@ -45,7 +45,7 @@ public class DatePickerDialog extends Dialog {
     }
 
     //To get the data from AddIntervalFragment
-    public void setData(Boolean isStartButton) {
+    public void setData(int isStartButton) {
         this.isStartButton = isStartButton;
     }
 }

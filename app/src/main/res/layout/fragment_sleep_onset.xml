@@ -78,32 +78,43 @@
                     android:id="@+id/workOnsetSettingView"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:layout_marginBottom="16dp"
                     android:orientation="horizontal">
 
                     <TextView
                         android:id="@+id/workOnsetText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Work Onset" />
+                        android:fontFamily="@font/pretendardvariable"
+                        android:text="work onset"
+                        android:textColor="@color/black"
+                        android:textSize="16sp" />
 
                     <Button
                         android:id="@+id/workOnsetDateButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Oct 24, 2023" />
+                        android:layout_marginLeft="16dp"
+                        android:layout_marginRight="8dp"
+                        android:backgroundTint="@color/gray_1"
+                        android:fontFamily="@font/pretendardvariable"
+                        android:text="Oct 24, 2023"
+                        android:textColor="@color/black"
+                        android:textSize="14sp" />
 
                     <Button
                         android:id="@+id/workOnsetTimeButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="21:45 PM" />
+                        android:backgroundTint="@color/gray_1"
+                        android:fontFamily="@font/pretendardvariable"
+                        android:text="18:30 PM"
+                        android:textColor="@color/black"
+                        android:textSize="14sp" />
                 </LinearLayout>
 
                 <LinearLayout
-                    android:id="@+id/endTimeSettingView"
+                    android:id="@+id/workOffsetSettingView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
@@ -147,7 +158,10 @@
             android:id="@+id/sleepSettingSubmitButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="UPDATE" />
+            android:text="UPDATE"
+            android:textColor="#000000"
+            android:visibility="visible"
+            tools:visibility="visible" />
 
     </LinearLayout>
 </FrameLayout>

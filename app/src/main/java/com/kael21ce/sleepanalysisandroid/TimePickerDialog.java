@@ -14,7 +14,7 @@ public class TimePickerDialog extends Dialog {
     public ImageButton backPopTimeButton;
     public Button checkTimeButton;
     public TimePicker timePicker;
-    public Boolean isStartButton;
+    public int isStartButton;
 
     public TimePickerDialog(@NonNull Context context, ButtonTextUpdater buttonTextUpdater) {
         super(context);
@@ -60,7 +60,7 @@ public class TimePickerDialog extends Dialog {
     }
 
     //To set the data from AddIntervalFragment
-    public void setData(Boolean isStartButton) {
+    public void setData(int isStartButton) {
         this.isStartButton = isStartButton;
     }
 }

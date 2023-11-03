@@ -73,7 +73,7 @@ public class AddIntervalFragment extends Fragment implements ButtonTextUpdater {
 
         //Set the initial added time to current time
         String current_date = new SimpleDateFormat("yyyy.MM.dd").format(new Date());
-        String current_time = new SimpleDateFormat("aaa hh:mm").format(new Date());
+        String current_time = new SimpleDateFormat("hh:mm aaa").format(new Date());
         startDateButton.setText(current_date);
         endDateButton.setText(current_date);
         startTimeButton.setText(current_time);
@@ -83,22 +83,22 @@ public class AddIntervalFragment extends Fragment implements ButtonTextUpdater {
         AddIntervalFragment addIntervalFragment = this;
         startDateButton.setOnClickListener(view -> {
             datePickerDialog = new DatePickerDialog(v.getContext(), addIntervalFragment);
-            datePickerDialog.setData(true);
+            datePickerDialog.setData(1);
             datePickerDialog.show();
         });
         endDateButton.setOnClickListener(view -> {
             datePickerDialog = new DatePickerDialog(v.getContext(), addIntervalFragment);
-            datePickerDialog.setData(false);
+            datePickerDialog.setData(0);
             datePickerDialog.show();
         });
         startTimeButton.setOnClickListener(view -> {
             timePickerDialog = new TimePickerDialog(v.getContext(), addIntervalFragment);
-            timePickerDialog.setData(true);
+            timePickerDialog.setData(1);
             timePickerDialog.show();
         });
         endTimeButton.setOnClickListener(view -> {
             timePickerDialog = new TimePickerDialog(v.getContext(), addIntervalFragment);
-            timePickerDialog.setData(false);
+            timePickerDialog.setData(0);
             timePickerDialog.show();
         });
         addButton.setOnClickListener(view -> {
@@ -144,8 +144,8 @@ public class AddIntervalFragment extends Fragment implements ButtonTextUpdater {
     }
 
     //Change the text of Button
-    public void setDateButtonText(String text, Boolean isStartButton) {
-        if (isStartButton) {
+    public void setDateButtonText(String text, int isStartButton) {
+        if (isStartButton==1) {
             if (startDateButton != null) {
                 startDateButton.setText(text);
             }
@@ -156,8 +156,8 @@ public class AddIntervalFragment extends Fragment implements ButtonTextUpdater {
         }
     }
 
-    public void setTimeButtonText(String text, Boolean isStartButton) {
-        if (isStartButton) {
+    public void setTimeButtonText(String text, int isStartButton) {
+        if (isStartButton==1) {
             if (startTimeButton != null) {
                 startTimeButton.setText(text);
             }

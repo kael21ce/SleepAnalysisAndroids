@@ -43,12 +43,12 @@ public class EditIntervalFragment extends Fragment implements ButtonTextUpdater 
         EditIntervalFragment editIntervalFragment = this;
         startTimeEditButton.setOnClickListener(view -> {
             TimePickerDialog timePickerDialog = new TimePickerDialog(v.getContext(), editIntervalFragment);
-            timePickerDialog.setData(true);
+            timePickerDialog.setData(1);
             timePickerDialog.show();
         });
         endTimeEditButton.setOnClickListener(view -> {
             TimePickerDialog timePickerDialog = new TimePickerDialog(v.getContext(), editIntervalFragment);
-            timePickerDialog.setData(false);
+            timePickerDialog.setData(0);
             timePickerDialog.show();
         });
 
@@ -70,12 +70,12 @@ public class EditIntervalFragment extends Fragment implements ButtonTextUpdater 
         return v;
     }
 
-    public void setDateButtonText(String text, Boolean isStartButton) {
+    public void setDateButtonText(String text, int isStartButton) {
 
     }
 
-    public void setTimeButtonText(String text, Boolean isStartButton) {
-        if (isStartButton) {
+    public void setTimeButtonText(String text, int isStartButton) {
+        if (isStartButton==1) {
             if (startTimeEditButton != null) {
                 startTimeEditButton.setText(text);
             }
