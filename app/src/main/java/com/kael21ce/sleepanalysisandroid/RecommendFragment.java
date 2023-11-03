@@ -71,7 +71,6 @@ public class RecommendFragment extends Fragment {
         workOffsetString = sdfTime.format(new Date(mainActivity.getWorkOffset()));
 
         View v = inflater.inflate(R.layout.fragment_recommend, container, false);
-        MainActivity mainActivity = (MainActivity) getActivity();
 
         sleepButton = v.findViewById(R.id.sleepButton);
         napButton = v.findViewById(R.id.napButton);
