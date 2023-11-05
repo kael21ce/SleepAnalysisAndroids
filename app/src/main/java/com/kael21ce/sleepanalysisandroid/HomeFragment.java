@@ -3,6 +3,7 @@ package com.kael21ce.sleepanalysisandroid;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,8 +21,9 @@ import java.util.Locale;
 
 public class HomeFragment extends Fragment {
     SimpleDateFormat sdfDateTime = new SimpleDateFormat( "hh:mm a", Locale.KOREA);
+    SimpleDateFormat sdfDateTime2 = new SimpleDateFormat( "dd/MM/yyyy hh:mm a", Locale.KOREA);
     SimpleDateFormat sdfTime = new SimpleDateFormat("hh:mm", Locale.KOREA);
-    String mainSleepStartString, mainSleepEndString, workOnsetString, workOffsetString, napSleepStartString, napSleepEndString;
+    String mainSleepStartString, mainSleepEndString, workOnsetString, workOffsetString, napSleepStartString, napSleepEndString, sleepOnsetString;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -61,6 +63,13 @@ public class HomeFragment extends Fragment {
         napSleepEndString = sdfTime.format(new Date(mainActivity.getNapSleepEnd()));
         workOnsetString = sdfTime.format(new Date(mainActivity.getWorkOnset()));
         workOffsetString = sdfTime.format(new Date(mainActivity.getWorkOffset()));
+        sleepOnsetString = sdfDateTime.format(new Date(mainActivity.getSleepOnset()));
+
+        SharedPreferences sharedPref = getActivity().getSharedPreferences("SleepWake", Context.MODE_PRIVATE);
+        Log.v("sleep onset", sdfDateTime2.format(new Date(sharedPref.getLong("sleepOnset", System.currentTimeMillis()))));
+        Log.v("work onset", sdfDateTime2.format(new Date(sharedPref.getLong("workOnset", System.currentTimeMillis()))));
+        Log.v("work offset", sdfDateTime2.format(new Date(sharedPref.getLong("workOffset", System.currentTimeMillis()))));
+
         //Just Example
         clockView.setAngleFromTime(mainSleepStartString, mainSleepEndString);
 

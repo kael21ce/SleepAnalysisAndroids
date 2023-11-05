@@ -6,12 +6,19 @@ import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import com.kael21ce.sleepanalysisandroid.data.Sleep;
+
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 
 public class SleepOnsetFragment extends Fragment implements ButtonTextUpdater{
@@ -22,6 +29,7 @@ public class SleepOnsetFragment extends Fragment implements ButtonTextUpdater{
     private Button workOnsetTimeButton;
     private Button workOffsetDateButton;
     private Button workOffsetTimeButton;
+    private Button sleepSettingSubmitButton;
     public DatePickerDialog datePickerDialog;
     public TimePickerDialog timePickerDialog;
     long sleepOnset, workOnset, workOffset;
@@ -33,12 +41,16 @@ public class SleepOnsetFragment extends Fragment implements ButtonTextUpdater{
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_sleep_onset, container, false);
+
+        MainActivity mainActivity = (MainActivity)getActivity();
+
         sleepOnsetDateButton = v.findViewById(R.id.sleepOnsetDateButton);
         sleepOnsetTimeButton = v.findViewById(R.id.sleepOnsetTimeButton);
         workOnsetDateButton = v.findViewById(R.id.workOnsetDateButton);
         workOnsetTimeButton = v.findViewById(R.id.workOnsetTimeButton);
         workOffsetDateButton = v.findViewById(R.id.workOffsetDateButton);
         workOffsetTimeButton = v.findViewById(R.id.workOffsetTimeButton);
+        sleepSettingSubmitButton = v.findViewById(R.id.sleepSettingSubmitButton);
 
         SharedPreferences sharedPref = getActivity().getSharedPreferences("SleepWake", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
@@ -87,6 +99,47 @@ public class SleepOnsetFragment extends Fragment implements ButtonTextUpdater{
             timePickerDialog = new TimePickerDialog(v.getContext(), sleepOnsetFragment);
             timePickerDialog.setData(2);
             timePickerDialog.show();
+        });
+
+        sleepSettingSubmitButton.setOnClickListener(view -> {
+            String sleepOnsetDate = (String) sleepOnsetDateButton.getText();
+            String sleepOnsetTime = (String) sleepOnsetTimeButton.getText();
+            String sleepOnsetSDF = sleepOnsetDate + ' ' + sleepOnsetTime;
+            String workOnsetDate = (String) workOnsetDateButton.getText();
+            String workOnsetTime = (String) workOnsetTimeButton.getText();
+            String workOnsetSDF = workOnsetDate + ' ' + workOnsetTime;
+            String workOffsetDate = (String) workOffsetDateButton.getText();
+            String workOffsetTime = (String) workOffsetTimeButton.getText();
+            String workOffsetSDF = workOffsetDate + ' ' + workOffsetTime;
+            Log.v("SLEEP ONSET SDF", sleepOnsetSDF);
+            Log.v("WORK ONSET SDF", workOnsetSDF);
+            Log.v("WORK OFFSET SDF", workOffsetSDF);
+
+            Date sleepOnset = null;
+            Date workOnset = null;
+            Date workOffset = null;
+            try {
+                sleepOnset = sdf.parse(sleepOnsetSDF);
+                workOnset = sdf.parse(workOnsetSDF);
+                workOffset = sdf.parse(workOffsetSDF);
+                //translate to local date time
+                LocalDateTime ldt1 = LocalDateTime.ofInstant(sleepOnset.toInstant(), ZoneId.systemDefault());
+                LocalDateTime ldt2 = LocalDateTime.ofInstant(workOnset.toInstant(), ZoneId.systemDefault());
+                LocalDateTime ldt3 = LocalDateTime.ofInstant(workOffset.toInstant(), ZoneId.systemDefault());
+                sleepOnset = Date.from(ldt1.atZone(ZoneId.systemDefault()).toInstant());
+                workOnset = Date.from(ldt2.atZone(ZoneId.systemDefault()).toInstant());
+                workOffset = Date.from(ldt3.atZone(ZoneId.systemDefault()).toInstant());
+            } catch (ParseException e) {
+                throw new RuntimeException(e);
+            }
+            assert sleepOnset != null;
+            assert workOnset != null;
+            assert workOffset != null;
+
+            mainActivity.setSleepOnset(sleepOnset.getTime());
+            mainActivity.setWorkOnset(workOnset.getTime());
+            mainActivity.setWorkOffset(workOffset.getTime());
+
         });
 
         // Inflate the layout for this fragment

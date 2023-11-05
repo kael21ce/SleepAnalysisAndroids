@@ -121,13 +121,13 @@ public class MainActivity extends AppCompatActivity {
         workOffset = sharedPref.getLong("workOffset", System.currentTimeMillis());
 
         //for testing
-        sleepOnset = sleepOnsetDummy;
-        workOnset = workOnsetDummy;
-        workOffset = workOffsetDummy;
-        editor.putLong("sleepOnset", sleepOnsetDummy);
-        editor.putLong("workOnset", workOnsetDummy);
-        editor.putLong("workOffset", workOffsetDummy);
-        editor.apply();
+//        sleepOnset = sleepOnsetDummy;
+//        workOnset = workOnsetDummy;
+//        workOffset = workOffsetDummy;
+//        editor.putLong("sleepOnset", sleepOnsetDummy);
+//        editor.putLong("workOnset", workOnsetDummy);
+//        editor.putLong("workOffset", workOffsetDummy);
+//        editor.apply();
 
         //sleep result variables
         mainSleepStart = sharedPref.getLong("mainSleepStart", System.currentTimeMillis() - twoWeeks);
@@ -503,10 +503,11 @@ public class MainActivity extends AppCompatActivity {
         return sleepOnset;
     }
 
-    public void setSleepOnset(long napSleepEnd) {
+    public void setSleepOnset(long sleepOnset) {
         this.sleepOnset = sleepOnset;
         editor.putLong("sleepOnset", sleepOnset);
         editor.apply();
+        Log.v("sleep onset", sdfDateTime.format(new Date(sharedPref.getLong("sleepOnset", System.currentTimeMillis()))));
     }
 
     public long getWorkOnset(){
@@ -517,6 +518,7 @@ public class MainActivity extends AppCompatActivity {
         this.workOnset = workOnset;
         editor.putLong("workOnset", workOnset);
         editor.apply();
+        Log.v("work onset", sdfDateTime.format(new Date(sharedPref.getLong("workOnset", System.currentTimeMillis()))));
     }
 
     public long getWorkOffset() {
@@ -527,6 +529,7 @@ public class MainActivity extends AppCompatActivity {
         this.workOffset = workOffset;
         editor.putLong("workOffset", workOffset);
         editor.apply();
+        Log.v("work offset", sdfDateTime.format(new Date(sharedPref.getLong("workOffset", System.currentTimeMillis()))));
     }
 
     public long getLastSleepUpdate() {
