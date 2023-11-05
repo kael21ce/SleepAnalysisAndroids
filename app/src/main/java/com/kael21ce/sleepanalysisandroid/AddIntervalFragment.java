@@ -130,14 +130,10 @@ public class AddIntervalFragment extends Fragment implements ButtonTextUpdater {
             assert sleepEndDate != null;
             add_sleep.sleepStart = sleepStartDate.getTime();
             add_sleep.sleepEnd = sleepEndDate.getTime();
-            Log.v("GO TO MAIN ACTIVITY", "GO TO MAIN ACTIVITY");
             mainActivity.addSleep(add_sleep);
-            FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
-            if (Build.VERSION.SDK_INT >= 26) {
-                ft.setReorderingAllowed(false);
-            }
-            ft.detach(this).attach(this).commit();
-            getParentFragmentManager().beginTransaction().replace(R.id.IntervalFrame, intervalFragment).commit();
+
+            mainActivity.finish();
+            startActivity(new Intent(mainActivity, SplashActivity.class));
         });
 
         return  v;
