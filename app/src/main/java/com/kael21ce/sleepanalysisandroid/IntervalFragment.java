@@ -66,7 +66,7 @@ public class IntervalFragment extends Fragment {
             Log.v("DURATION", String.valueOf(sleepStart));
             Log.v("DURATION2", String.valueOf(sleepEnd));
 //            intervalAdapter.addItem(new Interval(String.valueOf(duration), 2));
-            intervalAdapter.addItem(new Interval(sdf.format(new Date(sleepStart)) + " " + sdf.format(new Date(sleepEnd)), 2));
+            intervalAdapter.addItem(new Interval(sdf.format(new Date(sleepStart)) + " " + sdf.format(new Date(sleepEnd)), 3));
         }
         //Just example
 //        intervalAdapter.addItem(new Interval("1시간 0분", 2));
