@@ -347,12 +347,15 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                     if(isInAwareness == false){
+                        awarenesses.add(addAwareness);
+                    }
+                    if(awarenessDb == null){
                         //insert
                         List<Awareness> awarenessList = new ArrayList<>();
                         awarenessList.add(addAwareness);
                         awarenessDao.insertAll(awarenessList);
-                        awarenesses.add(addAwareness);
                     }else {
+                        //we can make it faster by using lazy loading, but this is okay for now
                         awarenessDao.updateAwareness(startDay, goodDuration, badDuration);
                     }
                     Log.v("AWARENESS", String.valueOf(startDay)+' '+ goodDuration + ' ' + badDuration);
