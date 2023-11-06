@@ -21,8 +21,14 @@ public class IntervalAdapter extends RecyclerView.Adapter<IntervalAdapter.ViewHo
     FragmentManager fragmentManager;
     String date;
 
+    Bundle bundle1;
+
     public void setDate(String date){
         this.date = date;
+    }
+
+    public void setBundle(Bundle bundle){
+        this.bundle1 = bundle;
     }
 
     public IntervalAdapter(FragmentManager fragmentManager) {
@@ -50,6 +56,7 @@ public class IntervalAdapter extends RecyclerView.Adapter<IntervalAdapter.ViewHo
                 bundle.putString("date", date);
                 bundle.putString("startHour", hours[0]);
                 bundle.putString("endHour", hours[1]);
+                bundle.putBundle("bundle", bundle1);
                 editIntervalFragment.setArguments(bundle);
 
                 FragmentTransaction transaction = fragmentManager.beginTransaction();

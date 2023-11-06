@@ -430,19 +430,25 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public boolean editSleep(Sleep prevSleep, Sleep updatedSleep){
-
+        int count = 0;
         for(Sleep sleep: this.sleeps){
             if(sleep.sleepStart == prevSleep.sleepStart && sleep.sleepEnd == prevSleep.sleepEnd){
                 int sleepId = sleep.sleep_id;
                 if(!isOverlap(this.sleeps, updatedSleep, sleepId)) {
                     updatedSleep.sleep_id = sleepId;
-                    this.sleeps.set(sleepId, updatedSleep);
+                    Log.v("COUNT", String.valueOf(count));
+                    Log.v("SLEEPS OF COUNT", sdfDateTime.format(new Date(this.sleeps.get(count).sleepStart)));
+                    Log.v("UPDATED SLEEP", sdfDateTime.format(new Date(updatedSleep.sleepStart)));
+                    Log.v("UPDATED SLEEP", sdfDateTime.format(new Date(updatedSleep.sleepEnd)));
+                    Log.v("SLEEP", String.valueOf(updatedSleep.sleepStart));
                     sleepDao.updateSleep(sleepId, updatedSleep.sleepStart, updatedSleep.sleepEnd);
+                    this.sleeps.set(count, updatedSleep);
                     return true;
                 }else{
                     return false;
                 }
             }
+            count += 1;
         }
         return false;
     }

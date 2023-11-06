@@ -73,6 +73,7 @@ public class IntervalFragment extends Fragment {
 
         String date = bundle.getString("date");
         intervalAdapter.setDate(date);
+        intervalAdapter.setBundle(bundle);
 
         //If there is no Item, not show IntervalListLayout
         if (intervalAdapter.getItemCount() == 0) {

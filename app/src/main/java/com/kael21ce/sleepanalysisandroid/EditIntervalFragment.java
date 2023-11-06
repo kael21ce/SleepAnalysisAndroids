@@ -53,6 +53,8 @@ public class EditIntervalFragment extends Fragment implements ButtonTextUpdater 
 
         IntervalFragment intervalFragment = new IntervalFragment();
         //Back to intervalFragment if backButtonEdit is clicked
+        Bundle bundle = this.getArguments();
+        intervalFragment.setArguments(bundle.getBundle("bundle"));
         backButtonEdit.setOnClickListener(view -> getParentFragmentManager().beginTransaction().replace(R.id.IntervalFrame, intervalFragment).commit());
 
         //Set the time picker to each timeEditButton
@@ -69,7 +71,6 @@ public class EditIntervalFragment extends Fragment implements ButtonTextUpdater 
         });
 
         //get the bundle
-        Bundle bundle = this.getArguments();
         if(bundle == null){
             Log.v("bundle", "bundle failed to be fetched");
         }
@@ -88,7 +89,11 @@ public class EditIntervalFragment extends Fragment implements ButtonTextUpdater 
         } catch (ParseException e) {
             throw new RuntimeException(e);
         }
+        Log.v("AM PM FORMAT", sdfAMPM.format(startHourD));
+        Log.v("AM PM FORMAT", sdfAMPM.format(endHourD));
 
+        startTimeEditButton.setText(sdfAMPM.format(startHourD));
+        endTimeEditButton.setText(sdfAMPM.format(endHourD));
         //Set the text of editIntervalText
         intervalTextView.setText("수면 시간: "
                + getInterval(v.getContext(), sdfAMPM.format(startHourD), sdfAMPM.format(endHourD)));
