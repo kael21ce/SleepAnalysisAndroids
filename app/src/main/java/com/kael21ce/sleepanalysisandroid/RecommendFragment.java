@@ -34,7 +34,7 @@ public class RecommendFragment extends Fragment {
     private TextView sleepTypeText;
     private TextView stateDescriptionText;
     SimpleDateFormat sdfDateTime = new SimpleDateFormat("dd/MM/yyyy"+ "HH:mm", Locale.KOREA);
-    SimpleDateFormat sdfTime = new SimpleDateFormat("hh:mm", Locale.KOREA);
+    SimpleDateFormat sdfTime = new SimpleDateFormat("HH:mm", Locale.KOREA);
     String mainSleepStartString, mainSleepEndString, workOnsetString, workOffsetString, napSleepStartString, napSleepEndString;
 
     @Override
@@ -96,7 +96,10 @@ public class RecommendFragment extends Fragment {
                 sleepButton, napButton, workButton, sleepTypeText, sleepImportanceText, stateDescriptionText,
                 clockView));
         clockView.setTypeOfInterval(1);
-        clockView.setAngleFromTime("00:00", "7:00");
+        clockView.setAngleFromTime(mainSleepStartString, mainSleepEndString);
+
+        startTime.setText(mainSleepStartString);
+        endTime.setText(mainSleepEndString);
 
         return v;
     }
@@ -106,8 +109,8 @@ public class RecommendFragment extends Fragment {
                                  TextView sleepTypeText, TextView sleepImportanceText,
                                  TextView stateDescriptionText, ClockView clockView)
     {
-        startTime.setText(sdfDateTime.format(new Date(mainActivity.getMainSleepStart())));
-        endTime.setText(sdfDateTime.format(new Date(mainActivity.getMainSleepStart())));
+        startTime.setText(mainSleepStartString);
+        endTime.setText(mainSleepEndString);
         //Change the color of buttons
         sleepButton.setBackground(ResourcesCompat
                 .getDrawable(getResources(), R.drawable.corner_8_clicked, null));
@@ -133,8 +136,8 @@ public class RecommendFragment extends Fragment {
                                TextView sleepTypeText, TextView sleepImportanceText,
                                TextView stateDescriptionText, ClockView clockView)
     {
-        startTime.setText(sdfDateTime.format(new Date(mainActivity.getNapSleepStart())));
-        endTime.setText(sdfDateTime.format(new Date(mainActivity.getNapSleepEnd())));
+        startTime.setText(napSleepStartString);
+        endTime.setText(napSleepEndString);
         //Change the color of buttons
         sleepButton.setBackground(ResourcesCompat
                 .getDrawable(getResources(), R.drawable.corner_8, null));
@@ -158,8 +161,8 @@ public class RecommendFragment extends Fragment {
                                 TextView sleepTypeText, TextView sleepImportanceText,
                                 TextView stateDescriptionText, ClockView clockView)
     {
-        startTime.setText(sdfDateTime.format(new Date(mainActivity.getWorkOnset())));
-        endTime.setText(sdfDateTime.format(new Date(mainActivity.getWorkOffset())));
+        startTime.setText(workOnsetString);
+        endTime.setText(workOffsetString);
         //Change the color of buttons
         sleepButton.setBackground(ResourcesCompat
                 .getDrawable(getResources(), R.drawable.corner_8, null));
