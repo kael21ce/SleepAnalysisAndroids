@@ -26,7 +26,7 @@ public class HomeFragment extends Fragment {
     SimpleDateFormat sdfDateTime = new SimpleDateFormat( "hh:mm a", Locale.KOREA);
     SimpleDateFormat sdfDateTime2 = new SimpleDateFormat( "dd/MM/yyyy hh:mm a", Locale.KOREA);
     SimpleDateFormat sdfDate = new SimpleDateFormat("MM/dd", Locale.KOREA);
-    SimpleDateFormat sdfTime = new SimpleDateFormat("hh:mm", Locale.KOREA);
+    SimpleDateFormat sdfTime = new SimpleDateFormat("HH:mm", Locale.KOREA);
     String mainSleepStartString, mainSleepEndString, workOnsetString, workOffsetString, napSleepStartString, napSleepEndString, sleepOnsetString;
     private List<Awareness> awarenesses;
 
@@ -94,13 +94,18 @@ public class HomeFragment extends Fragment {
         long curTime = System.currentTimeMillis();
         long curDay = curTime/oneDayToMils;
         for(Awareness awareness: awarenesses){
-            Log.v("AWARENESS VALUE IN SCHEDULE", sdfDate.format(new Date(awareness.awarenessDay*oneDayToMils+1)));
-            Log.v("AWARENESS VALUE IN SCHEDULE", sdfTime.format(new Date(awareness.goodDuration*60*1000)));
-            Log.v("AWARENESS VALUE IN SCHEDULE", sdfTime.format(new Date(awareness.badDuration*60*1000)));
+            Log.v("AWARENESS VALUE IN SCHEDULE", sdfDate.format(new Date(awareness.awarenessDay*oneDayToMils+oneDayToMils)));
+
+            long hourGoodDuration = awareness.goodDuration/60;
+            long minuteGoodDuration = awareness.goodDuration%60;
+            long hourBadDuration = awareness.badDuration/60;
+            long minuteBadDuration = awareness.badDuration%60;
+            Log.v("AWARENESS VALUE IN SCHEDULE", hourGoodDuration + ":" + minuteGoodDuration);
+            Log.v("AWARENESS VALUE IN SCHEDULE", hourBadDuration + ":" + minuteBadDuration);
             if(curDay-9 < awareness.awarenessDay){
-                String date = sdfDate.format(new Date(awareness.awarenessDay*oneDayToMils));
-                String goodDuration = sdfTime.format(new Date(awareness.goodDuration*60*1000));
-                String badDuration = sdfTime.format(new Date(awareness.badDuration*60*1000));
+                String date = sdfDate.format(new Date((awareness.awarenessDay+1)*oneDayToMils));
+                String goodDuration = hourGoodDuration + ":" + minuteGoodDuration;
+                String badDuration = hourBadDuration + ":" + minuteBadDuration;
                 barAdapter.addItem(new Bar(date, convertToWeight(goodDuration), convertToWeight(badDuration)));
             }
         }
