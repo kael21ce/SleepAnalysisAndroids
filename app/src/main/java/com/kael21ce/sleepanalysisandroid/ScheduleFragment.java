@@ -171,6 +171,7 @@ public class ScheduleFragment extends Fragment {
                     count++;
                 }
                 bundle.putInt("count", count);
+                bundle.putString("date", myDate);
 
                 intervalFragment = new IntervalFragment();
                 intervalFragment.setArguments(bundle);

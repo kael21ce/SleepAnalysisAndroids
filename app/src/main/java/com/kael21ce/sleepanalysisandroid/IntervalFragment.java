@@ -66,13 +66,13 @@ public class IntervalFragment extends Fragment {
             Log.v("DURATION", String.valueOf(sleepStart));
             Log.v("DURATION2", String.valueOf(sleepEnd));
 //            intervalAdapter.addItem(new Interval(String.valueOf(duration), 2));
-            intervalAdapter.addItem(new Interval(sdf.format(new Date(sleepStart)) + " " + sdf.format(new Date(sleepEnd)), 3));
+            intervalAdapter.addItem(new Interval(sdf.format(new Date(sleepStart)) + " - " + sdf.format(new Date(sleepEnd)), 3));
         }
-        //Just example
+//        Just example
 //        intervalAdapter.addItem(new Interval("1시간 0분", 2));
-//        intervalAdapter.addItem(new Interval("5시간 0분", 3));
-//        intervalAdapter.addItem(new Interval("8시간 58분", 2));
-//        intervalAdapter.addItem(new Interval("0시간 15분", 1));
+
+        String date = bundle.getString("date");
+        intervalAdapter.setDate(date);
 
         //If there is no Item, not show IntervalListLayout
         if (intervalAdapter.getItemCount() == 0) {

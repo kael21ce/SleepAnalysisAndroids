@@ -1,5 +1,6 @@
 package com.kael21ce.sleepanalysisandroid;
 
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +18,11 @@ import java.util.ArrayList;
 public class IntervalAdapter extends RecyclerView.Adapter<IntervalAdapter.ViewHolder> {
     ArrayList<Interval> items = new ArrayList<Interval>();
     FragmentManager fragmentManager;
+    String date;
+
+    public void setDate(String date){
+        this.date = date;
+    }
 
     public IntervalAdapter(FragmentManager fragmentManager) {
         this.fragmentManager = fragmentManager;
@@ -35,6 +41,15 @@ public class IntervalAdapter extends RecyclerView.Adapter<IntervalAdapter.ViewHo
             ImageButton editButton = itemView.findViewById(R.id.editIntervalButton);
             editButton.setOnClickListener(view -> {
                 //Move to the edit page
+                String itemText = itemView.findViewById(R.id.intervalTextEdit).toString();
+                String[] hours = itemText.split(" - ");
+                //Make a bundle
+                Bundle bundle = new Bundle();
+                bundle.putString("date", date);
+                bundle.putString("startHour", hours[0]);
+                bundle.putString("endHour", hours[1]);
+                editIntervalFragment.setArguments(bundle);
+
                 FragmentTransaction transaction = fragmentManager.beginTransaction();
                 transaction.replace(R.id.IntervalFrame, editIntervalFragment).commit();
             });

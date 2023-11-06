@@ -5,6 +5,7 @@ import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,7 +13,15 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import com.kael21ce.sleepanalysisandroid.data.Sleep;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class EditIntervalFragment extends Fragment implements ButtonTextUpdater {
 
@@ -20,6 +29,9 @@ public class EditIntervalFragment extends Fragment implements ButtonTextUpdater 
     public Button endTimeEditButton;
     private String buttonStartText;
     private String buttonEndText;
+
+    SimpleDateFormat sdfDateTime = new SimpleDateFormat( "yyyy/MM/dd HH:mm", Locale.KOREA);
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd hh:mm aaa");
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -56,15 +68,65 @@ public class EditIntervalFragment extends Fragment implements ButtonTextUpdater 
         intervalTextView.setText("수면 시간: "
                + getInterval(v.getContext(), (String) startTimeEditButton.getText(), (String) endTimeEditButton.getText()));
 
+        //get the bundle
+        Bundle bundle = this.getArguments();
+        if(bundle == null){
+            Log.v("bundle", "bundle failed to be fetched");
+        }
+        String date = bundle.getString("date");
+        String startHour = bundle.getString("startHour");
+        String endHour = bundle.getString("endHour");
+        long startSleep = 0;
+        long endSleep = 0;
+        try {
+            startSleep = sdfDateTime.parse(date + " " + startHour).getTime();
+            endSleep = sdfDateTime.parse(date + " " + endHour).getTime();
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
+
         //Delete interval if deleteButton is clicked
+        long finalStartSleep = startSleep;
+        long finalEndSleep = endSleep;
+        Sleep initSleep = new Sleep();
+        initSleep.sleepStart = finalStartSleep;
+        initSleep.sleepEnd = finalEndSleep;
         deleteButton.setOnClickListener(view -> {
-            //Delete
+
+            mainActivity.deleteSleep(initSleep);
         });
 
         //Edit interval if editButton is clicked
         editButton.setOnClickListener(view -> {
+            Sleep edit_sleep = new Sleep();
+            String startTime = (String) startTimeEditButton.getText();
+            String endTime = (String) endTimeEditButton.getText();
+            String startSDF = date + ' ' + startTime;
+            String endSDF = date + ' ' + endTime;
+            Log.v("START SDF", startSDF);
+            Log.v("END SDF", endSDF);
 
-            //Edit
+            Date sleepStartDate = null;
+            Date sleepEndDate = null;
+            try {
+                sleepStartDate = sdf.parse(startSDF);
+                sleepEndDate = sdf.parse(endSDF);
+                //translate to local date time
+                LocalDateTime ldt1 = LocalDateTime.ofInstant(sleepStartDate.toInstant(), ZoneId.systemDefault());
+                LocalDateTime ldt2 = LocalDateTime.ofInstant(sleepEndDate.toInstant(), ZoneId.systemDefault());
+                sleepStartDate = Date.from(ldt1.atZone(ZoneId.systemDefault()).toInstant());
+                sleepEndDate = Date.from(ldt2.atZone(ZoneId.systemDefault()).toInstant());
+            } catch (ParseException e) {
+                throw new RuntimeException(e);
+            }
+            Log.v("START DATE", sleepStartDate.toString());
+            Log.v("END DATE", sleepEndDate.toString());
+            assert sleepStartDate != null;
+            assert sleepEndDate != null;
+            edit_sleep.sleepStart = sleepStartDate.getTime();
+            edit_sleep.sleepEnd = sleepEndDate.getTime();
+
+            mainActivity.editSleep(initSleep, edit_sleep);
         });
 
         return v;
