@@ -94,13 +94,13 @@ public class HomeFragment extends Fragment {
         long curTime = System.currentTimeMillis();
         long curDay = curTime/oneDayToMils;
         for(Awareness awareness: awarenesses){
-            Log.v("AWARENESS VALUE IN SCHEDULE", String.valueOf(awareness.awarenessDay));
-            Log.v("AWARENESS VALUE IN SCHEDULE", String.valueOf(awareness.goodDuration));
-            Log.v("AWARENESS VALUE IN SCHEDULE", String.valueOf(awareness.badDuration));
-            if(curDay-8 < awareness.awarenessDay){
+            Log.v("AWARENESS VALUE IN SCHEDULE", sdfDate.format(new Date(awareness.awarenessDay*oneDayToMils+1)));
+            Log.v("AWARENESS VALUE IN SCHEDULE", sdfTime.format(new Date(awareness.goodDuration*60*1000)));
+            Log.v("AWARENESS VALUE IN SCHEDULE", sdfTime.format(new Date(awareness.badDuration*60*1000)));
+            if(curDay-9 < awareness.awarenessDay){
                 String date = sdfDate.format(new Date(awareness.awarenessDay*oneDayToMils));
                 String goodDuration = sdfTime.format(new Date(awareness.goodDuration*60*1000));
-                String badDuration = sdfTime.format(new Date(awareness.goodDuration*60*1000));
+                String badDuration = sdfTime.format(new Date(awareness.badDuration*60*1000));
                 barAdapter.addItem(new Bar(date, convertToWeight(goodDuration), convertToWeight(badDuration)));
             }
         }
@@ -108,14 +108,14 @@ public class HomeFragment extends Fragment {
         //Set the bar items to BarAdapter (8 items)
         //Just Examples
         //You can convert the duration "HH:mm" to weight by using convertToWeight function in this fragment
-        barAdapter.addItem(new Bar("12/25", convertToWeight("12:00"), convertToWeight("3:00")));
-        barAdapter.addItem(new Bar("12/26", 124, 80));
-        barAdapter.addItem(new Bar("12/27", 50, 10));
-        barAdapter.addItem(new Bar("12/28", 20, 20));
-        barAdapter.addItem(new Bar("12/29", 80, 90));
-        barAdapter.addItem(new Bar("12/30", 10, 20));
-        barAdapter.addItem(new Bar("12/31", 60, 10));
-        barAdapter.addItem(new Bar("1/1", 80, 40));
+//        barAdapter.addItem(new Bar("12/25", convertToWeight("12:00"), convertToWeight("3:00")));
+//        barAdapter.addItem(new Bar("12/26", 124, 80));
+//        barAdapter.addItem(new Bar("12/27", 50, 10));
+//        barAdapter.addItem(new Bar("12/28", 20, 20));
+//        barAdapter.addItem(new Bar("12/29", 80, 90));
+//        barAdapter.addItem(new Bar("12/30", 10, 20));
+//        barAdapter.addItem(new Bar("12/31", 60, 10));
+//        barAdapter.addItem(new Bar("1/1", 80, 40));
 
         chartRecycler.setAdapter(barAdapter);
 
