@@ -1,6 +1,7 @@
 package com.kael21ce.sleepanalysisandroid;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -33,6 +34,9 @@ public class EditIntervalFragment extends Fragment implements ButtonTextUpdater 
     SimpleDateFormat sdfDateTime = new SimpleDateFormat( "yyyy/MM/dd HH:mm", Locale.KOREA);
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd hh:mm aaa");
 
+    SimpleDateFormat sdf24H = new SimpleDateFormat("HH:mm");
+    SimpleDateFormat sdfAMPM = new SimpleDateFormat("hh:mm aaa");
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -64,10 +68,6 @@ public class EditIntervalFragment extends Fragment implements ButtonTextUpdater 
             timePickerDialog.show();
         });
 
-        //Set the text of editIntervalText
-        intervalTextView.setText("수면 시간: "
-               + getInterval(v.getContext(), (String) startTimeEditButton.getText(), (String) endTimeEditButton.getText()));
-
         //get the bundle
         Bundle bundle = this.getArguments();
         if(bundle == null){
@@ -78,12 +78,20 @@ public class EditIntervalFragment extends Fragment implements ButtonTextUpdater 
         String endHour = bundle.getString("endHour");
         long startSleep = 0;
         long endSleep = 0;
+        Date startHourD = new Date();
+        Date endHourD = new Date();
         try {
             startSleep = sdfDateTime.parse(date + " " + startHour).getTime();
             endSleep = sdfDateTime.parse(date + " " + endHour).getTime();
+            startHourD = sdf24H.parse(startHour);
+            endHourD = sdf24H.parse(endHour);
         } catch (ParseException e) {
             throw new RuntimeException(e);
         }
+
+        //Set the text of editIntervalText
+        intervalTextView.setText("수면 시간: "
+               + getInterval(v.getContext(), sdfAMPM.format(startHourD), sdfAMPM.format(endHourD)));
 
         //Delete interval if deleteButton is clicked
         long finalStartSleep = startSleep;
@@ -92,12 +100,14 @@ public class EditIntervalFragment extends Fragment implements ButtonTextUpdater 
         initSleep.sleepStart = finalStartSleep;
         initSleep.sleepEnd = finalEndSleep;
         deleteButton.setOnClickListener(view -> {
-
+            Log.v("DELETED", "DELETED");
             mainActivity.deleteSleep(initSleep);
+            startActivity(new Intent(mainActivity, SplashActivity.class));
         });
 
         //Edit interval if editButton is clicked
         editButton.setOnClickListener(view -> {
+            Log.v("EDITED", "EDITED");
             Sleep edit_sleep = new Sleep();
             String startTime = (String) startTimeEditButton.getText();
             String endTime = (String) endTimeEditButton.getText();
@@ -127,6 +137,7 @@ public class EditIntervalFragment extends Fragment implements ButtonTextUpdater 
             edit_sleep.sleepEnd = sleepEndDate.getTime();
 
             mainActivity.editSleep(initSleep, edit_sleep);
+            startActivity(new Intent(mainActivity, SplashActivity.class));
         });
 
         return v;

@@ -267,9 +267,9 @@ public class MainActivity extends AppCompatActivity {
         SleepModel sleepModel = new SleepModel();
         double[] sleepPattern = sleepToArray(startProcess, endProcess, sleeps);
         Log.v("SLEEP SIZE", String.valueOf(sleepPattern.length));
-        for(double i: sleepPattern){
-            Log.v("I", String.valueOf(i));
-        }
+//        for(double i: sleepPattern){
+//            Log.v("I", String.valueOf(i));
+//        }
         ArrayList<double[]> simulationResult = sleepModel.pcr_simulation(initV0, sleepPattern, 5/60.0);
 
         //update V0 from the simulation
@@ -283,7 +283,7 @@ public class MainActivity extends AppCompatActivity {
             v0.n_val = res[2];
             v0.H_val = res[3];
             v0.time = startProcess + (i*fiveMinutesToMil);
-            Log.v("VO TIME", sdfDateTime.format(new Date(v0.time)));
+//            Log.v("VO TIME", sdfDateTime.format(new Date(v0.time)));
             newV0.add(v0);
 
             if(v0.time >= (System.currentTimeMillis()-(1000*60*6)) && (v0.time <= System.currentTimeMillis())){

@@ -1,6 +1,7 @@
 package com.kael21ce.sleepanalysisandroid;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,7 +42,8 @@ public class IntervalAdapter extends RecyclerView.Adapter<IntervalAdapter.ViewHo
             ImageButton editButton = itemView.findViewById(R.id.editIntervalButton);
             editButton.setOnClickListener(view -> {
                 //Move to the edit page
-                String itemText = itemView.findViewById(R.id.intervalTextEdit).toString();
+                TextView itemTextView = itemView.findViewById(R.id.intervalTextEdit);
+                String itemText = itemTextView.getText().toString();
                 String[] hours = itemText.split(" - ");
                 //Make a bundle
                 Bundle bundle = new Bundle();
