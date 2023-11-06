@@ -205,9 +205,12 @@ public class MainActivity extends AppCompatActivity {
     public void getSleepData(){
         sleeps = sleepDao.getAll();
         boolean check = false;
+        long lastSleep1 = 0;
         for(Sleep sleep: sleeps){
             String sleepStart = sdfDateTime.format(new Date(sleep.sleepStart));
             String sleepEnd = sdfDateTime.format(new Date(sleep.sleepEnd));
+            Date sleepEndD = new Date(sleep.sleepEnd);
+            lastSleep1 = sleepEndD.getTime();
             Log.v("SLEEP REAL", sleepStart);
             Log.v("SLEEP REAL", sleepEnd);
             if(ILastSleepUpdate.isBefore(Instant.ofEpochMilli(sleep.sleepStart))){
@@ -215,11 +218,12 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         Log.v("CHECK", String.valueOf(check));
-        Log.v("LAST SLEEP UPDATE", String.valueOf(lastSleepUpdate));
+        Log.v("LAST SLEEP UPDATE", sdfDateTime.format(new Date(lastSleepUpdate)));
+        Log.v("LAST SLEEP DATA", sdfDateTime.format(new Date(lastSleep1)));
         Log.v("SLEEP DATA", "GOT SLEEP DATA");
         if(check){
             //edit lastSleepUpdate to match current time
-            editor.putLong("lastSleepUpdate", System.currentTimeMillis());
+            editor.putLong("lastSleepUpdate", lastSleep1);
             editor.apply();
         }
     }
@@ -334,20 +338,21 @@ public class MainActivity extends AppCompatActivity {
                     addAwareness.awarenessDay = startDay;
                     addAwareness.goodDuration = goodDuration;
                     addAwareness.badDuration = badDuration;
-                    if(awarenessDb == null){
+                    boolean isInAwareness = false;
+                    for(int i = 0; i < awarenesses.size(); i ++){
+                        if(awarenesses.get(i).awarenessDay == addAwareness.awarenessDay){
+                            awarenesses.set(i, addAwareness);
+                            isInAwareness = true;
+                            break;
+                        }
+                    }
+                    if(isInAwareness == false){
                         //insert
                         List<Awareness> awarenessList = new ArrayList<>();
                         awarenessList.add(addAwareness);
                         awarenessDao.insertAll(awarenessList);
                         awarenesses.add(addAwareness);
                     }else {
-                        //we can make it faster by using lazy loading, but this is okay for now
-                        for(int i = 0; i < awarenesses.size(); i ++){
-                            if(awarenesses.get(i).awarenessDay == addAwareness.awarenessDay){
-                                awarenesses.set(i, addAwareness);
-                                break;
-                            }
-                        }
                         awarenessDao.updateAwareness(startDay, goodDuration, badDuration);
                     }
                     Log.v("AWARENESS", String.valueOf(startDay)+' '+ goodDuration + ' ' + badDuration);
@@ -436,11 +441,6 @@ public class MainActivity extends AppCompatActivity {
                 int sleepId = sleep.sleep_id;
                 if(!isOverlap(this.sleeps, updatedSleep, sleepId)) {
                     updatedSleep.sleep_id = sleepId;
-                    Log.v("COUNT", String.valueOf(count));
-                    Log.v("SLEEPS OF COUNT", sdfDateTime.format(new Date(this.sleeps.get(count).sleepStart)));
-                    Log.v("UPDATED SLEEP", sdfDateTime.format(new Date(updatedSleep.sleepStart)));
-                    Log.v("UPDATED SLEEP", sdfDateTime.format(new Date(updatedSleep.sleepEnd)));
-                    Log.v("SLEEP", String.valueOf(updatedSleep.sleepStart));
                     sleepDao.updateSleep(sleepId, updatedSleep.sleepStart, updatedSleep.sleepEnd);
                     this.sleeps.set(count, updatedSleep);
                     return true;

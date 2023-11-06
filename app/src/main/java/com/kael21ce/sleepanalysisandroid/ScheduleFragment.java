@@ -90,6 +90,10 @@ public class ScheduleFragment extends Fragment {
         long goodDuration = 0;
         long badDuration = 0;
         for(Awareness awareness: awarenesses){
+            Log.v("AWARENESS VALUE IN SCHEDULE", String.valueOf(awareness.awarenessDay));
+            Log.v("AWARENESS VALUE IN SCHEDULE", String.valueOf(awareness.goodDuration));
+            Log.v("AWARENESS VALUE IN SCHEDULE", String.valueOf(awareness.badDuration));
+
             if(awareness.awarenessDay == todayDate){
                 goodDuration = awareness.goodDuration;
                 badDuration = awareness.badDuration;

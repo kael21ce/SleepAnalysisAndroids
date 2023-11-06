@@ -15,15 +15,21 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.kael21ce.sleepanalysisandroid.data.Awareness;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 public class HomeFragment extends Fragment {
     SimpleDateFormat sdfDateTime = new SimpleDateFormat( "hh:mm a", Locale.KOREA);
     SimpleDateFormat sdfDateTime2 = new SimpleDateFormat( "dd/MM/yyyy hh:mm a", Locale.KOREA);
+    SimpleDateFormat sdfDate = new SimpleDateFormat("MM/dd", Locale.KOREA);
     SimpleDateFormat sdfTime = new SimpleDateFormat("hh:mm", Locale.KOREA);
     String mainSleepStartString, mainSleepEndString, workOnsetString, workOffsetString, napSleepStartString, napSleepEndString, sleepOnsetString;
+    private List<Awareness> awarenesses;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -82,6 +88,22 @@ public class HomeFragment extends Fragment {
                 new LinearLayoutManager(v.getContext(), LinearLayoutManager.HORIZONTAL, false);
         chartRecycler.setLayoutManager(chartLinearLayoutManager);
         BarAdapter barAdapter = new BarAdapter();
+
+        awarenesses = mainActivity.getAwarenesses();
+        long oneDayToMils = 1000*60*60*24;
+        long curTime = System.currentTimeMillis();
+        long curDay = curTime/oneDayToMils;
+        for(Awareness awareness: awarenesses){
+            Log.v("AWARENESS VALUE IN SCHEDULE", String.valueOf(awareness.awarenessDay));
+            Log.v("AWARENESS VALUE IN SCHEDULE", String.valueOf(awareness.goodDuration));
+            Log.v("AWARENESS VALUE IN SCHEDULE", String.valueOf(awareness.badDuration));
+            if(curDay-8 < awareness.awarenessDay){
+                String date = sdfDate.format(new Date(awareness.awarenessDay*oneDayToMils));
+                String goodDuration = sdfTime.format(new Date(awareness.goodDuration*60*1000));
+                String badDuration = sdfTime.format(new Date(awareness.goodDuration*60*1000));
+                barAdapter.addItem(new Bar(date, convertToWeight(goodDuration), convertToWeight(badDuration)));
+            }
+        }
 
         //Set the bar items to BarAdapter (8 items)
         //Just Examples
