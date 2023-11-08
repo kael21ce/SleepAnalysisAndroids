@@ -99,18 +99,6 @@ public class MainActivity extends AppCompatActivity {
 
         now = System.currentTimeMillis();
 
-        //dummy variable to test sleep onset, work onset, and work offset
-        long sleepOnsetDummy = 0;
-        long workOnsetDummy = 0;
-        long workOffsetDummy = 0;
-        try {
-            sleepOnsetDummy = Objects.requireNonNull(sdfDateTime.parse("1/11/2023 01:00")).getTime();
-            workOnsetDummy = Objects.requireNonNull(sdfDateTime.parse("1/11/2023 09:00")).getTime();
-            workOffsetDummy = Objects.requireNonNull(sdfDateTime.parse("1/11/2023 17:00")).getTime();
-        } catch (ParseException e) {
-            throw new RuntimeException(e);
-        }
-
         //update variables
         lastSleepUpdate = sharedPref.getLong("lastSleepUpdate", System.currentTimeMillis() - twoWeeks);
         lastDataUpdate = sharedPref.getLong("lastUpdate", System.currentTimeMillis() - twoWeeks);
@@ -120,14 +108,19 @@ public class MainActivity extends AppCompatActivity {
         workOnset = sharedPref.getLong("workOnset", System.currentTimeMillis());
         workOffset = sharedPref.getLong("workOffset", System.currentTimeMillis());
 
-        //for testing
-//        sleepOnset = sleepOnsetDummy;
-//        workOnset = workOnsetDummy;
-//        workOffset = workOffsetDummy;
-//        editor.putLong("sleepOnset", sleepOnsetDummy);
-//        editor.putLong("workOnset", workOnsetDummy);
-//        editor.putLong("workOffset", workOffsetDummy);
-//        editor.apply();
+        if(now > sleepOnset && now < workOnset){
+            sleepOnset = now;
+        }else if(now > workOnset){
+            while(now > workOnset){
+                sleepOnset += 1000*60*60*24;
+                workOnset += 1000*60*60*24;
+                workOffset += 1000*60*60*24;
+            }
+            editor.putLong("sleepOnset", sleepOnset);
+            editor.putLong("workOnset", workOnset);
+            editor.putLong("workOffset", workOffset);
+            editor.apply();
+        }
 
         //sleep result variables
         mainSleepStart = sharedPref.getLong("mainSleepStart", System.currentTimeMillis() - twoWeeks);
@@ -329,7 +322,9 @@ public class MainActivity extends AppCompatActivity {
             long goodDuration = 0;
             long badDuration = 0;
             for(V0 v0: v0s){
+
                 long v0StartDay = v0.time/oneDayToMils;
+                //check through the sleep in O(N) time. Fix it using hash map, but for now the complexity should be fine
                 double awareness = getAwarenessValue(v0.H_val, v0.n_val, v0.y_val, v0.x_val);
                 if(startDay != v0StartDay){
                     //if it is not in database, add, if yes, update
