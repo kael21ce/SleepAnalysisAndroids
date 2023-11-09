@@ -27,6 +27,8 @@ import com.kael21ce.sleepanalysisandroid.data.Awareness;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.data.BarEntry;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -97,18 +99,28 @@ public class HomeFragment extends Fragment {
 
         //Graph showing alertness
         ArrayList<BarEntry> barEntries = new ArrayList<BarEntry>();
-            //Add data to Entries
+            //Add data to Entries: form-(x: time, y: alertness value)
+            //time range: 0 ~ 72 (yesterday ~ tomorrow) / alertness range: -100 ~ 100
         //Just Example
-        barEntries.add(new BarEntry(0f, 50f));
-        barEntries.add(new BarEntry(0.25f, 90f));
-        barEntries.add(new BarEntry(0.5f, 93f));
-        barEntries.add(new BarEntry(0.75f, 80f));
-        barEntries.add(new BarEntry(1f, 30f));
-        barEntries.add(new BarEntry(1.25f, -10f));
-        barEntries.add(new BarEntry(1.5f, -15f));
-        barEntries.add(new BarEntry(5f, -40f));
-        barEntries.add(new BarEntry(6f, 75f));
-        barEntries.add(new BarEntry(6.25f, 75.6f));
+        for (float i=0.25f; i < 0.25f*(48f * 4f + 1f); i += 0.25f) {
+            barEntries.add(new BarEntry(5f + i, (float) (100*Math.sin(i))));
+        }
+        /*
+        barEntries.add(new BarEntry(5f, 50f));
+        barEntries.add(new BarEntry(5.25f, 90f));
+        barEntries.add(new BarEntry(5.5f, 93f));
+        barEntries.add(new BarEntry(5.75f, 80f));
+        barEntries.add(new BarEntry(6f, 30f));
+        barEntries.add(new BarEntry(6.25f, -10f));
+        barEntries.add(new BarEntry(6.5f, -15f));
+        barEntries.add(new BarEntry(10f, -40f));
+        barEntries.add(new BarEntry(11f, 75f));
+        barEntries.add(new BarEntry(11.25f, 75.6f));
+        barEntries.add(new BarEntry(48f, 40f));
+        barEntries.add(new BarEntry(60f, -10f));
+
+         */
+            //
         //Set the color of bar depending on the y-value
         ArrayList<Integer> barColors = new ArrayList<>();
         for (int i = 0; i < barEntries.size(); i++) {
@@ -121,6 +133,7 @@ public class HomeFragment extends Fragment {
         BarDataSet barDataSet = new BarDataSet(barEntries, "Alertness");
         //Set the color of each bar
         barDataSet.setColors(barColors);
+        barDataSet.setHighlightEnabled(false);
         //Set the width of each bar
         barDataSet.setDrawValues(false);
         BarData barData = new BarData(barDataSet);
@@ -128,7 +141,11 @@ public class HomeFragment extends Fragment {
         alertnessChart.setData(barData);
         Legend alertnessLegend = alertnessChart.getLegend();
         alertnessLegend.setEnabled(false);
-        alertnessChart.setTouchEnabled(false);
+        alertnessChart.setTouchEnabled(true);
+        //Showing window
+        alertnessChart.setScaleEnabled(false);
+        alertnessChart.setPinchZoom(true);
+        alertnessChart.setVisibleXRangeMaximum(10f);
         //Customize the grid
         XAxis xAxis = alertnessChart.getXAxis();
         YAxis leftYAxis = alertnessChart.getAxisLeft();
@@ -137,6 +154,8 @@ public class HomeFragment extends Fragment {
         rightYAxis.setDrawAxisLine(false);
         xAxis.setGridColor(ResourcesCompat.getColor(getResources(), R.color.gray_4, null));
         xAxis.setValueFormatter(new XAxisValueFormatter());
+        xAxis.setGranularity(2f);
+        xAxis.setLabelCount(barEntries.size(), true);
         //Customize the description
         Description description = new Description();
         description.setText("");
@@ -281,12 +300,46 @@ public class HomeFragment extends Fragment {
     }
 }
 
+//Axis value formatter for x-axis in alertnessChart
 class XAxisValueFormatter extends ValueFormatter {
+    /*Range
+    Each hour is represented by float and integer
+    Yesterday: 0 ~ 24
+    Today: 24 ~ 48
+    Tomorrow: 48 ~ 72
+    The range of time for showing alertness is [(today current time) - 24, (today current time) + 24]
+    */
     @Override
     public String getFormattedValue(float value) {
+        /*
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/d");
         int valueInt = (int) value;
-        if (value < 12) return valueInt + " AM";
-        if (value >= 12) return valueInt + " PM";
+        float valueFloat = (float) valueInt;
+        if (valueFloat != valueInt) {
+            return "";
+        }
+        int quotient = valueInt / 24;
+        int remainder = valueInt % 24;
+        int remainderDisplaying = valueInt % 3;
+        //Display the tick label
+        if (remainderDisplaying == 1) {
+            if (remainder < 12) return remainder + " AM";
+            if (remainder >= 12) return remainder + " PM";
+        }
+        //Display the date
+        if (remainder == 0) {
+            if (quotient == 0) {
+                LocalDate yesterday = LocalDate.now().minusDays(1);
+                return yesterday.format(formatter);
+            } else if (quotient == 1) {
+                LocalDate today = LocalDate.now();
+                return today.format(formatter);
+            } else {
+                LocalDate tomorrow = LocalDate.now().plusDays(1);
+                return tomorrow.format(formatter);
+            }
+        }
+         */
         return "";
     }
 }
