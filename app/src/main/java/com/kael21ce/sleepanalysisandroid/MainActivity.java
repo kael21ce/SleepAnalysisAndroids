@@ -264,9 +264,6 @@ public class MainActivity extends AppCompatActivity {
         SleepModel sleepModel = new SleepModel();
         double[] sleepPattern = sleepToArray(startProcess, endProcess, sleeps);
         Log.v("SLEEP SIZE", String.valueOf(sleepPattern.length));
-//        for(double i: sleepPattern){
-//            Log.v("I", String.valueOf(i));
-//        }
         ArrayList<double[]> simulationResult = sleepModel.pcr_simulation(initV0, sleepPattern, 5/60.0);
 
         //update V0 from the simulation
@@ -306,11 +303,26 @@ public class MainActivity extends AppCompatActivity {
         mainSleepEnd = sleepSuggestion[1]*(1000*60*5)+now;
         napSleepStart = sleepSuggestion[2]*(1000*60*5)+now;
         napSleepEnd = sleepSuggestion[3]*(1000*60*5)+now;
-        editor.putLong("mainSleepStart", sleepSuggestion[0]*(1000*60*5)+now);
-        editor.putLong("mainSleepEnd", sleepSuggestion[1]*(1000*60*5)+now);
-        editor.putLong("napSleepStart", sleepSuggestion[2]*(1000*60*5)+now);
-        editor.putLong("napSleepEnd", sleepSuggestion[3]*(1000*60*5)+now);
+        editor.putLong("mainSleepStart", mainSleepStart);
+        editor.putLong("mainSleepEnd", mainSleepEnd);
+        editor.putLong("napSleepStart", napSleepStart);
+        editor.putLong("napSleepEnd", napSleepEnd);
         editor.apply();
+
+        //get the new graph V0
+        List<Sleep> newSleep = new ArrayList<>();
+        Sleep newMainSleep = new Sleep();
+        newMainSleep.sleepStart = mainSleepStart;
+        newMainSleep.sleepEnd = mainSleepEnd;
+        Sleep newNapSleep = new Sleep();
+        newNapSleep.sleepStart = napSleepStart;
+        newNapSleep.sleepEnd = napSleepEnd;
+        newSleep.add(newMainSleep);
+        newSleep.add(newNapSleep);
+
+        sleepPattern = sleepToArray(now, now+1000*60*60*24, newSleep);
+        Log.v("SLEEP SIZE", String.valueOf(sleepPattern.length));
+        simulationResult = sleepModel.pcr_simulation(initV0, sleepPattern, 5/60.0);
     }
 
     public void calculateAwareness(){
