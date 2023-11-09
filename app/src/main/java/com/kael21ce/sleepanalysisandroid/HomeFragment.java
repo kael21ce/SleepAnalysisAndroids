@@ -2,6 +2,7 @@ package com.kael21ce.sleepanalysisandroid;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,9 +16,18 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.github.mikephil.charting.components.Description;
+import com.github.mikephil.charting.components.Legend;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.components.YAxis;
+import com.github.mikephil.charting.data.BarData;
+import com.github.mikephil.charting.data.BarDataSet;
+import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.kael21ce.sleepanalysisandroid.data.Awareness;
-
+import com.github.mikephil.charting.charts.BarChart;
+import com.github.mikephil.charting.data.BarEntry;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -47,6 +57,8 @@ public class HomeFragment extends Fragment {
         TextView stateDescriptionText = v.findViewById(R.id.StateDescriptionHomeText);
         ClockView clockView = v.findViewById(R.id.sweepingClockHome);
         RecyclerView chartRecycler = v.findViewById(R.id.ChartRecyclerView);
+
+        BarChart alertnessChart = v.findViewById(R.id.alertnessChart);
 
         //Initial button color setting
         sleepButton.setBackground(ResourcesCompat
@@ -82,6 +94,53 @@ public class HomeFragment extends Fragment {
         //we use connection because fragment and activity is connected and we don't reuse fragment for other activity
         startTime.setText(mainSleepStartString);
         endTime.setText(mainSleepEndString);
+
+        //Graph showing alertness
+        ArrayList<BarEntry> barEntries = new ArrayList<BarEntry>();
+            //Add data to Entries
+        //Just Example
+        barEntries.add(new BarEntry(0f, 50f));
+        barEntries.add(new BarEntry(0.25f, 90f));
+        barEntries.add(new BarEntry(0.5f, 93f));
+        barEntries.add(new BarEntry(0.75f, 80f));
+        barEntries.add(new BarEntry(1f, 30f));
+        barEntries.add(new BarEntry(1.25f, -10f));
+        barEntries.add(new BarEntry(1.5f, -15f));
+        barEntries.add(new BarEntry(5f, -40f));
+        barEntries.add(new BarEntry(6f, 75f));
+        barEntries.add(new BarEntry(6.25f, 75.6f));
+        //Set the color of bar depending on the y-value
+        ArrayList<Integer> barColors = new ArrayList<>();
+        for (int i = 0; i < barEntries.size(); i++) {
+            if (barEntries.get(i).getY() > 0f) {
+                barColors.add(ResourcesCompat.getColor(getResources(), R.color.green_2, null));
+            } else {
+                barColors.add(ResourcesCompat.getColor(getResources(), R.color.red_2, null));
+            }
+        }
+        BarDataSet barDataSet = new BarDataSet(barEntries, "Alertness");
+        //Set the color of each bar
+        barDataSet.setColors(barColors);
+        //Set the width of each bar
+        barDataSet.setDrawValues(false);
+        BarData barData = new BarData(barDataSet);
+        barData.setBarWidth(0.2f);
+        alertnessChart.setData(barData);
+        Legend alertnessLegend = alertnessChart.getLegend();
+        alertnessLegend.setEnabled(false);
+        alertnessChart.setTouchEnabled(false);
+        //Customize the grid
+        XAxis xAxis = alertnessChart.getXAxis();
+        YAxis leftYAxis = alertnessChart.getAxisLeft();
+        YAxis rightYAxis = alertnessChart.getAxisRight();
+        leftYAxis.setDrawAxisLine(false);
+        rightYAxis.setDrawAxisLine(false);
+        xAxis.setGridColor(ResourcesCompat.getColor(getResources(), R.color.gray_4, null));
+        xAxis.setValueFormatter(new XAxisValueFormatter());
+        //Customize the description
+        Description description = new Description();
+        description.setText("");
+        alertnessChart.setDescription(description);
 
         //Load LinearLayoutManager and BarAdapter for ChartRecyclerView
         LinearLayoutManager chartLinearLayoutManager =
@@ -219,5 +278,15 @@ public class HomeFragment extends Fragment {
         double totalTime = hourInt + (double) minuteInt / 60;
 
         return (int) ((124/24)*totalTime);
+    }
+}
+
+class XAxisValueFormatter extends ValueFormatter {
+    @Override
+    public String getFormattedValue(float value) {
+        int valueInt = (int) value;
+        if (value < 12) return valueInt + " AM";
+        if (value >= 12) return valueInt + " PM";
+        return "";
     }
 }
