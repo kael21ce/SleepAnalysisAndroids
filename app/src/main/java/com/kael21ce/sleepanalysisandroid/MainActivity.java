@@ -5,8 +5,10 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.text.Html;
 import android.util.Log;
 import android.view.MenuItem;
@@ -34,6 +36,11 @@ import com.kael21ce.sleepanalysisandroid.data.SleepModel;
 import com.kael21ce.sleepanalysisandroid.data.V0;
 import com.kael21ce.sleepanalysisandroid.data.V0Dao;
 
+import java.io.DataOutputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.sql.Array;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -48,11 +55,16 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import kotlinx.coroutines.Dispatchers;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.data.BarEntry;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -144,6 +156,7 @@ public class MainActivity extends AppCompatActivity {
         getSleepData();
         do_simulation();
         calculateAwareness();
+        sendV0("testing");
 
         bottomNavigationView = findViewById(R.id.bottomNavigationView);
         boolean isSchedule = sharedPref.getBoolean("isSchedule", false);
@@ -441,6 +454,71 @@ public class MainActivity extends AppCompatActivity {
         return false;
     }
 
+    protected void sendV0(String test) {
+
+        Executor executor = Executors.newSingleThreadExecutor();
+        Handler handler = new Handler(Looper.getMainLooper());
+
+        executor.execute(() -> {
+            Log.v("EXECUTE", "EXECUTE");
+            String data = test;
+
+            HttpURLConnection httpURLConnection = null;
+            try {
+
+                httpURLConnection = (HttpURLConnection) new URL("http://localhost:8000/sleepapp/").openConnection();
+                httpURLConnection.setRequestMethod("POST");
+
+                httpURLConnection.setDoOutput(true);
+
+                DataOutputStream wr = new DataOutputStream(httpURLConnection.getOutputStream());
+                wr.writeBytes("PostData=" + data);
+                wr.flush();
+                wr.close();
+
+                InputStream in = httpURLConnection.getInputStream();
+                InputStreamReader inputStreamReader = new InputStreamReader(in);
+
+                int inputStreamData = inputStreamReader.read();
+                while (inputStreamData != -1) {
+                    char current = (char) inputStreamData;
+                    inputStreamData = inputStreamReader.read();
+                    data += current;
+                }
+                Log.v("DONE", "doneeee");
+            } catch (Exception e) {
+                e.printStackTrace();
+                Log.v("FAILED", "FAILED");
+            } finally {
+                if (httpURLConnection != null) {
+                    httpURLConnection.disconnect();
+                }
+                Log.v("SUPER DONE", "SUPER DONE");
+            }
+
+            handler.post(() -> {
+                Log.v("POSTED", "POSTED");
+                //UI Thread work here
+            });
+        });
+    }
+
+//    public void sendV0(V0 v0){
+//        JSONObject postData = new JSONObject();
+//        try {
+//            postData.put("name", name.getText().toString());
+//            postData.put("address", address.getText().toString());
+//            postData.put("manufacturer", manufacturer.getText().toString());
+//            postData.put("location", location.getText().toString());
+//            postData.put("type", type.getText().toString());
+//            postData.put("deviceID", deviceID.getText().toString());
+//
+//            new SendDeviceDetails().execute("http://52.88.194.67:8080/IOTProjectServer/registerDevice", postData.toString());
+//        } catch (JSONException e) {
+//            e.printStackTrace();
+//        }
+//    }
+
     public List<Awareness> getAwarenesses(){
         return awarenesses;
     }
@@ -581,6 +659,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 }
+
 
 //        long sleepOnset = AppDatabase.sleepOnset;
 //        String test = sdfDateTime.format(new Date(sleepOnset));
