@@ -429,7 +429,7 @@ public class MainActivity extends AppCompatActivity {
         for(Sleep sleep: sleeps){
             long tempSleepStart = sleep.sleepStart / fiveMinutesToMil;
             long tempSleepEnd = sleep.sleepEnd / fiveMinutesToMil;
-            if(sleepStart/fiveMinutesToMil < tempSleepStart) {
+            if(sleepStart/fiveMinutesToMil < tempSleepStart && tempSleepEnd < sleepEnd/fiveMinutesToMil) {
                 int idx = (int) (tempSleepStart - sleepStart / fiveMinutesToMil);
                 int offset = (int) (tempSleepEnd - sleepStart / fiveMinutesToMil);
                 Log.v("index", String.valueOf(idx));

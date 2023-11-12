@@ -132,7 +132,7 @@ public class ScheduleFragment extends Fragment {
             @Override
             public void onSelectedDayChange(@NonNull CalendarView calendarView, int year, int month, int dayOfMonth) {
                 //Load save data for specific time
-                String myDate = String.valueOf(year)+'/'+String.valueOf(month-1)+'/'+String.valueOf(dayOfMonth);
+                String myDate = String.valueOf(year)+'/'+String.valueOf(month+1)+'/'+String.valueOf(dayOfMonth);
                 Log.v("MY DATE", myDate);
                 Date date = null;
                 try {
