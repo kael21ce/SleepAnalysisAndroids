@@ -98,14 +98,29 @@ public class HomeFragment extends Fragment {
         endTime.setText(mainSleepEndString);
 
         //Graph showing alertness
-        ArrayList<BarEntry> barEntries = new ArrayList<BarEntry>();
+        ArrayList<BarEntry> barEntries = mainActivity.getBarEntries();
             //Add data to Entries: form-(x: time, y: alertness value)
             //time range: 0 ~ 72 (yesterday ~ tomorrow) / alertness range: -100 ~ 100
         //Just Example
-        for (float i=0.25f; i < 0.25f*(48f * 4f + 1f); i += 0.25f) {
-            barEntries.add(new BarEntry(5f + i, (float) (100*(0.7*Math.sin(i) + 0.3*Math.cos(i * 3)))));
-        }
-            //
+//        for (float i=0.25f; i < 0.25f*(48f * 4f + 1f); i += 0.25f) {
+//            barEntries.add(new BarEntry(5f + i, (float) (100*(0.7*Math.sin(i) + 0.3*Math.cos(i * 3)))));
+//        }
+        /*
+        barEntries.add(new BarEntry(5f, 50f));
+        barEntries.add(new BarEntry(5.25f, 90f));
+        barEntries.add(new BarEntry(5.5f, 93f));
+        barEntries.add(new BarEntry(5.75f, 80f));
+        barEntries.add(new BarEntry(6f, 30f));
+        barEntries.add(new BarEntry(6.25f, -10f));
+        barEntries.add(new BarEntry(6.5f, -15f));
+        barEntries.add(new BarEntry(10f, -40f));
+        barEntries.add(new BarEntry(11f, 75f));
+        barEntries.add(new BarEntry(11.25f, 75.6f));
+        barEntries.add(new BarEntry(48f, 40f));
+        barEntries.add(new BarEntry(60f, -10f));
+
+
+         */
         //Set the color of bar depending on the y-value
         ArrayList<Integer> barColors = new ArrayList<>();
         for (int i = 0; i < barEntries.size(); i++) {

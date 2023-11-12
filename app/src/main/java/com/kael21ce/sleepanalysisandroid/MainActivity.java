@@ -51,6 +51,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import kotlinx.coroutines.Dispatchers;
+import com.github.mikephil.charting.charts.BarChart;
+import com.github.mikephil.charting.data.BarEntry;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -83,6 +85,8 @@ public class MainActivity extends AppCompatActivity {
     SleepDao sleepDao;
     V0Dao v0Dao;
 
+    ArrayList<BarEntry> barEntries;
+
     @SuppressLint("NonConstantResourceId")
     @Override
     protected void onCreate(Bundle saveInstanceState) {
@@ -107,6 +111,8 @@ public class MainActivity extends AppCompatActivity {
         sleepOnset = sharedPref.getLong("sleepOnset", System.currentTimeMillis());
         workOnset = sharedPref.getLong("workOnset", System.currentTimeMillis());
         workOffset = sharedPref.getLong("workOffset", System.currentTimeMillis());
+
+        barEntries = new ArrayList<BarEntry>();
 
         if(now > sleepOnset && now < workOnset){
             sleepOnset = now;
@@ -269,6 +275,7 @@ public class MainActivity extends AppCompatActivity {
         //update V0 from the simulation
         List<V0> newV0 = new ArrayList<>();
         Log.v("SIZE", String.valueOf(simulationResult.size()));
+        float barIdx = 5.25f;
         for(int i = 0; i < simulationResult.size(); i ++){
             double[] res = simulationResult.get(i);
             V0 v0 = new V0();
@@ -282,6 +289,11 @@ public class MainActivity extends AppCompatActivity {
 
             if(v0.time >= (System.currentTimeMillis()-(1000*60*6)) && (v0.time <= System.currentTimeMillis())){
                 initV0 = res;
+            }
+
+            if(simulationResult.size() - 288 <= i){
+                barEntries.add(new BarEntry((float) barIdx, (float) getAwarenessValue(res[3], res[2], res[1], res[0])));
+                barIdx += 0.25f;
             }
         }
         v0Dao.insertAll(newV0);
@@ -323,6 +335,16 @@ public class MainActivity extends AppCompatActivity {
         sleepPattern = sleepToArray(now, now+1000*60*60*24, newSleep);
         Log.v("SLEEP SIZE", String.valueOf(sleepPattern.length));
         simulationResult = sleepModel.pcr_simulation(initV0, sleepPattern, 5/60.0);
+        for(int i = 0; i < 288; i ++){
+            double[] res = simulationResult.get(i);
+            double awarenessVal = getAwarenessValue(res[3], res[2], res[1], res[0]);
+            barEntries.add(new BarEntry(barIdx, (float)awarenessVal));
+            barIdx += 0.25f;
+        }
+    }
+
+    public ArrayList<BarEntry> getBarEntries(){
+        return barEntries;
     }
 
     public void calculateAwareness(){
