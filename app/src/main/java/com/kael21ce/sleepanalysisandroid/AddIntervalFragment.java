@@ -111,8 +111,8 @@ public class AddIntervalFragment extends Fragment implements ButtonTextUpdater {
             String endSDF = endDate + ' ' + endTime;
             Log.v("START SDF", startSDF);
             Log.v("END SDF", endSDF);
-            Date sleepStartDate = null;
-            Date sleepEndDate = null;
+            Date sleepStartDate;
+            Date sleepEndDate;
             try {
                 sleepStartDate = sdf.parse(startSDF);
                 sleepEndDate = sdf.parse(endSDF);
