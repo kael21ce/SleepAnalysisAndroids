@@ -232,8 +232,11 @@ public class HomeFragment extends Fragment {
         //Change the clock angle using setAngle and color using setTypeOfInterval
         clockView.setTypeOfInterval(1);
         //Just example
-        if(mainSleepStartString.equals(mainSleepEndString)) {
+        if(!mainSleepStartString.equals(mainSleepEndString)) {
+            clockView.setVisibility(View.VISIBLE);
             clockView.setAngleFromTime(mainSleepStartString, mainSleepEndString);
+        }else{
+            clockView.setVisibility(View.INVISIBLE);
         }
     }
 
@@ -259,9 +262,12 @@ public class HomeFragment extends Fragment {
         stateDescriptionText.setText("이때 주무시면 덜 피곤할거에요");
         clockView.setTypeOfInterval(2);
         //Just example
-//        if(napSleepStartString.equals(napSleepEndString)) {
-//            clockView.setAngleFromTime(napSleepStartString, napSleepEndString);
-//        }
+        if(!napSleepStartString.equals(napSleepEndString)) {
+            clockView.setVisibility(View.VISIBLE);
+            clockView.setAngleFromTime(napSleepStartString, napSleepEndString);
+        }else{
+            clockView.setVisibility(View.INVISIBLE);
+        }
     }
 
     public void workButtonClick(View v, MainActivity mainActivity, TextView startTime, TextView endTime,
@@ -286,6 +292,7 @@ public class HomeFragment extends Fragment {
         stateDescriptionText.setText("가장 각성도가 높은 시간이에요");
         clockView.setTypeOfInterval(3);
         //Just example
+        clockView.setVisibility(View.VISIBLE);
         clockView.setAngleFromTime(workOnsetString, workOffsetString);
     }
 

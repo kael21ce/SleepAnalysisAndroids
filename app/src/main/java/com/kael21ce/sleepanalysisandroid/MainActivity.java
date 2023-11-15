@@ -533,11 +533,13 @@ public class MainActivity extends AppCompatActivity {
         //check if the sleep is already there
         boolean isOverlap = isOverlap(sleeps, sleep, -1);
         if(!isOverlap) {
-            this.sleeps.add(sleep);
-            List<Sleep> listSleep = new ArrayList<>();
-            listSleep.add(sleep);
-            Log.v("SLEEP DATA ADDED", String.valueOf(sleep.sleepStart));
-            this.sleepDao.insertAll(listSleep);
+//            this.sleeps.add(sleep);
+            if(sleep.sleepStart < this.lastSleepUpdate) {
+                List<Sleep> listSleep = new ArrayList<>();
+                listSleep.add(sleep);
+                Log.v("SLEEP DATA ADDED", String.valueOf(sleep.sleepStart));
+                this.sleepDao.insertAll(listSleep);
+            }
             healthConnectManager.javWriteSleepInput(sleep.sleepStart, sleep.sleepEnd);
             return true;
         }else{

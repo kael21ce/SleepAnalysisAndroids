@@ -120,6 +120,8 @@ public class RecommendFragment extends Fragment {
                                  TextView sleepTypeText, TextView sleepImportanceText,
                                  TextView stateDescriptionText, ClockView clockView)
     {
+        Log.v("THE MAIN SLEEP STRING", mainSleepEndString);
+        Log.v("THE MAIN SLEEP STRING", mainSleepStartString);
         startTime.setText(mainSleepStartString);
         endTime.setText(mainSleepEndString);
         //Change the color of buttons
@@ -137,9 +139,16 @@ public class RecommendFragment extends Fragment {
         stateDescriptionText.setText("각성도가 낮아요!\n이 시간엔 꼭 주무세요");
 
         //Change the clock angle using setAngle and color using setTypeOfInterval
-        clockView.setTypeOfInterval(1);
         //Just example
-        clockView.setAngleFromTime(mainSleepStartString, mainSleepEndString);
+        if(!mainSleepStartString.equals(mainSleepEndString)) {
+            Log.v("FDLSJK", "DFSLJ");
+            clockView.setVisibility(clockView.VISIBLE);
+            clockView.setTypeOfInterval(1);
+            clockView.setAngleFromTime(mainSleepStartString, mainSleepEndString);
+        }else{
+            Log.v("GONE", "GONE");
+            clockView.setVisibility(clockView.GONE);
+        }
     }
 
     public void napButtonClick(View v, MainActivity mainActivity, TextView startTime, TextView endTime,
@@ -162,9 +171,16 @@ public class RecommendFragment extends Fragment {
         sleepImportanceText.setBackground(ResourcesCompat
                 .getDrawable(getResources(), R.drawable.recommend_caption, null));
         stateDescriptionText.setText("이때 주무시면 덜 피곤할거에요");
-        clockView.setTypeOfInterval(2);
         //Just example
-        clockView.setAngleFromTime(napSleepStartString, napSleepEndString);
+        if(!napSleepStartString.equals(napSleepEndString)) {
+            Log.v("TF", "TF");
+            clockView.setVisibility(clockView.VISIBLE);
+            clockView.setTypeOfInterval(2);
+            clockView.setAngleFromTime(napSleepStartString, napSleepEndString);
+        }else{
+            Log.v("OK BRO", "OK BRO");
+            clockView.setVisibility(clockView.GONE);
+        }
     }
 
     public void workButtonClick(View v, MainActivity mainActivity, TextView startTime, TextView endTime,
@@ -172,6 +188,7 @@ public class RecommendFragment extends Fragment {
                                 TextView sleepTypeText, TextView sleepImportanceText,
                                 TextView stateDescriptionText, ClockView clockView)
     {
+        clockView.setVisibility(clockView.VISIBLE);
         startTime.setText(workOnsetString);
         endTime.setText(workOffsetString);
         //Change the color of buttons
