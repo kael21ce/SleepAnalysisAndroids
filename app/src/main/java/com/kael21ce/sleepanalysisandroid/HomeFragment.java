@@ -174,7 +174,7 @@ public class HomeFragment extends Fragment {
         awarenesses = mainActivity.getAwarenesses();
         long oneDayToMils = 1000*60*60*24;
         long curTime = now;
-        long curDay = curTime/oneDayToMils;
+        long curDay = (curTime)/oneDayToMils;
         for(Awareness awareness: awarenesses){
             Log.v("AWARENESS VALUE IN SCHEDULE", sdfDate.format(new Date(awareness.awarenessDay*oneDayToMils+oneDayToMils)));
 
@@ -185,7 +185,7 @@ public class HomeFragment extends Fragment {
             Log.v("AWARENESS VALUE IN SCHEDULE", hourGoodDuration + ":" + minuteGoodDuration);
             Log.v("AWARENESS VALUE IN SCHEDULE", hourBadDuration + ":" + minuteBadDuration);
             if(curDay-9 < awareness.awarenessDay){
-                String date = sdfDate.format(new Date((awareness.awarenessDay+1)*oneDayToMils));
+                String date = sdfDate.format(new Date((awareness.awarenessDay)*oneDayToMils));
                 String goodDuration = hourGoodDuration + ":" + minuteGoodDuration;
                 String badDuration = hourBadDuration + ":" + minuteBadDuration;
                 barAdapter.addItem(new Bar(date, convertToWeight(goodDuration), convertToWeight(badDuration)));
