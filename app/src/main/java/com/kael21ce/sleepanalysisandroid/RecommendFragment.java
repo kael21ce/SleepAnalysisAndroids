@@ -35,7 +35,7 @@ public class RecommendFragment extends Fragment {
     private TextView stateDescriptionText;
     SimpleDateFormat sdfDateTime = new SimpleDateFormat("dd/MM/yyyy"+ "HH:mm", Locale.KOREA);
     SimpleDateFormat sdfTime = new SimpleDateFormat("HH:mm", Locale.KOREA);
-    String mainSleepStartString, mainSleepEndString, workOnsetString, workOffsetString, napSleepStartString, napSleepEndString;
+    String mainSleepStartString,sleepOnsetString, mainSleepEndString, workOnsetString, workOffsetString, napSleepStartString, napSleepEndString;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -67,6 +67,7 @@ public class RecommendFragment extends Fragment {
         mainSleepEndString = sdfTime.format(new Date(mainActivity.getMainSleepEnd()));
         napSleepStartString = sdfTime.format(new Date(mainActivity.getNapSleepStart()));
         napSleepEndString = sdfTime.format(new Date(mainActivity.getNapSleepEnd()));
+        sleepOnsetString = sdfTime.format(new Date(mainActivity.getSleepOnset()));
         workOnsetString = sdfTime.format(new Date(mainActivity.getWorkOnset()));
         workOffsetString = sdfTime.format(new Date(mainActivity.getWorkOffset()));
 
@@ -81,8 +82,15 @@ public class RecommendFragment extends Fragment {
         sleepImportanceText = v.findViewById(R.id.sleepImportanceText);
         stateDescriptionText = v.findViewById(R.id.StateDescriptionText);
         ClockView clockView = v.findViewById(R.id.sweepingClockRecommend);
+        TextView hopeTimeText = v.findViewById(R.id.HopeTimeDetail);
+        TextView workTimeStart = v.findViewById(R.id.WorkTimeStart);
+        TextView workTimeEnd = v.findViewById(R.id.WorkTimeEnd);
 
-        //Initial Button Setting
+        hopeTimeText.setText(sleepOnsetString);
+        workTimeStart.setText(workOnsetString);
+        workTimeEnd.setText(workOffsetString);
+
+                //Initial Button Setting
         sleepButton.setBackground(ResourcesCompat
                 .getDrawable(getResources(), R.drawable.corner_8_clicked, null));
 

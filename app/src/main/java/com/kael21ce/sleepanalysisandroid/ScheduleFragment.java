@@ -51,10 +51,10 @@ public class ScheduleFragment extends Fragment {
         List<Sleep> listSleep = new ArrayList<>();
         Log.v("SIZE OF SLEEP", String.valueOf(sleeps.size()));
         if(sleeps.size() > 0) {
-            long curDate = sleeps.get(0).sleepStart / oneDayToMils;
+            long curDate = (sleeps.get(0).sleepStart + (1000*60*60*9)) / oneDayToMils;
             for (Sleep sleep : sleeps) {
                 Log.v("SLEEPSSS", String.valueOf(sleep.sleepStart));
-                long sleepStartDate = (sleep.sleepStart / oneDayToMils);
+                long sleepStartDate = ((sleep.sleepStart+ (1000*60*60*9)) / oneDayToMils);
                 if (curDate != sleepStartDate) {
                     List<Sleep> putSleep = new ArrayList<>(listSleep);
                     sleepsData.put(curDate, putSleep);
@@ -84,6 +84,9 @@ public class ScheduleFragment extends Fragment {
 
         //get today's day
         long todayDate = System.currentTimeMillis()/oneDayToMils;
+        Log.v("TODAY DATE", String.valueOf(todayDate));
+        Log.v("TODAY DATE 2: ", sdfDateTime.format(new Date(System.currentTimeMillis())));
+        Log.v("today date 3", String.valueOf(System.currentTimeMillis()));
 
         //get awareness
         List<Awareness> awarenesses = mainActivity.getAwarenesses();
@@ -142,7 +145,8 @@ public class ScheduleFragment extends Fragment {
                 }
                 assert date != null;
                 long dayInMillis = date.getTime();
-                long selectedDay = dayInMillis / oneDayToMils;
+                Log.v("DATE CHOSEN", String.valueOf(dayInMillis));
+                long selectedDay = (dayInMillis + (1000*60*60*9)) / oneDayToMils;
                 Log.v("day", String.valueOf(selectedDay));
 
                 //get awareness

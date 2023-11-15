@@ -147,13 +147,13 @@ class HealthConnectManager(private val context: Context) {
         val userDao = db.sleepDao()
         val sleepList = mutableListOf<Sleep>()
         for (sleepRecord in response.records) {
-            var sleepStart = Date.from(sleepRecord.startTime).time
-            val sleepEnd = Date.from(sleepRecord.endTime).time
+            var sleepStart = Date.from(sleepRecord.startTime).time + (1000*60*60*9)
+            val sleepEnd = Date.from(sleepRecord.endTime).time + (1000*60*60*9)
             Log.v("THE RECORD START", sdfDateTime.format(Date.from(sleepRecord.startTime)))
             Log.v("THE RECORD END", sdfDateTime.format(Date.from(sleepRecord.endTime)))
             //check whether we need to divide the sleep to two
-            val sleepStartDay = ((sleepStart + (1000*60*60*9)) / (1000 * 60 * 60 * 24))
-            val sleepEndDay = ((sleepEnd + (1000*60*60*9)) / (1000 * 60 * 60 * 24))
+            val sleepStartDay = (sleepStart / (1000 * 60 * 60 * 24))
+            val sleepEndDay = (sleepEnd / (1000 * 60 * 60 * 24))
             if (sleepStartDay != sleepEndDay) {
                 val midnight = sleepEndDay * (1000 * 60 * 60 * 24)
                 val additionalSleep = Sleep()
