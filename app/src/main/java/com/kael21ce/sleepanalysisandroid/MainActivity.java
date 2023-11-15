@@ -371,6 +371,16 @@ public class MainActivity extends AppCompatActivity {
             long goodDuration = 0;
             long badDuration = 0;
             for(V0 v0: v0s){
+                boolean isSleep = false;
+                for(Sleep sleep: sleeps){
+                    if(sleep.sleepStart <= v0.time && v0.time <= sleep.sleepEnd){
+                        isSleep = true;
+                        break;
+                    }
+                }
+                if(isSleep){
+                    continue;
+                }
 
                 long v0StartDay = (v0.time + nineHours)/oneDayToMils;
                 //check through the sleep in O(N) time. Fix it using hash map, but for now the complexity should be fine
