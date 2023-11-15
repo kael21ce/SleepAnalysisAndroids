@@ -424,6 +424,33 @@ public class MainActivity extends AppCompatActivity {
                     badDuration += 5;
                 }
             }
+            if(goodDuration > 0 || badDuration > 0){
+                Awareness awarenessDb = awarenessDao.findByDay(startDay);
+                Awareness addAwareness = new Awareness();
+                addAwareness.awarenessDay = startDay;
+                addAwareness.goodDuration = goodDuration;
+                addAwareness.badDuration = badDuration;
+                boolean isInAwareness = false;
+                for(int i = 0; i < awarenesses.size(); i ++){
+                    if(awarenesses.get(i).awarenessDay == addAwareness.awarenessDay){
+                        awarenesses.set(i, addAwareness);
+                        isInAwareness = true;
+                        break;
+                    }
+                }
+                if(isInAwareness == false){
+                    awarenesses.add(addAwareness);
+                }
+                if(awarenessDb == null){
+                    //insert
+                    List<Awareness> awarenessList = new ArrayList<>();
+                    awarenessList.add(addAwareness);
+                    awarenessDao.insertAll(awarenessList);
+                }else {
+                    //we can make it faster by using lazy loading, but this is okay for now
+                    awarenessDao.updateAwareness(startDay, goodDuration, badDuration);
+                }
+            }
         }
     }
 
