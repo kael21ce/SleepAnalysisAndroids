@@ -127,10 +127,10 @@ public class EditIntervalFragment extends Fragment implements ButtonTextUpdater 
                 sleepStartDate = sdf.parse(startSDF);
                 sleepEndDate = sdf.parse(endSDF);
                 //translate to local date time
-                LocalDateTime ldt1 = LocalDateTime.ofInstant(sleepStartDate.toInstant(), ZoneId.systemDefault());
-                LocalDateTime ldt2 = LocalDateTime.ofInstant(sleepEndDate.toInstant(), ZoneId.systemDefault());
-                sleepStartDate = Date.from(ldt1.atZone(ZoneId.systemDefault()).toInstant());
-                sleepEndDate = Date.from(ldt2.atZone(ZoneId.systemDefault()).toInstant());
+//                LocalDateTime ldt1 = LocalDateTime.ofInstant(sleepStartDate.toInstant(), ZoneId.systemDefault());
+//                LocalDateTime ldt2 = LocalDateTime.ofInstant(sleepEndDate.toInstant(), ZoneId.systemDefault());
+//                sleepStartDate = Date.from(ldt1.atZone(ZoneId.systemDefault()).toInstant());
+//                sleepEndDate = Date.from(ldt2.atZone(ZoneId.systemDefault()).toInstant());
             } catch (ParseException e) {
                 throw new RuntimeException(e);
             }

@@ -35,10 +35,10 @@ import java.util.List;
 import java.util.Locale;
 
 public class HomeFragment extends Fragment {
-    SimpleDateFormat sdfDateTime = new SimpleDateFormat( "hh:mm a");
-    SimpleDateFormat sdfDateTime2 = new SimpleDateFormat( "dd/MM/yyyy hh:mm a");
-    SimpleDateFormat sdfDate = new SimpleDateFormat("MM/dd");
-    SimpleDateFormat sdfTime = new SimpleDateFormat("HH:mm");
+    SimpleDateFormat sdfDateTime = new SimpleDateFormat( "hh:mm a", Locale.KOREA);
+    SimpleDateFormat sdfDateTime2 = new SimpleDateFormat( "dd/MM/yyyy hh:mm a", Locale.KOREA);
+    SimpleDateFormat sdfDate = new SimpleDateFormat("MM/dd", Locale.KOREA);
+    SimpleDateFormat sdfTime = new SimpleDateFormat("HH:mm", Locale.KOREA);
     long now, nineHours;
     String mainSleepStartString, mainSleepEndString, workOnsetString, workOffsetString, napSleepStartString, napSleepEndString, sleepOnsetString;
     private List<Awareness> awarenesses;
@@ -64,7 +64,7 @@ public class HomeFragment extends Fragment {
         BarChart alertnessChart = v.findViewById(R.id.alertnessChart);
 
         nineHours = (1000*60*60*9);
-        now = System.currentTimeMillis() + nineHours;
+        now = System.currentTimeMillis();
 
         //Initial button color setting
         sleepButton.setBackground(ResourcesCompat
@@ -232,7 +232,9 @@ public class HomeFragment extends Fragment {
         //Change the clock angle using setAngle and color using setTypeOfInterval
         clockView.setTypeOfInterval(1);
         //Just example
-        clockView.setAngleFromTime(mainSleepStartString, mainSleepEndString);
+        if(mainSleepStartString.equals(mainSleepEndString)) {
+            clockView.setAngleFromTime(mainSleepStartString, mainSleepEndString);
+        }
     }
 
     public void napButtonClick(View v, MainActivity mainActivity, TextView startTime, TextView endTime,
@@ -257,7 +259,9 @@ public class HomeFragment extends Fragment {
         stateDescriptionText.setText("이때 주무시면 덜 피곤할거에요");
         clockView.setTypeOfInterval(2);
         //Just example
-        clockView.setAngleFromTime(napSleepStartString, napSleepEndString);
+//        if(napSleepStartString.equals(napSleepEndString)) {
+//            clockView.setAngleFromTime(napSleepStartString, napSleepEndString);
+//        }
     }
 
     public void workButtonClick(View v, MainActivity mainActivity, TextView startTime, TextView endTime,

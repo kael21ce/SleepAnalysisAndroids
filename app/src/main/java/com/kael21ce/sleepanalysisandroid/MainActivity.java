@@ -74,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
     RecommendFragment recommendFragment = new RecommendFragment();
     SettingFragment settingFragment = new SettingFragment();
     private RelativeLayout loadingScreenLayout;
-    SimpleDateFormat sdfDateTime = new SimpleDateFormat("dd/MM/yyyy"+ "HH:mm");
+    SimpleDateFormat sdfDateTime = new SimpleDateFormat("dd/MM/yyyy"+ "HH:mm", Locale.KOREA);
     HealthConnectManager healthConnectManager;
     //health connect
     private static Context context;
@@ -115,7 +115,7 @@ public class MainActivity extends AppCompatActivity {
 
         //this is in GMT
         nineHours = (1000*60*60*9);
-        now = System.currentTimeMillis() + nineHours;
+        now = System.currentTimeMillis();
 
         //update variables
         lastSleepUpdate = sharedPref.getLong("lastSleepUpdate", now - twoWeeks);
@@ -367,12 +367,12 @@ public class MainActivity extends AppCompatActivity {
         AwarenessDao awarenessDao = db.awarenessDao();
         long oneDayToMils = 1000*60*60*24;
         if(v0s.size() > 0){
-            long startDay = v0s.get(0).time/oneDayToMils;
+            long startDay = (v0s.get(0).time + nineHours)/oneDayToMils;
             long goodDuration = 0;
             long badDuration = 0;
             for(V0 v0: v0s){
 
-                long v0StartDay = v0.time/oneDayToMils;
+                long v0StartDay = (v0.time + nineHours)/oneDayToMils;
                 //check through the sleep in O(N) time. Fix it using hash map, but for now the complexity should be fine
                 double awareness = getAwarenessValue(v0.H_val, v0.n_val, v0.y_val, v0.x_val);
                 if(startDay != v0StartDay){
@@ -549,7 +549,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean editSleep(Sleep prevSleep, Sleep updatedSleep){
         int count = 0;
         for(Sleep sleep: this.sleeps){
-            if(sleep.sleepStart == prevSleep.sleepStart && sleep.sleepEnd == prevSleep.sleepEnd){
+            if(sleep.sleepStart/60000 == prevSleep.sleepStart/60000 && sleep.sleepEnd/60000 == prevSleep.sleepEnd/60000){
                 int sleepId = sleep.sleep_id;
                 if(!isOverlap(this.sleeps, updatedSleep, sleepId)) {
                     updatedSleep.sleep_id = sleepId;
@@ -566,10 +566,20 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public boolean deleteSleep(Sleep sleepDel){
+        long sleepDelStart = sleepDel.sleepStart/60000;
+        long sleepDelEnd = sleepDel.sleepEnd/60000;
+        Log.v("SLEEP DELETE START", String.valueOf(sleepDel.sleepStart));
+        Log.v("SLEEP DELETE END", String.valueOf(sleepDel.sleepEnd));
 
         for(Sleep sleep: this.sleeps){
-            if(sleep.sleepStart == sleepDel.sleepStart && sleep.sleepEnd == sleepDel.sleepEnd){
+            long sSleepStart = sleep.sleepStart/60000;
+            long sSleepEnd = sleep.sleepEnd/60000;
+            Log.v("SLEEP DELETE START", String.valueOf(sleep.sleepStart));
+            Log.v("SLEEP DELETE END", String.valueOf(sleep.sleepEnd));
+            if(sSleepStart == sleepDelStart && sSleepEnd == sleepDelEnd){
+                Log.v("deleted broooo", "broooo");
                 sleepDao.delete(sleep);
+                this.sleeps.remove(sleep);
                 return true;
             }
         }

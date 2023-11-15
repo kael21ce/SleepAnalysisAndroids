@@ -34,7 +34,7 @@ public class ScheduleFragment extends Fragment {
 
     public Map<Long, List<Sleep>> sleepsData;
 
-    SimpleDateFormat sdfDateTime = new SimpleDateFormat( "yyyy/MM/dd");
+    SimpleDateFormat sdfDateTime = new SimpleDateFormat( "yyyy/MM/dd", Locale.KOREA);
     long now, nineHours;
 
     @Override
@@ -46,7 +46,7 @@ public class ScheduleFragment extends Fragment {
         Log.v("FRAGMENT", "SCHEDULE FRAGMENT");
 
         nineHours = (1000*9*60*60);
-        now = System.currentTimeMillis() + nineHours;
+        now = System.currentTimeMillis();
 
         //get sleep data and calculate map values
         List<Sleep> sleeps = mainActivity.getSleeps();
@@ -55,10 +55,10 @@ public class ScheduleFragment extends Fragment {
         List<Sleep> listSleep = new ArrayList<>();
         Log.v("SIZE OF SLEEP", String.valueOf(sleeps.size()));
         if(sleeps.size() > 0) {
-            long curDate = sleeps.get(0).sleepStart / oneDayToMils;
+            long curDate = (sleeps.get(0).sleepStart + nineHours) / oneDayToMils;
             for (Sleep sleep : sleeps) {
                 Log.v("SLEEPSSS", String.valueOf(sleep.sleepStart));
-                long sleepStartDate = (sleep.sleepStart / oneDayToMils);
+                long sleepStartDate = ((sleep.sleepStart + nineHours) / oneDayToMils);
                 if (curDate != sleepStartDate) {
                     List<Sleep> putSleep = new ArrayList<>(listSleep);
                     sleepsData.put(curDate, putSleep);
@@ -87,7 +87,7 @@ public class ScheduleFragment extends Fragment {
 //        Log.v("THE MAP", String.valueOf(sleepsData.size()));
 
         //get today's day
-        long todayDate = now/oneDayToMils;
+        long todayDate = (now+nineHours)/oneDayToMils;
         Log.v("TODAY DATE", String.valueOf(todayDate));
         Log.v("TODAY DATE 2: ", sdfDateTime.format(new Date(now)));
         Log.v("today date 3", String.valueOf(now));
@@ -150,7 +150,7 @@ public class ScheduleFragment extends Fragment {
                 assert date != null;
                 long dayInMillis = date.getTime();
                 Log.v("DATE CHOSEN", String.valueOf(dayInMillis));
-                long selectedDay = dayInMillis / oneDayToMils;
+                long selectedDay = (dayInMillis+nineHours) / oneDayToMils;
                 Log.v("day", String.valueOf(selectedDay));
 
                 //get awareness

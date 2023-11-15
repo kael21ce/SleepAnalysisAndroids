@@ -33,8 +33,8 @@ public class RecommendFragment extends Fragment {
     private TextView sleepImportanceText;
     private TextView sleepTypeText;
     private TextView stateDescriptionText;
-    SimpleDateFormat sdfDateTime = new SimpleDateFormat("dd/MM/yyyy"+ "HH:mm");
-    SimpleDateFormat sdfTime = new SimpleDateFormat("HH:mm");
+    SimpleDateFormat sdfDateTime = new SimpleDateFormat("dd/MM/yyyy"+ "HH:mm", Locale.KOREA);
+    SimpleDateFormat sdfTime = new SimpleDateFormat("HH:mm", Locale.KOREA);
     String mainSleepStartString,sleepOnsetString, mainSleepEndString, workOnsetString, workOffsetString, napSleepStartString, napSleepEndString;
     long now, nineHours;
 
@@ -47,7 +47,7 @@ public class RecommendFragment extends Fragment {
 //        String test = sdfDateTime.format(new Date(sleepOnset));
 //        Log.v("tag_test", test);
         nineHours = (1000*60*60*9);
-        now = System.currentTimeMillis() + nineHours;
+        now = System.currentTimeMillis();
         SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
         long sleepOnset = sharedPref.getLong("sleepOnset", now);
         String test = sdfDateTime.format(new Date(sleepOnset));

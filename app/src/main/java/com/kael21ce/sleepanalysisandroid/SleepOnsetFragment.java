@@ -58,7 +58,7 @@ public class SleepOnsetFragment extends Fragment implements ButtonTextUpdater{
         sleepSettingSubmitButton = v.findViewById(R.id.sleepSettingSubmitButton);
 
         nineHours = (1000*60*60*9);
-        now = System.currentTimeMillis() + nineHours;
+        now = System.currentTimeMillis();
 
         SharedPreferences sharedPref = getActivity().getSharedPreferences("SleepWake", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
@@ -145,9 +145,9 @@ public class SleepOnsetFragment extends Fragment implements ButtonTextUpdater{
             assert workOffset != null;
 
             long nineHours = (1000*60*60*9);
-            mainActivity.setSleepOnset(sleepOnset.getTime() + nineHours);
-            mainActivity.setWorkOnset(workOnset.getTime() + nineHours);
-            mainActivity.setWorkOffset(workOffset.getTime() + nineHours);
+            mainActivity.setSleepOnset(sleepOnset.getTime() );
+            mainActivity.setWorkOnset(workOnset.getTime() );
+            mainActivity.setWorkOffset(workOffset.getTime() );
 
             mainActivity.finish();
             startActivity(new Intent(mainActivity, SplashActivity.class));
