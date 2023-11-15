@@ -40,6 +40,7 @@ public class SleepOnsetFragment extends Fragment implements ButtonTextUpdater{
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd hh:mm aaa");
     SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy.MM.dd");
     SimpleDateFormat sdfTime = new SimpleDateFormat("hh:mm aaa");
+    long now, nineHours;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -56,11 +57,14 @@ public class SleepOnsetFragment extends Fragment implements ButtonTextUpdater{
         workOffsetTimeButton = v.findViewById(R.id.workOffsetTimeButton);
         sleepSettingSubmitButton = v.findViewById(R.id.sleepSettingSubmitButton);
 
+        nineHours = (1000*60*60*9);
+        now = System.currentTimeMillis() + nineHours;
+
         SharedPreferences sharedPref = getActivity().getSharedPreferences("SleepWake", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
-        sleepOnset = sharedPref.getLong("sleepOnset", System.currentTimeMillis());
-        workOnset = sharedPref.getLong("workOnset", System.currentTimeMillis());
-        workOffset = sharedPref.getLong("workOffset", System.currentTimeMillis());
+        sleepOnset = sharedPref.getLong("sleepOnset", now);
+        workOnset = sharedPref.getLong("workOnset", now);
+        workOffset = sharedPref.getLong("workOffset", now);
 
 //        String sleepOnsetString = sdf.format(new Date(sleepOnset));
 //        String workOnsetString = sdf.format(new Date(workOnset));
@@ -127,12 +131,12 @@ public class SleepOnsetFragment extends Fragment implements ButtonTextUpdater{
                 workOnset = sdf.parse(workOnsetSDF);
                 workOffset = sdf.parse(workOffsetSDF);
                 //translate to local date time
-                LocalDateTime ldt1 = LocalDateTime.ofInstant(sleepOnset.toInstant(), ZoneId.systemDefault());
-                LocalDateTime ldt2 = LocalDateTime.ofInstant(workOnset.toInstant(), ZoneId.systemDefault());
-                LocalDateTime ldt3 = LocalDateTime.ofInstant(workOffset.toInstant(), ZoneId.systemDefault());
-                sleepOnset = Date.from(ldt1.atZone(ZoneId.systemDefault()).toInstant());
-                workOnset = Date.from(ldt2.atZone(ZoneId.systemDefault()).toInstant());
-                workOffset = Date.from(ldt3.atZone(ZoneId.systemDefault()).toInstant());
+//                LocalDateTime ldt1 = LocalDateTime.ofInstant(sleepOnset.toInstant(), ZoneId.systemDefault());
+//                LocalDateTime ldt2 = LocalDateTime.ofInstant(workOnset.toInstant(), ZoneId.systemDefault());
+//                LocalDateTime ldt3 = LocalDateTime.ofInstant(workOffset.toInstant(), ZoneId.systemDefault());
+//                sleepOnset = Date.from(ldt1.atZone(ZoneId.systemDefault()).toInstant());
+//                workOnset = Date.from(ldt2.atZone(ZoneId.systemDefault()).toInstant());
+//                workOffset = Date.from(ldt3.atZone(ZoneId.systemDefault()).toInstant());
             } catch (ParseException e) {
                 throw new RuntimeException(e);
             }
@@ -140,9 +144,10 @@ public class SleepOnsetFragment extends Fragment implements ButtonTextUpdater{
             assert workOnset != null;
             assert workOffset != null;
 
-            mainActivity.setSleepOnset(sleepOnset.getTime());
-            mainActivity.setWorkOnset(workOnset.getTime());
-            mainActivity.setWorkOffset(workOffset.getTime());
+            long nineHours = (1000*60*60*9);
+            mainActivity.setSleepOnset(sleepOnset.getTime() + nineHours);
+            mainActivity.setWorkOnset(workOnset.getTime() + nineHours);
+            mainActivity.setWorkOffset(workOffset.getTime() + nineHours);
 
             mainActivity.finish();
             startActivity(new Intent(mainActivity, SplashActivity.class));

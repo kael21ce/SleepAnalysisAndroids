@@ -74,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
     RecommendFragment recommendFragment = new RecommendFragment();
     SettingFragment settingFragment = new SettingFragment();
     private RelativeLayout loadingScreenLayout;
-    SimpleDateFormat sdfDateTime = new SimpleDateFormat("dd/MM/yyyy"+ "HH:mm", Locale.KOREA);
+    SimpleDateFormat sdfDateTime = new SimpleDateFormat("dd/MM/yyyy"+ "HH:mm");
     HealthConnectManager healthConnectManager;
     //health connect
     private static Context context;
@@ -90,7 +90,7 @@ public class MainActivity extends AppCompatActivity {
     private List<Sleep> sleeps;
     private List<Awareness> awarenesses;
     private List<V0> v0s;
-    long now;
+    long now, nineHours;
     long twoWeeks = (1000*60*60*24*14);
     long fiveMinutesToMil = (1000*60*5);
     Instant ILastSleepUpdate;
@@ -113,16 +113,18 @@ public class MainActivity extends AppCompatActivity {
         sharedPref = getSharedPreferences("SleepWake", Context.MODE_PRIVATE);
         editor = sharedPref.edit();
 
-        now = System.currentTimeMillis();
+        //this is in GMT
+        nineHours = (1000*60*60*9);
+        now = System.currentTimeMillis() + nineHours;
 
         //update variables
-        lastSleepUpdate = sharedPref.getLong("lastSleepUpdate", System.currentTimeMillis() - twoWeeks);
-        lastDataUpdate = sharedPref.getLong("lastUpdate", System.currentTimeMillis() - twoWeeks);
+        lastSleepUpdate = sharedPref.getLong("lastSleepUpdate", now - twoWeeks);
+        lastDataUpdate = sharedPref.getLong("lastUpdate", now - twoWeeks);
 
         //user sleep variables
-        sleepOnset = sharedPref.getLong("sleepOnset", System.currentTimeMillis());
-        workOnset = sharedPref.getLong("workOnset", System.currentTimeMillis());
-        workOffset = sharedPref.getLong("workOffset", System.currentTimeMillis());
+        sleepOnset = sharedPref.getLong("sleepOnset", now);
+        workOnset = sharedPref.getLong("workOnset", now);
+        workOffset = sharedPref.getLong("workOffset", now);
 
         barEntries = new ArrayList<BarEntry>();
 
@@ -141,10 +143,10 @@ public class MainActivity extends AppCompatActivity {
         }
 
         //sleep result variables
-        mainSleepStart = sharedPref.getLong("mainSleepStart", System.currentTimeMillis() - twoWeeks);
-        mainSleepEnd = sharedPref.getLong("mainSleepEnd", System.currentTimeMillis() - twoWeeks);
-        napSleepStart = sharedPref.getLong("napSleepStart", System.currentTimeMillis() - twoWeeks);
-        napSleepEnd = sharedPref.getLong("napSleepEnd", System.currentTimeMillis() - twoWeeks);
+        mainSleepStart = sharedPref.getLong("mainSleepStart", now - twoWeeks);
+        mainSleepEnd = sharedPref.getLong("mainSleepEnd", now - twoWeeks);
+        napSleepStart = sharedPref.getLong("napSleepStart", now - twoWeeks);
+        napSleepEnd = sharedPref.getLong("napSleepEnd", now - twoWeeks);
 
         ILastSleepUpdate = Instant.ofEpochMilli(lastSleepUpdate);
 
@@ -246,9 +248,9 @@ public class MainActivity extends AppCompatActivity {
         v0s = v0Dao.getAll();
 
         //do pcr simulation
-        long yesterday = System.currentTimeMillis() - (1000*60*60*24);
+        long yesterday = now - (1000*60*60*24);
         long startProcess = Long.min(yesterday, lastSleepUpdate);
-        long endProcess = System.currentTimeMillis();
+        long endProcess = now;
         long processDuration = (endProcess - startProcess) / fiveMinutesToMil;
         boolean gotInitV0 = false;
         double[] initV0 = {-0.8283, 0.8413, 0.6758, 13.3336};
@@ -288,7 +290,7 @@ public class MainActivity extends AppCompatActivity {
         //update V0 from the simulation
         List<V0> newV0 = new ArrayList<>();
         Log.v("SIZE", String.valueOf(simulationResult.size()));
-        float barIdx = 5.25f;
+        float barIdx = 0.25f;
         for(int i = 0; i < simulationResult.size(); i ++){
             double[] res = simulationResult.get(i);
             V0 v0 = new V0();
@@ -300,7 +302,7 @@ public class MainActivity extends AppCompatActivity {
 //            Log.v("VO TIME", sdfDateTime.format(new Date(v0.time)));
             newV0.add(v0);
 
-            if(v0.time >= (System.currentTimeMillis()-(1000*60*6)) && (v0.time <= System.currentTimeMillis())){
+            if(v0.time >= (now-(1000*60*6)) && (v0.time <= now)){
                 initV0 = res;
             }
 
@@ -623,7 +625,7 @@ public class MainActivity extends AppCompatActivity {
         this.sleepOnset = sleepOnset;
         editor.putLong("sleepOnset", sleepOnset);
         editor.apply();
-        Log.v("sleep onset", sdfDateTime.format(new Date(sharedPref.getLong("sleepOnset", System.currentTimeMillis()))));
+        Log.v("sleep onset", sdfDateTime.format(new Date(sharedPref.getLong("sleepOnset", now))));
     }
 
     public long getWorkOnset(){
@@ -634,7 +636,7 @@ public class MainActivity extends AppCompatActivity {
         this.workOnset = workOnset;
         editor.putLong("workOnset", workOnset);
         editor.apply();
-        Log.v("work onset", sdfDateTime.format(new Date(sharedPref.getLong("workOnset", System.currentTimeMillis()))));
+        Log.v("work onset", sdfDateTime.format(new Date(sharedPref.getLong("workOnset", now))));
     }
 
     public long getWorkOffset() {
@@ -645,7 +647,7 @@ public class MainActivity extends AppCompatActivity {
         this.workOffset = workOffset;
         editor.putLong("workOffset", workOffset);
         editor.apply();
-        Log.v("work offset", sdfDateTime.format(new Date(sharedPref.getLong("workOffset", System.currentTimeMillis()))));
+        Log.v("work offset", sdfDateTime.format(new Date(sharedPref.getLong("workOffset", now))));
     }
 
     public long getLastSleepUpdate() {

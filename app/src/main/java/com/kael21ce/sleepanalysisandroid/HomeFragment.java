@@ -35,10 +35,11 @@ import java.util.List;
 import java.util.Locale;
 
 public class HomeFragment extends Fragment {
-    SimpleDateFormat sdfDateTime = new SimpleDateFormat( "hh:mm a", Locale.KOREA);
-    SimpleDateFormat sdfDateTime2 = new SimpleDateFormat( "dd/MM/yyyy hh:mm a", Locale.KOREA);
-    SimpleDateFormat sdfDate = new SimpleDateFormat("MM/dd", Locale.KOREA);
-    SimpleDateFormat sdfTime = new SimpleDateFormat("HH:mm", Locale.KOREA);
+    SimpleDateFormat sdfDateTime = new SimpleDateFormat( "hh:mm a");
+    SimpleDateFormat sdfDateTime2 = new SimpleDateFormat( "dd/MM/yyyy hh:mm a");
+    SimpleDateFormat sdfDate = new SimpleDateFormat("MM/dd");
+    SimpleDateFormat sdfTime = new SimpleDateFormat("HH:mm");
+    long now, nineHours;
     String mainSleepStartString, mainSleepEndString, workOnsetString, workOffsetString, napSleepStartString, napSleepEndString, sleepOnsetString;
     private List<Awareness> awarenesses;
 
@@ -61,6 +62,9 @@ public class HomeFragment extends Fragment {
         RecyclerView chartRecycler = v.findViewById(R.id.ChartRecyclerView);
 
         BarChart alertnessChart = v.findViewById(R.id.alertnessChart);
+
+        nineHours = (1000*60*60*9);
+        now = System.currentTimeMillis() + nineHours;
 
         //Initial button color setting
         sleepButton.setBackground(ResourcesCompat
@@ -86,9 +90,9 @@ public class HomeFragment extends Fragment {
         sleepOnsetString = sdfDateTime.format(new Date(mainActivity.getSleepOnset()));
 
         SharedPreferences sharedPref = getActivity().getSharedPreferences("SleepWake", Context.MODE_PRIVATE);
-        Log.v("sleep onset", sdfDateTime2.format(new Date(sharedPref.getLong("sleepOnset", System.currentTimeMillis()))));
-        Log.v("work onset", sdfDateTime2.format(new Date(sharedPref.getLong("workOnset", System.currentTimeMillis()))));
-        Log.v("work offset", sdfDateTime2.format(new Date(sharedPref.getLong("workOffset", System.currentTimeMillis()))));
+        Log.v("sleep onset", sdfDateTime2.format(new Date(sharedPref.getLong("sleepOnset", now))));
+        Log.v("work onset", sdfDateTime2.format(new Date(sharedPref.getLong("workOnset", now))));
+        Log.v("work offset", sdfDateTime2.format(new Date(sharedPref.getLong("workOffset", now))));
 
         //Just Example
         clockView.setAngleFromTime(mainSleepStartString, mainSleepEndString);
@@ -169,7 +173,7 @@ public class HomeFragment extends Fragment {
 
         awarenesses = mainActivity.getAwarenesses();
         long oneDayToMils = 1000*60*60*24;
-        long curTime = System.currentTimeMillis();
+        long curTime = now;
         long curDay = curTime/oneDayToMils;
         for(Awareness awareness: awarenesses){
             Log.v("AWARENESS VALUE IN SCHEDULE", sdfDate.format(new Date(awareness.awarenessDay*oneDayToMils+oneDayToMils)));
