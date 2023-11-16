@@ -30,6 +30,7 @@ import com.kael21ce.sleepanalysisandroid.data.Awareness;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
@@ -117,27 +118,7 @@ public class HomeFragment extends Fragment {
         //Graph showing alertness
         ArrayList<BarEntry> barEntries = mainActivity.getBarEntries();
             //Add data to Entries: form-(x: time, y: alertness value)
-            //time range: 0 ~ 72 (yesterday ~ tomorrow) / alertness range: -100 ~ 100
-        //Just Example
-//        for (float i=0.25f; i < 0.25f*(48f * 4f + 1f); i += 0.25f) {
-//            barEntries.add(new BarEntry(5f + i, (float) (100*(0.7*Math.sin(i) + 0.3*Math.cos(i * 3)))));
-//        }
-        /*
-        barEntries.add(new BarEntry(5f, 50f));
-        barEntries.add(new BarEntry(5.25f, 90f));
-        barEntries.add(new BarEntry(5.5f, 93f));
-        barEntries.add(new BarEntry(5.75f, 80f));
-        barEntries.add(new BarEntry(6f, 30f));
-        barEntries.add(new BarEntry(6.25f, -10f));
-        barEntries.add(new BarEntry(6.5f, -15f));
-        barEntries.add(new BarEntry(10f, -40f));
-        barEntries.add(new BarEntry(11f, 75f));
-        barEntries.add(new BarEntry(11.25f, 75.6f));
-        barEntries.add(new BarEntry(48f, 40f));
-        barEntries.add(new BarEntry(60f, -10f));
-
-
-         */
+            //time range: 0 ~ 48 (- 24 + current , current + 24) / alertness range: -100 ~ 100
         //Set the color of bar depending on the y-value
         ArrayList<Integer> barColors = new ArrayList<>();
         for (int i = 0; i < barEntries.size(); i++) {
@@ -171,7 +152,7 @@ public class HomeFragment extends Fragment {
         rightYAxis.setDrawAxisLine(false);
         xAxis.setGridColor(ResourcesCompat.getColor(getResources(), R.color.gray_4, null));
         xAxis.setValueFormatter(new XAxisValueFormatter());
-        xAxis.setGranularity(20);
+        xAxis.setGranularity(20f);
         xAxis.setLabelCount(barEntries.size() / 20, true);
         //Customize the description
         Description description = new Description();
@@ -406,43 +387,80 @@ public class HomeFragment extends Fragment {
 class XAxisValueFormatter extends ValueFormatter {
     /*Range
     Each hour is represented by float and integer
-    Yesterday: 0 ~ 24
-    Today: 24 ~ 48
-    Tomorrow: 48 ~ 72
     The range of time for showing alertness is [(today current time) - 24, (today current time) + 24]
     */
+    //To make displayed tick label not overlap
+    String displayedHour = "";
+    String displayedDate = "";
     @Override
     public String getFormattedValue(float value) {
+        String timeLabel;
+        String dateLabel;
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/d");
-        int valueInt = (int) value;
-        int quotient = valueInt / 24;
-        int remainder = valueInt % 24;
-        int remainderDisplaying = valueInt % 3;
-        float valueF = (float) valueInt;
-        Log.v("Ticks", String.valueOf(value));
-        if (value < valueInt + 0.6) {
-            if (remainderDisplaying == 1) {
-                if (remainder < 12) {
-                    return remainder + " AM";
-                } else {
-                    return remainder + " PM";
-                }
-            }
-            if (remainder == 0) {
-                if (quotient == 0) {
-                    LocalDate yesterday = LocalDate.now().minusDays(1);
-                    return yesterday.format(formatter);
-                } else if (quotient == 1) {
-                    LocalDate today = LocalDate.now();
-                    return today.format(formatter);
-                } else {
-                    LocalDate tomorrow = LocalDate.now().plusDays(1);
-                    return tomorrow.format(formatter);
-                }
-            }
+        LocalTime current = LocalTime.now();
+        LocalDate yesterday = LocalDate.now().minusDays(1);
+        LocalDate today = LocalDate.now();
+        LocalDate tomorrow = LocalDate.now().plusDays(1);
+        int currentHour = current.getHour();
+        int currentMinute = current.getMinute();
+        float valueReal = value / 2;
+        float valueCentered = valueReal + currentHour + currentMinute / 60f;
+        float currentCenter = 24f + currentHour + currentMinute / 60f;
+        int valueR = Math.round(valueCentered);
+        if (valueCentered < 0) {
             return "";
         } else {
-            return "";
+            int quotient = valueR / 24;
+            int remainder = valueR % 24;
+            int remainderDisplaying = valueR % 3;
+            //Time
+            if (remainderDisplaying == 1) {
+                if (remainder < 12) {
+                    timeLabel = remainder + " AM";
+                    if (!timeLabel.equals(this.displayedHour)) {
+                        this.displayedHour = timeLabel;
+                        return timeLabel;
+                    } else {
+                        return "";
+                    }
+                } else {
+                    timeLabel = remainder - 12 + " PM";
+                    if (!timeLabel.equals(this.displayedHour)) {
+                        this.displayedHour = timeLabel;
+                        return timeLabel;
+                    } else {
+                        return "";
+                    }
+                }
+            }
+            //Date
+            if (valueCentered > 24f && valueCentered < 48f) {
+                dateLabel = today.format(formatter);
+                if (!dateLabel.equals(this.displayedDate)) {
+                    this.displayedDate = dateLabel;
+                    return dateLabel;
+                } else {
+                    return "";
+                }
+            } else if (valueCentered >= 48f) {
+                dateLabel = tomorrow.format(formatter);
+                if (!dateLabel.equals(this.displayedDate)) {
+                    this.displayedDate = dateLabel;
+                    return dateLabel;
+                } else {
+                    return "";
+                }
+            } else if (valueCentered < 24f) {
+                dateLabel = yesterday.format(formatter);
+                if (!dateLabel.equals(this.displayedDate)) {
+                    this.displayedDate = dateLabel;
+                    return dateLabel;
+                } else {
+                    return "";
+                }
+            } else {
+                return "";
+            }
         }
     }
 }

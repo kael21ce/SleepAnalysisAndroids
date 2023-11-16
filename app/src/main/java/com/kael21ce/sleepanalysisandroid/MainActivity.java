@@ -307,7 +307,7 @@ public class MainActivity extends AppCompatActivity {
                 initV0 = res;
             }
 
-            if(simulationResult.size() - 288 <= i){
+            if(simulationResult.size() - 192 <= i){
                 barEntries.add(new BarEntry((float) barIdx, (float) getAwarenessValue(res[3], res[2], res[1], res[0])));
                 barIdx += 0.25f;
             }
@@ -351,7 +351,7 @@ public class MainActivity extends AppCompatActivity {
         sleepPattern = sleepToArray(now, now+1000*60*60*24, newSleep);
         Log.v("SLEEP SIZE", String.valueOf(sleepPattern.length));
         simulationResult = sleepModel.pcr_simulation(initV0, sleepPattern, 5/60.0);
-        for(int i = 0; i < 288; i ++){
+        for(int i = 0; i < 192; i ++){
             double[] res = simulationResult.get(i);
             double awarenessVal = getAwarenessValue(res[3], res[2], res[1], res[0]);
             barEntries.add(new BarEntry(barIdx, (float)awarenessVal));
