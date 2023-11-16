@@ -146,11 +146,13 @@ public class HomeFragment extends Fragment {
         alertnessChart.setVisibleXRangeMaximum(10f);
         //Customize the grid
         XAxis xAxis = alertnessChart.getXAxis();
-        XAxis xAxisBottom = alertnessChart.getXAxis();
         YAxis leftYAxis = alertnessChart.getAxisLeft();
         YAxis rightYAxis = alertnessChart.getAxisRight();
         leftYAxis.setDrawAxisLine(false);
         rightYAxis.setDrawAxisLine(false);
+        //x axis on the bottom
+        alertnessChart.setXAxisRenderer(new DoubleXLabelAxisRenderer(alertnessChart.getViewPortHandler(), alertnessChart.getXAxis(),
+        alertnessChart.getTransformer(YAxis.AxisDependency.LEFT), new XAxisBottomFormatter()));
         //x axis on the top
         xAxis.setGridColor(ResourcesCompat.getColor(getResources(), R.color.gray_4, null));
         xAxis.setValueFormatter(new XAxisValueFormatter());
@@ -158,17 +160,7 @@ public class HomeFragment extends Fragment {
         xAxis.setGranularity(2f);
         xAxis.setLabelCount(barEntries.size(), true);
         Log.v("Size", String.valueOf(barEntries.size()));
-        xAxis.setDrawGridLines(true);
-        //x axis on the bottom
-        /*
-        xAxisBottom.setGridColor(ResourcesCompat.getColor(getResources(), R.color.gray_4, null));
-        xAxisBottom.setValueFormatter(new XAxisBottomFormatter());
-        xAxisBottom.setPosition(XAxis.XAxisPosition.BOTTOM);
-        xAxisBottom.setGranularity(20f);
-        xAxisBottom.setLabelCount(barEntries.size() / 20, true);
-        xAxisBottom.setDrawGridLines(false);
-
-         */
+        xAxis.setDrawGridLines(false);
         //Customize the description
         Description description = new Description();
         description.setText("");
@@ -193,7 +185,7 @@ public class HomeFragment extends Fragment {
             long minuteBadDuration = awareness.badDuration%60;
             Log.v("AWARENESS VALUE IN SCHEDULE", hourGoodDuration + ":" + minuteGoodDuration);
             Log.v("AWARENESS VALUE IN SCHEDULE", hourBadDuration + ":" + minuteBadDuration);
-            if(curDay-8 < awareness.awarenessDay){
+            if(curDay-7 < awareness.awarenessDay){
                 String date = sdfDate.format(new Date((awareness.awarenessDay)*oneDayToMils));
                 String goodDuration = hourGoodDuration + ":" + minuteGoodDuration;
                 String badDuration = hourBadDuration + ":" + minuteBadDuration;
