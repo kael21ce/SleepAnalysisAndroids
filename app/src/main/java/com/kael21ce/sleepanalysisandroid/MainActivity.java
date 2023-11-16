@@ -119,7 +119,7 @@ public class MainActivity extends AppCompatActivity {
 
         //update variables
         lastSleepUpdate = sharedPref.getLong("lastSleepUpdate", now - twoWeeks);
-        lastDataUpdate = sharedPref.getLong("lastUpdate", now - twoWeeks);
+        lastDataUpdate = sharedPref.getLong("lastDataUpdate", now - twoWeeks);
 
         //user sleep variables
         sleepOnset = sharedPref.getLong("sleepOnset", now);
@@ -249,7 +249,8 @@ public class MainActivity extends AppCompatActivity {
 
         //do pcr simulation
         long yesterday = now - (1000*60*60*24);
-        long startProcess = Long.min(yesterday, lastSleepUpdate);
+        long startProcess = Long.min(yesterday, lastDataUpdate);
+        lastDataUpdate = now-(1000*60*5);
         long endProcess = now;
         long processDuration = (endProcess - startProcess) / fiveMinutesToMil;
         boolean gotInitV0 = false;
@@ -577,6 +578,9 @@ public class MainActivity extends AppCompatActivity {
                 Log.v("SLEEP DATA ADDED", String.valueOf(sleep.sleepStart));
                 this.sleepDao.insertAll(listSleep);
             }
+            lastDataUpdate = sleep.sleepStart - (1000*60*60*24);
+            editor.putLong("lastDataUpdate", lastDataUpdate);
+            editor.apply();
             healthConnectManager.javWriteSleepInput(sleep.sleepStart, sleep.sleepEnd);
             return true;
         }else{
@@ -591,6 +595,10 @@ public class MainActivity extends AppCompatActivity {
             if(sleep.sleepStart/60000 == prevSleep.sleepStart/60000 && sleep.sleepEnd/60000 == prevSleep.sleepEnd/60000){
                 int sleepId = sleep.sleep_id;
                 if(!isOverlap(this.sleeps, updatedSleep, sleepId)) {
+                    lastDataUpdate = updatedSleep.sleepStart - (1000*60*60*24);
+                    editor.putLong("lastDataUpdate", lastDataUpdate);
+                    editor.apply();
+
                     updatedSleep.sleep_id = sleepId;
                     sleepDao.updateSleep(sleepId, updatedSleep.sleepStart, updatedSleep.sleepEnd);
                     this.sleeps.set(count, updatedSleep);
@@ -617,6 +625,9 @@ public class MainActivity extends AppCompatActivity {
             Log.v("SLEEP DELETE END", String.valueOf(sleep.sleepEnd));
             if(sSleepStart == sleepDelStart && sSleepEnd == sleepDelEnd){
                 Log.v("deleted broooo", "broooo");
+                lastDataUpdate = sleep.sleepStart - (1000*60*60*24);
+                editor.putLong("lastDataUpdate", lastDataUpdate);
+                editor.apply();
                 sleepDao.delete(sleep);
                 this.sleeps.remove(sleep);
                 return true;
