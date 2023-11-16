@@ -1,13 +1,11 @@
 package com.kael21ce.sleepanalysisandroid;
 
-import android.content.Context;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -16,6 +14,18 @@ import java.util.ArrayList;
 
 public class BarAdapter extends RecyclerView.Adapter<BarAdapter.ViewHolder> {
     ArrayList<Bar> items = new ArrayList<Bar>();
+    private int selectedItemPosition = RecyclerView.NO_POSITION;
+    private OnItemClickListener onBarClickListener;
+
+    //Interface for onBarClickListener
+    public interface OnItemClickListener {
+        void onItemClick(int position);
+    }
+
+    //Method to set the click listener from HomeFragment
+    public void setOnBarClickListener(OnItemClickListener listener) {
+        this.onBarClickListener = listener;
+    }
 
     @NonNull
     @Override
@@ -29,6 +39,17 @@ public class BarAdapter extends RecyclerView.Adapter<BarAdapter.ViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull ViewHolder viewHolder, int position) {
         Bar item = items.get(position);
+        LinearLayout positiveDisplayer = viewHolder.itemView.findViewById(R.id.PositiveDisplayer);
+        LinearLayout negativeDisplayer = viewHolder.itemView.findViewById(R.id.NegativeDisplayer);
+        //Set the background of bar whether it is clicked or not
+        if (selectedItemPosition == position) {
+            positiveDisplayer.setBackgroundResource(R.color.green_1);
+            negativeDisplayer.setBackgroundResource(R.color.red_1);
+        } else {
+            positiveDisplayer.setBackgroundResource(R.color.green_2);
+            negativeDisplayer.setBackgroundResource(R.color.red_2);
+        }
+
         viewHolder.setItem(item);
     }
 
@@ -53,7 +74,8 @@ public class BarAdapter extends RecyclerView.Adapter<BarAdapter.ViewHolder> {
         items.set(position, item);
     }
 
-    static class ViewHolder extends RecyclerView.ViewHolder {
+
+    class ViewHolder extends RecyclerView.ViewHolder {
         TextView dateTextView;
         LinearLayout positiveCompetitor;
         LinearLayout positiveDisplayer;
@@ -68,6 +90,17 @@ public class BarAdapter extends RecyclerView.Adapter<BarAdapter.ViewHolder> {
             positiveDisplayer = itemView.findViewById(R.id.PositiveDisplayer);
             negativeCompetitor = itemView.findViewById(R.id.NegativeCompetitor);
             negativeDisplayer = itemView.findViewById(R.id.NegativeDisplayer);
+
+            itemView.setOnClickListener(view -> {
+                int previousSelectedPosition = selectedItemPosition;
+                selectedItemPosition = getAdapterPosition();
+                int position = getAdapterPosition();
+                if (selectedItemPosition != RecyclerView.NO_POSITION && onBarClickListener != null) {
+                    onBarClickListener.onItemClick(position);
+                }
+                notifyItemChanged(previousSelectedPosition);
+                notifyItemChanged(selectedItemPosition);
+            });
         }
 
         public void setItem(Bar item) {

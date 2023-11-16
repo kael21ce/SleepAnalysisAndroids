@@ -1,14 +1,15 @@
 package com.kael21ce.sleepanalysisandroid;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.core.content.res.ResourcesCompat;
@@ -16,16 +17,17 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.components.Description;
 import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
+import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.kael21ce.sleepanalysisandroid.data.Awareness;
-import com.github.mikephil.charting.charts.BarChart;
-import com.github.mikephil.charting.data.BarEntry;
+
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -42,16 +44,17 @@ public class HomeFragment extends Fragment {
     long now, nineHours;
     String mainSleepStartString, mainSleepEndString, workOnsetString, workOffsetString, napSleepStartString, napSleepEndString, sleepOnsetString;
     private List<Awareness> awarenesses;
+    int position = 7;
 
+    @SuppressLint("ResourceAsColor")
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_home, container, false);
         MainActivity mainActivity = (MainActivity)getActivity();
-
+        //ClockView
         TextView startTime = (TextView) v.findViewById(R.id.StartTimeHome);
         TextView endTime = (TextView) v.findViewById(R.id.EndTimeHome);
-
         ImageButton sleepButton = v.findViewById(R.id.sleepButtonHome);
         ImageButton napButton = v.findViewById(R.id.napButtonHome);
         ImageButton workButton = v.findViewById(R.id.workButtonHome);
@@ -59,9 +62,19 @@ public class HomeFragment extends Fragment {
         TextView sleepTypeText = v.findViewById(R.id.sleepTypeHomeText);
         TextView stateDescriptionText = v.findViewById(R.id.StateDescriptionHomeText);
         ClockView clockView = v.findViewById(R.id.sweepingClockHome);
-        RecyclerView chartRecycler = v.findViewById(R.id.ChartRecyclerView);
 
+        //Alertness Graph
         BarChart alertnessChart = v.findViewById(R.id.alertnessChart);
+
+        //Weekly alertness chart
+        RecyclerView chartRecycler = v.findViewById(R.id.ChartRecyclerView);
+        TextView positiveTimeText = v.findViewById(R.id.positiveTimeText);
+        TextView negativeTimeText = v.findViewById(R.id.negativeTimeText);
+        ImageView positiveImage = v.findViewById(R.id.positiveImage);
+        ImageView negativeImage = v.findViewById(R.id.negativeImage);
+        TextView positiveNumberText = v.findViewById(R.id.positiveNumberText);
+        TextView negativeNumberText = v.findViewById(R.id.negativeNumberText);
+
 
         nineHours = (1000*60*60*9);
         now = System.currentTimeMillis();
@@ -184,13 +197,87 @@ public class HomeFragment extends Fragment {
             long minuteBadDuration = awareness.badDuration%60;
             Log.v("AWARENESS VALUE IN SCHEDULE", hourGoodDuration + ":" + minuteGoodDuration);
             Log.v("AWARENESS VALUE IN SCHEDULE", hourBadDuration + ":" + minuteBadDuration);
-            if(curDay-9 < awareness.awarenessDay){
+            if(curDay-8 < awareness.awarenessDay){
                 String date = sdfDate.format(new Date((awareness.awarenessDay)*oneDayToMils));
                 String goodDuration = hourGoodDuration + ":" + minuteGoodDuration;
                 String badDuration = hourBadDuration + ":" + minuteBadDuration;
                 barAdapter.addItem(new Bar(date, convertToWeight(goodDuration), convertToWeight(badDuration)));
             }
         }
+        //Load the clicked position in RecyclerView
+        barAdapter.setOnBarClickListener(position -> {
+            Log.d("HomeFragment", "Item clicked at position " + position);
+            Awareness clickedAwareness = awarenesses.get(position);
+            long hourGoodDuration = clickedAwareness.goodDuration/60;
+            long minuteGoodDuration = clickedAwareness.goodDuration%60;
+            long hourBadDuration = clickedAwareness.badDuration/60;
+            long minuteBadDuration = clickedAwareness.badDuration%60;
+            //Time for positive
+            positiveTimeText.setText(hourGoodDuration + "시간 " + minuteGoodDuration + "분");
+            //Time for negative
+            negativeTimeText.setText(hourBadDuration + "시간 " + minuteBadDuration + "분");
+            //Number for increase and decrease
+
+            if (position == 0) {
+                positiveNumberText.setText("- %");
+                positiveNumberText.setTextColor(R.color.black);
+                positiveImage.setVisibility(View.INVISIBLE);
+                negativeNumberText.setText("- %");
+                negativeNumberText.setTextColor(R.color.black);
+                negativeImage.setVisibility(View.INVISIBLE);
+            } else {
+                positiveImage.setVisibility(View.VISIBLE);
+                negativeImage.setVisibility(View.VISIBLE);
+                Awareness formerAwareness = awarenesses.get(position - 1);
+                long deltaGood = clickedAwareness.goodDuration - formerAwareness.goodDuration;
+                long deltaBad = clickedAwareness.badDuration - formerAwareness.badDuration;
+                //Positive Number
+                if (deltaGood > 0) {
+                    //If former one is zero
+                    if (formerAwareness.goodDuration == 0) {
+                        positiveNumberText.setText("- %");
+                        positiveNumberText.setTextColor(R.color.green_1);
+                        positiveImage.setImageDrawable(getResources().getDrawable(R.drawable.arrow_up));
+                    } else {
+                        positiveNumberText.setText(deltaGood / formerAwareness.goodDuration * 100 + " %");
+                        positiveNumberText.setTextColor(R.color.green_1);
+                        positiveImage.setImageDrawable(getResources().getDrawable(R.drawable.arrow_up));
+                    }
+                } else {
+                    if (formerAwareness.goodDuration == 0) {
+                        positiveNumberText.setText("- %");
+                        positiveNumberText.setTextColor(R.color.red_1);
+                        positiveImage.setImageDrawable(getResources().getDrawable(R.drawable.arrow_down));
+                    } else {
+                        positiveNumberText.setText(- deltaGood / formerAwareness.goodDuration * 100 + " %");
+                        positiveNumberText.setTextColor(R.color.red_1);
+                        positiveImage.setImageDrawable(getResources().getDrawable(R.drawable.arrow_down));
+                    }
+                }
+                //Negative Number
+                if (deltaBad > 0) {
+                    if (formerAwareness.badDuration == 0) {
+                        negativeNumberText.setText("- %");
+                        negativeNumberText.setTextColor(R.color.green_1);
+                        negativeImage.setImageDrawable(getResources().getDrawable(R.drawable.arrow_up));
+                    } else {
+                        negativeNumberText.setText(deltaBad / formerAwareness.badDuration * 100 + " %");
+                        negativeNumberText.setTextColor(R.color.green_1);
+                        negativeImage.setImageDrawable(getResources().getDrawable(R.drawable.arrow_up));
+                    }
+                } else {
+                    if (formerAwareness.badDuration == 0) {
+                        negativeNumberText.setText("- %");
+                        negativeNumberText.setTextColor(R.color.red_1);
+                        negativeImage.setImageDrawable(getResources().getDrawable(R.drawable.arrow_down));
+                    } else {
+                        negativeNumberText.setText(- deltaBad / formerAwareness.badDuration * 100 + " %");
+                        negativeNumberText.setTextColor(R.color.red_1);
+                        negativeImage.setImageDrawable(getResources().getDrawable(R.drawable.arrow_down));
+                    }
+                }
+            }
+        });
 
         //Set the bar items to BarAdapter (8 items)
         //Just Examples
