@@ -299,7 +299,7 @@ public class MainActivity extends AppCompatActivity {
         //update V0 from the simulation
         List<V0> newV0 = new ArrayList<>();
         Log.v("SIZE", String.valueOf(simulationResult.size()));
-        float barIdx = 0.25f;
+        float barIdx = 0f;
         float addBarIdx = 0.17f;
         for(int i = 0; i < simulationResult.size(); i ++){
             double[] res = simulationResult.get(i);

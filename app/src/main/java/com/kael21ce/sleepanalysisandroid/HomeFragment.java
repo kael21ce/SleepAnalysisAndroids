@@ -146,14 +146,29 @@ public class HomeFragment extends Fragment {
         alertnessChart.setVisibleXRangeMaximum(10f);
         //Customize the grid
         XAxis xAxis = alertnessChart.getXAxis();
+        XAxis xAxisBottom = alertnessChart.getXAxis();
         YAxis leftYAxis = alertnessChart.getAxisLeft();
         YAxis rightYAxis = alertnessChart.getAxisRight();
         leftYAxis.setDrawAxisLine(false);
         rightYAxis.setDrawAxisLine(false);
+        //x axis on the top
         xAxis.setGridColor(ResourcesCompat.getColor(getResources(), R.color.gray_4, null));
         xAxis.setValueFormatter(new XAxisValueFormatter());
-        xAxis.setGranularity(20f);
-        xAxis.setLabelCount(barEntries.size() / 20, true);
+        xAxis.setPosition(XAxis.XAxisPosition.TOP);
+        xAxis.setGranularity(2f);
+        xAxis.setLabelCount(barEntries.size(), true);
+        Log.v("Size", String.valueOf(barEntries.size()));
+        xAxis.setDrawGridLines(true);
+        //x axis on the bottom
+        /*
+        xAxisBottom.setGridColor(ResourcesCompat.getColor(getResources(), R.color.gray_4, null));
+        xAxisBottom.setValueFormatter(new XAxisBottomFormatter());
+        xAxisBottom.setPosition(XAxis.XAxisPosition.BOTTOM);
+        xAxisBottom.setGranularity(20f);
+        xAxisBottom.setLabelCount(barEntries.size() / 20, true);
+        xAxisBottom.setDrawGridLines(false);
+
+         */
         //Customize the description
         Description description = new Description();
         description.setText("");
@@ -433,6 +448,61 @@ class XAxisValueFormatter extends ValueFormatter {
                     }
                 }
             }
+            //Date
+            if (valueCentered > 24f && valueCentered < 48f) {
+                dateLabel = today.format(formatter);
+                if (!dateLabel.equals(this.displayedDate)) {
+                    this.displayedDate = dateLabel;
+                    return dateLabel;
+                } else {
+                    return "";
+                }
+            } else if (valueCentered >= 48f) {
+                dateLabel = tomorrow.format(formatter);
+                if (!dateLabel.equals(this.displayedDate)) {
+                    this.displayedDate = dateLabel;
+                    return dateLabel;
+                } else {
+                    return "";
+                }
+            } else if (valueCentered < 24f) {
+                dateLabel = yesterday.format(formatter);
+                if (!dateLabel.equals(this.displayedDate)) {
+                    this.displayedDate = dateLabel;
+                    return dateLabel;
+                } else {
+                    return "";
+                }
+            } else {
+                return "";
+            }
+        }
+    }
+}
+
+//Axis value formatter for x-axis in alertnessChart
+class XAxisBottomFormatter extends ValueFormatter {
+    /*Range
+    Each hour is represented by float and integer
+    The range of time for showing alertness is [(today current time) - 24, (today current time) + 24]
+    */
+    //To make displayed tick label not overlap
+    String displayedDate = "";
+    @Override
+    public String getFormattedValue(float value) {
+        String dateLabel;
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/d");
+        LocalTime current = LocalTime.now();
+        LocalDate yesterday = LocalDate.now().minusDays(1);
+        LocalDate today = LocalDate.now();
+        LocalDate tomorrow = LocalDate.now().plusDays(1);
+        int currentHour = current.getHour();
+        int currentMinute = current.getMinute();
+        float valueReal = value / 2;
+        float valueCentered = valueReal + currentHour + currentMinute / 60f;
+        if (valueCentered < 0) {
+            return "";
+        } else {
             //Date
             if (valueCentered > 24f && valueCentered < 48f) {
                 dateLabel = today.format(formatter);
