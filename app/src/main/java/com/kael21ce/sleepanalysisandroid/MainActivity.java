@@ -228,6 +228,11 @@ public class MainActivity extends AppCompatActivity {
             Log.v("SLEEP REAL", sleepStart);
             Log.v("SLEEP REAL", sleepEnd);
             if(ILastSleepUpdate.isBefore(Instant.ofEpochMilli(sleep.sleepStart))){
+                if(check == false){
+                    lastDataUpdate = Long.min(lastDataUpdate, sleep.sleepStart - (1000*60*60*24));
+                    editor.putLong("lastDataUpdate", lastDataUpdate);
+                    editor.apply();
+                }
                 check = true;
             }
         }
@@ -283,6 +288,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         Log.v("START PROCESS", sdfDateTime.format(new Date(startProcess)));
+        Log.v("END PROCESS", sdfDateTime.format(new Date(endProcess)));
 
         //get the sleep model & simulation result
         SleepModel sleepModel = new SleepModel();
@@ -294,6 +300,7 @@ public class MainActivity extends AppCompatActivity {
         List<V0> newV0 = new ArrayList<>();
         Log.v("SIZE", String.valueOf(simulationResult.size()));
         float barIdx = 0.25f;
+        float addBarIdx = 0.17f;
         for(int i = 0; i < simulationResult.size(); i ++){
             double[] res = simulationResult.get(i);
             V0 v0 = new V0();
@@ -309,9 +316,9 @@ public class MainActivity extends AppCompatActivity {
                 initV0 = res;
             }
 
-            if(simulationResult.size() - 192 <= i){
+            if(simulationResult.size() - 288 <= i){
                 barEntries.add(new BarEntry((float) barIdx, (float) getAwarenessValue(res[3], res[2], res[1], res[0])));
-                barIdx += 0.25f;
+                barIdx += addBarIdx;
             }
         }
         v0Dao.insertAll(newV0);
@@ -351,13 +358,16 @@ public class MainActivity extends AppCompatActivity {
         newSleep.add(newNapSleep);
 
         sleepPattern = sleepToArray(now, now+1000*60*60*24, newSleep);
+        for(int i = 0; i < sleepPattern.length; i ++){
+            Log.v("SLEEP PATTERN: ", String.valueOf(i) + " " + String.valueOf(sleepPattern[i]));
+        }
         Log.v("SLEEP SIZE", String.valueOf(sleepPattern.length));
         simulationResult = sleepModel.pcr_simulation(initV0, sleepPattern, 5/60.0);
-        for(int i = 0; i < 192; i ++){
+        for(int i = 0; i < 288; i ++){
             double[] res = simulationResult.get(i);
             double awarenessVal = getAwarenessValue(res[3], res[2], res[1], res[0]);
             barEntries.add(new BarEntry(barIdx, (float)awarenessVal));
-            barIdx += 0.25f;
+            barIdx += addBarIdx;
         }
     }
 
@@ -469,11 +479,15 @@ public class MainActivity extends AppCompatActivity {
         double[] sleepPattern = new double[duration + 5];
         Arrays.fill(sleepPattern, 0);
         for(Sleep sleep: sleeps){
-            long tempSleepStart = sleep.sleepStart / fiveMinutesToMil;
-            long tempSleepEnd = sleep.sleepEnd / fiveMinutesToMil;
-            if(sleepStart/fiveMinutesToMil < tempSleepStart && tempSleepEnd < sleepEnd/fiveMinutesToMil) {
-                int idx = (int) (tempSleepStart - sleepStart / fiveMinutesToMil);
-                int offset = (int) (tempSleepEnd - sleepStart / fiveMinutesToMil);
+            long tempSleepStart = Long.max( sleepStart/fiveMinutesToMil, sleep.sleepStart / fiveMinutesToMil);
+            long tempSleepEnd = Long.min(sleepEnd/fiveMinutesToMil, sleep.sleepEnd / fiveMinutesToMil);
+            if(sleepStart/fiveMinutesToMil <= tempSleepStart && tempSleepEnd <= sleepEnd/fiveMinutesToMil) {
+                Log.v("temp sleep start", String.valueOf(tempSleepStart));
+                Log.v("temp sleep end", String.valueOf(tempSleepEnd));
+                Log.v("sleep start", String.valueOf(sleepStart));
+                Log.v("sleep end", String.valueOf(sleepEnd));
+                int idx = (int) (tempSleepStart - (sleepStart / fiveMinutesToMil));
+                int offset = (int) (tempSleepEnd - (sleepStart / fiveMinutesToMil));
                 Log.v("index", String.valueOf(idx));
                 Log.v("offset", String.valueOf(offset));
                 for (int i = idx; i <= offset; i++) {
