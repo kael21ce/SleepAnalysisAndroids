@@ -251,10 +251,12 @@ public class MainActivity extends AppCompatActivity {
         long yesterday = now - (1000*60*60*24);
         long startProcess = Long.min(yesterday, lastDataUpdate);
         lastDataUpdate = now-(1000*60*5);
+        editor.putLong("lastDataUpdate", lastDataUpdate);
+        editor.apply();
         long endProcess = now;
         long processDuration = (endProcess - startProcess) / fiveMinutesToMil;
         boolean gotInitV0 = false;
-        double[] initV0 = {-0.8283, 0.8413, 0.6758, 13.3336};
+        double[] initV0 = {-0.8990, -0.6153, 0.0961, 14.2460};
         //get init V0
         for(V0 v0: v0s){
 //            Log.v("V0", "H: "+ v0.H_val + ", n: " + v0.n_val + ", y: "+v0.y_val + ", x: " + v0.x_val);
@@ -271,13 +273,13 @@ public class MainActivity extends AppCompatActivity {
         //or it is the first time we get sleep data, recalculate everything from the first sleep
         if(!gotInitV0 && sleeps.size() > 0){
             Sleep firstSleep = sleeps.get(0);
-            long firstSleepDayStart = firstSleep.sleepStart / (1000*60*60*24);
+            long firstSleepDayStart = (firstSleep.sleepStart + nineHours)/ (1000*60*60*24);
             long firstSleepNoon = (firstSleepDayStart*(1000*60*60*24)) + (1000*60*60*12);
             if(firstSleep.sleepStart > firstSleepNoon){
-                startProcess = firstSleepNoon;
+                startProcess = firstSleepNoon-nineHours;
                 initV0=new double[]{0.8958, 0.5219, 0.5792, 12.4225};
             }else{
-                startProcess = firstSleepDayStart * (1000*60*60*24);
+                startProcess = (firstSleepDayStart * (1000*60*60*24))-nineHours;
             }
         }
         Log.v("START PROCESS", sdfDateTime.format(new Date(startProcess)));
