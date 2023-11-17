@@ -113,8 +113,10 @@ public class HomeFragment extends Fragment {
         clockView.setAngleFromTime(mainSleepStartString, mainSleepEndString);
 
         //we use connection because fragment and activity is connected and we don't reuse fragment for other activity
-        startTime.setText(mainSleepStartString);
-        endTime.setText(mainSleepEndString);
+        //startTime.setText(mainSleepStartString);
+        //endTime.setText(mainSleepEndString);
+        startTime.setText(sdfDateTime.format(new Date(mainActivity.getMainSleepStart())));
+        endTime.setText(sdfDateTime.format(new Date(mainActivity.getMainSleepEnd())));
 
         //Graph showing alertness
         ArrayList<BarEntry> barEntries = mainActivity.getBarEntries();
