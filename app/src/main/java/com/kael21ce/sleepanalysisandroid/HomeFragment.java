@@ -40,6 +40,7 @@ import java.util.Locale;
 public class HomeFragment extends Fragment {
     SimpleDateFormat sdfDateTime = new SimpleDateFormat( "hh:mm a", Locale.KOREA);
     SimpleDateFormat sdfDateTime2 = new SimpleDateFormat( "dd/MM/yyyy hh:mm a", Locale.KOREA);
+    SimpleDateFormat sdfDateTimeRecomm = new SimpleDateFormat("a hh:mm", Locale.KOREA);
     SimpleDateFormat sdfDate = new SimpleDateFormat("MM/dd", Locale.KOREA);
     SimpleDateFormat sdfTime = new SimpleDateFormat("HH:mm", Locale.KOREA);
     long now, nineHours;
@@ -115,8 +116,8 @@ public class HomeFragment extends Fragment {
         //we use connection because fragment and activity is connected and we don't reuse fragment for other activity
         //startTime.setText(mainSleepStartString);
         //endTime.setText(mainSleepEndString);
-        startTime.setText(sdfDateTime.format(new Date(mainActivity.getMainSleepStart())));
-        endTime.setText(sdfDateTime.format(new Date(mainActivity.getMainSleepEnd())));
+        startTime.setText(sdfDateTimeRecomm.format(new Date(mainActivity.getMainSleepStart())));
+        endTime.setText(sdfDateTimeRecomm.format(new Date(mainActivity.getMainSleepEnd())));
 
         //Graph showing alertness
         ArrayList<BarEntry> barEntries = mainActivity.getBarEntries();
@@ -169,9 +170,8 @@ public class HomeFragment extends Fragment {
         description.setText("");
         alertnessChart.setDescription(description);
         //Set the time of alertnessText
-        String originString = sdfDateTime.format(new Date(mainActivity.getMainSleepStart()));
-        String shortenString = originString.substring(0, originString.indexOf(" "));
-        AlertnessText.setText("오늘의 권장 취침 시각은 " + shortenString + " 입니다");
+        String originString = sdfDateTimeRecomm.format(new Date(mainActivity.getMainSleepStart()));
+        AlertnessText.setText("오늘의 권장 취침 시각은 " + originString + " 입니다");
 
         //Load LinearLayoutManager and BarAdapter for ChartRecyclerView
         LinearLayoutManager chartLinearLayoutManager =
@@ -296,8 +296,8 @@ public class HomeFragment extends Fragment {
                                  TextView sleepTypeText, TextView sleepImportanceText,
                                  TextView stateDescriptionText, ClockView clockView)
     {
-        startTime.setText(sdfDateTime.format(new Date(mainActivity.getMainSleepStart())));
-        endTime.setText(sdfDateTime.format(new Date(mainActivity.getMainSleepEnd())));
+        startTime.setText(sdfDateTimeRecomm.format(new Date(mainActivity.getMainSleepStart())));
+        endTime.setText(sdfDateTimeRecomm.format(new Date(mainActivity.getMainSleepEnd())));
         //Change the color of buttons
         sleepButton.setBackground(ResourcesCompat
                 .getDrawable(getResources(), R.drawable.corner_8_clicked, null));
@@ -327,8 +327,8 @@ public class HomeFragment extends Fragment {
                                TextView sleepTypeText, TextView sleepImportanceText,
                                TextView stateDescriptionText, ClockView clockView)
     {
-        startTime.setText(sdfDateTime.format(new Date(mainActivity.getNapSleepStart())));
-        endTime.setText(sdfDateTime.format(new Date(mainActivity.getNapSleepEnd())));
+        startTime.setText(sdfDateTimeRecomm.format(new Date(mainActivity.getNapSleepStart())));
+        endTime.setText(sdfDateTimeRecomm.format(new Date(mainActivity.getNapSleepEnd())));
         //Change the color of buttons
         sleepButton.setBackground(ResourcesCompat
                 .getDrawable(getResources(), R.drawable.corner_8, null));
@@ -360,8 +360,8 @@ public class HomeFragment extends Fragment {
                                 TextView sleepTypeText, TextView sleepImportanceText,
                                 TextView stateDescriptionText, ClockView clockView)
     {
-        startTime.setText(sdfDateTime.format(new Date(mainActivity.getWorkOnset())));
-        endTime.setText(sdfDateTime.format(new Date(mainActivity.getWorkOffset())));
+        startTime.setText(sdfDateTimeRecomm.format(new Date(mainActivity.getWorkOnset())));
+        endTime.setText(sdfDateTimeRecomm.format(new Date(mainActivity.getWorkOffset())));
         //Change the color of buttons
         sleepButton.setBackground(ResourcesCompat
                 .getDrawable(getResources(), R.drawable.corner_8, null));
