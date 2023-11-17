@@ -347,6 +347,9 @@ public class HomeFragment extends Fragment {
             clockView.setAngleFromTime(napSleepStartString, napSleepEndString);
         }else{
             clockView.setVisibility(View.INVISIBLE);
+            stateDescriptionText.setText("낮잠이 필요하지 않습니다");
+            startTime.setText("--:--");
+            endTime.setText("--:--");
         }
     }
 

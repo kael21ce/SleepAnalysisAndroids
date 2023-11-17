@@ -106,7 +106,8 @@
                             android:fontFamily="@font/pretendardvariable"
                             android:gravity="end"
                             android:text="오전 0시 00분"
-                            android:textColor="@color/black" />
+                            android:textColor="@color/black"
+                            android:textSize="16sp" />
                     </LinearLayout>
 
                     <LinearLayout
@@ -167,7 +168,8 @@
                                 android:layout_gravity="left"
                                 android:fontFamily="@font/pretendardvariable"
                                 android:text="오전 8시 00분"
-                                android:textColor="@color/black" />
+                                android:textColor="@color/black"
+                                android:textSize="16sp" />
 
                             <LinearLayout
                                 android:id="@+id/WorkCaption"
@@ -182,7 +184,8 @@
                                     android:layout_height="wrap_content"
                                     android:fontFamily="@font/pretendardvariable"
                                     android:text="오전 1시 00분"
-                                    android:textColor="@color/black" />
+                                    android:textColor="@color/black"
+                                    android:textSize="16sp" />
                             </LinearLayout>
                         </LinearLayout>
                     </LinearLayout>
