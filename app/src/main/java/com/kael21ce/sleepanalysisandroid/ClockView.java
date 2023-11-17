@@ -91,7 +91,11 @@ public class ClockView extends View {
         float startAngle = convertTimeToAngle(startTime);
         this.startAngle = startAngle;
         float endAngle = convertTimeToAngle(endTime);
-        this.sweepAngle = endAngle - startAngle;
+        if (startAngle > endAngle) {
+            this.sweepAngle = 360 + endAngle - startAngle;
+        } else {
+            this.sweepAngle = endAngle - startAngle;
+        }
         invalidate();
     }
 
@@ -111,6 +115,7 @@ public class ClockView extends View {
             if (intHour > 24 || intMinute > 60) {
                 return (float) 0;
             }
+
             return (float) (15 * (intHour - 6) + 0.25 * intMinute);
         } else {
             return (float) 0;
