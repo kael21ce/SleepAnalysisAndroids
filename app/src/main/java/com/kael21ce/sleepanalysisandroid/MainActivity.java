@@ -156,9 +156,11 @@ public class MainActivity extends AppCompatActivity {
         sleepDao = db.sleepDao();
 
         getSleepData();
-        do_simulation();
-        calculateAwareness();
-        sendV0("testing");
+        if(sleeps.size() > 0) {
+            do_simulation();
+            calculateAwareness();
+            sendV0("testing");
+        }
 
         bottomNavigationView = findViewById(R.id.bottomNavigationView);
         boolean isSchedule = sharedPref.getBoolean("isSchedule", false);
