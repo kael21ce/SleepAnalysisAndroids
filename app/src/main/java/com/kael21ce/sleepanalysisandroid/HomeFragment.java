@@ -185,7 +185,7 @@ public class HomeFragment extends Fragment {
             long minuteBadDuration = awareness.badDuration%60;
             Log.v("AWARENESS VALUE IN SCHEDULE", hourGoodDuration + ":" + minuteGoodDuration);
             Log.v("AWARENESS VALUE IN SCHEDULE", hourBadDuration + ":" + minuteBadDuration);
-            if(curDay-7 < awareness.awarenessDay){
+            if(curDay-8 < awareness.awarenessDay){
                 String date = sdfDate.format(new Date((awareness.awarenessDay)*oneDayToMils));
                 String goodDuration = hourGoodDuration + ":" + minuteGoodDuration;
                 String badDuration = hourBadDuration + ":" + minuteBadDuration;
