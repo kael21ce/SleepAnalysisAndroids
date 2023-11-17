@@ -63,12 +63,21 @@ class HealthConnectManager(private val context: Context) {
     private val healthConnectClient by lazy { HealthConnectClient.getOrCreate(context) }
 
     var isSleepDone = false
+    var isAddSleepDone = false
     public fun getIsSleepDone(): Boolean{
         return isSleepDone
     }
 
+    public fun getIsAddSleepDone(): Boolean{
+        return isAddSleepDone
+    }
+
     public fun setIsSleepDone(isSleepDone1: Boolean){
         this.isSleepDone = isSleepDone1
+    }
+
+    public fun setIsAddSleepDone(isAddSleepDone1: Boolean){
+        this.isAddSleepDone = isAddSleepDone1
     }
 
     var availability = mutableStateOf(HealthConnectAvailability.NOT_SUPPORTED)
@@ -120,6 +129,7 @@ class HealthConnectManager(private val context: Context) {
         val records = listOf(sleepRecord)
         try {
             healthConnectClient.insertRecords(records)
+            isAddSleepDone = true
             Toast.makeText(context, "Successfully insert records", Toast.LENGTH_SHORT).show()
         } catch (e: Exception) {
             Toast.makeText(context, e.message.toString(), Toast.LENGTH_SHORT).show()

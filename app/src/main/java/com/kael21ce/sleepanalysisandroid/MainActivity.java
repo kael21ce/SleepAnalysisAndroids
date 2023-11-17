@@ -256,6 +256,7 @@ public class MainActivity extends AppCompatActivity {
 
         //do pcr simulation
         long yesterday = now - (1000*60*60*24);
+        Log.v("LAST DATA UPDATE", lastDataUpdate + " " + sdfDateTime.format(new Date(lastDataUpdate)));
         long startProcess = Long.min(yesterday, lastDataUpdate);
         if(sleeps.size() > 0) {
             lastDataUpdate = now - (1000 * 60 * 5);
@@ -267,6 +268,7 @@ public class MainActivity extends AppCompatActivity {
         boolean gotInitV0 = false;
         double[] initV0 = {-0.8990, -0.6153, 0.0961, 14.2460};
         //get init V0
+        List<V0> deleteV0 = new ArrayList<>();
         for(V0 v0: v0s){
 //            Log.v("V0", "H: "+ v0.H_val + ", n: " + v0.n_val + ", y: "+v0.y_val + ", x: " + v0.x_val);
             if(v0.time >= startProcess){
@@ -274,7 +276,11 @@ public class MainActivity extends AppCompatActivity {
                     initV0 = new double[]{v0.y_val, v0.x_val, v0.n_val, v0.H_val};
                     gotInitV0 = true;
                 }
+                deleteV0.add(v0);
             }
+        }
+        for(V0 v0: deleteV0){
+            v0s.remove(v0);
         }
         v0Dao.deleteRange(startProcess, endProcess);
 
@@ -320,8 +326,9 @@ public class MainActivity extends AppCompatActivity {
             v0.n_val = res[2];
             v0.H_val = res[3];
             v0.time = startProcess + (i*fiveMinutesToMil);
-            Log.v("VO TIME", i*5 + " " + getAwarenessValue(res[3], res[2], res[1], res[0]));
+//            Log.v("VO TIME", i*5 + " " + getAwarenessValue(res[3], res[2], res[1], res[0]));
             newV0.add(v0);
+            v0s.add(v0);
 
             if(v0.time >= (now-(1000*60*6)) && (v0.time <= now)){
                 initV0 = res;

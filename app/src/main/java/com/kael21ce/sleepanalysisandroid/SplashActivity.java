@@ -40,7 +40,7 @@ public class SplashActivity extends AppCompatActivity {
         healthConnectManager.javReadSleepInputs(ILastSleepUpdate, now);
         Instant curTime = Instant.now();
 
-        while(!healthConnectManager.getIsSleepDone()){
+        while(!healthConnectManager.getIsSleepDone() || !healthConnectManager.getIsAddSleepDone()){
             Instant curTimeUpdated = Instant.now();
             if(curTime.plusMillis(1000*2).isAfter(curTimeUpdated)){
                 break;
@@ -49,6 +49,7 @@ public class SplashActivity extends AppCompatActivity {
 
         }
         healthConnectManager.setIsSleepDone(false);
+        healthConnectManager.setAddSleepDone(false);
 
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
