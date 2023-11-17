@@ -294,11 +294,18 @@ public class MainActivity extends AppCompatActivity {
         Log.v("START PROCESS", sdfDateTime.format(new Date(startProcess)));
         Log.v("END PROCESS", sdfDateTime.format(new Date(endProcess)));
 
+        Log.v("INIT V0", initV0[0] + " " + initV0[1] + " " + initV0[2] + " " + initV0[3]);
+        Log.v("AWARENESS OF V0", String.valueOf(getAwarenessValue(initV0[3], initV0[2], initV0[1], initV0[0])));
+
         //get the sleep model & simulation result
         SleepModel sleepModel = new SleepModel();
         double[] sleepPattern = sleepToArray(startProcess, endProcess, sleeps);
         Log.v("SLEEP SIZE", String.valueOf(sleepPattern.length));
-        ArrayList<double[]> simulationResult = sleepModel.pcr_simulation(initV0, sleepPattern, 5/60.0);
+        for(int i = 0; i < sleepPattern.length; i ++){
+            Log.v("SLEEP PATTERN SUPER: ", String.valueOf(i) + " " + String.valueOf(sleepPattern[i]));
+        }
+        double step = 1/12.0;
+        ArrayList<double[]> simulationResult = sleepModel.pcr_simulation(initV0, sleepPattern, step);
 
         //update V0 from the simulation
         List<V0> newV0 = new ArrayList<>();
@@ -313,7 +320,7 @@ public class MainActivity extends AppCompatActivity {
             v0.n_val = res[2];
             v0.H_val = res[3];
             v0.time = startProcess + (i*fiveMinutesToMil);
-//            Log.v("VO TIME", sdfDateTime.format(new Date(v0.time)));
+            Log.v("VO TIME", i*5 + " " + getAwarenessValue(res[3], res[2], res[1], res[0]));
             newV0.add(v0);
 
             if(v0.time >= (now-(1000*60*6)) && (v0.time <= now)){
@@ -321,6 +328,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
             if(simulationResult.size() - 288 <= i){
+                Log.v("BAR ENTRY", sdfDateTime.format(new Date(startProcess + (i*fiveMinutesToMil))));
                 barEntries.add(new BarEntry((float) barIdx, (float) getAwarenessValue(res[3], res[2], res[1], res[0])));
                 barIdx += addBarIdx;
             }
@@ -362,9 +370,9 @@ public class MainActivity extends AppCompatActivity {
         newSleep.add(newNapSleep);
 
         sleepPattern = sleepToArray(now, now+1000*60*60*24, newSleep);
-        for(int i = 0; i < sleepPattern.length; i ++){
-            Log.v("SLEEP PATTERN: ", String.valueOf(i) + " " + String.valueOf(sleepPattern[i]));
-        }
+//        for(int i = 0; i < sleepPattern.length; i ++){
+//            Log.v("SLEEP PATTERN: ", String.valueOf(i) + " " + String.valueOf(sleepPattern[i]));
+//        }
         Log.v("SLEEP SIZE", String.valueOf(sleepPattern.length));
         simulationResult = sleepModel.pcr_simulation(initV0, sleepPattern, 5/60.0);
         for(int i = 0; i < 288; i ++){
@@ -485,7 +493,7 @@ public class MainActivity extends AppCompatActivity {
         for(Sleep sleep: sleeps){
             long tempSleepStart = Long.max( sleepStart/fiveMinutesToMil, sleep.sleepStart / fiveMinutesToMil);
             long tempSleepEnd = Long.min(sleepEnd/fiveMinutesToMil, sleep.sleepEnd / fiveMinutesToMil);
-            if(sleepStart/fiveMinutesToMil <= tempSleepStart && tempSleepEnd <= sleepEnd/fiveMinutesToMil) {
+            if(sleepStart/fiveMinutesToMil <= tempSleepStart && tempSleepEnd <= sleepEnd/fiveMinutesToMil && tempSleepStart <= tempSleepEnd) {
                 Log.v("temp sleep start", String.valueOf(tempSleepStart));
                 Log.v("temp sleep end", String.valueOf(tempSleepEnd));
                 Log.v("sleep start", String.valueOf(sleepStart));
