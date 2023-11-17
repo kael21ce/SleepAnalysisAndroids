@@ -255,9 +255,11 @@ public class MainActivity extends AppCompatActivity {
         //do pcr simulation
         long yesterday = now - (1000*60*60*24);
         long startProcess = Long.min(yesterday, lastDataUpdate);
-        lastDataUpdate = now-(1000*60*5);
-        editor.putLong("lastDataUpdate", lastDataUpdate);
-        editor.apply();
+        if(sleeps.size() > 0) {
+            lastDataUpdate = now - (1000 * 60 * 5);
+            editor.putLong("lastDataUpdate", lastDataUpdate);
+            editor.apply();
+        }
         long endProcess = now;
         long processDuration = (endProcess - startProcess) / fiveMinutesToMil;
         boolean gotInitV0 = false;
