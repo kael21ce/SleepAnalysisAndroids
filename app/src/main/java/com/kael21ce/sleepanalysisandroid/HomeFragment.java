@@ -66,6 +66,7 @@ public class HomeFragment extends Fragment {
 
         //Alertness Graph
         BarChart alertnessChart = v.findViewById(R.id.alertnessChart);
+        TextView AlertnessText = v.findViewById(R.id.AlertnessText);
 
         //Weekly alertness chart
         RecyclerView chartRecycler = v.findViewById(R.id.ChartRecyclerView);
@@ -165,6 +166,10 @@ public class HomeFragment extends Fragment {
         Description description = new Description();
         description.setText("");
         alertnessChart.setDescription(description);
+        //Set the time of alertnessText
+        String originString = sdfDateTime.format(new Date(mainActivity.getMainSleepStart()));
+        String shortenString = originString.substring(0, originString.indexOf(" "));
+        AlertnessText.setText("오늘의 권장 취침 시각은 " + shortenString + " 입니다");
 
         //Load LinearLayoutManager and BarAdapter for ChartRecyclerView
         LinearLayoutManager chartLinearLayoutManager =
