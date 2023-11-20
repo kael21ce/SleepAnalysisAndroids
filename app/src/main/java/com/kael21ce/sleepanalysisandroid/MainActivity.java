@@ -387,7 +387,7 @@ public class MainActivity extends AppCompatActivity {
         }
         Log.v("SLEEP SIZE", String.valueOf(sleepPattern.length));
         simulationResult = sleepModel.pcr_simulation(initV0, sleepPattern, 5/60.0);
-        for(int i = 0; i < 288; i ++){
+        for(int i = 5; i < 293; i ++){
             double[] res = simulationResult.get(i);
             double awarenessVal = getAwarenessValue(res[3], res[2], res[1], res[0]);
             barEntries.add(new BarEntry(barIdx, (float)awarenessVal));
