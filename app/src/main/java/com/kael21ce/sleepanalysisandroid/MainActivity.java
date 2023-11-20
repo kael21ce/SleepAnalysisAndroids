@@ -276,7 +276,7 @@ public class MainActivity extends AppCompatActivity {
 //            Log.v("V0", "H: "+ v0.H_val + ", n: " + v0.n_val + ", y: "+v0.y_val + ", x: " + v0.x_val);
             if(v0.time >= startProcess){
                 if(!gotInitV0 && v0.time <= startProcess + (1000*60*6)){
-                    initV0 = new double[]{v0.y_val, v0.x_val, v0.n_val, v0.H_val};
+                    initV0 = new double[]{v0.x_val, v0.y_val, v0.n_val, v0.H_val};
                     gotInitV0 = true;
                 }
                 deleteV0.add(v0);
@@ -334,6 +334,7 @@ public class MainActivity extends AppCompatActivity {
             v0s.add(v0);
 
             if(v0.time >= (now-(1000*60*6)) && (v0.time <= now)){
+                Log.v("UPDATED INIT V0", "UPDATED INIT V0");
                 initV0 = res;
             }
 
