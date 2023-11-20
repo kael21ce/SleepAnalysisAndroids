@@ -212,7 +212,7 @@ public class MainActivity extends AppCompatActivity {
 
     public double getAwarenessValue(double H, double n, double y, double x){
         double coef_y = 0.8, coef_x = -0.16, v_vh = 1.01;
-        double C = 3.37*0.5*(1+coef_y*x + coef_x * y);
+        double C = 3.37*0.5*(1+coef_y*y + coef_x * x);
         double D_up = (2.46+10.2+C)/v_vh;
         double awareness = D_up - H;
         return awareness;
