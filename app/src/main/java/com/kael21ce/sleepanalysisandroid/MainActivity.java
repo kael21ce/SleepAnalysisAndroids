@@ -47,6 +47,7 @@ import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -107,7 +108,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         healthConnectManager = new HealthConnectManager(getApplicationContext());
-        awarenesses = new ArrayList<>();
+        awarenesses = Collections.synchronizedList(new ArrayList<>());
 
         //get the shared preferences variable
         sharedPref = getSharedPreferences("SleepWake", Context.MODE_PRIVATE);
@@ -129,8 +130,10 @@ public class MainActivity extends AppCompatActivity {
         barEntries = new ArrayList<BarEntry>();
 
         if(now > sleepOnset && now < workOnset){
-            sleepOnset = now;
+            Log.v("SLEEP ONSET", "SLEEP ONSET IS NOW");
+            sleepOnset = now + 1000*60*15;
         }else if(now > workOnset){
+            Log.v("NOW", "NOW IS BIGGER THAN WORK ONSET");
             while(now > workOnset){
                 sleepOnset += 1000*60*60*24;
                 workOnset += 1000*60*60*24;
@@ -219,7 +222,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void getSleepData(){
-        sleeps = sleepDao.getAll();
+        sleeps = Collections.synchronizedList(sleepDao.getAll());
         boolean check = false;
         long lastSleep1 = 0;
         for(Sleep sleep: sleeps){
@@ -252,7 +255,7 @@ public class MainActivity extends AppCompatActivity {
     public void do_simulation(){
         //get V0 data
         v0Dao = db.v0Dao();
-        v0s = v0Dao.getAll();
+        v0s = Collections.synchronizedList(v0Dao.getAll());
 
         //do pcr simulation
         long yesterday = now - (1000*60*60*24);
@@ -321,12 +324,12 @@ public class MainActivity extends AppCompatActivity {
         for(int i = 0; i < simulationResult.size(); i ++){
             double[] res = simulationResult.get(i);
             V0 v0 = new V0();
-            v0.y_val = res[0];
-            v0.x_val = res[1];
+            v0.x_val = res[0];
+            v0.y_val = res[1];
             v0.n_val = res[2];
             v0.H_val = res[3];
             v0.time = startProcess + (i*fiveMinutesToMil);
-//            Log.v("VO TIME", i*5 + " " + getAwarenessValue(res[3], res[2], res[1], res[0]));
+            Log.v("VO TIME", i*5 + " " + getAwarenessValue(res[3], res[2], res[1], res[0]));
             newV0.add(v0);
             v0s.add(v0);
 
@@ -336,6 +339,7 @@ public class MainActivity extends AppCompatActivity {
 
             if(simulationResult.size() - 288 <= i){
                 Log.v("BAR ENTRY", sdfDateTime.format(new Date(startProcess + (i*fiveMinutesToMil))));
+                Log.v("WTF", "WTF");
                 barEntries.add(new BarEntry((float) barIdx, (float) getAwarenessValue(res[3], res[2], res[1], res[0])));
                 barIdx += addBarIdx;
             }
@@ -377,9 +381,9 @@ public class MainActivity extends AppCompatActivity {
         newSleep.add(newNapSleep);
 
         sleepPattern = sleepToArray(now, now+1000*60*60*24, newSleep);
-//        for(int i = 0; i < sleepPattern.length; i ++){
-//            Log.v("SLEEP PATTERN: ", String.valueOf(i) + " " + String.valueOf(sleepPattern[i]));
-//        }
+        for(int i = 0; i < sleepPattern.length; i ++){
+            Log.v("SLEEP PATTERN: ", String.valueOf(i) + " " + String.valueOf(sleepPattern[i]));
+        }
         Log.v("SLEEP SIZE", String.valueOf(sleepPattern.length));
         simulationResult = sleepModel.pcr_simulation(initV0, sleepPattern, 5/60.0);
         for(int i = 0; i < 288; i ++){
@@ -399,7 +403,7 @@ public class MainActivity extends AppCompatActivity {
         AwarenessDao awarenessDao = db.awarenessDao();
         long oneDayToMils = 1000*60*60*24;
         if(v0s.size() > 0){
-            long startDay = (v0s.get(0).time + nineHours)/oneDayToMils;
+            long startDay = (v0s.get(0).time+nineHours)/oneDayToMils;
             long goodDuration = 0;
             long badDuration = 0;
             for(V0 v0: v0s){
@@ -414,7 +418,7 @@ public class MainActivity extends AppCompatActivity {
                     continue;
                 }
 
-                long v0StartDay = (v0.time + nineHours)/oneDayToMils;
+                long v0StartDay = (v0.time+nineHours)/oneDayToMils;
                 //check through the sleep in O(N) time. Fix it using hash map, but for now the complexity should be fine
                 double awareness = getAwarenessValue(v0.H_val, v0.n_val, v0.y_val, v0.x_val);
                 if(startDay != v0StartDay){
@@ -450,7 +454,8 @@ public class MainActivity extends AppCompatActivity {
                     badDuration = 0;
                     startDay = v0StartDay;
                 }
-                if(awareness > 0){
+                Log.v("AWARENESS CALCULATION", (sdfDateTime.format(new Date(v0.time)))+": " + String.valueOf(awareness));
+                if(awareness >= 0.0){
                     goodDuration += 5;
                 }else{
                     badDuration += 5;
