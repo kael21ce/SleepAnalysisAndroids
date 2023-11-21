@@ -124,6 +124,7 @@ public class ScheduleFragment extends Fragment {
             count++;
         }
         bundle.putInt("count", count);
+        bundle.putString("date", sdfDateTime.format(new Date((todayDate*oneDayToMils)-nineHours)));
 
         Context context = v.getContext();
         intervalFragment = new IntervalFragment();
