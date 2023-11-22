@@ -48,7 +48,7 @@ public class TimePickerDialog extends Dialog {
                     if(languageSetting == "en") {
                         format = "0" + (hour - 12) + ":" + minuteStr + " PM";
                     }else{
-                        format = "0" + (hour - 12) + ":" + minuteStr + " 오전";
+                        format = "0" + (hour - 12) + ":" + minuteStr + " 오후";
                     }
                 } else {
                     if(languageSetting == "en") {
