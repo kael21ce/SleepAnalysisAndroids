@@ -7,6 +7,8 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TimePicker;
 
+import java.util.Locale;
+
 import io.reactivex.annotations.NonNull;
 
 public class TimePickerDialog extends Dialog {
@@ -15,6 +17,7 @@ public class TimePickerDialog extends Dialog {
     public Button checkTimeButton;
     public TimePicker timePicker;
     public int isStartButton;
+    public String languageSetting;
 
     public TimePickerDialog(@NonNull Context context, ButtonTextUpdater buttonTextUpdater) {
         super(context);
@@ -24,8 +27,11 @@ public class TimePickerDialog extends Dialog {
         checkTimeButton = findViewById(R.id.checkTimeButton);
         timePicker = findViewById(R.id.timePicker);
 
+        languageSetting = Locale.getDefault().getLanguage();
+
         //Finish activity if backPopTimeButton is clicked
         backPopTimeButton.setOnClickListener(view -> dismiss());
+        Log.v("LANGUAGE SETTING", languageSetting);
 
         //Send selected time to AddIntervalFragment when checkTimeButton is clicked
         timePicker.setOnTimeChangedListener((timePicker, hour, minute) -> {
@@ -39,15 +45,31 @@ public class TimePickerDialog extends Dialog {
             }
             if (hour >= 12) {
                 if (hour - 12 < 10) {
-                    format = "0" + (hour - 12) + ":" + minuteStr + " PM";
+                    if(languageSetting == "en") {
+                        format = "0" + (hour - 12) + ":" + minuteStr + " PM";
+                    }else{
+                        format = "0" + (hour - 12) + ":" + minuteStr + " 오전";
+                    }
                 } else {
-                    format = (hour - 12) + ":" + minuteStr + " PM";
+                    if(languageSetting == "en") {
+                        format = (hour - 12) + ":" + minuteStr + " PM";
+                    }else{
+                        format = (hour - 12) + ":" + minuteStr + " 오후";
+                    }
                 }
             } else {
                 if (hour < 10) {
-                    format = "0" + hour + ":" + minuteStr + " AM";
+                    if(languageSetting == "en") {
+                        format = "0" + hour + ":" + minuteStr + " AM";
+                    }else{
+                        format = "0" + hour + ":" + minuteStr + " 오전";
+                    }
                 } else {
-                    format = hour + ":" + minuteStr + " AM";
+                    if(languageSetting == "en") {
+                        format = hour + ":" + minuteStr + " AM";
+                    }else{
+                        format = hour + ":" + minuteStr + " 오전";
+                    }
                 }
             }
             checkTimeButton.setOnClickListener(view -> {
