@@ -1,5 +1,6 @@
 package com.kael21ce.sleepanalysisandroid;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -144,17 +145,40 @@ public class SleepOnsetFragment extends Fragment implements ButtonTextUpdater{
             assert workOnset != null;
             assert workOffset != null;
 
-            long nineHours = (1000*60*60*9);
-            mainActivity.setSleepOnset(sleepOnset.getTime() );
-            mainActivity.setWorkOnset(workOnset.getTime() );
-            mainActivity.setWorkOffset(workOffset.getTime() );
+            if(isValid(sleepOnset.getTime(), workOnset.getTime(), workOffset.getTime())) {
+                mainActivity.setSleepOnset(sleepOnset.getTime());
+                mainActivity.setWorkOnset(workOnset.getTime());
+                mainActivity.setWorkOffset(workOffset.getTime());
 
-            mainActivity.finish();
-            startActivity(new Intent(mainActivity, SplashActivity.class));
+                mainActivity.finish();
+                startActivity(new Intent(mainActivity, SplashActivity.class));
+            }else{
+                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                builder.setCancelable(true);
+                builder.setTitle("ERROR");
+                builder.setMessage("Start of the sleep has to be before the end of the sleep");
+
+                builder.setNegativeButton("OK", (dialogInterface, i) -> dialogInterface.cancel());
+
+                AlertDialog alert = builder.create();
+                alert.setOnShowListener(arg0 -> {
+                    alert.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(getResources().getColor(R.color.black));
+                });
+                alert.show();
+            }
         });
 
         // Inflate the layout for this fragment
         return v;
+    }
+
+    public boolean isValid(long sleepOnset1, long workOnset1, long workOffset1){
+        if(sleepOnset1 <= workOnset1 && workOnset1 <= workOffset1){
+            if(workOnset1 - sleepOnset1 <= 1000*60*60*24 && workOffset1 - workOnset1 <= 1000*60*60*24){
+                return true;
+            }
+        }
+        return false;
     }
 
     //Change the text of Button
