@@ -1,5 +1,6 @@
 package com.kael21ce.sleepanalysisandroid;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -130,10 +131,25 @@ public class AddIntervalFragment extends Fragment implements ButtonTextUpdater {
             assert sleepEndDate != null;
             add_sleep.sleepStart = sleepStartDate.getTime();
             add_sleep.sleepEnd = sleepEndDate.getTime();
-            mainActivity.addSleep(add_sleep);
+            if(sleepStartDate.getTime() <= sleepEndDate.getTime() && !mainActivity.isOverlap(mainActivity.getSleeps(), add_sleep, -1)) {
+                mainActivity.addSleep(add_sleep);
 
-            mainActivity.finish();
-            startActivity(new Intent(mainActivity, SplashActivity.class));
+                mainActivity.finish();
+                startActivity(new Intent(mainActivity, SplashActivity.class));
+            }else{
+                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                builder.setCancelable(true);
+                builder.setTitle("ERROR");
+                builder.setMessage("INVALID SLEEP VALUE");
+
+                builder.setNegativeButton("OK", (dialogInterface, i) -> dialogInterface.cancel());
+
+                AlertDialog alert = builder.create();
+                alert.setOnShowListener(arg0 -> {
+                    alert.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(getResources().getColor(R.color.black));
+                });
+                alert.show();
+            }
         });
 
         return  v;

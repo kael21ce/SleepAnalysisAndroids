@@ -608,25 +608,18 @@ public class MainActivity extends AppCompatActivity {
         return sleeps;
     }
 
-    public boolean addSleep(Sleep sleep){
+    public void addSleep(Sleep sleep){
         //check if the sleep is already there
-        boolean isOverlap = isOverlap(sleeps, sleep, -1);
-        if(!isOverlap) {
-//            this.sleeps.add(sleep);
-            if(sleep.sleepStart < this.lastSleepUpdate) {
-                List<Sleep> listSleep = new ArrayList<>();
-                listSleep.add(sleep);
-                Log.v("SLEEP DATA ADDED", String.valueOf(sleep.sleepStart));
-                this.sleepDao.insertAll(listSleep);
-            }
-            lastDataUpdate = sleep.sleepStart - (1000*60*60*24);
-            editor.putLong("lastDataUpdate", lastDataUpdate);
-            editor.apply();
-            healthConnectManager.javWriteSleepInput(sleep.sleepStart, sleep.sleepEnd);
-            return true;
-        }else{
-            return false;
+        if(sleep.sleepStart < this.lastSleepUpdate) {
+            List<Sleep> listSleep = new ArrayList<>();
+            listSleep.add(sleep);
+            Log.v("SLEEP DATA ADDED", String.valueOf(sleep.sleepStart));
+            this.sleepDao.insertAll(listSleep);
         }
+        lastDataUpdate = sleep.sleepStart - (1000*60*60*24);
+        editor.putLong("lastDataUpdate", lastDataUpdate);
+        editor.apply();
+        healthConnectManager.javWriteSleepInput(sleep.sleepStart, sleep.sleepEnd);
 
     }
 

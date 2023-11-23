@@ -1,6 +1,8 @@
 package com.kael21ce.sleepanalysisandroid;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -138,11 +140,26 @@ public class EditIntervalFragment extends Fragment implements ButtonTextUpdater 
             Log.v("END DATE", sleepEndDate.toString());
             assert sleepStartDate != null;
             assert sleepEndDate != null;
-            edit_sleep.sleepStart = sleepStartDate.getTime();
-            edit_sleep.sleepEnd = sleepEndDate.getTime();
+            if(sleepStartDate.getTime() <= sleepEndDate.getTime()) {
+                edit_sleep.sleepStart = sleepStartDate.getTime();
+                edit_sleep.sleepEnd = sleepEndDate.getTime();
 
-            mainActivity.editSleep(initSleep, edit_sleep);
-            startActivity(new Intent(mainActivity, SplashActivity.class));
+                mainActivity.editSleep(initSleep, edit_sleep);
+                startActivity(new Intent(mainActivity, SplashActivity.class));
+            }else{
+                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                builder.setCancelable(true);
+                builder.setTitle("ERROR");
+                builder.setMessage("Start of the sleep has to be before the end of the sleep");
+
+                builder.setNegativeButton("OK", (dialogInterface, i) -> dialogInterface.cancel());
+
+                AlertDialog alert = builder.create();
+                alert.setOnShowListener(arg0 -> {
+                    alert.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(getResources().getColor(R.color.black));
+                });
+                alert.show();
+            }
         });
 
         return v;
