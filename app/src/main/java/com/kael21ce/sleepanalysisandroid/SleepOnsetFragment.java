@@ -156,7 +156,7 @@ public class SleepOnsetFragment extends Fragment implements ButtonTextUpdater{
                 AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
                 builder.setCancelable(true);
                 builder.setTitle("ERROR");
-                builder.setMessage("Start of the sleep has to be before the end of the sleep");
+                builder.setMessage("INVALID INPUT");
 
                 builder.setNegativeButton("OK", (dialogInterface, i) -> dialogInterface.cancel());
 
