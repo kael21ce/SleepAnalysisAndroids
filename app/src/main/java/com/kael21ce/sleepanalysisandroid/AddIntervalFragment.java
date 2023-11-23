@@ -38,6 +38,7 @@ public class AddIntervalFragment extends Fragment implements ButtonTextUpdater {
     public IntervalFragment intervalFragment;
     public DatePickerDialog datePickerDialog;
     public TimePickerDialog timePickerDialog;
+    SimpleDateFormat sdfDateTimeSchedule = new SimpleDateFormat( "yyyy/MM/dd", Locale.KOREA);
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -73,8 +74,14 @@ public class AddIntervalFragment extends Fragment implements ButtonTextUpdater {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd hh:mm aaa");
 
         //Set the initial added time to current time
-        String current_date = new SimpleDateFormat("yyyy.MM.dd").format(new Date());
-        String current_time = new SimpleDateFormat("hh:mm aaa").format(new Date());
+        Date curDate = null;
+        try {
+            curDate = sdfDateTimeSchedule.parse(bundle.getString("date"));
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
+        String current_date = new SimpleDateFormat("yyyy.MM.dd").format(curDate);
+        String current_time = new SimpleDateFormat("hh:mm aaa").format(new Date(1000*60*60*15));
         startDateButton.setText(current_date);
         endDateButton.setText(current_date);
         startTimeButton.setText(current_time);
