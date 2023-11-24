@@ -102,11 +102,13 @@ public class AddIntervalFragment extends Fragment implements ButtonTextUpdater {
         startTimeButton.setOnClickListener(view -> {
             timePickerDialog = new TimePickerDialog(v.getContext(), addIntervalFragment);
             timePickerDialog.setData(1);
+            timePickerDialog.setTimePicker("00:00");
             timePickerDialog.show();
         });
         endTimeButton.setOnClickListener(view -> {
             timePickerDialog = new TimePickerDialog(v.getContext(), addIntervalFragment);
             timePickerDialog.setData(0);
+            timePickerDialog.setTimePicker("00:00");
             timePickerDialog.show();
         });
         addButton.setOnClickListener(view -> {

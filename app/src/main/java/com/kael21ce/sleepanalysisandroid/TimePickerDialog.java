@@ -31,7 +31,6 @@ public class TimePickerDialog extends Dialog {
 
         //Finish activity if backPopTimeButton is clicked
         backPopTimeButton.setOnClickListener(view -> dismiss());
-        Log.v("LANGUAGE SETTING", languageSetting);
 
         //Send selected time to AddIntervalFragment when checkTimeButton is clicked
         timePicker.setOnTimeChangedListener((timePicker, hour, minute) -> {
@@ -84,5 +83,12 @@ public class TimePickerDialog extends Dialog {
     //To set the data from AddIntervalFragment
     public void setData(int isStartButton) {
         this.isStartButton = isStartButton;
+    }
+
+    public void setTimePicker(String current_time){
+        int hour = Integer.parseInt(current_time.substring(0, 2));
+        int minutes = Integer.parseInt(current_time.substring(3,5));
+        timePicker.setHour(hour);
+        timePicker.setMinute(minutes);
     }
 }

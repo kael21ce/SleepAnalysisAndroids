@@ -59,18 +59,10 @@ public class EditIntervalFragment extends Fragment implements ButtonTextUpdater 
         intervalFragment.setArguments(bundle.getBundle("bundle"));
         backButtonEdit.setOnClickListener(view -> getParentFragmentManager().beginTransaction().replace(R.id.IntervalFrame, intervalFragment).commit());
 
+
+
         //Set the time picker to each timeEditButton
         EditIntervalFragment editIntervalFragment = this;
-        startTimeEditButton.setOnClickListener(view -> {
-            TimePickerDialog timePickerDialog = new TimePickerDialog(v.getContext(), editIntervalFragment);
-            timePickerDialog.setData(1);
-            timePickerDialog.show();
-        });
-        endTimeEditButton.setOnClickListener(view -> {
-            TimePickerDialog timePickerDialog = new TimePickerDialog(v.getContext(), editIntervalFragment);
-            timePickerDialog.setData(0);
-            timePickerDialog.show();
-        });
 
         //get the bundle
         if(bundle == null){
@@ -99,6 +91,20 @@ public class EditIntervalFragment extends Fragment implements ButtonTextUpdater 
         //Set the text of editIntervalText
         intervalTextView.setText("수면 시간: "
                + getInterval(v.getContext(), sdfAMPM.format(startHourD), sdfAMPM.format(endHourD)));
+
+        Date finalStartHourD = startHourD;
+        startTimeEditButton.setOnClickListener(view -> {
+            TimePickerDialog timePickerDialog = new TimePickerDialog(v.getContext(), editIntervalFragment);
+            timePickerDialog.setData(1);
+            timePickerDialog.setTimePicker((String) startTimeEditButton.getText());
+            timePickerDialog.show();
+        });
+        endTimeEditButton.setOnClickListener(view -> {
+            TimePickerDialog timePickerDialog = new TimePickerDialog(v.getContext(), editIntervalFragment);
+            timePickerDialog.setData(0);
+            timePickerDialog.setTimePicker((String) endTimeEditButton.getText());
+            timePickerDialog.show();
+        });
 
         //Delete interval if deleteButton is clicked
         long finalStartSleep = startSleep;
