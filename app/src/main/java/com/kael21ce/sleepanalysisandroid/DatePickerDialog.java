@@ -44,6 +44,14 @@ public class DatePickerDialog extends Dialog {
 
     }
 
+    public void setDatePicker(String theDate){
+        Log.v("CURRENT DATE", theDate);
+        int year = Integer.parseInt(theDate.substring(0, 4));
+        int month = Integer.parseInt(theDate.substring(5, 7));
+        int day = Integer.parseInt(theDate.substring(8, 10));
+        datePicker.updateDate(year, month, day);
+    }
+
     //To get the data from AddIntervalFragment
     public void setData(int isStartButton) {
         this.isStartButton = isStartButton;

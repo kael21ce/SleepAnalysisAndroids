@@ -82,6 +82,7 @@ public class SleepOnsetFragment extends Fragment implements ButtonTextUpdater{
         sleepOnsetDateButton.setOnClickListener(view -> {
             datePickerDialog = new DatePickerDialog(v.getContext(), sleepOnsetFragment);
             datePickerDialog.setData(0);
+            datePickerDialog.setDatePicker((String) sleepOnsetDateButton.getText());
             datePickerDialog.show();
         });
         sleepOnsetTimeButton.setOnClickListener(view -> {
@@ -93,6 +94,7 @@ public class SleepOnsetFragment extends Fragment implements ButtonTextUpdater{
         workOnsetDateButton.setOnClickListener(view -> {
             datePickerDialog = new DatePickerDialog(v.getContext(), sleepOnsetFragment);
             datePickerDialog.setData(1);
+            datePickerDialog.setDatePicker((String) workOnsetDateButton.getText());
             datePickerDialog.show();
         });
         workOnsetTimeButton.setOnClickListener(view -> {
@@ -104,6 +106,7 @@ public class SleepOnsetFragment extends Fragment implements ButtonTextUpdater{
         workOffsetDateButton.setOnClickListener(view -> {
             datePickerDialog = new DatePickerDialog(v.getContext(), sleepOnsetFragment);
             datePickerDialog.setData(2);
+            datePickerDialog.setDatePicker((String) workOffsetDateButton.getText());
             datePickerDialog.show();
         });
         workOffsetTimeButton.setOnClickListener(view -> {
