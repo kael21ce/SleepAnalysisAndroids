@@ -86,8 +86,13 @@ public class TimePickerDialog extends Dialog {
     }
 
     public void setTimePicker(String current_time){
+//        Log.v("CURRENT TIME", current_time);
         int hour = Integer.parseInt(current_time.substring(0, 2));
         int minutes = Integer.parseInt(current_time.substring(3,5));
+        if(current_time.substring(6, 8).equals("PM") || current_time.substring(6, 8).equals("오후")){
+            hour += 12;
+        }
+//        Log.v("THE INT", hour + " " + minutes + " " + current_time.substring(6, 8));
         timePicker.setHour(hour);
         timePicker.setMinute(minutes);
     }

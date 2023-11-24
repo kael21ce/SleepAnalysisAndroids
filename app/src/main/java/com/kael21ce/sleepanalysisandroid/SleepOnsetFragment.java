@@ -87,6 +87,7 @@ public class SleepOnsetFragment extends Fragment implements ButtonTextUpdater{
         sleepOnsetTimeButton.setOnClickListener(view -> {
             timePickerDialog = new TimePickerDialog(v.getContext(), sleepOnsetFragment);
             timePickerDialog.setData(0);
+            timePickerDialog.setTimePicker((String) sleepOnsetTimeButton.getText());
             timePickerDialog.show();
         });
         workOnsetDateButton.setOnClickListener(view -> {
@@ -97,6 +98,7 @@ public class SleepOnsetFragment extends Fragment implements ButtonTextUpdater{
         workOnsetTimeButton.setOnClickListener(view -> {
             timePickerDialog = new TimePickerDialog(v.getContext(), sleepOnsetFragment);
             timePickerDialog.setData(1);
+            timePickerDialog.setTimePicker((String) workOnsetTimeButton.getText());
             timePickerDialog.show();
         });
         workOffsetDateButton.setOnClickListener(view -> {
@@ -107,6 +109,7 @@ public class SleepOnsetFragment extends Fragment implements ButtonTextUpdater{
         workOffsetTimeButton.setOnClickListener(view -> {
             timePickerDialog = new TimePickerDialog(v.getContext(), sleepOnsetFragment);
             timePickerDialog.setData(2);
+            timePickerDialog.setTimePicker((String) workOffsetTimeButton.getText());
             timePickerDialog.show();
         });
 
