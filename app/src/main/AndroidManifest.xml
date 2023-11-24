@@ -12,7 +12,6 @@
     </queries>
 
     <application
-        android:usesCleartextTraffic="true"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -22,10 +21,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.SleepAnalysisAndroid"
+        android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
             android:name=".PermissionChecker"
-            android:exported="true" >
+            android:exported="true">
             <intent-filter>
                 <action android:name="androidx.health.ACTION_SHOW_PERMISSIONS_RATIONALE" />
             </intent-filter>
@@ -42,8 +42,7 @@
         </activity>
         <activity
             android:name=".SplashActivity"
-            android:exported="false">
-        </activity>
+            android:exported="false" />
         <activity
             android:name=".PermissionsActivity"
             android:exported="true">
@@ -52,11 +51,11 @@
             </intent-filter>
         </activity>
         <activity
-            android:usesCleartextTraffic="true"
             android:name=".MainActivity"
             android:exported="true"
             android:label="@string/title_activity_main"
-            android:theme="@style/Theme.SleepAnalysisAndroid"></activity>
+            android:theme="@style/Theme.SleepAnalysisAndroid"
+            android:usesCleartextTraffic="true" />
     </application>
 
 </manifest>
