@@ -390,6 +390,7 @@ public class MainActivity extends AppCompatActivity {
         for(int i = Integer.max(0, sleepPattern.length-288); i < sleepPattern.length; i ++){
             double[] res = simulationResult.get(i);
             double awarenessVal = getAwarenessValue(res[3], res[2], res[1], res[0]);
+            awarenessVal = Double.min(3.0, Double.max(-3.0, awarenessVal));
             barEntries.add(new BarEntry(barIdx, (float)awarenessVal));
             barIdx += addBarIdx;
         }
