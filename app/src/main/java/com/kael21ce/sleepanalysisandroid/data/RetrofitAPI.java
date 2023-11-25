@@ -5,7 +5,7 @@ import retrofit2.http.Body;
 import retrofit2.http.POST;
 
 public interface RetrofitAPI {
-    @POST("users")
+    @POST("android/")
 
         //on below line we are creating a method to post our data.
     Call<DataModal> createPost(@Body DataModal dataModal);

@@ -170,7 +170,7 @@ public class MainActivity extends AppCompatActivity {
         if(sleeps.size() > 0) {
             do_simulation();
             calculateAwareness();
-            sendV0("testing");
+            sendV0("tester33");
         }
 
         bottomNavigationView = findViewById(R.id.bottomNavigationView);
@@ -546,13 +546,28 @@ public class MainActivity extends AppCompatActivity {
 
     protected void sendV0(String username) {
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("https://sleep-math.com/sleepapp/android/")
+                .baseUrl("https://sleep-math.com/sleepapp/")
                 // as we are sending data in json format so
                 // we have to add Gson converter factory
                 .addConverterFactory(GsonConverterFactory.create())
                 // at last we are building our retrofit builder.
                 .build();
         RetrofitAPI retrofitAPI = retrofit.create(RetrofitAPI.class);
+//        List<Sleep> testSleep = new ArrayList<>();
+//        Sleep testSleep1 = new Sleep();
+//        testSleep1.sleepStart = 0;
+//        testSleep1.sleepEnd = 10;
+//        testSleep.add(testSleep1);
+//
+//        List<V0> testV0 = new ArrayList<>();
+//        V0 testV01 = new V0();
+//        testV01.y_val = 0.1;
+//        testV01.n_val = 0.1;
+//        testV01.H_val = 0.1;
+//        testV01.x_val = 0.1;
+//        testV01.time = 0;
+//        testV0.add(testV01);
+
         DataModal modal = new DataModal(username, sleeps, v0s);
         Call<DataModal> call = retrofitAPI.createPost(modal);
         call.enqueue(new Callback<DataModal>() {
