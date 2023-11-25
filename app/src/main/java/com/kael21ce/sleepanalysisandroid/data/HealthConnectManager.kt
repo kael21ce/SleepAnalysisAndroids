@@ -168,9 +168,9 @@ class HealthConnectManager(private val context: Context) {
                 val midnight = sleepEndDay * (1000 * 60 * 60 * 24)
                 val additionalSleep = Sleep()
                 additionalSleep.sleepStart = sleepStart
-                additionalSleep.sleepEnd = midnight
+                additionalSleep.sleepEnd = midnight - (1000*60*60*9)
                 sleepList.add(additionalSleep)
-                sleepStart = midnight
+                sleepStart = midnight - (1000*60*60*9)
             }
             //save everything in the database
             val sleep = Sleep()

@@ -612,7 +612,20 @@ public class MainActivity extends AppCompatActivity {
         //check if the sleep is already there
         if(sleep.sleepStart < this.lastSleepUpdate) {
             List<Sleep> listSleep = new ArrayList<>();
-            listSleep.add(sleep);
+            long sleepDayStart = (sleep.sleepStart + nineHours)/(1000*60*60*24);
+            long sleepDayEnd = (sleep.sleepEnd + nineHours)/(1000*60*60*24);
+            if(sleepDayStart != sleepDayEnd){
+                long midnight = sleepDayEnd * 1000*60*60*24;
+                midnight = midnight - nineHours;
+                Sleep sleep2 = new Sleep();
+                sleep2.sleepStart = sleep.sleepStart;
+                sleep2.sleepEnd = midnight;
+                sleep.sleepStart = midnight;
+                listSleep.add(sleep2);
+                listSleep.add(sleep);
+            }else {
+                listSleep.add(sleep);
+            }
             Log.v("SLEEP DATA ADDED", String.valueOf(sleep.sleepStart));
             this.sleepDao.insertAll(listSleep);
         }
