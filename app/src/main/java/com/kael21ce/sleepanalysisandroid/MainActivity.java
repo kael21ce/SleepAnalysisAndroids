@@ -320,7 +320,7 @@ public class MainActivity extends AppCompatActivity {
         List<V0> newV0 = new ArrayList<>();
         Log.v("SIZE", String.valueOf(simulationResult.size()));
         float barIdx = 0f;
-        float addBarIdx = 0.17f;
+        float addBarIdx = 0.0833333f;
         for(int i = 0; i < simulationResult.size(); i ++){
             double[] res = simulationResult.get(i);
             V0 v0 = new V0();

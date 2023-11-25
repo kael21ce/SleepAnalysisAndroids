@@ -3,6 +3,8 @@ package com.kael21ce.sleepanalysisandroid;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.util.Log;
@@ -18,8 +20,8 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.github.mikephil.charting.animation.ChartAnimator;
 import com.github.mikephil.charting.charts.BarChart;
-import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.Description;
 import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.components.XAxis;
@@ -28,6 +30,11 @@ import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.formatter.ValueFormatter;
+import com.github.mikephil.charting.interfaces.dataprovider.BarDataProvider;
+import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
+import com.github.mikephil.charting.renderer.BarChartRenderer;
+import com.github.mikephil.charting.renderer.HorizontalBarChartRenderer;
+import com.github.mikephil.charting.utils.ViewPortHandler;
 import com.kael21ce.sleepanalysisandroid.data.Awareness;
 
 import java.text.SimpleDateFormat;
@@ -38,6 +45,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+
+import io.reactivex.annotations.NonNull;
 
 public class HomeFragment extends Fragment {
     SimpleDateFormat sdfDateTime = new SimpleDateFormat( "hh:mm a", Locale.KOREA);
@@ -123,6 +132,7 @@ public class HomeFragment extends Fragment {
 
         //Graph showing alertness
         ArrayList<BarEntry> barEntries = mainActivity.getBarEntries();
+        Log.v("BarEntries", String.valueOf(barEntries.size()));
             //Add data to Entries: form-(x: time, y: alertness value)
             //time range: 0 ~ 48 (- 24 + current , current + 24) / alertness range: -100 ~ 100
         //Set the color of bar depending on the y-value
@@ -161,8 +171,9 @@ public class HomeFragment extends Fragment {
         alertnessChart.getTransformer(YAxis.AxisDependency.LEFT), new XAxisBottomFormatter()));
          */
         //x axis on the top
-        xAxis.setValueFormatter(new XAxisValueFormatter());
-        //xAxis.setValueFormatter(new XAxisValueFormatter2());
+        XAxisValueFormatter xAxisValueFormatter = new XAxisValueFormatter();
+        xAxisValueFormatter.setBarChart(alertnessChart);
+        xAxis.setValueFormatter(xAxisValueFormatter);
         xAxis.setPosition(XAxis.XAxisPosition.TOP);
         xAxis.setGranularity(2f);
         xAxis.setLabelCount(barEntries.size(), true);
@@ -448,6 +459,7 @@ class XAxisValueFormatter extends ValueFormatter {
     //To make displayed tick label not overlap
     String displayedDate = "";
     String displayedTime = "";
+    BarChart barChart;
     @Override
     public String getFormattedValue(float value) {
         String timeLabel;
@@ -461,13 +473,13 @@ class XAxisValueFormatter extends ValueFormatter {
 
         int currentHour = current.getHour();
         int currentMinute = current.getMinute();
-        float valueReal = value / 2;
+        float valueReal = value;
         float valueCentered = valueReal + currentHour + currentMinute / 60f;
-        float currentCenter = 24f + currentHour + currentMinute / 60f;
+        float currentCenter = 24f;
+        Log.v("Ticks", String.valueOf(currentCenter) + " compared to " + String.valueOf(value));
         int valueR = Math.round(valueCentered);
         int quotient = valueR / 24;
         int remainder = valueR % 24;
-        int remainderDisplaying = valueR % 3;
         //Calculate time
         if (remainder < 12) {
             timeLabel = remainder + " AM";
@@ -504,5 +516,9 @@ class XAxisValueFormatter extends ValueFormatter {
         } else {
             return "";
         }
+    }
+
+    public void setBarChart(BarChart barChart) {
+        this.barChart = barChart;
     }
 }
