@@ -15,6 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -27,9 +28,11 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.kael21ce.sleepanalysisandroid.data.AppDatabase;
 import com.kael21ce.sleepanalysisandroid.data.Awareness;
 import com.kael21ce.sleepanalysisandroid.data.AwarenessDao;
+import com.kael21ce.sleepanalysisandroid.data.DataModal;
 import com.kael21ce.sleepanalysisandroid.data.HealthConnectAvailability;
 import com.kael21ce.sleepanalysisandroid.data.HealthConnectManager;
 import com.kael21ce.sleepanalysisandroid.data.HealthConnectManagerKt;
+import com.kael21ce.sleepanalysisandroid.data.RetrofitAPI;
 import com.kael21ce.sleepanalysisandroid.data.Sleep;
 import com.kael21ce.sleepanalysisandroid.data.SleepDao;
 import com.kael21ce.sleepanalysisandroid.data.SleepModel;
@@ -66,6 +69,11 @@ import com.github.mikephil.charting.data.BarEntry;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -536,53 +544,40 @@ public class MainActivity extends AppCompatActivity {
         return false;
     }
 
-    protected void sendV0(String test) {
+    protected void sendV0(String username) {
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("https://sleep-math.com/sleepapp/android/")
+                // as we are sending data in json format so
+                // we have to add Gson converter factory
+                .addConverterFactory(GsonConverterFactory.create())
+                // at last we are building our retrofit builder.
+                .build();
+        RetrofitAPI retrofitAPI = retrofit.create(RetrofitAPI.class);
+        DataModal modal = new DataModal(username, sleeps, v0s);
+        Call<DataModal> call = retrofitAPI.createPost(modal);
+        call.enqueue(new Callback<DataModal>() {
+            @Override
+            public void onResponse(Call<DataModal> call, Response<DataModal> response) {
+                // this method is called when we get response from our api.
+                Toast.makeText(MainActivity.this, "Data added to API", Toast.LENGTH_SHORT).show();
 
-        Executor executor = Executors.newSingleThreadExecutor();
-        Handler handler = new Handler(Looper.getMainLooper());
+                // we are getting response from our body
+                // and passing it to our modal class.
+                DataModal responseFromAPI = response.body();
 
-        executor.execute(() -> {
-            Log.v("EXECUTE", "EXECUTE");
-            String data = test;
-
-            HttpURLConnection httpURLConnection = null;
-            try {
-
-                httpURLConnection = (HttpURLConnection) new URL("http://localhost:8000/sleepapp/").openConnection();
-                httpURLConnection.setRequestMethod("POST");
-
-                httpURLConnection.setDoOutput(true);
-
-                DataOutputStream wr = new DataOutputStream(httpURLConnection.getOutputStream());
-                wr.writeBytes("PostData=" + data);
-                wr.flush();
-                wr.close();
-
-                InputStream in = httpURLConnection.getInputStream();
-                InputStreamReader inputStreamReader = new InputStreamReader(in);
-
-                int inputStreamData = inputStreamReader.read();
-                while (inputStreamData != -1) {
-                    char current = (char) inputStreamData;
-                    inputStreamData = inputStreamReader.read();
-                    data += current;
-                }
-                Log.v("DONE", "doneeee");
-            } catch (Exception e) {
-                e.printStackTrace();
-                Log.v("FAILED", "FAILED");
-            } finally {
-                if (httpURLConnection != null) {
-                    httpURLConnection.disconnect();
-                }
-                Log.v("SUPER DONE", "SUPER DONE");
+                // on below line we are getting our data from modal class and adding it to our string.
+                String responseString = "Response Code : " + response.code() + "\nName : "  + "\n" ;
+                Log.v("RESPONSE", responseString);
             }
 
-            handler.post(() -> {
-                Log.v("POSTED", "POSTED");
-                //UI Thread work here
-            });
+            @Override
+            public void onFailure(Call<DataModal> call, Throwable t) {
+                // setting text to our text view when
+                // we get error response from API.
+               Log.v("ERROR", "Error found is : " + t.getMessage());
+            }
         });
+
     }
 
 //    public void sendV0(V0 v0){
