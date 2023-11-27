@@ -24,6 +24,15 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
+            android:name=".StartActivity"
+            android:exported="false" />
+        <activity
+            android:name=".CheckActivity"
+            android:exported="false" />
+        <activity
+            android:name=".BeginRegisterActivity"
+            android:exported="false" />
+        <activity
             android:name=".PermissionChecker"
             android:exported="true">
             <intent-filter>

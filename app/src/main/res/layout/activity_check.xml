@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".CheckActivity">
+
+    <LinearLayout
+        android:id="@+id/checkBackButtonCaption"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <ImageButton
+            android:id="@+id/checkBackButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/white"
+            android:layout_marginVertical="8dp"
+            android:src="@drawable/chevron_left" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/checkTextCaption"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/checkTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/pretendardbold"
+            android:text="이메일을 알려주세요"
+            android:textColor="@color/black"
+            android:textSize="24sp" />
+
+        <TextView
+            android:id="@+id/checkDescription"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="32dp"
+            android:fontFamily="@font/pretendardvariable"
+            android:text="SleepWake가 수면 정보를 기억해둘게요"
+            android:textColor="@color/gray_4"
+            android:textSize="16sp" />
+    </LinearLayout>
+
+    <EditText
+        android:id="@+id/emailText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginVertical="32dp"
+        android:background="@drawable/corner_8"
+        android:ems="10"
+        android:fontFamily="@font/pretendardvariable"
+        android:inputType="text"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="16dp"
+        android:text="이메일"
+        android:textColor="@color/gray_4"
+        android:textSize="16sp"
+        android:hint="example@example.com"
+        android:textColorHint="@color/gray_4"
+        />
+
+    <LinearLayout
+        android:id="@+id/checkButtonCaption"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="bottom"
+        android:orientation="vertical">
+
+        <Button
+            android:id="@+id/checkKButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="48dp"
+            android:layout_marginHorizontal="16dp"
+            android:backgroundTint="@color/blue_1"
+            android:fontFamily="@font/pretendardvariable"
+            android:padding="16dp"
+            android:text="다음"
+            android:textSize="16sp"
+            app:cornerRadius="28dp" />
+    </LinearLayout>
+
+</LinearLayout>
