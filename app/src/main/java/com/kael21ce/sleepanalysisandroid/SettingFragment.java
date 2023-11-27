@@ -36,7 +36,7 @@ public class SettingFragment extends Fragment {
             } else {
                 isFolded = true;
                 getChildFragmentManager().beginTransaction().remove(sleepOnsetFragment).commit();
-                onsetView.setBackground(AppCompatResources.getDrawable(v.getContext(), R.color.white));
+                onsetView.setBackgroundResource(R.drawable.setting_stroke);
                 ObjectAnimator.ofFloat(onsetButton, View.ROTATION, 90f, 0f).setDuration(100).start();
             }
         });

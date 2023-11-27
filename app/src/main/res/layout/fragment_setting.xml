@@ -18,7 +18,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/setting_stroke"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:visibility="gone">
 
             <LinearLayout
                 android:id="@+id/LoadDataTextView"
@@ -69,7 +70,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/setting_stroke"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:visibility="gone">
 
             <LinearLayout
                 android:id="@+id/ServiceTextView"
@@ -81,8 +83,8 @@
                     android:id="@+id/ServiceTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="16dp"
                     android:layout_marginVertical="24dp"
+                    android:layout_marginLeft="16dp"
                     android:fontFamily="@font/pretendardbold"
                     android:text="약관 및 개인정보 처리방침 동의"
                     android:textColor="@color/black"
@@ -114,7 +116,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/setting_stroke"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:visibility="gone">
 
             <LinearLayout
                 android:id="@+id/VersionTextView"
