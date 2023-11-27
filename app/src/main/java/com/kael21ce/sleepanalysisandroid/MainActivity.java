@@ -170,7 +170,7 @@ public class MainActivity extends AppCompatActivity {
         if(sleeps.size() > 0) {
             do_simulation();
             calculateAwareness();
-            sendV0("tester33");
+//            sendV0("tester33");
         }
 
         bottomNavigationView = findViewById(R.id.bottomNavigationView);
@@ -215,6 +215,50 @@ public class MainActivity extends AppCompatActivity {
                 }
         );
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.v("RESUMING", "RESUMING");
+        barEntries = new ArrayList<BarEntry>();
+
+        if(now > sleepOnset && now < workOnset){
+            Log.v("SLEEP ONSET", "SLEEP ONSET IS NOW");
+            sleepOnset = now + 1000*60*15;
+        }else if(now > workOnset){
+            Log.v("NOW", "NOW IS BIGGER THAN WORK ONSET");
+            while(now > workOnset){
+                sleepOnset += 1000*60*60*24;
+                workOnset += 1000*60*60*24;
+                workOffset += 1000*60*60*24;
+            }
+            editor.putLong("sleepOnset", sleepOnset);
+            editor.putLong("workOnset", workOnset);
+            editor.putLong("workOffset", workOffset);
+            editor.apply();
+        }
+
+        //sleep result variables
+        mainSleepStart = sharedPref.getLong("mainSleepStart", now - twoWeeks);
+        mainSleepEnd = sharedPref.getLong("mainSleepEnd", now - twoWeeks);
+        napSleepStart = sharedPref.getLong("napSleepStart", now - twoWeeks);
+        napSleepEnd = sharedPref.getLong("napSleepEnd", now - twoWeeks);
+
+        ILastSleepUpdate = Instant.ofEpochMilli(lastSleepUpdate);
+
+        db = Room.databaseBuilder(getApplicationContext(),
+                AppDatabase.class, "sleep_wake").allowMainThreadQueries().build();
+
+        sleepDao = db.sleepDao();
+
+        getSleepData();
+        if(sleeps.size() > 0) {
+            do_simulation();
+            calculateAwareness();
+//            sendV0("tester33");
+        }
+    }
+
     @Override
     public void onDestroy(){
         super.onDestroy();
