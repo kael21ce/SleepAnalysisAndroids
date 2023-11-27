@@ -54,8 +54,34 @@ public class IntervalFragment extends Fragment {
         //update the awareness
         AlertnessHighTimeText = v.findViewById(R.id.AlertnessHighTimeText);
         AlertnessLowTimeText = v.findViewById(R.id.AlertnessLowTimeText);
-        AlertnessHighTimeText.setText(String.valueOf(bundle.getLong("goodDuration")));
-        AlertnessLowTimeText.setText(String.valueOf(bundle.getLong("badDuration")));
+        long alertnessHighHour = bundle.getLong("goodDuration") / 60;
+        long alertnessHighMinute = bundle.getLong("goodDuration") % 60;
+        String alertnessHighString, alertnessHighHourString;
+        String alertnessLowString, alertnessLowHourString;
+        if (alertnessHighHour < 10) {
+            alertnessHighHourString = "  " + alertnessHighHour;
+        } else {
+            alertnessHighHourString = String.valueOf(alertnessHighHour);
+        }
+        if (alertnessHighMinute < 10) {
+            alertnessHighString = alertnessHighHourString + "시간 0" + alertnessHighMinute + "분";
+        } else {
+            alertnessHighString = alertnessHighHourString + "시간 " + alertnessHighMinute + "분";
+        }
+        long alertnessLowHour = bundle.getLong("badDuration") / 60;
+        long alertnessLowMinute = bundle.getLong("badDuration") % 60;
+        if (alertnessLowHour < 10) {
+            alertnessLowHourString = "  " + alertnessLowHour;
+        } else {
+            alertnessLowHourString = String.valueOf(alertnessLowHour);
+        }
+        if (alertnessLowMinute < 10) {
+            alertnessLowString = alertnessLowHourString + "시간 0" + alertnessLowMinute + "분";
+        } else {
+            alertnessLowString = alertnessLowHourString + "시간 " + alertnessLowMinute + "분";
+        }
+        AlertnessHighTimeText.setText(alertnessHighString);
+        AlertnessLowTimeText.setText(alertnessLowString);
 
         //Add time interval to intervalRecyclerView (info about interval is get from ScheduleFragment!)
         int count = bundle.getInt("count");
