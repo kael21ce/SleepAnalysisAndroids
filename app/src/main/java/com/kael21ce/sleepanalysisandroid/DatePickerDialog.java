@@ -31,8 +31,19 @@ public class DatePickerDialog extends Dialog {
         datePicker.setOnDateChangedListener((datePicker, year, month, dayOfMonth) -> {
             //Get date in format
             String format;
-            //I don't know the reason why month get from listener has -1 from real month...
-            format = year + "." + (month + 1) + "." + dayOfMonth;
+            if (month + 1 < 10) {
+                if (dayOfMonth < 10) {
+                    format = year + ".0" + (month + 1) + ".0" + dayOfMonth;
+                } else {
+                    format = year + ".0" + (month + 1) + "." + dayOfMonth;
+                }
+            } else {
+                if (dayOfMonth < 10) {
+                    format = year + "." + (month + 1) + ".0" + dayOfMonth;
+                } else {
+                    format = year + "." + (month + 1) + "." + dayOfMonth;
+                }
+            }
             checkDateButton.setOnClickListener(view -> {
                 //Send date to AddIntervalFragment
                 buttonTextUpdater.setDateButtonText(format, isStartButton);
@@ -49,7 +60,7 @@ public class DatePickerDialog extends Dialog {
         int year = Integer.parseInt(theDate.substring(0, 4));
         int month = Integer.parseInt(theDate.substring(5, 7));
         int day = Integer.parseInt(theDate.substring(8, 10));
-        datePicker.updateDate(year, month, day);
+        datePicker.updateDate(year, month - 1, day);
     }
 
     //To get the data from AddIntervalFragment
