@@ -201,9 +201,11 @@ public class HomeFragment extends Fragment {
         BarAdapter barAdapter = new BarAdapter();
 
         awarenesses = mainActivity.getAwarenesses();
+        List<Awareness> weeklyAwareness = new ArrayList<>();
         long oneDayToMils = 1000*60*60*24;
         long curTime = now;
         long curDay = (curTime)/oneDayToMils;
+        int i = 0;
         for(Awareness awareness: awarenesses){
             Log.v("AWARENESS VALUE IN SCHEDULE", sdfDate.format(new Date(awareness.awarenessDay*oneDayToMils+oneDayToMils)));
 
@@ -217,13 +219,27 @@ public class HomeFragment extends Fragment {
                 String date = sdfDate.format(new Date((awareness.awarenessDay)*oneDayToMils));
                 String goodDuration = hourGoodDuration + ":" + minuteGoodDuration;
                 String badDuration = hourBadDuration + ":" + minuteBadDuration;
+                //Add to get ONLY weekly awareness
+                weeklyAwareness.add(i, awareness);
                 barAdapter.addItem(new Bar(date, convertToWeight(goodDuration), convertToWeight(badDuration)));
+                i++;
             }
         }
+        //When HomeFragment appears
+        if (weeklyAwareness.size() >= 7) {
+            Awareness todayAwareness = weeklyAwareness.get(7);
+            long todayHourGoodDuration = todayAwareness.goodDuration/60;
+            long todayMinuteGoodDuration = todayAwareness.goodDuration%60;
+            long todayHourBadDuration = todayAwareness.badDuration/60;
+            long todayMinuteBadDuration = todayAwareness.badDuration%60;
+            positiveTimeText.setText(todayHourGoodDuration + "시간 " + todayMinuteGoodDuration + "분");
+            negativeTimeText.setText(todayHourBadDuration + "시간 " + todayMinuteBadDuration + "분");
+        }
+
         //Load the clicked position in RecyclerView
         barAdapter.setOnBarClickListener(position -> {
             Log.d("HomeFragment", "Item clicked at position " + position);
-            Awareness clickedAwareness = awarenesses.get(position);
+            Awareness clickedAwareness = weeklyAwareness.get(position);
             long hourGoodDuration = clickedAwareness.goodDuration/60;
             long minuteGoodDuration = clickedAwareness.goodDuration%60;
             long hourBadDuration = clickedAwareness.badDuration/60;
