@@ -35,8 +35,10 @@ public class RecommendFragment extends Fragment {
     private TextView stateDescriptionText;
     SimpleDateFormat sdfDateTime = new SimpleDateFormat("dd/MM/yyyy"+ "HH:mm", Locale.KOREA);
     SimpleDateFormat sdfDateTimeRecomm = new SimpleDateFormat("a hh:mm", Locale.KOREA);
+    SimpleDateFormat sdfDateTimeRecomm2 = new SimpleDateFormat("a h시 mm분", Locale.KOREA);
     SimpleDateFormat sdfTime = new SimpleDateFormat("HH:mm", Locale.KOREA);
     String mainSleepStartString,sleepOnsetString, mainSleepEndString, workOnsetString, workOffsetString, napSleepStartString, napSleepEndString;
+    String sleepOnsetDisplaying, workOnsetDisplaying, workOffsetDisplaying;
     long now, nineHours;
 
     @Override
@@ -74,6 +76,9 @@ public class RecommendFragment extends Fragment {
         sleepOnsetString = sdfTime.format(new Date(mainActivity.getSleepOnset()));
         workOnsetString = sdfTime.format(new Date(mainActivity.getWorkOnset()));
         workOffsetString = sdfTime.format(new Date(mainActivity.getWorkOffset()));
+        sleepOnsetDisplaying = sdfDateTimeRecomm2.format(new Date(mainActivity.getSleepOnset()));
+        workOnsetDisplaying = sdfDateTimeRecomm2.format(new Date(mainActivity.getWorkOnset()));
+        workOffsetDisplaying = sdfDateTimeRecomm2.format(new Date(mainActivity.getWorkOffset()));
 
         View v = inflater.inflate(R.layout.fragment_recommend, container, false);
 
@@ -90,9 +95,9 @@ public class RecommendFragment extends Fragment {
         TextView workTimeStart = v.findViewById(R.id.WorkTimeStart);
         TextView workTimeEnd = v.findViewById(R.id.WorkTimeEnd);
 
-        hopeTimeText.setText(sleepOnsetString);
-        workTimeStart.setText(workOnsetString);
-        workTimeEnd.setText(workOffsetString);
+        hopeTimeText.setText(sleepOnsetDisplaying);
+        workTimeStart.setText(workOnsetDisplaying);
+        workTimeEnd.setText(workOffsetDisplaying);
 
                 //Initial Button Setting
         sleepButton.setBackground(ResourcesCompat
