@@ -40,7 +40,6 @@ public class RecommendFragment extends Fragment {
     String mainSleepStartString,sleepOnsetString, mainSleepEndString, workOnsetString, workOffsetString, napSleepStartString, napSleepEndString;
     String sleepOnsetDisplaying, workOnsetDisplaying, workOffsetDisplaying;
     long now, nineHours;
-    SharedPreferences sharedPref;
     SharedPreferences.Editor editor;
 
     @Override
@@ -71,10 +70,10 @@ public class RecommendFragment extends Fragment {
 
         MainActivity mainActivity = (MainActivity)getActivity();
 
-        sharedPref = getActivity().getSharedPreferences("SleepWake", Context.MODE_PRIVATE);
-        editor = sharedPref.edit();
+        SharedPreferences sharedPref2 = getActivity().getSharedPreferences("SleepWake", Context.MODE_PRIVATE);
+        editor = sharedPref2.edit();
 
-        String user_name = sharedPref.getString("User_Name", "UserName");
+        String user_name = sharedPref2.getString("User_Name", "UserName");
 
         mainSleepStartString = sdfTime.format(new Date(mainActivity.getMainSleepStart()));
         mainSleepEndString = sdfTime.format(new Date(mainActivity.getMainSleepEnd()));

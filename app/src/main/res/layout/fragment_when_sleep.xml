@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".WhenSleepFragment">
+
+    <LinearLayout
+        android:id="@+id/whenSleepLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+        <LinearLayout
+            android:id="@+id/sleepBackButtonCaption"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <ImageButton
+                android:id="@+id/sleepBackButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/white"
+                android:layout_marginVertical="8dp"
+                android:src="@drawable/chevron_left" />
+
+            <LinearLayout
+                android:id="@+id/sleepTextCaption"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="16dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/whenSleepTitle"
+                    android:fontFamily="@font/pretendardbold"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="24sp"
+                    android:textColor="@color/black"
+                    android:text="언제 주무시고 싶으신가요?" />
+
+                <TextView
+                    android:id="@+id/whenSleepDescription"
+                    android:fontFamily="@font/pretendardvariable"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="16sp"
+                    android:textColor="@color/black"
+                    android:layout_marginTop="8dp"
+                    android:text="userName님이 희망하시는 취침시간을 알려주세요" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/whenSleepCaption"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="64dp"
+            android:layout_marginBottom="32dp"
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/whenSleepHour1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="32dp"
+                android:layout_weight="1"
+                android:background="@drawable/corner_16_gray"
+                android:ems="10"
+                android:fontFamily="@font/pretendardbold"
+                android:gravity="center"
+                android:inputType="number"
+                android:maxLength="1"
+                android:maxLines="1"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="18dp"
+                android:textColor="@color/black"
+                android:textSize="32sp" />
+
+            <EditText
+                android:id="@+id/whenSleepHour2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="7dp"
+                android:layout_weight="1"
+                android:background="@drawable/corner_16_gray"
+                android:ems="10"
+                android:fontFamily="@font/pretendardbold"
+                android:gravity="center"
+                android:inputType="number"
+                android:maxLength="1"
+                android:maxLines="1"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="18dp"
+                android:textColor="@color/black"
+                android:textSize="32sp" />
+
+            <TextView
+                android:id="@+id/whenSleepHalf"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="7dp"
+                android:fontFamily="@font/pretendardbold"
+                android:gravity="center"
+                android:text=":"
+                android:textColor="@color/black"
+                android:textSize="32sp" />
+
+            <EditText
+                android:id="@+id/whenSleepMinute1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="7dp"
+                android:layout_weight="1"
+                android:background="@drawable/corner_16_gray"
+                android:ems="10"
+                android:fontFamily="@font/pretendardbold"
+                android:gravity="center"
+                android:inputType="number"
+                android:maxLength="1"
+                android:maxLines="1"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="18dp"
+                android:textColor="@color/black"
+                android:textSize="32sp" />
+
+            <EditText
+                android:id="@+id/whenSleepMinute2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="32dp"
+                android:layout_weight="1"
+                android:background="@drawable/corner_16_gray"
+                android:ems="10"
+                android:fontFamily="@font/pretendardbold"
+                android:gravity="center"
+                android:inputType="number"
+                android:maxLength="1"
+                android:maxLines="1"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="18dp"
+                android:textColor="@color/black"
+                android:textSize="32sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/sleepButtonCaption"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="bottom"
+            android:orientation="vertical">
+
+            <Button
+                android:id="@+id/whenSleepButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/blue_1"
+                android:fontFamily="@font/pretendardvariable"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="16dp"
+                android:text="다음"
+                android:textSize="16sp"
+                app:cornerRadius="8dp" />
+        </LinearLayout>
+    </LinearLayout>
+
+</FrameLayout>
