@@ -220,8 +220,8 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onStart() {
+        super.onStart();
         if(creation == false) {
-            super.onStart();
             Log.v("RESUMING", "RESUMING");
             barEntries = new ArrayList<BarEntry>();
 
