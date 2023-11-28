@@ -83,6 +83,7 @@ public class MainActivity extends AppCompatActivity {
     RecommendFragment recommendFragment = new RecommendFragment();
     SettingFragment settingFragment = new SettingFragment();
     private RelativeLayout loadingScreenLayout;
+    boolean creation = false;
     SimpleDateFormat sdfDateTime = new SimpleDateFormat("dd/MM/yyyy"+ "HH:mm", Locale.KOREA);
     HealthConnectManager healthConnectManager;
     //health connect
@@ -125,6 +126,7 @@ public class MainActivity extends AppCompatActivity {
         //this is in GMT
         nineHours = (1000*60*60*9);
         now = System.currentTimeMillis();
+        creation = true;
 
         //update variables
         lastSleepUpdate = sharedPref.getLong("lastSleepUpdate", now - twoWeeks);
@@ -217,45 +219,47 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        Log.v("RESUMING", "RESUMING");
-        barEntries = new ArrayList<BarEntry>();
+    protected void onStart() {
+        if(creation == false) {
+            super.onStart();
+            Log.v("RESUMING", "RESUMING");
+            barEntries = new ArrayList<BarEntry>();
 
-        if(now > sleepOnset && now < workOnset){
-            Log.v("SLEEP ONSET", "SLEEP ONSET IS NOW");
-            sleepOnset = now + 1000*60*15;
-        }else if(now > workOnset){
-            Log.v("NOW", "NOW IS BIGGER THAN WORK ONSET");
-            while(now > workOnset){
-                sleepOnset += 1000*60*60*24;
-                workOnset += 1000*60*60*24;
-                workOffset += 1000*60*60*24;
+            if (now > sleepOnset && now < workOnset) {
+                Log.v("SLEEP ONSET", "SLEEP ONSET IS NOW");
+                sleepOnset = now + 1000 * 60 * 15;
+            } else if (now > workOnset) {
+                Log.v("NOW", "NOW IS BIGGER THAN WORK ONSET");
+                while (now > workOnset) {
+                    sleepOnset += 1000 * 60 * 60 * 24;
+                    workOnset += 1000 * 60 * 60 * 24;
+                    workOffset += 1000 * 60 * 60 * 24;
+                }
+                editor.putLong("sleepOnset", sleepOnset);
+                editor.putLong("workOnset", workOnset);
+                editor.putLong("workOffset", workOffset);
+                editor.apply();
             }
-            editor.putLong("sleepOnset", sleepOnset);
-            editor.putLong("workOnset", workOnset);
-            editor.putLong("workOffset", workOffset);
-            editor.apply();
-        }
 
-        //sleep result variables
-        mainSleepStart = sharedPref.getLong("mainSleepStart", now - twoWeeks);
-        mainSleepEnd = sharedPref.getLong("mainSleepEnd", now - twoWeeks);
-        napSleepStart = sharedPref.getLong("napSleepStart", now - twoWeeks);
-        napSleepEnd = sharedPref.getLong("napSleepEnd", now - twoWeeks);
+            //sleep result variables
+            mainSleepStart = sharedPref.getLong("mainSleepStart", now - twoWeeks);
+            mainSleepEnd = sharedPref.getLong("mainSleepEnd", now - twoWeeks);
+            napSleepStart = sharedPref.getLong("napSleepStart", now - twoWeeks);
+            napSleepEnd = sharedPref.getLong("napSleepEnd", now - twoWeeks);
 
-        ILastSleepUpdate = Instant.ofEpochMilli(lastSleepUpdate);
+            ILastSleepUpdate = Instant.ofEpochMilli(lastSleepUpdate);
 
-        db = Room.databaseBuilder(getApplicationContext(),
-                AppDatabase.class, "sleep_wake").allowMainThreadQueries().build();
+            db = Room.databaseBuilder(getApplicationContext(),
+                    AppDatabase.class, "sleep_wake").allowMainThreadQueries().build();
 
-        sleepDao = db.sleepDao();
+            sleepDao = db.sleepDao();
 
-        getSleepData();
-        if(sleeps.size() > 0) {
-            do_simulation();
-            calculateAwareness();
+            getSleepData();
+            if (sleeps.size() > 0) {
+                do_simulation();
+                calculateAwareness();
 //            sendV0("tester33");
+            }
         }
     }
 
