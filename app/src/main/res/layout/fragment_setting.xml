@@ -13,15 +13,6 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <Button
-            android:id="@+id/onBoardingTestButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="16dp"
-            android:backgroundTint="@color/blue_1"
-            android:text="OnboardingTest"
-            app:cornerRadius="28dp" />
-
         <LinearLayout
             android:id="@+id/LoadDataView"
             android:layout_width="match_parent"

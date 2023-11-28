@@ -123,6 +123,12 @@ public class MainActivity extends AppCompatActivity {
         sharedPref = getSharedPreferences("SleepWake", Context.MODE_PRIVATE);
         editor = sharedPref.edit();
 
+        //If there is no user email, start onBoarding pages
+        if (!sharedPref.contains("User_Name") || !sharedPref.contains("User_Email")) {
+            Intent signIntent = new Intent(MainActivity.this, BeginRegisterActivity.class);
+            startActivity(signIntent);
+        }
+
         //this is in GMT
         nineHours = (1000*60*60*9);
         now = System.currentTimeMillis();
