@@ -120,6 +120,12 @@ public class HomeFragment extends Fragment {
         endTime.setText(sdfDateTimeRecomm.format(new Date(mainActivity.getMainSleepEnd())));
 
         //Graph showing alertness
+        //Change the alertnessDescription
+
+        String user_name = sharedPref.getString("User_Name", "UserName");
+        TextView alertnessDescription = v.findViewById(R.id.AlertnessDescription);
+        alertnessDescription.setText(user_name + "님의 각성도가 낮아요");
+
         ArrayList<BarEntry> barEntries = mainActivity.getBarEntries();
         Log.v("BarEntries", String.valueOf(barEntries.size()));
             //Add data to Entries: form-(x: time, y: alertness value)
@@ -182,6 +188,11 @@ public class HomeFragment extends Fragment {
         AlertnessText.setText("오늘의 권장 취침 시각은 " + originString + " 입니다");
 
         alertnessChart.invalidate();
+
+        //Weekly chart
+        //Set the ChartDescription
+        TextView chartDescription = v.findViewById(R.id.ChartDescription);
+        chartDescription.setText("이번주 " + user_name + "님의 각성도에요");
 
         //Load LinearLayoutManager and BarAdapter for ChartRecyclerView
         LinearLayoutManager chartLinearLayoutManager =

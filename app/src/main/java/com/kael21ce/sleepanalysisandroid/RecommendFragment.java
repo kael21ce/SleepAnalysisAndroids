@@ -40,6 +40,8 @@ public class RecommendFragment extends Fragment {
     String mainSleepStartString,sleepOnsetString, mainSleepEndString, workOnsetString, workOffsetString, napSleepStartString, napSleepEndString;
     String sleepOnsetDisplaying, workOnsetDisplaying, workOffsetDisplaying;
     long now, nineHours;
+    SharedPreferences sharedPref;
+    SharedPreferences.Editor editor;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -69,6 +71,11 @@ public class RecommendFragment extends Fragment {
 
         MainActivity mainActivity = (MainActivity)getActivity();
 
+        sharedPref = getActivity().getSharedPreferences("SleepWake", Context.MODE_PRIVATE);
+        editor = sharedPref.edit();
+
+        String user_name = sharedPref.getString("User_Name", "UserName");
+
         mainSleepStartString = sdfTime.format(new Date(mainActivity.getMainSleepStart()));
         mainSleepEndString = sdfTime.format(new Date(mainActivity.getMainSleepEnd()));
         napSleepStartString = sdfTime.format(new Date(mainActivity.getNapSleepStart()));
@@ -94,10 +101,16 @@ public class RecommendFragment extends Fragment {
         TextView hopeTimeText = v.findViewById(R.id.HopeTimeDetail);
         TextView workTimeStart = v.findViewById(R.id.WorkTimeStart);
         TextView workTimeEnd = v.findViewById(R.id.WorkTimeEnd);
+        TextView infoText = v.findViewById(R.id.InfoText);
+        TextView clockTitleRecommend = v.findViewById(R.id.ClockTitleRecommend);
 
         hopeTimeText.setText(sleepOnsetDisplaying);
         workTimeStart.setText(workOnsetDisplaying);
         workTimeEnd.setText(workOffsetDisplaying);
+
+        //User name setting
+        infoText.setText(user_name + "님을 위한 정보");
+        clockTitleRecommend.setText(user_name + "님을 위한 추천 수면");
 
                 //Initial Button Setting
         sleepButton.setBackground(ResourcesCompat
