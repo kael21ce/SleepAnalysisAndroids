@@ -187,8 +187,10 @@ public class MainActivity extends AppCompatActivity {
             editor.putBoolean("isSchedule", false);
             editor.apply();
             getSupportFragmentManager().beginTransaction().replace(R.id.mainFrame, scheduleFragment).commit();
+            setBottomNaviItem(R.id.tabSchedule);
         }else {
             getSupportFragmentManager().beginTransaction().replace(R.id.mainFrame, homeFragment).commit();
+            setBottomNaviItem(R.id.tabHome);
         }
         getSupportActionBar().setTitle(Html.fromHtml("<font color='#223047'>SleepWake</font>"));
 
@@ -830,6 +832,24 @@ public class MainActivity extends AppCompatActivity {
         this.lastSleepUpdate = lastSleepUpdate;
         editor.putLong("lastSleepUpdate", lastSleepUpdate);
         editor.apply();
+    }
+
+    public void setGoneBottomNavi() {
+        if (bottomNavigationView != null) {
+            bottomNavigationView.setVisibility(View.GONE);
+        }
+    }
+
+    public void setVisibleBottomNavi() {
+        if (bottomNavigationView != null) {
+            bottomNavigationView.setVisibility(View.VISIBLE);
+        }
+    }
+
+    public void setBottomNaviItem(int selected_id) {
+        if (bottomNavigationView != null) {
+            bottomNavigationView.setSelectedItemId(selected_id);
+        }
     }
 
 }
