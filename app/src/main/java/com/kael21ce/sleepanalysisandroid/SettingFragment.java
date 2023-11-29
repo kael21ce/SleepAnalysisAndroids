@@ -15,6 +15,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.kael21ce.sleepanalysisandroid.data.Sleep;
 
 public class SettingFragment extends Fragment {
@@ -26,6 +27,8 @@ public class SettingFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_setting, container, false);
+
+        MainActivity mainActivity = (MainActivity)getActivity();
 
         LinearLayout onsetView = v.findViewById(R.id.OnsetView);
         ImageView onsetButton = v.findViewById(R.id.OnsetButton);
@@ -41,6 +44,14 @@ public class SettingFragment extends Fragment {
                 onsetView.setBackgroundResource(R.drawable.setting_stroke);
                 ObjectAnimator.ofFloat(onsetButton, View.ROTATION, 90f, 0f).setDuration(100).start();
             }
+        });
+
+        //Test for time setting
+        Button timeSettingButton = v.findViewById(R.id.timeSettingButton);
+        timeSettingButton.setOnClickListener(view -> {
+            WhenSleepFragment whenSleepFragment = new WhenSleepFragment();
+            getParentFragmentManager().beginTransaction().replace(R.id.mainFrame, whenSleepFragment).commit();
+            mainActivity.setGoneBottomNavi();
         });
         return v;
     }
