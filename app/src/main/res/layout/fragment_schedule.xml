@@ -27,17 +27,6 @@
                 android:background="@drawable/corner_half_16"
                 android:orientation="vertical">
                 <!--Calendar-->
-                <!--
-                <CalendarView
-                    android:id="@+id/CalendarView"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_margin="16dp"
-                    android:focusedMonthDateColor="@color/black"
-                    android:unfocusedMonthDateColor="@color/gray_1"
-                    android:visibility="gone"
-                    />
-                    -->
                 <com.prolificinteractive.materialcalendarview.MaterialCalendarView
                     android:id="@+id/CalendarView"
                     android:layout_width="match_parent"
@@ -48,8 +37,16 @@
                     app:mcv_showOtherDates="defaults"
                     app:mcv_dateTextAppearance="@style/CalendarDate"
                     android:visibility="visible"
-                    android:layout_marginBottom="8dp"
                     />
+
+                <LinearLayout
+                    android:id="@+id/calendarHandler"
+                    android:layout_width="100dp"
+                    android:layout_height="8dp"
+                    android:layout_gravity="center_horizontal"
+                    android:background="@drawable/corner_16_black"
+                    android:layout_marginVertical="16dp"
+                    android:orientation="horizontal"></LinearLayout>
 
 
             </LinearLayout>

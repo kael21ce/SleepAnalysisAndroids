@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 
 import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
@@ -13,6 +14,7 @@ import androidx.fragment.app.Fragment;
 import com.kael21ce.sleepanalysisandroid.data.Awareness;
 import com.kael21ce.sleepanalysisandroid.data.Sleep;
 import com.prolificinteractive.materialcalendarview.CalendarDay;
+import com.prolificinteractive.materialcalendarview.CalendarMode;
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
 
 import java.text.ParseException;
@@ -28,7 +30,7 @@ import java.util.Map;
 public class ScheduleFragment extends Fragment {
 
     public MaterialCalendarView calendarView;
-    private View overlayView;
+    private boolean isFolded = false;
     public Fragment intervalFragment;
 
     public Map<Long, List<Sleep>> sleepsData;
@@ -138,6 +140,19 @@ public class ScheduleFragment extends Fragment {
         reportedDecorator.setResources(getResources());
         reportedDecorator.setSleepsData(sleepsData);
         calendarView.addDecorator(reportedDecorator);
+
+        //Make foldable calendar
+        LinearLayout handle = v.findViewById(R.id.calendarHandler);
+        handle.setOnClickListener(view -> {
+            Log.v("CalendarHandler", "Clicked");
+            if (isFolded == false) {
+                isFolded = true;
+                calendarView.state().edit().setCalendarDisplayMode(CalendarMode.WEEKS).commit();
+            } else {
+                isFolded = false;
+                calendarView.state().edit().setCalendarDisplayMode(CalendarMode.MONTHS).commit();
+            }
+        });
 
         //Add sleep interval to specific date
         calendarView.setOnDateChangedListener((widget, Cdate, selected) -> {
