@@ -45,7 +45,7 @@ public class SettingFragment extends Fragment {
                 ObjectAnimator.ofFloat(onsetButton, View.ROTATION, 90f, 0f).setDuration(100).start();
             }
         });
-
+        /*
         //Test for time setting
         Button timeSettingButton = v.findViewById(R.id.timeSettingButton);
         timeSettingButton.setOnClickListener(view -> {
@@ -53,6 +53,8 @@ public class SettingFragment extends Fragment {
             getParentFragmentManager().beginTransaction().replace(R.id.mainFrame, whenSleepFragment).commit();
             mainActivity.setGoneBottomNavi();
         });
+
+         */
         return v;
     }
 }
