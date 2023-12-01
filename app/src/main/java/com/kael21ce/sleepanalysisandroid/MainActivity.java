@@ -405,7 +405,9 @@ public class MainActivity extends AppCompatActivity {
             if(simulationResult.size() - 288 <= i){
                 Log.v("BAR ENTRY", sdfDateTime.format(new Date(startProcess + (i*fiveMinutesToMil))));
                 Log.v("WTF", "WTF");
-                barEntries.add(new BarEntry((float) barIdx, (float) getAwarenessValue(res[3], res[2], res[1], res[0])));
+                float value = (float) getAwarenessValue(res[3], res[2], res[1], res[0]);
+                //Normalization
+                barEntries.add(new BarEntry((float) barIdx, value*100f/3f));
                 barIdx += addBarIdx;
             }
         }
@@ -455,7 +457,8 @@ public class MainActivity extends AppCompatActivity {
             double[] res = simulationResult.get(i);
             double awarenessVal = getAwarenessValue(res[3], res[2], res[1], res[0]);
             awarenessVal = Double.min(3.0, Double.max(-3.0, awarenessVal));
-            barEntries.add(new BarEntry(barIdx, (float)awarenessVal));
+            float fAwarenessVal = (float) awarenessVal;
+            barEntries.add(new BarEntry(barIdx, fAwarenessVal*100f/3.0f));
             barIdx += addBarIdx;
         }
     }

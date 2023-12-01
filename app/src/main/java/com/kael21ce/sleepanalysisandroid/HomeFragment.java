@@ -3,6 +3,7 @@ package com.kael21ce.sleepanalysisandroid;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.util.Log;
@@ -27,6 +28,7 @@ import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.formatter.ValueFormatter;
+import com.github.mikephil.charting.utils.ViewPortHandler;
 import com.kael21ce.sleepanalysisandroid.data.Awareness;
 
 import java.text.SimpleDateFormat;
@@ -134,15 +136,23 @@ public class HomeFragment extends Fragment {
         ArrayList<Integer> barColors = new ArrayList<>();
         for (int i = 0; i < barEntries.size(); i++) {
             if (barEntries.get(i).getY() > 0f) {
-                barColors.add(ResourcesCompat.getColor(getResources(), R.color.green_2, null));
+                if (barEntries.get(i).getX() >= 23.92f && barEntries.get(i).getX() <= 24.08f) {
+                    barColors.add(ResourcesCompat.getColor(getResources(), R.color.blue_1, null));
+                } else {
+                    barColors.add(ResourcesCompat.getColor(getResources(), R.color.green_2, null));
+                }
             } else {
-                barColors.add(ResourcesCompat.getColor(getResources(), R.color.red_2, null));
+                if (barEntries.get(i).getX() >= 23.92f && barEntries.get(i).getX() <= 24.08f) {
+                    barColors.add(ResourcesCompat.getColor(getResources(), R.color.blue_1, null));
+                } else {
+                    barColors.add(ResourcesCompat.getColor(getResources(), R.color.red_2, null));
+                }
             }
         }
         BarDataSet barDataSet = new BarDataSet(barEntries, "Alertness");
         //Set the color of each bar
         barDataSet.setColors(barColors);
-        barDataSet.setHighlightEnabled(false);
+        barDataSet.setHighlightEnabled(true);
         //Set the width of each bar
         barDataSet.setDrawValues(false);
         BarData barData = new BarData(barDataSet);
@@ -155,6 +165,7 @@ public class HomeFragment extends Fragment {
         alertnessChart.setScaleEnabled(false);
         alertnessChart.setPinchZoom(true);
         alertnessChart.setVisibleXRangeMaximum(10f);
+        alertnessChart.setFitBars(true);
         //Customize the grid
         XAxis xAxis = alertnessChart.getXAxis();
         YAxis leftYAxis = alertnessChart.getAxisLeft();
@@ -186,6 +197,12 @@ public class HomeFragment extends Fragment {
         //Set the time of alertnessText
         String originString = sdfDateTimeRecomm.format(new Date(mainActivity.getMainSleepStart()));
         AlertnessText.setText("오늘의 권장 취침 시각은 " + originString + " 입니다");
+        //Set MarkerView
+        CurrentMarker mv = new CurrentMarker(v.getContext(), R.layout.current_marker);
+        mv.setChartView(alertnessChart);
+        alertnessChart.setMarker(mv);
+        //Set the current time always Highlight
+        alertnessChart.highlightValue(24f, 0);
 
         alertnessChart.invalidate();
 
@@ -365,8 +382,8 @@ public class HomeFragment extends Fragment {
         yAxis.setAxisLineColor(ResourcesCompat.getColor(getResources(), R.color.gray_4, null));
         yAxis.setGridColor(ResourcesCompat.getColor(getResources(), R.color.gray_4, null));
         //Set the displaying range
-        yAxis.setAxisMinimum(-3f);
-        yAxis.setAxisMaximum(3f);
+        yAxis.setAxisMinimum(-100f);
+        yAxis.setAxisMaximum(100f);
     }
 
     //Customize the label
