@@ -18,6 +18,11 @@ public class CheckActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_check);
 
+        //Hide action bar
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().hide();
+        }
+
         //Turn on the checkButton whether email is valid or not
         Button checkButton = findViewById(R.id.checkButton);
         checkButton.setEnabled(false);

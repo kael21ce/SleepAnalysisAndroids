@@ -129,6 +129,11 @@ public class MainActivity extends AppCompatActivity {
             startActivity(signIntent);
         }
 
+        //Show action bar
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().show();
+        }
+
         //this is in GMT
         nineHours = (1000*60*60*9);
         now = System.currentTimeMillis();

@@ -13,6 +13,11 @@ public class BeginRegisterActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_begin_register);
 
+        //Hide action bar
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().hide();
+        }
+
         Button beginButton = findViewById(R.id.beginButton);
         beginButton.setOnClickListener(view -> {
             //Move to CheckActivity
