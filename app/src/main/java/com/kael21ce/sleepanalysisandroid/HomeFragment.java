@@ -2,6 +2,7 @@ package com.kael21ce.sleepanalysisandroid;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -221,6 +222,14 @@ public class HomeFragment extends Fragment {
         }
 
         alertnessChart.invalidate();
+
+        //Move to SurveyActivity if surveyButton is clicked
+        ImageButton surveyButton = v.findViewById(R.id.surveyButton);
+        surveyButton.setOnClickListener(view -> {
+            Intent surveyIntent = new Intent(v.getContext(), SurveyActivity.class);
+            startActivity(surveyIntent);
+        });
+
 
         //Weekly chart
         //Set the ChartDescription

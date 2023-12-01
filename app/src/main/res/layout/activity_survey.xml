@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".SurveyActivity">
+
+    <LinearLayout
+        android:id="@+id/backButtonSurveyCaption"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <ImageButton
+            android:id="@+id/surveyBackButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/white"
+            android:src="@drawable/chevron_left" />
+
+        <LinearLayout
+            android:id="@+id/nextTextCaption"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="right"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/nextText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:text="건너뛰기"
+                android:layout_marginRight="16dp"
+                android:fontFamily="@font/pretendardvariable"
+                android:textColor="@color/black"
+                android:textSize="16sp" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/surveyTextCaption"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/SurveyTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/pretendardbold"
+            android:text="오늘은 얼마나 가뿐하신가요?"
+            android:textColor="@color/black"
+            android:textSize="24dp" />
+
+        <TextView
+            android:id="@+id/SurveyDescription"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:fontFamily="@font/pretendardbold"
+            android:text="지금의 각성도를 잘 메모해둘게요 :)"
+            android:textColor="@color/gray_4" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/surveyLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="32dp"
+        android:orientation="vertical">
+
+        <ImageView
+            android:id="@+id/AwarenessEmoji"
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_margin="20dp"
+            android:src="@drawable/puke" />
+
+        <TextView
+            android:id="@+id/EmojiDescription"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:fontFamily="@font/pretendardbold"
+            android:gravity="center"
+            android:text="매우 졸림"
+            android:textColor="@color/black"
+            android:textSize="24sp" />
+
+        <LinearLayout
+            android:id="@+id/seekButtonLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="40dp"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/seek1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="2dp"
+                android:layout_weight="1"
+                android:backgroundTint="@color/black" />
+
+            <Button
+                android:id="@+id/seek2"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="2dp"
+                android:layout_weight="1"
+                android:backgroundTint="@color/gray_3" />
+
+            <Button
+                android:id="@+id/seek3"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="2dp"
+                android:layout_weight="1"
+                android:backgroundTint="@color/gray_3" />
+
+            <Button
+                android:id="@+id/seek4"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="2dp"
+                android:layout_weight="1"
+                android:backgroundTint="@color/gray_3" />
+
+            <Button
+                android:id="@+id/seek5"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="2dp"
+                android:layout_weight="1"
+                android:backgroundTint="@color/gray_3" />
+
+            <Button
+                android:id="@+id/seek6"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="2dp"
+                android:layout_weight="1"
+                android:backgroundTint="@color/gray_3" />
+
+            <Button
+                android:id="@+id/seek7"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="2dp"
+                android:layout_weight="1"
+                android:backgroundTint="@color/gray_3" />
+
+            <Button
+                android:id="@+id/seek8"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="2dp"
+                android:layout_weight="1"
+                android:backgroundTint="@color/gray_3" />
+
+            <Button
+                android:id="@+id/seek9"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="2dp"
+                android:text=""
+                android:layout_weight="1"
+                android:backgroundTint="@color/gray_3" />
+
+            <Button
+                android:id="@+id/seek10"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="2dp"
+                android:layout_weight="1"
+                android:backgroundTint="@color/gray_3" />
+
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="bottom"
+        android:orientation="vertical">
+
+        <Button
+            android:id="@+id/endSurveyButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginBottom="48dp"
+            android:backgroundTint="@color/blue_1"
+            android:fontFamily="@font/pretendardvariable"
+            android:padding="16dp"
+            android:text="시작하기"
+            android:textSize="16sp"
+            app:cornerRadius="28dp" />
+    </LinearLayout>
+
+</LinearLayout>
