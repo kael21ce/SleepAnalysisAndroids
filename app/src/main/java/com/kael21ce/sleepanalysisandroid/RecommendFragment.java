@@ -11,6 +11,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.compose.ui.text.font.FontVariation;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 import androidx.room.Room;
@@ -107,6 +108,7 @@ public class RecommendFragment extends Fragment {
         TextView workTimeEnd = v.findViewById(R.id.WorkTimeEnd);
         TextView infoText = v.findViewById(R.id.InfoText);
         TextView clockTitleRecommend = v.findViewById(R.id.ClockTitleRecommend);
+        ImageButton infoButton = v.findViewById(R.id.infoButton);
 
         hopeTimeText.setText(sleepOnsetDisplaying);
         workTimeStart.setText(workOnsetDisplaying);
@@ -115,6 +117,15 @@ public class RecommendFragment extends Fragment {
         //User name setting
         infoText.setText(user_name + "님을 위한 정보");
         clockTitleRecommend.setText(user_name + "님을 위한 추천 수면");
+
+        //Move to setting if infoButton is clicked
+        SettingFragment settingFragment = new SettingFragment();
+        infoButton.setOnClickListener(view -> {
+            Bundle settingBundle = new Bundle();
+            settingFragment.setArguments(settingBundle);
+            settingBundle.putString("isClicked", "Yes");
+            getParentFragmentManager().beginTransaction().replace(R.id.mainFrame, settingFragment).commit();
+        });
 
                 //Initial Button Setting
         sleepButton.setBackground(ResourcesCompat

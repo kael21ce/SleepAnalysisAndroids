@@ -32,6 +32,17 @@ public class SettingFragment extends Fragment {
 
         LinearLayout onsetView = v.findViewById(R.id.OnsetView);
         ImageView onsetButton = v.findViewById(R.id.OnsetButton);
+
+        //Get the information about whether infoButton is clicked
+        if (getArguments() != null) {
+            String reply = getArguments().getString("isClicked");
+            if (reply.equals("Yes")) {
+                isFolded = false;
+                getChildFragmentManager().beginTransaction().replace(R.id.SettingView, sleepOnsetFragment).commit();
+                onsetView.setBackground(AppCompatResources.getDrawable(v.getContext(), R.color.gray_1));
+                ObjectAnimator.ofFloat(onsetButton, View.ROTATION, 0f, 90f).setDuration(100).start();
+            }
+        }
         onsetView.setOnClickListener(view -> {
             if (isFolded) {
                 isFolded = false;
