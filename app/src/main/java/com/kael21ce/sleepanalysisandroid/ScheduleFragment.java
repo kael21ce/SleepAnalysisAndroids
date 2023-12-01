@@ -1,11 +1,14 @@
 package com.kael21ce.sleepanalysisandroid;
 
+import android.animation.ObjectAnimator;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 
 import androidx.core.content.res.ResourcesCompat;
@@ -30,7 +33,7 @@ import java.util.Map;
 public class ScheduleFragment extends Fragment {
 
     public MaterialCalendarView calendarView;
-    private boolean isFolded = false;
+    private boolean isFolded;
     public Fragment intervalFragment;
 
     public Map<Long, List<Sleep>> sleepsData;
@@ -48,6 +51,8 @@ public class ScheduleFragment extends Fragment {
 
         nineHours = (1000*9*60*60);
         now = System.currentTimeMillis();
+        SharedPreferences sharedPref = getActivity().getSharedPreferences("SleepWake", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
 
         //get sleep data and calculate map values
         List<Sleep> sleeps = mainActivity.getSleeps();
@@ -140,17 +145,39 @@ public class ScheduleFragment extends Fragment {
         reportedDecorator.setResources(getResources());
         reportedDecorator.setSleepsData(sleepsData);
         calendarView.addDecorator(reportedDecorator);
+        ImageButton handle = v.findViewById(R.id.calendarHandler);
+
+        //Set the default mode of calendar
+        if (sharedPref.contains("isFolded")) {
+            boolean isFolded = sharedPref.getBoolean("isFolded", false);
+            Log.v("isFolded", "isFolded: " + isFolded);
+            if (!isFolded) {
+                calendarView.state().edit().setCalendarDisplayMode(CalendarMode.MONTHS).commit();
+            } else {
+                ObjectAnimator.ofFloat(handle, View.ROTATION, 0f, 180f).setDuration(200).start();
+                calendarView.state().edit().setCalendarDisplayMode(CalendarMode.WEEKS).commit();
+            }
+        }
 
         //Make foldable calendar
-        LinearLayout handle = v.findViewById(R.id.calendarHandler);
         handle.setOnClickListener(view -> {
-            Log.v("CalendarHandler", "Clicked");
-            if (isFolded == false) {
-                isFolded = true;
+            //Save whether folded or not
+            if (!sharedPref.contains("isFolded")) {
+                editor.putBoolean("isFolded", false);
+                editor.apply();
+            }
+            boolean isFolded = sharedPref.getBoolean("isFolded", false);
+            Log.v("CalendarHandler", "isFolded: " + isFolded);
+            if (!isFolded) {
+                ObjectAnimator.ofFloat(handle, View.ROTATION, 0f, 180f).setDuration(200).start();
                 calendarView.state().edit().setCalendarDisplayMode(CalendarMode.WEEKS).commit();
+                editor.putBoolean("isFolded", true);
+                editor.apply();
             } else {
-                isFolded = false;
                 calendarView.state().edit().setCalendarDisplayMode(CalendarMode.MONTHS).commit();
+                ObjectAnimator.ofFloat(handle, View.ROTATION, 180f, 0f).setDuration(200).start();
+                editor.putBoolean("isFolded", false);
+                editor.apply();
             }
         });
 
