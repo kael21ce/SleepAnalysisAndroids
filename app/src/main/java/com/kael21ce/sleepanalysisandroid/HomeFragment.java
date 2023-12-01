@@ -128,7 +128,7 @@ public class HomeFragment extends Fragment {
 
         String user_name = sharedPref.getString("User_Name", "UserName");
         TextView alertnessDescription = v.findViewById(R.id.AlertnessDescription);
-        alertnessDescription.setText(user_name + "님의 각성도가 낮아요");
+        TextView alertnessTitle = v.findViewById(R.id.AlertnessRecommend);
 
         ArrayList<BarEntry> barEntries = mainActivity.getBarEntries();
         Log.v("BarEntries", String.valueOf(barEntries.size()));
@@ -205,6 +205,15 @@ public class HomeFragment extends Fragment {
         alertnessChart.setMarker(mv);
         //Set the current time always Highlight
         alertnessChart.highlightValue(24f, 0);
+        //Change the description depending on current alertness
+        float currentAlertness = barEntries.get(288).getY();
+        if (currentAlertness >= 0) {
+            alertnessTitle.setText("집중하기 좋은 상태에요");
+            alertnessDescription.setText(user_name + "님의 각성도가 높아요");
+        } else {
+            alertnessTitle.setText("잠시 바람 쐬는 건 어때요?");
+            alertnessDescription.setText(user_name + "님의 각성도가 낮아요");
+        }
 
         alertnessChart.invalidate();
 
