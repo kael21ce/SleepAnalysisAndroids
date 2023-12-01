@@ -186,17 +186,42 @@
                     android:background="@drawable/corner_8"
                     android:orientation="horizontal">
 
-                    <TextView
-                        android:id="@+id/StateDescriptionHomeText"
+                    <ImageView
+                        android:id="@+id/StateDescriptionHomeImage"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginLeft="12dp"
+                        android:src="@drawable/sleep" />
+
+                    <LinearLayout
+                        android:id="@+id/StateDescriptioinHomeCaption"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:fontFamily="@font/pretendardbold"
-                        android:gravity="center"
-                        android:text="각성도가 낮아요!\n이 시간엔 꼭 주무세요"
-                        android:textAlignment="center"
-                        android:textColor="@color/black"
-                        android:textSize="20sp" />
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginHorizontal="12dp"
+                        android:layout_marginVertical="16dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/StateDescriptionHomeText"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/pretendardbold"
+                            android:text="잠을 자기 좋은 시간이에요"
+                            android:textColor="@color/black"
+                            android:textSize="20sp" />
+
+                        <TextView
+                            android:id="@+id/StateDescriptionHomeSmallText"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:fontFamily="@font/pretendardbold"
+                            android:text="기상시간을 지켜주세요"
+                            android:textColor="@color/gray_4" />
+                    </LinearLayout>
+
                 </LinearLayout>
 
             </LinearLayout>

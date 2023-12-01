@@ -65,6 +65,8 @@ public class HomeFragment extends Fragment {
         TextView sleepImportanceText = v.findViewById(R.id.sleepImprotanceHomeText);
         TextView sleepTypeText = v.findViewById(R.id.sleepTypeHomeText);
         TextView stateDescriptionText = v.findViewById(R.id.StateDescriptionHomeText);
+        TextView stateDescriptionSmallText = v.findViewById(R.id.StateDescriptionHomeSmallText);
+        ImageView stateDescriptionImage = v.findViewById(R.id.StateDescriptionHomeImage);
         ClockView clockView = v.findViewById(R.id.sweepingClockHome);
 
         //Alertness Graph
@@ -91,13 +93,13 @@ public class HomeFragment extends Fragment {
 
         sleepButton.setOnClickListener(v1 -> sleepButtonClick(v1, mainActivity, startTime, endTime,
                 sleepButton, napButton, workButton, sleepTypeText, sleepImportanceText, stateDescriptionText,
-                clockView));
+                stateDescriptionSmallText, stateDescriptionImage, clockView));
         napButton.setOnClickListener(v1 -> napButtonClick(v1, mainActivity, startTime, endTime,
                 sleepButton, napButton, workButton, sleepTypeText, sleepImportanceText, stateDescriptionText,
-                clockView));
+                stateDescriptionSmallText, stateDescriptionImage, clockView));
         workButton.setOnClickListener(v1 -> workButtonClick(v1, mainActivity, startTime, endTime,
                 sleepButton, napButton, workButton, sleepTypeText, sleepImportanceText, stateDescriptionText,
-                clockView));
+                stateDescriptionSmallText, stateDescriptionImage, clockView));
         clockView.setTypeOfInterval(1);
         mainSleepStartString = sdfTime.format(new Date(mainActivity.getMainSleepStart()));
         mainSleepEndString = sdfTime.format(new Date(mainActivity.getMainSleepEnd()));
@@ -281,8 +283,10 @@ public class HomeFragment extends Fragment {
     public void sleepButtonClick(View v, MainActivity mainActivity, TextView startTime, TextView endTime,
                                  ImageButton sleepButton, ImageButton napButton, ImageButton workButton,
                                  TextView sleepTypeText, TextView sleepImportanceText,
-                                 TextView stateDescriptionText, ClockView clockView)
+                                 TextView stateDescriptionText, TextView stateDescriptionSmallText,
+                                 ImageView stateDescriptionImage, ClockView clockView)
     {
+        stateDescriptionSmallText.setVisibility(View.VISIBLE);
         startTime.setText(sdfDateTimeRecomm.format(new Date(mainActivity.getMainSleepStart())));
         endTime.setText(sdfDateTimeRecomm.format(new Date(mainActivity.getMainSleepEnd())));
         //Change the color of buttons
@@ -297,7 +301,9 @@ public class HomeFragment extends Fragment {
         sleepImportanceText.setText("중요");
         sleepImportanceText.setBackground(ResourcesCompat
                 .getDrawable(getResources(), R.drawable.important_caption, null));
-        stateDescriptionText.setText("각성도가 낮아요!\n이 시간엔 꼭 주무세요");
+        stateDescriptionText.setText("잠을 자기 좋은 시간이에요");
+        stateDescriptionSmallText.setText("기상시간을 지켜주세요");
+        stateDescriptionImage.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.sleep, null));
         //Change the clock angle using setAngle and color using setTypeOfInterval
         clockView.setTypeOfInterval(1);
         //Just example
@@ -312,8 +318,10 @@ public class HomeFragment extends Fragment {
     public void napButtonClick(View v, MainActivity mainActivity, TextView startTime, TextView endTime,
                                ImageButton sleepButton, ImageButton napButton, ImageButton workButton,
                                TextView sleepTypeText, TextView sleepImportanceText,
-                               TextView stateDescriptionText, ClockView clockView)
+                               TextView stateDescriptionText, TextView stateDescriptionSmallText,
+                               ImageView stateDescriptionImage, ClockView clockView)
     {
+        stateDescriptionSmallText.setVisibility(View.VISIBLE);
         startTime.setText(sdfDateTimeRecomm.format(new Date(mainActivity.getNapSleepStart())));
         endTime.setText(sdfDateTimeRecomm.format(new Date(mainActivity.getNapSleepEnd())));
         //Change the color of buttons
@@ -328,7 +336,9 @@ public class HomeFragment extends Fragment {
         sleepImportanceText.setText("권장");
         sleepImportanceText.setBackground(ResourcesCompat
                 .getDrawable(getResources(), R.drawable.recommend_caption, null));
-        stateDescriptionText.setText("이때 주무시면 덜 피곤할거에요");
+        stateDescriptionText.setText("낮잠을 주무세요");
+        stateDescriptionSmallText.setText("맑은 정신을 유지할 수 있어요");
+        stateDescriptionImage.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.sleep, null));
         clockView.setTypeOfInterval(2);
         //Just example
         if(!napSleepStartString.equals(napSleepEndString)) {
@@ -336,7 +346,9 @@ public class HomeFragment extends Fragment {
             clockView.setAngleFromTime(napSleepStartString, napSleepEndString);
         }else{
             clockView.setVisibility(View.INVISIBLE);
-            stateDescriptionText.setText("낮잠이 필요하지 않습니다");
+            stateDescriptionText.setText("낮잠이 필요하지 않아요");
+            stateDescriptionSmallText.setText("낮잠 없이도 맑은 정신을 유지할 수 있어요");
+            stateDescriptionImage.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.laugh, null));
             startTime.setText("--:--");
             endTime.setText("--:--");
         }
@@ -345,8 +357,10 @@ public class HomeFragment extends Fragment {
     public void workButtonClick(View v, MainActivity mainActivity, TextView startTime, TextView endTime,
                                 ImageButton sleepButton, ImageButton napButton, ImageButton workButton,
                                 TextView sleepTypeText, TextView sleepImportanceText,
-                                TextView stateDescriptionText, ClockView clockView)
+                                TextView stateDescriptionText, TextView stateDescriptionSmallText,
+                                ImageView stateDescriptionImage, ClockView clockView)
     {
+        stateDescriptionSmallText.setVisibility(View.GONE);
         startTime.setText(sdfDateTimeRecomm.format(new Date(mainActivity.getWorkOnset())));
         endTime.setText(sdfDateTimeRecomm.format(new Date(mainActivity.getWorkOffset())));
         //Change the color of buttons
@@ -362,6 +376,7 @@ public class HomeFragment extends Fragment {
         sleepImportanceText.setBackground(ResourcesCompat
                 .getDrawable(getResources(), R.drawable.important_caption, null));
         stateDescriptionText.setText("가장 각성도가 높은 시간이에요");
+        stateDescriptionImage.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.smile, null));
         clockView.setTypeOfInterval(3);
         //Just example
         clockView.setVisibility(View.VISIBLE);
