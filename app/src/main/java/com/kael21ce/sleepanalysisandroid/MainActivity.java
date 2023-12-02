@@ -100,6 +100,7 @@ public class MainActivity extends AppCompatActivity {
     private List<Sleep> sleeps;
     private List<Awareness> awarenesses;
     private List<V0> v0s;
+    String email, username;
     long now, nineHours;
     long twoWeeks = (1000*60*60*24*14);
     long fiveMinutesToMil = (1000*60*5);
@@ -142,6 +143,8 @@ public class MainActivity extends AppCompatActivity {
         //update variables
         lastSleepUpdate = sharedPref.getLong("lastSleepUpdate", now - twoWeeks);
         lastDataUpdate = sharedPref.getLong("lastDataUpdate", now - twoWeeks);
+        email = sharedPref.getString("User_Email", "tester33");
+        username = sharedPref.getString("User_Name", "tester33");
 
         //user sleep variables
         sleepOnset = sharedPref.getLong("sleepOnset", now);
@@ -183,7 +186,7 @@ public class MainActivity extends AppCompatActivity {
         if(sleeps.size() > 0) {
             do_simulation();
             calculateAwareness();
-//            sendV0("tester33");
+//            sendV0(username);
         }
 
         //Hide navigation bar
@@ -276,7 +279,7 @@ public class MainActivity extends AppCompatActivity {
             if (sleeps.size() > 0) {
                 do_simulation();
                 calculateAwareness();
-//            sendV0("tester33");
+//            sendV0(username);
             }
         }
     }
