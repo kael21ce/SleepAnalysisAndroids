@@ -3,14 +3,28 @@ package com.kael21ce.sleepanalysisandroid;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.res.ResourcesCompat;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.kael21ce.sleepanalysisandroid.data.DataModal;
+import com.kael21ce.sleepanalysisandroid.data.DataSurvey;
+import com.kael21ce.sleepanalysisandroid.data.RetrofitAPI;
 
 import java.util.ArrayList;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class SurveyActivity extends AppCompatActivity {
     private int level = 1;
@@ -147,6 +161,48 @@ public class SurveyActivity extends AppCompatActivity {
                 description.setText("매우 졸림");
             }
         }
+    }
+
+    private void sendSurvey(){
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("https://sleep-math.com/sleepapp/")
+                // as we are sending data in json format so
+                // we have to add Gson converter factory
+                .addConverterFactory(GsonConverterFactory.create())
+                // at last we are building our retrofit builder.
+                .build();
+        RetrofitAPI retrofitAPI = retrofit.create(RetrofitAPI.class);
+        SharedPreferences sharedPref = getSharedPreferences("SleepWake", Context.MODE_PRIVATE);
+        String username = sharedPref.getString("User_Name", "tester33");
+        long time = System.currentTimeMillis();
+        long sleep_onset = sharedPref.getLong("sleepOnset", time);
+        long work_onset = sharedPref.getLong("workOnset", time);
+        long work_offset = sharedPref.getLong("workOffset", time);
+
+        DataSurvey survey = new DataSurvey(username, sleep_onset, work_onset, work_offset, getLevel(), time);
+        Call<DataSurvey> call = retrofitAPI.createSurvey(survey);
+        call.enqueue(new Callback<DataSurvey>() {
+            @Override
+            public void onResponse(Call<DataSurvey> call, Response<DataSurvey> response) {
+                // this method is called when we get response from our api.
+                Toast.makeText(SurveyActivity.this, "Data added to API", Toast.LENGTH_SHORT).show();
+
+                // we are getting response from our body
+                // and passing it to our modal class.
+                DataSurvey responseFromAPI = response.body();
+
+                // on below line we are getting our data from modal class and adding it to our string.
+                String responseString = "Response Code : " + response.code() + "\nName : "  + "\n" ;
+                Log.v("RESPONSE", responseString);
+            }
+
+            @Override
+            public void onFailure(Call<DataSurvey> call, Throwable t) {
+                // setting text to our text view when
+                // we get error response from API.
+                Log.v("ERROR", "Error found is : " + t.getMessage());
+            }
+        });
     }
 
     //Return level

@@ -9,4 +9,9 @@ public interface RetrofitAPI {
 
         //on below line we are creating a method to post our data.
     Call<DataModal> createPost(@Body DataModal dataModal);
+
+
+    @POST("survey/")
+
+    Call<DataSurvey> createSurvey(@Body DataSurvey dataSurvey);
 }
