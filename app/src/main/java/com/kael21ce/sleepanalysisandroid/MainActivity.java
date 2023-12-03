@@ -94,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
     //for fragment too
     private long mainSleepStart, mainSleepEnd, napSleepStart, napSleepEnd;
     private long sleepOnset, workOnset, workOffset;
-    private long lastSleepUpdate, lastDataUpdate;
+    private long lastSleepUpdate, lastDataUpdate, lastBackendUpdate;
 
     AppDatabase db;
     private List<Sleep> sleeps;
@@ -143,6 +143,7 @@ public class MainActivity extends AppCompatActivity {
         //update variables
         lastSleepUpdate = sharedPref.getLong("lastSleepUpdate", now - twoWeeks);
         lastDataUpdate = sharedPref.getLong("lastDataUpdate", now - twoWeeks);
+        lastBackendUpdate = sharedPref.getLong("lastBackendUpdate", now - twoWeeks);
         email = sharedPref.getString("User_Email", "tester33");
         username = sharedPref.getString("User_Name", "tester33");
 
@@ -186,7 +187,12 @@ public class MainActivity extends AppCompatActivity {
         if(sleeps.size() > 0) {
             do_simulation();
             calculateAwareness();
-//            sendV0(username);
+            if(now-lastBackendUpdate >= (1000*60*60*24)) {
+                sendV0(username);
+                lastBackendUpdate = now;
+                editor.putLong("lastBackendUpdate", now);
+                editor.apply();
+            }
         }
 
         //Hide navigation bar
@@ -279,7 +285,12 @@ public class MainActivity extends AppCompatActivity {
             if (sleeps.size() > 0) {
                 do_simulation();
                 calculateAwareness();
-//            sendV0(username);
+                if(now-lastBackendUpdate >= (1000*60*60*24)) {
+                    sendV0(username);
+                    lastBackendUpdate = now;
+                    editor.putLong("lastBackendUpdate", now);
+                    editor.apply();
+                }
             }
         }
     }
@@ -625,22 +636,21 @@ public class MainActivity extends AppCompatActivity {
                 // at last we are building our retrofit builder.
                 .build();
         RetrofitAPI retrofitAPI = retrofit.create(RetrofitAPI.class);
-//        List<Sleep> testSleep = new ArrayList<>();
-//        Sleep testSleep1 = new Sleep();
-//        testSleep1.sleepStart = 0;
-//        testSleep1.sleepEnd = 10;
-//        testSleep.add(testSleep1);
-//
-//        List<V0> testV0 = new ArrayList<>();
-//        V0 testV01 = new V0();
-//        testV01.y_val = 0.1;
-//        testV01.n_val = 0.1;
-//        testV01.H_val = 0.1;
-//        testV01.x_val = 0.1;
-//        testV01.time = 0;
-//        testV0.add(testV01);
 
-        DataModal modal = new DataModal(username, sleeps, v0s);
+        List<Sleep> tempSleep = new ArrayList<>();
+        List<V0> tempV0 = new ArrayList<>();
+        for(Sleep sleep: sleeps){
+            if(sleep.sleepStart >= lastBackendUpdate){
+                tempSleep.add(sleep);
+            }
+        }
+        for(V0 v0: v0s){
+            if(v0.time >= lastBackendUpdate){
+                tempV0.add(v0);
+            }
+        }
+
+        DataModal modal = new DataModal(username, tempSleep, tempV0);
         Call<DataModal> call = retrofitAPI.createPost(modal);
         call.enqueue(new Callback<DataModal>() {
             @Override

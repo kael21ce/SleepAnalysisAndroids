@@ -117,6 +117,7 @@ public class SurveyActivity extends AppCompatActivity {
         endSurveyButton.setOnClickListener(view -> {
             Intent endIntent = new Intent(SurveyActivity.this, MainActivity.class);
             endIntent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+            sendSurvey();
             //Need to add level to dataseet
             startActivity(endIntent);
         });
