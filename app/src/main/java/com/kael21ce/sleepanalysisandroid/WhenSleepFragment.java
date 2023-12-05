@@ -12,8 +12,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 public class WhenSleepFragment extends Fragment {
@@ -26,6 +26,11 @@ public class WhenSleepFragment extends Fragment {
         View v =  inflater.inflate(R.layout.fragment_when_sleep, container, false);
 
         MainActivity mainActivity = (MainActivity)getActivity();
+
+        //Hide action bar
+        if (((AppCompatActivity) getActivity()).getSupportActionBar() != null) {
+            ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
+        }
 
         //Set the user name
         SharedPreferences sharedPref = getActivity().getSharedPreferences("SleepWake", Context.MODE_PRIVATE);
@@ -40,6 +45,11 @@ public class WhenSleepFragment extends Fragment {
             mainActivity.setBottomNaviItem(R.id.tabRecommend);
             RecommendFragment recommendFragment = new RecommendFragment();
             getParentFragmentManager().beginTransaction().replace(R.id.mainFrame, recommendFragment).commit();
+
+            //Show action bar
+            if (((AppCompatActivity) getActivity()).getSupportActionBar() != null) {
+                ((AppCompatActivity) getActivity()).getSupportActionBar().show();
+            }
         });
 
         //Get the sleep onset
@@ -90,10 +100,14 @@ public class WhenSleepFragment extends Fragment {
                 if (whenSleepHour2.getText() == null || whenSleepHour2.getText().toString().isEmpty()) {
                     whenSleepButton.setEnabled(false);
                     whenSleepButton.setBackgroundColor(getResources().getColor(R.color.blue_2, null));
-                } else if (Integer.parseInt(whenSleepHour2.getText().toString()) >= 4 && hour1 != null) {
-                    if (Integer.parseInt(hour1) == 2) {
+                } else if (hour1 != null) {
+                    if (Integer.parseInt(whenSleepHour2.getText().toString()) >= 4 && Integer.parseInt(hour1) == 2) {
                         whenSleepButton.setEnabled(false);
                         whenSleepButton.setBackgroundColor(getResources().getColor(R.color.blue_2, null));
+                    } else {
+                        whenSleepButton.setEnabled(true);
+                        whenSleepButton.setBackgroundColor(getResources().getColor(R.color.blue_1, null));
+                        hour2 = whenSleepHour2.getText().toString();
                     }
                 } else {
                     whenSleepButton.setEnabled(true);
@@ -149,12 +163,14 @@ public class WhenSleepFragment extends Fragment {
             public void afterTextChanged(Editable editable) {}
         });
 
-        //Send sleep onset to whenActivityFragment
+        //Send sleep onset to whenWorkFragment
         whenSleepButton.setOnClickListener(view -> {
             Bundle onSetBundle = new Bundle();
             onSetBundle.putString("SleepOnset", hour1 + hour2 + ":" + minute1 + minute2);
-            //Move to whenActivityFragment
-
+            //Move to whenWorkFragment
+            WhenWorkFragment whenWorkFragment = new WhenWorkFragment();
+            whenWorkFragment.setArguments(onSetBundle);
+            getParentFragmentManager().beginTransaction().replace(R.id.mainFrame, whenWorkFragment).commit();
         });
         return v;
     }
