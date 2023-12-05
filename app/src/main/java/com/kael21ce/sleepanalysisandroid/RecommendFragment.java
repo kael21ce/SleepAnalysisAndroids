@@ -7,8 +7,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.compose.ui.text.font.FontVariation;
@@ -16,6 +18,7 @@ import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 import androidx.room.Room;
 
+import com.bumptech.glide.Glide;
 import com.kael21ce.sleepanalysisandroid.data.AppDatabase;
 import com.kael21ce.sleepanalysisandroid.data.Sleep;
 import com.kael21ce.sleepanalysisandroid.data.SleepDao;
@@ -37,6 +40,7 @@ public class RecommendFragment extends Fragment {
     private TextView stateDescriptionText;
     private TextView stateDescriptionSmallText;
     private ImageView stateDescriptionImage;
+    private LinearLayout InfoView, RecommendClockView;
     SimpleDateFormat sdfDateTime = new SimpleDateFormat("dd/MM/yyyy"+ "HH:mm", Locale.KOREA);
     SimpleDateFormat sdfDateTimeRecomm = new SimpleDateFormat("a hh:mm", Locale.KOREA);
     SimpleDateFormat sdfDateTimeRecomm2 = new SimpleDateFormat("a h시 mm분", Locale.KOREA);
@@ -91,6 +95,35 @@ public class RecommendFragment extends Fragment {
         workOffsetDisplaying = sdfDateTimeRecomm2.format(new Date(mainActivity.getWorkOffset()));
 
         View v = inflater.inflate(R.layout.fragment_recommend, container, false);
+
+        //No data
+        LinearLayout noDataLayout = v.findViewById(R.id.noDataLayout);
+        ImageView no_data = v.findViewById(R.id.no_data);
+        Glide.with(v.getContext()).load(R.raw.no_data).into(no_data);
+        Button addDataButton = v.findViewById(R.id.addDataButton);
+
+        //If no onset, offset data, show noDataLayout
+        InfoView = v.findViewById(R.id.InfoView);
+        RecommendClockView = v.findViewById(R.id.RecommendClockView);
+        TextView noDataDescription = v.findViewById(R.id.noDataDescription);
+        noDataDescription.setText(user_name + "님에게 딱 맞는 수면 패턴을 추천해 드릴게요");
+
+        if (sharedPref2.contains("sleepOnset") && sharedPref2.contains("workOnset") && sharedPref2.contains("workOffset")) {
+            noDataLayout.setVisibility(View.GONE);
+            InfoView.setVisibility(View.VISIBLE);
+            RecommendClockView.setVisibility(View.VISIBLE);
+        } else {
+            noDataLayout.setVisibility(View.VISIBLE);
+            InfoView.setVisibility(View.GONE);
+            RecommendClockView.setVisibility(View.GONE);
+        }
+
+        //Move to WhenSleepFragment
+        addDataButton.setOnClickListener(view -> {
+            WhenSleepFragment whenSleepFragment = new WhenSleepFragment();
+            getParentFragmentManager().beginTransaction().replace(R.id.mainFrame, whenSleepFragment).commit();
+            mainActivity.setGoneBottomNavi();
+        });
 
         sleepButton = v.findViewById(R.id.sleepButton);
         napButton = v.findViewById(R.id.napButton);

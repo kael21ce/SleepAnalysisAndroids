@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.core.content.res.ResourcesCompat;
@@ -20,6 +21,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.components.Description;
 import com.github.mikephil.charting.components.Legend;
@@ -69,10 +71,12 @@ public class HomeFragment extends Fragment {
         TextView stateDescriptionSmallText = v.findViewById(R.id.StateDescriptionHomeSmallText);
         ImageView stateDescriptionImage = v.findViewById(R.id.StateDescriptionHomeImage);
         ClockView clockView = v.findViewById(R.id.sweepingClockHome);
+        LinearLayout RecommendHomeView = v.findViewById(R.id.RecommendHomeView);
 
         //Alertness Graph
         BarChart alertnessChart = v.findViewById(R.id.alertnessChart);
         TextView AlertnessText = v.findViewById(R.id.AlertnessText);
+        LinearLayout AlertnessHomeView = v.findViewById(R.id.AlertnessHomeView);
 
         //Weekly alertness chart
         RecyclerView chartRecycler = v.findViewById(R.id.ChartRecyclerView);
@@ -82,7 +86,36 @@ public class HomeFragment extends Fragment {
         ImageView negativeImage = v.findViewById(R.id.negativeImage);
         TextView positiveNumberText = v.findViewById(R.id.positiveNumberText);
         TextView negativeNumberText = v.findViewById(R.id.negativeNumberText);
+        LinearLayout ChartHomeView = v.findViewById(R.id.ChartHomeView);
 
+        SharedPreferences sharedPref = getActivity().getSharedPreferences("SleepWake", Context.MODE_PRIVATE);
+        String user_name = sharedPref.getString("User_Name", "UserName");
+
+        //No data
+        LinearLayout homeNoDataView = v.findViewById(R.id.homeNoDataView);
+        TextView homeNoDataDescription = v.findViewById(R.id.homeNoDataDescription);
+        ImageButton toRecommendButton = v.findViewById(R.id.toRecommendButton);
+        ImageView no_data = v.findViewById(R.id.no_data_home);
+        Glide.with(v.getContext()).load(R.raw.no_data).into(no_data);
+
+        homeNoDataDescription.setText(user_name + "님의 수면 추천 정보가 없어요");
+        toRecommendButton.setOnClickListener(view -> {
+            RecommendFragment recommendFragment = new RecommendFragment();
+            getParentFragmentManager().beginTransaction().replace(R.id.mainFrame, recommendFragment).commit();
+            mainActivity.setBottomNaviItem(R.id.tabRecommend);
+        });
+
+        if (sharedPref.contains("sleepOnset") && sharedPref.contains("workOnset") && sharedPref.contains("workOffset")) {
+            homeNoDataView.setVisibility(View.GONE);
+            RecommendHomeView.setVisibility(View.VISIBLE);
+            AlertnessHomeView.setVisibility(View.VISIBLE);
+            ChartHomeView.setVisibility(View.VISIBLE);
+        } else {
+            homeNoDataView.setVisibility(View.VISIBLE);
+            RecommendHomeView.setVisibility(View.GONE);
+            AlertnessHomeView.setVisibility(View.GONE);
+            ChartHomeView.setVisibility(View.GONE);
+        }
 
         nineHours = (1000*60*60*9);
         now = System.currentTimeMillis();
@@ -110,7 +143,6 @@ public class HomeFragment extends Fragment {
         workOffsetString = sdfTime.format(new Date(mainActivity.getWorkOffset()));
         sleepOnsetString = sdfDateTime.format(new Date(mainActivity.getSleepOnset()));
 
-        SharedPreferences sharedPref = getActivity().getSharedPreferences("SleepWake", Context.MODE_PRIVATE);
         Log.v("sleep onset", sdfDateTime2.format(new Date(sharedPref.getLong("sleepOnset", now))));
         Log.v("work onset", sdfDateTime2.format(new Date(sharedPref.getLong("workOnset", now))));
         Log.v("work offset", sdfDateTime2.format(new Date(sharedPref.getLong("workOffset", now))));
@@ -127,7 +159,6 @@ public class HomeFragment extends Fragment {
         //Graph showing alertness
         //Change the alertnessDescription
 
-        String user_name = sharedPref.getString("User_Name", "UserName");
         TextView alertnessDescription = v.findViewById(R.id.AlertnessDescription);
         TextView alertnessTitle = v.findViewById(R.id.AlertnessRecommend);
 

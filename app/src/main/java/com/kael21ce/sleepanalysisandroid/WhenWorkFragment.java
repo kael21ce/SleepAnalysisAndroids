@@ -316,8 +316,6 @@ public class WhenWorkFragment extends Fragment {
             if (sleepOnsetTime.equals(workOnsetTime)) {
                 Toast.makeText(v.getContext(), "취침 시간과 집중 시작 시간은 일치하면 안됩니다!",Toast.LENGTH_SHORT).show();
             } else {
-                mainActivity.setVisibleBottomNavi();
-                mainActivity.setBottomNaviItem(R.id.tabRecommend);
                 int index = sleepOnsetTime.indexOf(":");
                 String currentHr = inputSdfTime.format(now);
                 String sleepHr = sleepOnsetTime.substring(0, index);
