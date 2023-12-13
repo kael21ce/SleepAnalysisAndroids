@@ -19,6 +19,7 @@ import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.MainThread;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.compose.runtime.MutableState;
@@ -90,6 +91,8 @@ public class MainActivity extends AppCompatActivity {
     private static Context context;
     SharedPreferences sharedPref;
     SharedPreferences.Editor editor;
+    //Time after click back button
+    private boolean doubleBackToExitPressedOnce = false;
 
     //for fragment too
     private long mainSleepStart, mainSleepEnd, napSleepStart, napSleepEnd;
@@ -196,9 +199,13 @@ public class MainActivity extends AppCompatActivity {
         }
 
         //Hide navigation bar
+        /*
         View decorView = getWindow().getDecorView();
         int uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_FULLSCREEN;
         decorView.setSystemUiVisibility(uiOptions);
+
+         */
+
 
         bottomNavigationView = findViewById(R.id.bottomNavigationView);
         boolean isSchedule = sharedPref.getBoolean("isSchedule", false);
@@ -243,6 +250,25 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
         );
+    }
+
+    //If back button is clicked twice, move out from application
+    @Override
+    public void onBackPressed() {
+        if (doubleBackToExitPressedOnce) {
+            finishAffinity();
+            return;
+        }
+        this.doubleBackToExitPressedOnce = true;
+        Toast.makeText(this, "\'뒤로\' 버튼을 한 번 더 누르시면 종료됩니다",
+                Toast.LENGTH_SHORT).show();
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                doubleBackToExitPressedOnce = false;
+            }
+        }, 2000);
     }
 
     @Override
