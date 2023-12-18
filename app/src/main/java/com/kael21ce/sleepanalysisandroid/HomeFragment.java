@@ -23,6 +23,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.github.mikephil.charting.charts.BarChart;
+import com.github.mikephil.charting.charts.CombinedChart;
 import com.github.mikephil.charting.components.Description;
 import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.components.XAxis;
@@ -30,10 +31,12 @@ import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
+import com.github.mikephil.charting.data.CombinedData;
 import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.utils.ViewPortHandler;
 import com.kael21ce.sleepanalysisandroid.data.Awareness;
+import com.kael21ce.sleepanalysisandroid.data.Sleep;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -177,7 +180,9 @@ public class HomeFragment extends Fragment {
 
         TextView alertnessDescription = v.findViewById(R.id.AlertnessDescription);
         TextView alertnessTitle = v.findViewById(R.id.AlertnessRecommend);
+        CurrentMarker mv = new CurrentMarker(v.getContext(), R.layout.current_marker);
 
+        //BarDataSet 1: alertness
         ArrayList<BarEntry> barEntries = mainActivity.getBarEntries();
         Log.v("BarEntries", String.valueOf(barEntries.size()));
             //Add data to Entries: form-(x: time, y: alertness value)
@@ -200,42 +205,134 @@ public class HomeFragment extends Fragment {
             }
         }
         BarDataSet barDataSet = new BarDataSet(barEntries, "Alertness");
-        //Set the color of each bar
         barDataSet.setColors(barColors);
         barDataSet.setHighlightEnabled(true);
-        //Set the width of each bar
         barDataSet.setDrawValues(false);
-        BarData barData = new BarData(barDataSet);
+
+        //BarDataSet 2: Recommended sleep interval
+        String recommendedOnset = sdfTime.format(new Date(mainActivity.getMainSleepStart()));
+        String recommendedOffset = sdfTime.format(new Date(mainActivity.getMainSleepEnd()));
+        float rOnsetF = mv.timeToX(recommendedOnset);
+        float rOffsetF = mv.timeToX(recommendedOffset);
+        ArrayList sleepIntervalEntries1 = new ArrayList<BarEntry>();
+        ArrayList sleepIntervalEntries2 = new ArrayList<BarEntry>();
+        int[] rBarColors = new int[barEntries.size()];
+        for (int i = 0; i < barEntries.size(); i++) {
+            if (barEntries.get(i).getX() >= rOnsetF && barEntries.get(i).getX() <= rOffsetF) {
+                sleepIntervalEntries1.add(new BarEntry(barEntries.get(i).getX(), -90f));
+                sleepIntervalEntries2.add(new BarEntry(barEntries.get(i).getX(), 90f));
+            } else {
+                sleepIntervalEntries1.add(new BarEntry(barEntries.get(i).getX(), 0f));
+                sleepIntervalEntries2.add(new BarEntry(barEntries.get(i).getX(), 0f));
+            }
+            rBarColors[i] = ResourcesCompat.getColor(getResources(), R.color.black, null);
+        }
+        BarDataSet sleepSet1 = new BarDataSet(sleepIntervalEntries1, "Sleep_Interval_1");
+        BarDataSet sleepSet2 = new BarDataSet(sleepIntervalEntries2, "Sleep_Interval_2");
+        sleepSet1.setColors(rBarColors, 20);
+        sleepSet2.setColors(rBarColors, 20);
+
+        //BarDataSet 3: Work interval
+        String workOnset = sdfTime.format(new Date(mainActivity.getWorkOnset()));
+        String workOffset = sdfTime.format(new Date(mainActivity.getWorkOffset()));
+        float wOnsetF = mv.timeToX(workOnset);
+        float wOffsetF = mv.timeToX(workOffset);
+        ArrayList workIntervalEntries1 = new ArrayList<BarEntry>();
+        ArrayList workIntervalEntries2 = new ArrayList<BarEntry>();
+        int[] wBarColors = new int[barEntries.size()];
+        for (int i = 0; i < barEntries.size(); i++) {
+            if (barEntries.get(i).getX() >= wOnsetF) {
+                if (wOnsetF >= wOffsetF) {
+                    //work offset > current time + 24h
+                    workIntervalEntries1.add(new BarEntry(barEntries.get(i).getX(), -90f));
+                    workIntervalEntries2.add(new BarEntry(barEntries.get(i).getX(), 90f));
+                } else {
+                    if (barEntries.get(i).getX() <= wOffsetF) {
+                        workIntervalEntries1.add(new BarEntry(barEntries.get(i).getX(), -90f));
+                        workIntervalEntries2.add(new BarEntry(barEntries.get(i).getX(), 90f));
+                    } else {
+                        workIntervalEntries1.add(new BarEntry(barEntries.get(i).getX(), 0f));
+                        workIntervalEntries2.add(new BarEntry(barEntries.get(i).getX(), 0f));
+                    }
+                }
+            } else {
+                workIntervalEntries1.add(new BarEntry(barEntries.get(i).getX(), 0f));
+                workIntervalEntries2.add(new BarEntry(barEntries.get(i).getX(), 0f));
+            }
+            wBarColors[i] = ResourcesCompat.getColor(getResources(), R.color.yellow_2, null);
+        }
+        BarDataSet workSet1 = new BarDataSet(workIntervalEntries1, "Work_Interval_1");
+        BarDataSet workSet2 = new BarDataSet(workIntervalEntries2, "Work_Interval_2");
+        workSet1.setColors(wBarColors, 20);
+        workSet2.setColors(wBarColors, 20);
+
+        //Set the bar data
+        BarData barData = new BarData(barDataSet, sleepSet1, sleepSet2, workSet1, workSet2);
+
+        //BarDataSet 4: Last sleep interval
+        List<Sleep> sleeps = mainActivity.getSleeps();
+        if (sleeps.size() > 0) {
+            Sleep lastSleep = sleeps.get(sleeps.size() - 1);
+            String lastOnset = sdfTime.format(new Date(lastSleep.sleepStart));
+            String lastOffset = sdfTime.format(new Date(lastSleep.sleepEnd));
+            float lOnsetF = mv.pastTimeToX(lastOnset);
+            float lOffsetF = mv.pastTimeToX(lastOffset);
+            Log.v("LastSleep", "Onset: " + lOnsetF + " / Offset: " + lOffsetF);
+            ArrayList lastIntervalEntries1 = new ArrayList<BarEntry>();
+            ArrayList lastIntervalEntries2 = new ArrayList<BarEntry>();
+            int[] lBarColors = new int[barEntries.size()];
+            for (int i = 0; i < barEntries.size(); i++) {
+                if (barEntries.get(i).getX() >= lOnsetF && barEntries.get(i).getX() <= lOffsetF) {
+                    lastIntervalEntries1.add(new BarEntry(barEntries.get(i).getX(), -90f));
+                    lastIntervalEntries2.add(new BarEntry(barEntries.get(i).getX(), 90f));
+                } else {
+                    lastIntervalEntries1.add(new BarEntry(barEntries.get(i).getX(), 0f));
+                    lastIntervalEntries2.add(new BarEntry(barEntries.get(i).getX(), 0f));
+                }
+                lBarColors[i] = ResourcesCompat.getColor(getResources(), R.color.blue_1, null);
+            }
+            BarDataSet lastSet1 = new BarDataSet(lastIntervalEntries1, "Last_Interval_1");
+            BarDataSet lastSet2 = new BarDataSet(lastIntervalEntries2, "Last_Interval_2");
+            lastSet1.setColors(lBarColors, 20);
+            lastSet2.setColors(lBarColors, 20);
+
+            barData.addDataSet(lastSet1);
+            barData.addDataSet(lastSet2);
+        }
+
+
+        //Set the width of each bar
         barData.setBarWidth(0.2f);
         alertnessChart.setData(barData);
+
+        //Legend
         Legend alertnessLegend = alertnessChart.getLegend();
         alertnessLegend.setEnabled(false);
         alertnessChart.setTouchEnabled(true);
+
         //Showing window
         alertnessChart.setScaleEnabled(false);
         alertnessChart.setPinchZoom(true);
         alertnessChart.setVisibleXRangeMaximum(10f);
         alertnessChart.setFitBars(true);
+
         //Customize the grid
         XAxis xAxis = alertnessChart.getXAxis();
         YAxis leftYAxis = alertnessChart.getAxisLeft();
         YAxis rightYAxis = alertnessChart.getAxisRight();
         rightYAxis.setEnabled(false);
-        //x axis on the bottom
-        /*
-        alertnessChart.setXAxisRenderer(new DoubleXLabelAxisRenderer(alertnessChart.getViewPortHandler(), alertnessChart.getXAxis(),
-        alertnessChart.getTransformer(YAxis.AxisDependency.LEFT), new XAxisBottomFormatter()));
-         */
+
         //x axis on the top
         XAxisValueFormatter xAxisValueFormatter = new XAxisValueFormatter();
-        xAxisValueFormatter.setBarChart(alertnessChart);
         xAxis.setValueFormatter(xAxisValueFormatter);
         xAxis.setPosition(XAxis.XAxisPosition.TOP);
         xAxis.setGranularity(2f);
         xAxis.setLabelCount(barEntries.size(), true);
         Log.v("Size", String.valueOf(barEntries.size()));
+
         //y axis on the left
         leftYAxis.setDrawAxisLine(true);
+
         //Customize the description
         Description description = new Description();
         description.setText("");
@@ -244,12 +341,11 @@ public class HomeFragment extends Fragment {
         customizeGridLine(alertnessChart);
         //Customize the font of labels
         customizeLabel(v.getContext(), alertnessChart);
+
         //Set the time of alertnessText
         String originString = sdfDateTimeRecomm.format(new Date(mainActivity.getMainSleepStart()));
         AlertnessText.setText("오늘의 권장 취침 시각은 " + originString + " 입니다");
         //Set MarkerView
-        CurrentMarker mv = new CurrentMarker(v.getContext(), R.layout.current_marker);
-        String recommendedOnset = sdfTime.format(new Date(mainActivity.getMainSleepStart()));
         String inputOnset = sdfTime.format(new Date(mainActivity.getSleepOnset()));
         mv.setRecommendedTime(recommendedOnset);
         mv.setInputTime(inputOnset);
@@ -567,7 +663,6 @@ class XAxisValueFormatter extends ValueFormatter {
     //To make displayed tick label not overlap
     String displayedDate = "";
     String displayedTime = "";
-    BarChart barChart;
     @Override
     public String getFormattedValue(float value) {
         String timeLabel;
@@ -624,9 +719,5 @@ class XAxisValueFormatter extends ValueFormatter {
         } else {
             return "";
         }
-    }
-
-    public void setBarChart(BarChart barChart) {
-        this.barChart = barChart;
     }
 }

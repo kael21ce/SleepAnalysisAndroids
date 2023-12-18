@@ -129,4 +129,25 @@ public class CurrentMarker extends MarkerView {
             return 24f + remainedTime + timeFloat;
         }
     }
+
+    public float pastTimeToX(String time) {
+        long now = System.currentTimeMillis();
+        Date date = new Date(now);
+        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
+        String currentTime = sdf.format(date);
+        int currentHour = Integer.parseInt(currentTime.substring(0, currentTime.indexOf(":")));
+        int currentMinute = Integer.parseInt(currentTime.substring(currentTime.indexOf(":") + 1));
+        int hour = Integer.parseInt(time.substring(0, currentTime.indexOf(":")));
+        int minute = Integer.parseInt(time.substring(currentTime.indexOf(":") + 1));
+        float currentFloat = currentHour + currentMinute / 60f;
+        float timeFloat = hour + minute / 60f;
+        if (currentFloat > timeFloat) {
+            //Time is in today
+            float delta = currentFloat - timeFloat;
+            return 24f - delta;
+        } else {
+            //Time is in yesterday
+            return timeFloat - currentFloat;
+        }
+    }
 }
