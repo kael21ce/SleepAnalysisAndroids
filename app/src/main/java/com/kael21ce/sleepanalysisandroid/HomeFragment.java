@@ -59,6 +59,12 @@ public class HomeFragment extends Fragment {
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_home, container, false);
         MainActivity mainActivity = (MainActivity)getActivity();
+
+        //Survey Caption
+        LinearLayout SurveyUpperView = v.findViewById(R.id.SurveyUpperView);
+        TextView surveyDescription = v.findViewById(R.id.surveyDescription);
+        ImageButton surveyUpperButton = v.findViewById(R.id.surveyUpperButton);
+
         //ClockView
         TextView startTime = (TextView) v.findViewById(R.id.StartTimeHome);
         TextView endTime = (TextView) v.findViewById(R.id.EndTimeHome);
@@ -107,11 +113,13 @@ public class HomeFragment extends Fragment {
 
         if (sharedPref.contains("sleepOnset") && sharedPref.contains("workOnset") && sharedPref.contains("workOffset")) {
             homeNoDataView.setVisibility(View.GONE);
+            SurveyUpperView.setVisibility(View.VISIBLE);
             RecommendHomeView.setVisibility(View.VISIBLE);
             AlertnessHomeView.setVisibility(View.VISIBLE);
             ChartHomeView.setVisibility(View.VISIBLE);
         } else {
             homeNoDataView.setVisibility(View.VISIBLE);
+            SurveyUpperView.setVisibility(View.GONE);
             RecommendHomeView.setVisibility(View.GONE);
             AlertnessHomeView.setVisibility(View.GONE);
             ChartHomeView.setVisibility(View.GONE);
@@ -119,6 +127,13 @@ public class HomeFragment extends Fragment {
 
         nineHours = (1000*60*60*9);
         now = System.currentTimeMillis();
+
+        //Survey description and button: move to SurveyActivity
+        surveyDescription.setText(user_name + "님의 상태를 알려주세요");
+        surveyUpperButton.setOnClickListener(view -> {
+            Intent surveyIntent = new Intent(v.getContext(), SurveyActivity.class);
+            startActivity(surveyIntent);
+        });
 
         //Initial button color setting
         sleepButton.setBackground(ResourcesCompat
@@ -253,14 +268,6 @@ public class HomeFragment extends Fragment {
         }
 
         alertnessChart.invalidate();
-
-        //Move to SurveyActivity if surveyButton is clicked
-        ImageButton surveyButton = v.findViewById(R.id.surveyButton);
-        surveyButton.setOnClickListener(view -> {
-            Intent surveyIntent = new Intent(v.getContext(), SurveyActivity.class);
-            startActivity(surveyIntent);
-        });
-
 
         //Weekly chart
         //Set the ChartDescription

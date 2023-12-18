@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:foregroundTint="@color/black"
-    tools:context=".HomeFragment" >
+    tools:context=".HomeFragment">
 
     <ScrollView
         android:id="@+id/HomeScrollView"
@@ -20,11 +20,69 @@
             android:orientation="vertical">
 
             <LinearLayout
+                android:id="@+id/SurveyUpperView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/corner_8_white"
+                android:orientation="horizontal"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="16dp"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:id="@+id/SurveyTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/surveyTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/pretendardbold"
+                        android:text="추천이 마음에 들지 않나요?"
+                        android:textColor="@color/black"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:id="@+id/surveyDescription"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:fontFamily="@font/pretendardbold"
+                        android:text="\userName님의 상태를 알려주세요"
+                        android:textColor="@color/gray_4"
+                        android:textSize="14sp" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/SurveryButtonCaption"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="right"
+                    android:orientation="horizontal">
+
+                    <ImageButton
+                        android:id="@+id/surveyUpperButton"
+                        style="@style/NoClickEffect"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center_vertical"
+                        android:backgroundTint="@color/white"
+                        android:src="@drawable/chevron_right" />
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
                 android:id="@+id/homeNoDataView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@drawable/corner_16"
                 android:layout_margin="16dp"
+                android:background="@drawable/corner_16"
                 android:orientation="vertical">
 
                 <LinearLayout
@@ -40,9 +98,9 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
                         android:fontFamily="@font/pretendardbold"
+                        android:text="수면 추천"
                         android:textColor="@color/black"
-                        android:textSize="20sp"
-                        android:text="수면 추천" />
+                        android:textSize="20sp" />
 
                     <LinearLayout
                         android:id="@+id/rightRecommendCaption"
@@ -53,11 +111,11 @@
 
                         <ImageButton
                             android:id="@+id/toRecommendButton"
+                            style="@style/NoClickEffect"
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
                             android:backgroundTint="@color/white"
-                            android:src="@drawable/chevron_right"
-                            style="@style/NoClickEffect"/>
+                            android:src="@drawable/chevron_right" />
                     </LinearLayout>
 
                 </LinearLayout>
@@ -67,10 +125,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="24dp"
-                    android:textSize="14sp"
                     android:fontFamily="@font/pretendardvariable"
+                    android:text="userName님의 수면 추천 정보가 없어요"
                     android:textColor="@color/black"
-                    android:text="userName님의 수면 추천 정보가 없어요" />
+                    android:textSize="14sp" />
 
                 <ImageView
                     android:id="@+id/no_data_home"
@@ -79,7 +137,7 @@
                     android:layout_gravity="center_horizontal"
                     android:layout_marginHorizontal="24dp"
                     android:layout_marginTop="24dp"
-                    android:layout_marginBottom="48dp"/>
+                    android:layout_marginBottom="48dp" />
             </LinearLayout>
 
             <LinearLayout
@@ -331,21 +389,6 @@
 
                     </LinearLayout>
 
-                    <LinearLayout
-                        android:id="@+id/AlertnessButtonCaption"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:gravity="right"
-                        android:orientation="horizontal">
-
-                        <ImageButton
-                            android:id="@+id/surveyButton"
-                            android:layout_width="wrap_content"
-                            android:layout_height="match_parent"
-                            android:layout_gravity="center_vertical"
-                            android:backgroundTint="@color/white"
-                            android:src="@drawable/edit_pencil" />
-                    </LinearLayout>
                 </LinearLayout>
 
                 <LinearLayout
