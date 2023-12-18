@@ -31,6 +31,7 @@ import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.formatter.ValueFormatter;
+import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.utils.ViewPortHandler;
 import com.kael21ce.sleepanalysisandroid.data.Awareness;
 
@@ -248,10 +249,19 @@ public class HomeFragment extends Fragment {
         AlertnessText.setText("오늘의 권장 취침 시각은 " + originString + " 입니다");
         //Set MarkerView
         CurrentMarker mv = new CurrentMarker(v.getContext(), R.layout.current_marker);
+        String recommendedOnset = sdfTime.format(new Date(mainActivity.getMainSleepStart()));
+        String inputOnset = sdfTime.format(new Date(mainActivity.getSleepOnset()));
+        mv.setRecommendedTime(recommendedOnset);
+        mv.setInputTime(inputOnset);
         mv.setChartView(alertnessChart);
         alertnessChart.setMarker(mv);
-        //Set the current time always Highlight
-        alertnessChart.highlightValue(24f, 0);
+        //Set the Highlight
+        Highlight[] highlights = new Highlight[] {
+                new Highlight(24f, 0, -1),
+                new Highlight(mv.timeToX(recommendedOnset), 0, -1),
+                new Highlight(mv.timeToX(inputOnset), 0, -1)
+        };
+        alertnessChart.highlightValues(highlights);
         //Change the description depending on current alertness
         if (barEntries.size() > 0) {
             float currentAlertness = barEntries.get(288).getY();
