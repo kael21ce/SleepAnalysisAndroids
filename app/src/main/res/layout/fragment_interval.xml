@@ -99,7 +99,7 @@
                             android:fontFamily="@font/pretendardbold"
                             android:text="00시간 00분"
                             android:textColor="@color/green_1"
-                            android:textSize="20sp" />
+                            android:textSize="16sp" />
                     </LinearLayout>
                 </LinearLayout>
             </LinearLayout>
@@ -147,7 +147,7 @@
                             android:fontFamily="@font/pretendardbold"
                             android:text="00시간 00분"
                             android:textColor="@color/red_1"
-                            android:textSize="20sp" />
+                            android:textSize="16sp" />
                     </LinearLayout>
                 </LinearLayout>
             </LinearLayout>
