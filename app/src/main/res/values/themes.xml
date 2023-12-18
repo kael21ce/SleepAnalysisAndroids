@@ -21,4 +21,11 @@
         <item name="android:textColor">@color/black</item>
         <item name="fontFamily">@font/pretendardvariable</item>
     </style>
+
+    <!--No click effect-->
+    <style name="NoClickEffect" parent="Widget.AppCompat.ImageButton">
+        <item name="android:background">?android:attr/selectableItemBackgroundBorderless</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+    </style>
 </resources>
