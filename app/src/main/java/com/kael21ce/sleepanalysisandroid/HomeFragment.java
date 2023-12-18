@@ -369,10 +369,10 @@ public class HomeFragment extends Fragment {
         clockView.setTypeOfInterval(1);
         //Just example
         if(!mainSleepStartString.equals(mainSleepEndString)) {
-            clockView.setVisibility(View.VISIBLE);
+            clockView.setIsRecommended(true);
             clockView.setAngleFromTime(mainSleepStartString, mainSleepEndString);
         }else{
-            clockView.setVisibility(View.INVISIBLE);
+            clockView.setIsRecommended(false);
         }
     }
 
@@ -403,10 +403,10 @@ public class HomeFragment extends Fragment {
         clockView.setTypeOfInterval(2);
         //Just example
         if(!napSleepStartString.equals(napSleepEndString)) {
-            clockView.setVisibility(View.VISIBLE);
+            clockView.setIsRecommended(true);
             clockView.setAngleFromTime(napSleepStartString, napSleepEndString);
         }else{
-            clockView.setVisibility(View.INVISIBLE);
+            clockView.setIsRecommended(false);
             stateDescriptionText.setText("낮잠이 필요하지 않아요");
             stateDescriptionSmallText.setText("낮잠 없이도 맑은 정신을 유지할 수 있어요");
             stateDescriptionImage.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.laugh, null));
@@ -440,7 +440,7 @@ public class HomeFragment extends Fragment {
         stateDescriptionImage.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.smile, null));
         clockView.setTypeOfInterval(3);
         //Just example
-        clockView.setVisibility(View.VISIBLE);
+        clockView.setIsRecommended(true);
         clockView.setAngleFromTime(workOnsetString, workOffsetString);
     }
 

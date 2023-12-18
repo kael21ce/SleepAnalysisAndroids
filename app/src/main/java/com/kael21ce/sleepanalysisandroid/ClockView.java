@@ -24,6 +24,7 @@ public class ClockView extends View {
     //To distinguish the type of interval
     private int typeOfInterval = 1;
     private final Rect textBounds = new Rect();
+    private boolean isRecommended = true;
 
     public ClockView(Context context) {
         super(context);
@@ -87,12 +88,14 @@ public class ClockView extends View {
         float positionY1 = (float) (centerY - (radius - smallCircleRadius) * Math.sin(-startAngleRad - beta));
         float positionX2 = (float) (centerX + (radius - smallCircleRadius) * Math.cos(-sweepedAngleRad + beta));
         float positionY2 = (float) (centerY - (radius - smallCircleRadius) * Math.sin(-sweepedAngleRad + beta));
-        //Draw the arc on the canvas
-        canvas.drawArc(left, top, right, bottom, startAngle + Math.abs((float) betaDeg),
-                sweepAngle - 2 * Math.abs((float) betaDeg), true, arcPaint);
-        //Draw small circles
-        canvas.drawCircle(positionX1, positionY1, (float) smallCircleRadius, arcPaint);
-        canvas.drawCircle(positionX2, positionY2, (float) smallCircleRadius, arcPaint);
+        if (isRecommended) {
+            //Draw the arc on the canvas
+            canvas.drawArc(left, top, right, bottom, startAngle + Math.abs((float) betaDeg),
+                    sweepAngle - 2 * Math.abs((float) betaDeg), true, arcPaint);
+            //Draw small circles
+            canvas.drawCircle(positionX1, positionY1, (float) smallCircleRadius, arcPaint);
+            canvas.drawCircle(positionX2, positionY2, (float) smallCircleRadius, arcPaint);
+        }
         //Draw circle on the canvas
         double circleRadius = Math.min(width, height) / 2.8;
         float CircleRadius = (float) circleRadius;
@@ -188,6 +191,11 @@ public class ClockView extends View {
     public void drawTextCentred(Canvas canvas, Paint paint, String text, float cx, float cy) {
         paint.getTextBounds(text, 0, text.length(), textBounds);
         canvas.drawText(text, cx, cy - textBounds.exactCenterY(), paint);
+    }
+
+    //Set visibility of time interval
+    public void setIsRecommended(Boolean bool) {
+        this.isRecommended = bool;
     }
 }
 

@@ -217,12 +217,12 @@ public class RecommendFragment extends Fragment {
         //Just example
         if(!mainSleepStartString.equals(mainSleepEndString)) {
             Log.v("FDLSJK", "DFSLJ");
-            clockView.setVisibility(clockView.VISIBLE);
+            clockView.setIsRecommended(true);
             clockView.setTypeOfInterval(1);
             clockView.setAngleFromTime(mainSleepStartString, mainSleepEndString);
         }else{
             Log.v("GONE", "GONE");
-            clockView.setVisibility(clockView.GONE);
+            clockView.setIsRecommended(false);
         }
     }
 
@@ -232,8 +232,6 @@ public class RecommendFragment extends Fragment {
                                TextView stateDescriptionText, TextView stateDescriptionSmallText,
                                ImageView stateDescriptionImage, ClockView clockView)
     {
-        //startTime.setText(napSleepStartString);
-        //endTime.setText(napSleepEndString);
         stateDescriptionSmallText.setVisibility(View.VISIBLE);
         startTime.setText(sdfDateTimeRecomm.format(new Date(mainActivity.getNapSleepStart())));
         endTime.setText(sdfDateTimeRecomm.format(new Date(mainActivity.getNapSleepEnd())));
@@ -252,15 +250,13 @@ public class RecommendFragment extends Fragment {
         stateDescriptionText.setText("낮잠을 주무세요");
         stateDescriptionSmallText.setText("맑은 정신을 유지할 수 있어요");
         stateDescriptionImage.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.sleep, null));
+        clockView.setTypeOfInterval(2);
         //Just example
         if(!napSleepStartString.equals(napSleepEndString)) {
-            Log.v("TF", "TF");
-            clockView.setVisibility(clockView.VISIBLE);
-            clockView.setTypeOfInterval(2);
+            clockView.setIsRecommended(true);
             clockView.setAngleFromTime(napSleepStartString, napSleepEndString);
         }else{
-            Log.v("OK BRO", "OK BRO");
-            clockView.setVisibility(clockView.GONE);
+            clockView.setIsRecommended(false);
             stateDescriptionText.setText("낮잠이 필요하지 않아요");
             stateDescriptionSmallText.setText("낮잠 없이도 맑은 정신을 유지할 수 있어요");
             stateDescriptionImage.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.laugh, null));
@@ -275,7 +271,7 @@ public class RecommendFragment extends Fragment {
                                 TextView stateDescriptionText, TextView stateDescriptionSmallText,
                                 ImageView stateDescriptionImage, ClockView clockView)
     {
-        clockView.setVisibility(clockView.VISIBLE);
+        clockView.setIsRecommended(true);
         //startTime.setText(workOnsetString);
         //endTime.setText(workOffsetString);
         startTime.setText(sdfDateTimeRecomm.format(new Date(mainActivity.getWorkOnset())));
