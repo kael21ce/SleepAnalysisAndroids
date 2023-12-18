@@ -256,12 +256,22 @@ public class HomeFragment extends Fragment {
         mv.setChartView(alertnessChart);
         alertnessChart.setMarker(mv);
         //Set the Highlight
-        Highlight[] highlights = new Highlight[] {
-                new Highlight(24f, 0, -1),
-                new Highlight(mv.timeToX(recommendedOnset), 0, -1),
-                new Highlight(mv.timeToX(inputOnset), 0, -1)
-        };
-        alertnessChart.highlightValues(highlights);
+        //If the recommended onset and input onset exhibits little difference,
+        //only display the recommended onset
+        if (Math.abs(mv.timeToX(recommendedOnset) - mv.timeToX(inputOnset)) > 0.5) {
+            Highlight[] highlights = new Highlight[] {
+                    new Highlight(24f, 0, -1),
+                    new Highlight(mv.timeToX(recommendedOnset), 0, -1),
+                    new Highlight(mv.timeToX(inputOnset), 0, -1)
+            };
+            alertnessChart.highlightValues(highlights);
+        } else {
+            Highlight[] highlights = new Highlight[] {
+                    new Highlight(24f, 0, -1),
+                    new Highlight(mv.timeToX(recommendedOnset), 0, -1)
+            };
+            alertnessChart.highlightValues(highlights);
+        }
         //Change the description depending on current alertness
         if (barEntries.size() > 0) {
             float currentAlertness = barEntries.get(288).getY();

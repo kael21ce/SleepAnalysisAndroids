@@ -4,6 +4,8 @@ import android.content.Context;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.core.content.res.ResourcesCompat;
+
 import com.github.mikephil.charting.components.MarkerView;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.highlight.Highlight;
@@ -43,6 +45,19 @@ public class CurrentMarker extends MarkerView {
             TimeMarkerLayout.setVisibility(GONE);
             timeTypeText.setVisibility(GONE);
             timeDotLayout.setVisibility(GONE);
+            if (e.getY() >= 0) {
+                markerLayout.setBackground(ResourcesCompat.getDrawable(getResources(),
+                        R.drawable.corner_8_green, null));
+                tvContent.setTextColor(ResourcesCompat.getColor(getResources(), R.color.green_1, null));
+                currentDotLayout.setBackground(ResourcesCompat.getDrawable(getResources(),
+                        R.drawable.corner_8_green_stroke, null));
+            } else {
+                markerLayout.setBackground(ResourcesCompat.getDrawable(getResources(),
+                        R.drawable.corner_8_red, null));
+                tvContent.setTextColor(ResourcesCompat.getColor(getResources(), R.color.red_1, null));
+                currentDotLayout.setBackground(ResourcesCompat.getDrawable(getResources(),
+                        R.drawable.corner_8_red_stroke, null));
+            }
             float currentAwareness = Math.round(e.getY()*10f)/10.0f;
             tvContent.setText("현재 각성도: " + currentAwareness);
         } else if (e.getX() > xR - 0.1f && e.getX() <= xR + 0.1f) {
@@ -52,7 +67,7 @@ public class CurrentMarker extends MarkerView {
             TimeMarkerLayout.setVisibility(VISIBLE);
             timeTypeText.setVisibility(VISIBLE);
             timeDotLayout.setVisibility(VISIBLE);
-            timeTypeText.setText("희망 취침 시각");
+            timeTypeText.setText("권장 취침 시각");
         } else if (e.getX() > xI - 0.1f && e.getX() <= xI + 0.1f) {
             markerLayout.setVisibility(INVISIBLE);
             tvContent.setVisibility(INVISIBLE);
@@ -60,7 +75,7 @@ public class CurrentMarker extends MarkerView {
             TimeMarkerLayout.setVisibility(VISIBLE);
             timeTypeText.setVisibility(VISIBLE);
             timeDotLayout.setVisibility(VISIBLE);
-            timeTypeText.setText("권장 취침 시각");
+            timeTypeText.setText("희망 취침 시각");
         } else {
             markerLayout.setVisibility(GONE);
             tvContent.setVisibility(GONE);
@@ -77,7 +92,8 @@ public class CurrentMarker extends MarkerView {
     public MPPointF getOffset() {
         if(mOffset == null) {
             // center the marker horizontally and vertically
-            mOffset = new MPPointF(-(getWidth() / 2), -getHeight());
+            //mOffset = new MPPointF(-(getWidth() / 2), -getHeight() + 20f);
+            mOffset = new MPPointF(-(getWidth() / 2), -getHeight() + 18f);
         }
         return mOffset;
     }
