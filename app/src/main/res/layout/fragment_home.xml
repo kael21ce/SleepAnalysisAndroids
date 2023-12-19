@@ -385,6 +385,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="\(userName)님의 각성도가 낮아요"
+                            android:fontFamily="@font/pretendardvariable"
                             android:textColor="@color/black" />
 
                     </LinearLayout>
@@ -459,6 +460,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="16dp"
+                    android:fontFamily="@font/pretendardvariable"
                     android:text="이번주 \(userName)님의 각성도에요"
                     android:textColor="@color/black" />
 
