@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.graphics.DashPathEffect;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.util.Log;
@@ -346,7 +347,7 @@ public class HomeFragment extends Fragment {
         xAxis.setValueFormatter(xAxisValueFormatter);
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
         xAxis.setGranularity(2f);
-        xAxis.setLabelCount(barEntries.size(), true);
+        xAxis.setLabelCount(12, true);
         Log.v("Size", String.valueOf(barEntries.size()));
 
         //y axis on the left
