@@ -27,9 +27,8 @@ public class CurrentMarker extends MarkerView {
     private TextView timeTypeText, intervalTypeText;
     private String recommendedTime = "00:00";
     private String inputTime = "00:00";
-    private float sleepIntervalTimeFloat = 0f;
-    private float workIntervalTimeFloat = 0f;
-    private float lastIntervalTimeFloat = 0f;
+    private float alertnessPhaseChange = 0f;
+    private float sleepIntervalTimeFloat = 0f, workIntervalTimeFloat = 0f, lastIntervalTimeFloat = 0f;
     private Entry currentEntry;
     private BarChart barChart;
 
@@ -42,7 +41,6 @@ public class CurrentMarker extends MarkerView {
     @Override
     public void refreshContent(Entry e, Highlight highlight) {
         currentEntry = e;
-        float xR = timeToX(this.recommendedTime);
         float xI = timeToX(this.inputTime);
 
         //Remove all views
@@ -71,7 +69,8 @@ public class CurrentMarker extends MarkerView {
             }
             float currentAwareness = Math.round(e.getY()*10f)/10.0f;
             tvContent.setText("현재 각성도: " + currentAwareness);
-        } else if (e.getX() > xR - 0.1f && e.getX() <= xR + 0.1f) {
+        } else if (e.getX() > this.alertnessPhaseChange - 0.1f
+                && e.getX() <= this.alertnessPhaseChange + 0.1f) {
             view = LayoutInflater.from(context).inflate(R.layout.time_marker, this, true);
             timeTypeText = view.findViewById(R.id.timeTypeText);
             timeTypeText.setText("권장 취침 시각");
@@ -239,5 +238,10 @@ public class CurrentMarker extends MarkerView {
         this.sleepIntervalTimeFloat = sleepF;
         this.workIntervalTimeFloat = workF;
         this.lastIntervalTimeFloat = lastF;
+    }
+
+    //Set alertnessPhaseChange
+    public void setAlertnessPhaseChange(float value) {
+        this.alertnessPhaseChange = value;
     }
 }

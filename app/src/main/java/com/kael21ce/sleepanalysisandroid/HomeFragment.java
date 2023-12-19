@@ -279,6 +279,7 @@ public class HomeFragment extends Fragment {
 
         //BarDataSet 4: Last sleep interval
         List<Sleep> sleeps = mainActivity.getSleeps();
+        float alertnessPhaseChange = 49f;
         float lMidF = 0f;
         if (sleeps.size() > 0) {
             Sleep lastSleep = sleeps.get(sleeps.size() - 1);
@@ -300,6 +301,14 @@ public class HomeFragment extends Fragment {
                     lastIntervalEntries2.add(new BarEntry(barEntries.get(i).getX(), 0f));
                 }
                 lBarColors[i] = ResourcesCompat.getColor(getResources(), R.color.blue_1, null);
+                //Theoretically recommended sleep onset
+                if (i < barEntries.size() - 1) {
+                    if (barEntries.get(i).getY() >= 0 && barEntries.get(i + 1).getY() <= 0) {
+                        if (barEntries.get(i).getX() >= lOffsetF) {
+                            alertnessPhaseChange = barEntries.get(i).getX();
+                        }
+                    }
+                }
             }
             BarDataSet lastSet1 = new BarDataSet(lastIntervalEntries1, "Last_Interval_1");
             BarDataSet lastSet2 = new BarDataSet(lastIntervalEntries2, "Last_Interval_2");
@@ -360,25 +369,37 @@ public class HomeFragment extends Fragment {
         mv.setRecommendedTime(recommendedOnset);
         mv.setInputTime(inputOnset);
         mv.setIntervalFloat(rMidF, wMidF, lMidF);
+        mv.setAlertnessPhaseChange(alertnessPhaseChange);
         mv.setChartView(alertnessChart);
         alertnessChart.setMarker(mv);
         //Set the Highlight
         //If the recommended onset and input onset exhibits little difference,
         //only display the recommended onset
-        if (Math.abs(mv.timeToX(recommendedOnset) - mv.timeToX(inputOnset)) > 0.5) {
-            Highlight[] highlights = new Highlight[] {
-                    new Highlight(24f, 0, -1),
-                    new Highlight(mv.timeToX(recommendedOnset), 0, -1),
-                    new Highlight(mv.timeToX(inputOnset), 0, -1),
-                    new Highlight(rMidF, 0, -1),
-                    new Highlight(wMidF, 0, -1),
-                    new Highlight(lMidF, 0, -1)
-            };
-            alertnessChart.highlightValues(highlights);
+        if (alertnessPhaseChange != 49f) {
+            if (Math.abs(alertnessPhaseChange - mv.timeToX(inputOnset)) > 0.1) {
+                Highlight[] highlights = new Highlight[] {
+                        new Highlight(24f, 0, -1),
+                        new Highlight(alertnessPhaseChange, 0, -1),
+                        new Highlight(mv.timeToX(inputOnset), 0, -1),
+                        new Highlight(rMidF, 0, -1),
+                        new Highlight(wMidF, 0, -1),
+                        new Highlight(lMidF, 0, -1)
+                };
+                alertnessChart.highlightValues(highlights);
+            } else {
+                Highlight[] highlights = new Highlight[] {
+                        new Highlight(24f, 0, -1),
+                        new Highlight(mv.timeToX(inputOnset), 0, -1),
+                        new Highlight(rMidF, 0, -1),
+                        new Highlight(wMidF, 0, -1),
+                        new Highlight(lMidF, 0, -1)
+                };
+                alertnessChart.highlightValues(highlights);
+            }
         } else {
             Highlight[] highlights = new Highlight[] {
                     new Highlight(24f, 0, -1),
-                    new Highlight(mv.timeToX(recommendedOnset), 0, -1),
+                    new Highlight(mv.timeToX(inputOnset), 0, -1),
                     new Highlight(rMidF, 0, -1),
                     new Highlight(wMidF, 0, -1),
                     new Highlight(lMidF, 0, -1)
