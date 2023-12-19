@@ -13,7 +13,19 @@
         <item name="android:windowLightStatusBar">true</item>
         <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
+        <item name="android:textColor">@color/black</item>
+        <item name="android:fontFamily">@font/pretendardbold</item>
     </style>
+    <!--
+    <style name="ActionBar" parent="Widget.AppCompat.ActionBar.Solid">
+        <item name="android:background">@color/white</item>
+        <item name="titleTextStyle">@style/ActionBarText</item>
+    </style>
+    <style name="ActionBarText" parent="android:TextAppearance.Holo.Widget.ActionBar.Title">
+        <item name="android:textColor">@color/black</item>
+        <item name="android:fontFamily">@font/pretendardbold</item>
+    </style>
+    -->
 
     <!--Customize the date text appearance-->
     <style name="CalendarDate">
