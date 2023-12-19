@@ -1,50 +1,61 @@
 package com.kael21ce.sleepanalysisandroid;
 
 import android.content.Context;
+import android.graphics.Canvas;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.core.content.res.ResourcesCompat;
 
+import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.components.MarkerView;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.highlight.Highlight;
+import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
+import com.github.mikephil.charting.utils.MPPointD;
 import com.github.mikephil.charting.utils.MPPointF;
 
 import java.sql.Date;
 import java.text.SimpleDateFormat;
 
 public class CurrentMarker extends MarkerView {
+    private Context context;
     private TextView tvContent;
-    private LinearLayout markerLayout;
-    private LinearLayout TimeMarkerLayout;
-    private LinearLayout currentDotLayout, timeDotLayout;
-    private TextView timeTypeText;
+    private LinearLayout markerLayout, currentDotLayout, intervalLayout;
+    private TextView timeTypeText, intervalTypeText;
     private String recommendedTime = "00:00";
     private String inputTime = "00:00";
+    private float sleepIntervalTimeFloat = 0f;
+    private float workIntervalTimeFloat = 0f;
+    private float lastIntervalTimeFloat = 0f;
+    private Entry currentEntry;
+    private BarChart barChart;
 
-    public CurrentMarker(Context context, int layoutResource) {
+    public CurrentMarker(Context context, int layoutResource, BarChart barChart) {
         super(context, layoutResource);
-        // find your layout components
-        tvContent = (TextView) findViewById(R.id.currentAwareness);
-        markerLayout = (LinearLayout) findViewById(R.id.MarkerLayout);
-        TimeMarkerLayout = findViewById(R.id.TimeMarkerLayout);
-        timeTypeText = findViewById(R.id.timeTypeText);
-        currentDotLayout = findViewById(R.id.currentDotLayout);
-        timeDotLayout = findViewById(R.id.timeDotLayout);
+        this.context = context;
+        this.barChart = barChart;
     }
+
     @Override
     public void refreshContent(Entry e, Highlight highlight) {
+        currentEntry = e;
         float xR = timeToX(this.recommendedTime);
         float xI = timeToX(this.inputTime);
+
+        //Remove all views
+        this.removeAllViews();
+
+        //Inflate the layout
+        View view;
         if (e.getX() > 23.9f && e.getX() <= 24.1f) {
             //current alertness
-            markerLayout.setVisibility(VISIBLE);
-            tvContent.setVisibility(VISIBLE);
-            currentDotLayout.setVisibility(VISIBLE);
-            TimeMarkerLayout.setVisibility(GONE);
-            timeTypeText.setVisibility(GONE);
-            timeDotLayout.setVisibility(GONE);
+            view = LayoutInflater.from(context).inflate(R.layout.current_marker, this, true);
+            markerLayout = view.findViewById(R.id.MarkerLayout);
+            tvContent = view.findViewById(R.id.currentAwareness);
+            currentDotLayout = view.findViewById(R.id.currentDotLayout);
             if (e.getY() >= 0) {
                 markerLayout.setBackground(ResourcesCompat.getDrawable(getResources(),
                         R.drawable.corner_8_green, null));
@@ -61,42 +72,114 @@ public class CurrentMarker extends MarkerView {
             float currentAwareness = Math.round(e.getY()*10f)/10.0f;
             tvContent.setText("현재 각성도: " + currentAwareness);
         } else if (e.getX() > xR - 0.1f && e.getX() <= xR + 0.1f) {
-            markerLayout.setVisibility(INVISIBLE);
-            tvContent.setVisibility(INVISIBLE);
-            currentDotLayout.setVisibility(INVISIBLE);
-            TimeMarkerLayout.setVisibility(VISIBLE);
-            timeTypeText.setVisibility(VISIBLE);
-            timeDotLayout.setVisibility(VISIBLE);
+            view = LayoutInflater.from(context).inflate(R.layout.time_marker, this, true);
+            timeTypeText = view.findViewById(R.id.timeTypeText);
             timeTypeText.setText("권장 취침 시각");
         } else if (e.getX() > xI - 0.1f && e.getX() <= xI + 0.1f) {
-            markerLayout.setVisibility(INVISIBLE);
-            tvContent.setVisibility(INVISIBLE);
-            currentDotLayout.setVisibility(INVISIBLE);
-            TimeMarkerLayout.setVisibility(VISIBLE);
-            timeTypeText.setVisibility(VISIBLE);
-            timeDotLayout.setVisibility(VISIBLE);
+            view = LayoutInflater.from(context).inflate(R.layout.time_marker, this, true);
+            timeTypeText = view.findViewById(R.id.timeTypeText);
             timeTypeText.setText("희망 취침 시각");
-        } else {
-            markerLayout.setVisibility(GONE);
-            tvContent.setVisibility(GONE);
-            currentDotLayout.setVisibility(GONE);
-            TimeMarkerLayout.setVisibility(GONE);
-            timeTypeText.setVisibility(GONE);
-            timeDotLayout.setVisibility(GONE);
+        } else if (e.getX() > this.sleepIntervalTimeFloat - 0.1f && e.getX() <= this.sleepIntervalTimeFloat + 0.1f) {
+            view = LayoutInflater.from(context).inflate(R.layout.interval_marker, this, true);
+            intervalLayout = view.findViewById(R.id.IntervalLayout);
+            intervalTypeText = view.findViewById(R.id.intervalTypeText);
+            intervalLayout.setBackground(ResourcesCompat.getDrawable(getResources(),
+                    R.drawable.corner_8_black_alpha, null));
+            intervalTypeText.setText("추천 수면 시간");
+        } else if (e.getX() > this.workIntervalTimeFloat - 0.1f && e.getX() <= this.workIntervalTimeFloat + 0.1f) {
+            view = LayoutInflater.from(context).inflate(R.layout.interval_marker, this, true);
+            intervalLayout = view.findViewById(R.id.IntervalLayout);
+            intervalTypeText = view.findViewById(R.id.intervalTypeText);
+            intervalLayout.setBackground(ResourcesCompat.getDrawable(getResources(),
+                    R.drawable.corner_8_yellow_alpha, null));
+            intervalTypeText.setText("집중을 위한 시간");
+        } else if (e.getX() > this.lastIntervalTimeFloat - 0.1f && e.getX() <= this.lastIntervalTimeFloat + 0.1f) {
+            view = LayoutInflater.from(context).inflate(R.layout.interval_marker, this, true);
+            intervalLayout = view.findViewById(R.id.IntervalLayout);
+            intervalTypeText = view.findViewById(R.id.intervalTypeText);
+            intervalLayout.setBackground(ResourcesCompat.getDrawable(getResources(),
+                    R.drawable.corner_8_blue_alpha, null));
+            intervalTypeText.setText("지난 수면 시간");
         }
+
         // this will perform necessary layouting
         super.refreshContent(e, highlight);
     }
-    private MPPointF mOffset;
+
     @Override
-    public MPPointF getOffset() {
-        if(mOffset == null) {
-            // center the marker horizontally and vertically
-            //mOffset = new MPPointF(-(getWidth() / 2), -getHeight() + 20f);
-            mOffset = new MPPointF(-(getWidth() / 2), -getHeight() + 18f);
+    public void draw(Canvas canvas, float posX, float posY) {
+        // Get the chart dimensions
+        MPPointF offset = getOffsetForDrawingAtPoint(posX, posY);
+
+        int width = getWidth();
+        int height = getHeight();
+
+        float xR = timeToX(this.recommendedTime);
+
+        // Adjust the x-coordinate to center the marker
+        if (posX + offset.x < 0) {
+            offset.x = -posX;
+        } else if (posX + width + offset.x > canvas.getWidth()) {
+            offset.x = canvas.getWidth() - posX - width;
         }
-        return mOffset;
+
+        // Adjust the y-coordinate
+        float yValue = posY;
+        float xValue = posX;
+        IBarDataSet dataSet = barChart.getData().getDataSetByIndex(0);
+        MPPointD point;
+        if (currentEntry.getX() > 23.9f && currentEntry.getX() <= 24.1f) {
+            yValue = currentEntry.getY();
+            xValue = currentEntry.getX();
+            point = barChart.getTransformer(dataSet.getAxisDependency()).getPixelForValues(xValue, yValue);
+            posY = (float) point.y;
+        }
+        if (currentEntry.getX() > xR - 0.1f && currentEntry.getX() <= xR + 0.1f) {
+            yValue = currentEntry.getY();
+            xValue = currentEntry.getX();
+            point = barChart.getTransformer(dataSet.getAxisDependency()).getPixelForValues(xValue, yValue);
+            posY = (float) point.y;
+        }
+
+        //Center the marker horizontally
+        offset.x -= width / 2.0f;
+
+        //Make interval marker move to top of the chart
+        boolean inSleep = false, inWork = false, inLast = false;
+        if (currentEntry.getX() > this.sleepIntervalTimeFloat - 0.1f
+                && currentEntry.getX() <= this.sleepIntervalTimeFloat + 0.1f) {
+            inSleep = true;
+        } else {
+            inSleep = false;
+        }
+        if (currentEntry.getX() > this.workIntervalTimeFloat - 0.1f
+                && currentEntry.getX() <= this.workIntervalTimeFloat + 0.1f) {
+            inWork = true;
+        } else {
+            inWork = false;
+        }
+        if (currentEntry.getX() > this.lastIntervalTimeFloat - 0.1f
+                && currentEntry.getX() <= this.lastIntervalTimeFloat + 0.1f) {
+            inLast = true;
+        } else {
+            inLast = false;
+        }
+        if (inSleep || inWork || inLast) {
+            offset.y = 0;
+            canvas.translate(posX + offset.x, offset.y);
+            draw(canvas);
+            canvas.translate(-(posX + offset.x), -offset.y);
+        } else {
+            posY -= (height - 15f);
+            canvas.translate(posX + offset.x, posY);
+            draw(canvas);
+            canvas.translate(-(posX + offset.x), -posY);
+        }
     }
+
+
+
+
 
     //Set the recommended time: format should be "hh:mm"
     public void setRecommendedTime(String time) {
@@ -149,5 +232,12 @@ public class CurrentMarker extends MarkerView {
             //Time is in yesterday
             return timeFloat - currentFloat;
         }
+    }
+
+    //Set the interval time float
+    public void setIntervalFloat(float sleepF, float workF, float lastF) {
+        this.sleepIntervalTimeFloat = sleepF;
+        this.workIntervalTimeFloat = workF;
+        this.lastIntervalTimeFloat = lastF;
     }
 }

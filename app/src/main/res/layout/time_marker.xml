@@ -1,36 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/LinearLayout"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
-    <!--Current alertness-->
+    <!--Input or recommeneded time-->
     <LinearLayout
-        android:id="@+id/MarkerLayout"
+        android:id="@+id/TimeMarkerLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/corner_8_red"
+        android:layout_gravity="center_horizontal"
+        android:background="@drawable/corner_8_black_stroke"
         android:orientation="vertical">
 
         <TextView
-            android:id="@+id/currentAwareness"
+            android:id="@+id/timeTypeText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="8dp"
             android:layout_marginVertical="4dp"
-            android:fontFamily="@font/pretendardbold"
-            android:text="현재 각성도: 00"
-            android:textColor="@color/red_1"
-            android:textSize="12sp" />
+            android:fontFamily="@font/pretendardvariable"
+            android:gravity="center_horizontal"
+            android:textSize="12sp"
+            android:text="희망 취침 시각"
+            android:textColor="@color/black" />
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/currentDotLayout"
+        android:id="@+id/timeDotLayout"
         android:layout_width="10dp"
         android:layout_height="10dp"
         android:layout_gravity="center_horizontal"
-        android:background="@drawable/corner_8_red_stroke"
         android:layout_marginTop="4dp"
+        android:background="@drawable/corner_8_black_stroke"
         android:orientation="vertical"></LinearLayout>
+
 </LinearLayout>

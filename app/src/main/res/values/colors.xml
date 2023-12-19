@@ -7,13 +7,16 @@
     <color name="gray_4">#A7ACB6</color>
     <color name="blue_1">#3680F7</color>
     <color name="blue_2">#E1ECFE</color>
+    <color name="blue_alpha">#203680F7</color>
     <color name="red_1">#EA5A5B</color>
     <color name="red_2">#FCE6E6</color>
     <color name="yellow_1">#F8B301</color>
     <color name="yellow_2">#FEF4D9</color>
+    <color name="yellow_alpha">#20F8B301</color>
     <color name="green_1">#28C82E</color>
     <color name="green_2">#DFF7E0</color>
     <color name="black">#223047</color>
+    <color name="black_alpha">#20223047</color>
     <color name="white">#FFFFFFFF</color>
     <color name="orange_1">#FF9500</color>
     <color name="orange_2">#33FF9500</color>

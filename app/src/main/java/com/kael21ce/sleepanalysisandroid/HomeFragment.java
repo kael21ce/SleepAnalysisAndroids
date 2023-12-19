@@ -180,7 +180,7 @@ public class HomeFragment extends Fragment {
 
         TextView alertnessDescription = v.findViewById(R.id.AlertnessDescription);
         TextView alertnessTitle = v.findViewById(R.id.AlertnessRecommend);
-        CurrentMarker mv = new CurrentMarker(v.getContext(), R.layout.current_marker);
+        CurrentMarker mv = new CurrentMarker(v.getContext(), R.layout.current_marker, alertnessChart);
 
         //BarDataSet 1: alertness
         ArrayList<BarEntry> barEntries = mainActivity.getBarEntries();
@@ -208,12 +208,14 @@ public class HomeFragment extends Fragment {
         barDataSet.setColors(barColors);
         barDataSet.setHighlightEnabled(true);
         barDataSet.setDrawValues(false);
+        barDataSet.setHighLightAlpha(0);
 
         //BarDataSet 2: Recommended sleep interval
         String recommendedOnset = sdfTime.format(new Date(mainActivity.getMainSleepStart()));
         String recommendedOffset = sdfTime.format(new Date(mainActivity.getMainSleepEnd()));
         float rOnsetF = mv.timeToX(recommendedOnset);
         float rOffsetF = mv.timeToX(recommendedOffset);
+        float rMidF = (rOnsetF + rOffsetF) / 2f;
         ArrayList sleepIntervalEntries1 = new ArrayList<BarEntry>();
         ArrayList sleepIntervalEntries2 = new ArrayList<BarEntry>();
         int[] rBarColors = new int[barEntries.size()];
@@ -237,6 +239,12 @@ public class HomeFragment extends Fragment {
         String workOffset = sdfTime.format(new Date(mainActivity.getWorkOffset()));
         float wOnsetF = mv.timeToX(workOnset);
         float wOffsetF = mv.timeToX(workOffset);
+        float wMidF = 0f;
+        if (wOnsetF >= wOffsetF) {
+            wMidF = (wOnsetF + 48f) / 2f;
+        } else {
+            wMidF = (wOnsetF + wOffsetF) / 2f;
+        }
         ArrayList workIntervalEntries1 = new ArrayList<BarEntry>();
         ArrayList workIntervalEntries2 = new ArrayList<BarEntry>();
         int[] wBarColors = new int[barEntries.size()];
@@ -259,7 +267,7 @@ public class HomeFragment extends Fragment {
                 workIntervalEntries1.add(new BarEntry(barEntries.get(i).getX(), 0f));
                 workIntervalEntries2.add(new BarEntry(barEntries.get(i).getX(), 0f));
             }
-            wBarColors[i] = ResourcesCompat.getColor(getResources(), R.color.yellow_2, null);
+            wBarColors[i] = ResourcesCompat.getColor(getResources(), R.color.yellow_1, null);
         }
         BarDataSet workSet1 = new BarDataSet(workIntervalEntries1, "Work_Interval_1");
         BarDataSet workSet2 = new BarDataSet(workIntervalEntries2, "Work_Interval_2");
@@ -271,12 +279,14 @@ public class HomeFragment extends Fragment {
 
         //BarDataSet 4: Last sleep interval
         List<Sleep> sleeps = mainActivity.getSleeps();
+        float lMidF = 0f;
         if (sleeps.size() > 0) {
             Sleep lastSleep = sleeps.get(sleeps.size() - 1);
             String lastOnset = sdfTime.format(new Date(lastSleep.sleepStart));
             String lastOffset = sdfTime.format(new Date(lastSleep.sleepEnd));
             float lOnsetF = mv.pastTimeToX(lastOnset);
             float lOffsetF = mv.pastTimeToX(lastOffset);
+            lMidF = (lOnsetF + lOffsetF) / 2f;
             Log.v("LastSleep", "Onset: " + lOnsetF + " / Offset: " + lOffsetF);
             ArrayList lastIntervalEntries1 = new ArrayList<BarEntry>();
             ArrayList lastIntervalEntries2 = new ArrayList<BarEntry>();
@@ -325,7 +335,7 @@ public class HomeFragment extends Fragment {
         //x axis on the top
         XAxisValueFormatter xAxisValueFormatter = new XAxisValueFormatter();
         xAxis.setValueFormatter(xAxisValueFormatter);
-        xAxis.setPosition(XAxis.XAxisPosition.TOP);
+        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
         xAxis.setGranularity(2f);
         xAxis.setLabelCount(barEntries.size(), true);
         Log.v("Size", String.valueOf(barEntries.size()));
@@ -349,6 +359,7 @@ public class HomeFragment extends Fragment {
         String inputOnset = sdfTime.format(new Date(mainActivity.getSleepOnset()));
         mv.setRecommendedTime(recommendedOnset);
         mv.setInputTime(inputOnset);
+        mv.setIntervalFloat(rMidF, wMidF, lMidF);
         mv.setChartView(alertnessChart);
         alertnessChart.setMarker(mv);
         //Set the Highlight
@@ -358,13 +369,19 @@ public class HomeFragment extends Fragment {
             Highlight[] highlights = new Highlight[] {
                     new Highlight(24f, 0, -1),
                     new Highlight(mv.timeToX(recommendedOnset), 0, -1),
-                    new Highlight(mv.timeToX(inputOnset), 0, -1)
+                    new Highlight(mv.timeToX(inputOnset), 0, -1),
+                    new Highlight(rMidF, 0, -1),
+                    new Highlight(wMidF, 0, -1),
+                    new Highlight(lMidF, 0, -1)
             };
             alertnessChart.highlightValues(highlights);
         } else {
             Highlight[] highlights = new Highlight[] {
                     new Highlight(24f, 0, -1),
-                    new Highlight(mv.timeToX(recommendedOnset), 0, -1)
+                    new Highlight(mv.timeToX(recommendedOnset), 0, -1),
+                    new Highlight(rMidF, 0, -1),
+                    new Highlight(wMidF, 0, -1),
+                    new Highlight(lMidF, 0, -1)
             };
             alertnessChart.highlightValues(highlights);
         }
