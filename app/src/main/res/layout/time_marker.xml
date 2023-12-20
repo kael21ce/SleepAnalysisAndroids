@@ -11,7 +11,8 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:background="@drawable/corner_8_black_stroke"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:visibility="visible">
 
         <TextView
             android:id="@+id/timeTypeText"
@@ -21,9 +22,9 @@
             android:layout_marginVertical="4dp"
             android:fontFamily="@font/pretendardvariable"
             android:gravity="center_horizontal"
-            android:textSize="12sp"
             android:text="희망 취침 시각"
-            android:textColor="@color/black" />
+            android:textColor="@color/black"
+            android:textSize="12sp" />
     </LinearLayout>
 
     <LinearLayout

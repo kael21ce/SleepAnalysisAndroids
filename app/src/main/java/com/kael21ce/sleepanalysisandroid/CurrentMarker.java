@@ -48,7 +48,7 @@ public class CurrentMarker extends MarkerView {
 
         //Inflate the layout
         View view;
-        if (e.getX() > 23.9f && e.getX() <= 24.1f) {
+        if (e.getX() > 23.9f && e.getX() <= 24.1f && highlight.getX() == 24f) {
             //current alertness
             view = LayoutInflater.from(context).inflate(R.layout.current_marker, this, true);
             markerLayout = view.findViewById(R.id.MarkerLayout);
@@ -70,7 +70,8 @@ public class CurrentMarker extends MarkerView {
             float currentAwareness = Math.round(e.getY()*10f)/10.0f;
             tvContent.setText("현재 각성도: " + currentAwareness);
         } else if (e.getX() > this.alertnessPhaseChange - 0.1f
-                && e.getX() <= this.alertnessPhaseChange + 0.1f) {
+                && e.getX() <= this.alertnessPhaseChange + 0.1f
+                && highlight.getX() == this.alertnessPhaseChange) {
             view = LayoutInflater.from(context).inflate(R.layout.time_marker, this, true);
             timeTypeText = view.findViewById(R.id.timeTypeText);
             timeTypeText.setText("권장 취침 시각");

@@ -281,6 +281,7 @@ public class HomeFragment extends Fragment {
         //BarDataSet 4: Last sleep interval
         List<Sleep> sleeps = mainActivity.getSleeps();
         float alertnessPhaseChange = 49f;
+        boolean calculateMore = true;
         float lMidF = 0f;
         if (sleeps.size() > 0) {
             Sleep lastSleep = sleeps.get(sleeps.size() - 1);
@@ -305,8 +306,9 @@ public class HomeFragment extends Fragment {
                 //Theoretically recommended sleep onset
                 if (i < barEntries.size() - 1) {
                     if (barEntries.get(i).getY() >= 0 && barEntries.get(i + 1).getY() <= 0) {
-                        if (barEntries.get(i).getX() >= lOffsetF) {
+                        if (barEntries.get(i).getX() >= lOffsetF && calculateMore) {
                             alertnessPhaseChange = barEntries.get(i).getX();
+                            calculateMore = false;
                         }
                     }
                 }
