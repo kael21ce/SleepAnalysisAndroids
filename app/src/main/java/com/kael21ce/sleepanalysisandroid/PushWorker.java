@@ -1,5 +1,6 @@
 package com.kael21ce.sleepanalysisandroid;
 
+import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -33,6 +34,7 @@ public class PushWorker extends Worker {
     private NotificationManager mNotifyManager;
     private static final int NOTIFICATION_ID = 0;
     long now = 0, sleepStart = 0, oneHour = 1000 * 60 * 60;
+    private int notiCount = 0;
     MainActivity mainActivity;
     SharedPreferences sharedPref;
 
@@ -57,6 +59,8 @@ public class PushWorker extends Worker {
                 .setContentText("추천 수면 시간을 확인해주세요")
                 .setContentIntent(pendingIntent)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE)
+                .setVibrate(new long[] { 1000, 1000, 1000, 1000, 1000 })
                 .setAutoCancel(true);
         createNotificationChannel(context);
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
@@ -75,11 +79,15 @@ public class PushWorker extends Worker {
                     return Result.failure();
                 }
                 Log.v(TAG, "Permission exists");
-                notificationManager.notify(NOTIFICATION_ID, builder.build());
+                if (notiCount == 0) {
+                    notificationManager.notify(NOTIFICATION_ID, builder.build());
+                    notiCount += 1;
+                }
 
                 return Result.success();
             } else {
                 Log.v(TAG, "Retry");
+                notiCount = 0;
                 return Result.retry();
             }
 
@@ -91,7 +99,7 @@ public class PushWorker extends Worker {
     public void createNotificationChannel(Context context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(CHECK_CHANNEL_ID,
-                    "Check Recommendation", NotificationManager.IMPORTANCE_DEFAULT);
+                    "Check Recommendation", NotificationManager.IMPORTANCE_HIGH);
             NotificationManager notificationManager = context.getSystemService(NotificationManager.class);
             notificationManager.createNotificationChannel(channel);
         }
