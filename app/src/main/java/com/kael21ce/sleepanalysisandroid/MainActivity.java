@@ -17,6 +17,10 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.room.Room;
+import androidx.work.Data;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkManager;
+import androidx.work.WorkRequest;
 
 import com.github.mikephil.charting.data.BarEntry;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -41,6 +45,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import io.reactivex.Observer;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -218,6 +223,22 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
         );
+
+        //Start worker
+        setOnOneTimeWorkRequest();
+    }
+
+
+    //WorkManager
+    private void setOnOneTimeWorkRequest() {
+        Data recommendOnset = new Data.Builder().putLong("recommendOnset", getMainSleepStart()).build();
+        WorkManager workManager = WorkManager.getInstance(getApplicationContext());
+        //Make work request
+        OneTimeWorkRequest pushRequest = new OneTimeWorkRequest.Builder(PushWorker.class)
+                .setInputData(recommendOnset)
+                .build();
+        workManager.beginWith(pushRequest).enqueue();
+        Log.v("recommendOnset", "WorkManager is called");
     }
 
     //If back button is clicked twice, move out from application
