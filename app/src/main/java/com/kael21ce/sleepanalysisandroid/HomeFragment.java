@@ -222,8 +222,8 @@ public class HomeFragment extends Fragment {
         int[] rBarColors = new int[barEntries.size()];
         for (int i = 0; i < barEntries.size(); i++) {
             if (barEntries.get(i).getX() >= rOnsetF && barEntries.get(i).getX() <= rOffsetF) {
-                sleepIntervalEntries1.add(new BarEntry(barEntries.get(i).getX(), -90f));
-                sleepIntervalEntries2.add(new BarEntry(barEntries.get(i).getX(), 90f));
+                sleepIntervalEntries1.add(new BarEntry(barEntries.get(i).getX(), -100f));
+                sleepIntervalEntries2.add(new BarEntry(barEntries.get(i).getX(), 100f));
             } else {
                 sleepIntervalEntries1.add(new BarEntry(barEntries.get(i).getX(), 0f));
                 sleepIntervalEntries2.add(new BarEntry(barEntries.get(i).getX(), 0f));
@@ -253,12 +253,12 @@ public class HomeFragment extends Fragment {
             if (barEntries.get(i).getX() >= wOnsetF) {
                 if (wOnsetF >= wOffsetF) {
                     //work offset > current time + 24h
-                    workIntervalEntries1.add(new BarEntry(barEntries.get(i).getX(), -90f));
-                    workIntervalEntries2.add(new BarEntry(barEntries.get(i).getX(), 90f));
+                    workIntervalEntries1.add(new BarEntry(barEntries.get(i).getX(), -100f));
+                    workIntervalEntries2.add(new BarEntry(barEntries.get(i).getX(), 100f));
                 } else {
                     if (barEntries.get(i).getX() <= wOffsetF) {
-                        workIntervalEntries1.add(new BarEntry(barEntries.get(i).getX(), -90f));
-                        workIntervalEntries2.add(new BarEntry(barEntries.get(i).getX(), 90f));
+                        workIntervalEntries1.add(new BarEntry(barEntries.get(i).getX(), -100f));
+                        workIntervalEntries2.add(new BarEntry(barEntries.get(i).getX(), 100f));
                     } else {
                         workIntervalEntries1.add(new BarEntry(barEntries.get(i).getX(), 0f));
                         workIntervalEntries2.add(new BarEntry(barEntries.get(i).getX(), 0f));
@@ -296,8 +296,8 @@ public class HomeFragment extends Fragment {
             int[] lBarColors = new int[barEntries.size()];
             for (int i = 0; i < barEntries.size(); i++) {
                 if (barEntries.get(i).getX() >= lOnsetF && barEntries.get(i).getX() <= lOffsetF) {
-                    lastIntervalEntries1.add(new BarEntry(barEntries.get(i).getX(), -90f));
-                    lastIntervalEntries2.add(new BarEntry(barEntries.get(i).getX(), 90f));
+                    lastIntervalEntries1.add(new BarEntry(barEntries.get(i).getX(), -100f));
+                    lastIntervalEntries2.add(new BarEntry(barEntries.get(i).getX(), 100f));
                 } else {
                     lastIntervalEntries1.add(new BarEntry(barEntries.get(i).getX(), 0f));
                     lastIntervalEntries2.add(new BarEntry(barEntries.get(i).getX(), 0f));
