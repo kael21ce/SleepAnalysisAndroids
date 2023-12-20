@@ -116,13 +116,6 @@ public class CurrentMarker extends MarkerView {
 
         float xR = timeToX(this.recommendedTime);
 
-        // Adjust the x-coordinate to center the marker
-        if (posX + offset.x < 0) {
-            offset.x = -posX;
-        } else if (posX + width + offset.x > canvas.getWidth()) {
-            offset.x = canvas.getWidth() - posX - width;
-        }
-
         // Adjust the y-coordinate
         float yValue = posY;
         float xValue = posX;
@@ -141,8 +134,7 @@ public class CurrentMarker extends MarkerView {
             posY = (float) point.y;
         }
 
-        //Center the marker horizontally
-        offset.x -= width / 2.0f;
+        posX -= width / 2.0f;
 
         //Make interval marker move to top of the chart
         boolean inSleep = false, inWork = false, inLast = false;
@@ -164,21 +156,23 @@ public class CurrentMarker extends MarkerView {
         } else {
             inLast = false;
         }
+
         if (inSleep || inWork || inLast) {
             offset.y = 0;
-            canvas.translate(posX + offset.x, offset.y);
+            canvas.translate(posX, offset.y);
             draw(canvas);
-            canvas.translate(-(posX + offset.x), -offset.y);
+            canvas.translate(-posX, -offset.y);
         } else {
+            int savedId = canvas.save();
+
+            canvas.clipRect(barChart.getViewPortHandler().getContentRect());
+
             posY -= (height - 15f);
-            canvas.translate(posX + offset.x, posY);
+            canvas.translate(posX, posY);
             draw(canvas);
-            canvas.translate(-(posX + offset.x), -posY);
+            canvas.restoreToCount(savedId);
         }
     }
-
-
-
 
 
     //Set the recommended time: format should be "hh:mm"
