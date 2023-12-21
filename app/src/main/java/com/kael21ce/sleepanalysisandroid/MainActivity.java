@@ -2,9 +2,12 @@ package com.kael21ce.sleepanalysisandroid;
 
 
 import android.annotation.SuppressLint;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.Html;
@@ -17,10 +20,8 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.room.Room;
-import androidx.work.Data;
 import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkManager;
-import androidx.work.WorkRequest;
 
 import com.github.mikephil.charting.data.BarEntry;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -44,8 +45,8 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
-import io.reactivex.Observer;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -62,6 +63,8 @@ public class MainActivity extends AppCompatActivity {
     private RelativeLayout loadingScreenLayout;
     boolean creation = false;
     SimpleDateFormat sdfDateTime = new SimpleDateFormat("dd/MM/yyyy"+ "HH:mm", Locale.KOREA);
+    private static final String TAG = "MainActivity";
+    private static final String CHECK_CHANNEL_ID = "check_recommend";
     HealthConnectManager healthConnectManager;
     //health connect
     private static Context context;
@@ -223,22 +226,33 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
         );
+        //Create channel
+        createNotificationChannel(this);
 
-        //Start worker
-        setOnOneTimeWorkRequest();
+        //Start worker with delay
+        long targetTime = getMainSleepStart();
+        long delay = targetTime - now - TimeUnit.HOURS.toMillis(1);
+        Log.v(TAG, "Delay of the notification: " + delay);
+
+        OneTimeWorkRequest pushRequest = new OneTimeWorkRequest.Builder(PushWorker.class)
+                .setInitialDelay(delay, TimeUnit.MILLISECONDS)
+                .build();
+        /*For test
+        OneTimeWorkRequest pushRequest = new OneTimeWorkRequest.Builder(PushWorker.class)
+                .setInitialDelay(1, TimeUnit.MINUTES)
+                .build();
+        */
+        WorkManager.getInstance(this).enqueue(pushRequest);
     }
 
-
-    //WorkManager
-    private void setOnOneTimeWorkRequest() {
-        Data recommendOnset = new Data.Builder().putLong("recommendOnset", getMainSleepStart()).build();
-        WorkManager workManager = WorkManager.getInstance(getApplicationContext());
-        //Make work request
-        OneTimeWorkRequest pushRequest = new OneTimeWorkRequest.Builder(PushWorker.class)
-                .setInputData(recommendOnset)
-                .build();
-        workManager.beginWith(pushRequest).enqueue();
-        Log.v("recommendOnset", "WorkManager is called");
+    //Create channel for notification of recommendation
+    public void createNotificationChannel(Context context) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(CHECK_CHANNEL_ID,
+                    "Check Recommendation", NotificationManager.IMPORTANCE_HIGH);
+            NotificationManager notificationManager = context.getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
     }
 
     //If back button is clicked twice, move out from application
@@ -314,6 +328,7 @@ public class MainActivity extends AppCompatActivity {
     public void onDestroy(){
         super.onDestroy();
         db.close();
+        Log.v(TAG, "onDestroy() is called");
     }
 
     public double getAwarenessValue(double H, double n, double y, double x){

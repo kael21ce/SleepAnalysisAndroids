@@ -20,6 +20,12 @@ import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.Locale;
 
 import io.reactivex.annotations.NonNull;
@@ -31,12 +37,7 @@ public class PushWorker extends Worker {
 
     private static final String TAG = PushWorker.class.getSimpleName();
     private static final String CHECK_CHANNEL_ID = "check_recommend";
-    private NotificationManager mNotifyManager;
     private static final int NOTIFICATION_ID = 0;
-    long now = 0, sleepStart = 0, oneHour = 1000 * 60 * 60;
-    private int notiCount = 0;
-    MainActivity mainActivity;
-    SharedPreferences sharedPref;
 
 
     //Compare the current time and recommended sleep -> Send push notification
@@ -44,10 +45,18 @@ public class PushWorker extends Worker {
     @Override
     public Result doWork() {
         Context context = getApplicationContext();
-        now = System.currentTimeMillis();
-        //sharedPref = context.getSharedPreferences("SleepWake", Context.MODE_PRIVATE);
-        //sleepStart = sharedPref.getLong("mainSleepStart", 0);
 
+        try {
+            //Code for notification
+            sendNotification(context);
+            return Result.success();
+
+        } catch (Exception e) {
+            return Result.failure();
+        }
+    }
+
+    public void sendNotification(Context context) {
         //Set the intent called when the notification is tapped
         Intent intent = new Intent(context, MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -62,46 +71,11 @@ public class PushWorker extends Worker {
                 .setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE)
                 .setVibrate(new long[] { 1000, 1000, 1000, 1000, 1000 })
                 .setAutoCancel(true);
-        createNotificationChannel(context);
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
 
-        //Get the data from MainActivity
-        try {
-            sleepStart = getInputData().getLong("recommendOnset", 0);
-
-            //Push notification before 1 hour from the recommended onset
-            long delta = sleepStart - now;
-            Log.v(TAG, "Difference from the recommended onset: " + delta);
-            if (delta >= 0 && delta <= oneHour) {
-                //Send push notification
-                if (ActivityCompat.checkSelfPermission(context, android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-                    Log.v(TAG, "No permission");
-                    return Result.failure();
-                }
-                Log.v(TAG, "Permission exists");
-                if (notiCount == 0) {
-                    notificationManager.notify(NOTIFICATION_ID, builder.build());
-                    notiCount += 1;
-                }
-
-                return Result.success();
-            } else {
-                Log.v(TAG, "Retry");
-                notiCount = 0;
-                return Result.retry();
-            }
-
-        } catch (Exception e) {
-            return Result.failure();
+        if (ActivityCompat.checkSelfPermission(context, android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+            Log.v(TAG, "No permission");
         }
-    }
-
-    public void createNotificationChannel(Context context) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel channel = new NotificationChannel(CHECK_CHANNEL_ID,
-                    "Check Recommendation", NotificationManager.IMPORTANCE_HIGH);
-            NotificationManager notificationManager = context.getSystemService(NotificationManager.class);
-            notificationManager.createNotificationChannel(channel);
-        }
+        notificationManager.notify(NOTIFICATION_ID, builder.build());
     }
 }

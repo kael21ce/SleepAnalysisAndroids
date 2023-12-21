@@ -616,7 +616,7 @@ public class HomeFragment extends Fragment {
         yAxis.setGridColor(ResourcesCompat.getColor(getResources(), R.color.gray_4, null));
         //Set the displaying range
         yAxis.setAxisMinimum(-100f);
-        yAxis.setAxisMaximum(100f);
+        yAxis.setAxisMaximum(110f);
     }
 
     //Customize the label
@@ -720,7 +720,6 @@ class XAxisValueFormatter extends ValueFormatter {
         float valueReal = value;
         float valueCentered = valueReal + currentHour + currentMinute / 60f;
         float currentCenter = 24f;
-        Log.v("Ticks", currentCenter + " compared to " + value);
         int valueR = Math.round(valueCentered);
         int quotient = valueR / 24;
         int remainder = valueR % 24;
