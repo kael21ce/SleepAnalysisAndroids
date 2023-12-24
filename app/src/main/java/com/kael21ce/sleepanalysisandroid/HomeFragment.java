@@ -364,6 +364,9 @@ public class HomeFragment extends Fragment {
         //Customize the font of labels
         customizeLabel(v.getContext(), alertnessChart);
 
+        //Move the view to current alertness which is shown in the center of the graph
+        alertnessChart.moveViewToX(19f);
+
         //Set the time of alertnessText
         String originString = sdfDateTimeRecomm.format(new Date(mainActivity.getMainSleepStart()));
         AlertnessText.setText("오늘의 권장 취침 시각은 " + originString + " 입니다");
