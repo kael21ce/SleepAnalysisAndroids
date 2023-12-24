@@ -1,12 +1,14 @@
 package com.kael21ce.sleepanalysisandroid;
 
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -19,6 +21,8 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.room.Room;
 import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkManager;
@@ -37,8 +41,14 @@ import com.kael21ce.sleepanalysisandroid.data.SleepModel;
 import com.kael21ce.sleepanalysisandroid.data.V0;
 import com.kael21ce.sleepanalysisandroid.data.V0Dao;
 
+import java.security.Permission;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -70,8 +80,11 @@ public class MainActivity extends AppCompatActivity {
     private static Context context;
     SharedPreferences sharedPref;
     SharedPreferences.Editor editor;
+    private static final String NotifyKey = "Notify_At";
     //Time after click back button
     private boolean doubleBackToExitPressedOnce = false;
+
+    private static final int PERMISSION_REQUEST_READ_LOCATION = 0x00000001;
 
     //for fragment too
     private long mainSleepStart, mainSleepEnd, napSleepStart, napSleepEnd;
@@ -84,7 +97,7 @@ public class MainActivity extends AppCompatActivity {
     private List<V0> v0s;
     String email, username;
     long now, nineHours;
-    long twoWeeks = (1000*60*60*24*14);
+    long twoWeeks = (1000*60*60*24*14), oneDay = 1000*60*60*24;
     long fiveMinutesToMil = (1000*60*5);
     Instant ILastSleepUpdate;
     SleepDao sleepDao;
@@ -105,6 +118,33 @@ public class MainActivity extends AppCompatActivity {
         //get the shared preferences variable
         sharedPref = getSharedPreferences("SleepWake", Context.MODE_PRIVATE);
         editor = sharedPref.edit();
+
+        //Set the initial notification time
+        if (!sharedPref.contains(NotifyKey)) {
+            editor.putString(NotifyKey, "21:00").apply();
+        }
+
+        //Create channel
+        createNotificationChannel(this);
+
+
+        //Request the permission of notification in context if API >= 33
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) !=
+                    PackageManager.PERMISSION_GRANTED) {
+                //Request again with rational
+                if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                        Manifest.permission.POST_NOTIFICATIONS)) {
+                    Toast.makeText(this, "추천 수면에 대한 알림을 받기 위해서 권한을 설정해야 합니다.",
+                            Toast.LENGTH_SHORT).show();
+                    ActivityCompat.requestPermissions(this,
+                            new String[]{Manifest.permission.POST_NOTIFICATIONS}, PERMISSION_REQUEST_READ_LOCATION);
+                } else {
+                    ActivityCompat.requestPermissions(this,
+                            new String[]{Manifest.permission.POST_NOTIFICATIONS}, PERMISSION_REQUEST_READ_LOCATION);
+                }
+            }
+        }
 
         //If there is no user email, start onBoarding pages
         if (!sharedPref.contains("User_Name") || !sharedPref.contains("User_Email")) {
@@ -226,23 +266,21 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
         );
-        //Create channel
-        createNotificationChannel(this);
 
         //Start worker with delay
-        long targetTime = getMainSleepStart();
-        long delay = targetTime - now - TimeUnit.HOURS.toMillis(1);
+        String notifyAt = sharedPref.getString(NotifyKey, "21:00");
+        long targetTime = timeToSeconds(notifyAt);
+        long delay = targetTime - now;
+        if (delay < 0) {
+            delay += oneDay;
+        }
         Log.v(TAG, "Delay of the notification: " + delay);
 
         OneTimeWorkRequest pushRequest = new OneTimeWorkRequest.Builder(PushWorker.class)
                 .setInitialDelay(delay, TimeUnit.MILLISECONDS)
                 .build();
-        /*For test
-        OneTimeWorkRequest pushRequest = new OneTimeWorkRequest.Builder(PushWorker.class)
-                .setInitialDelay(1, TimeUnit.MINUTES)
-                .build();
-        */
         WorkManager.getInstance(this).enqueue(pushRequest);
+        settingFragment.setRequested(pushRequest);
     }
 
     //Create channel for notification of recommendation
@@ -253,6 +291,16 @@ public class MainActivity extends AppCompatActivity {
             NotificationManager notificationManager = context.getSystemService(NotificationManager.class);
             notificationManager.createNotificationChannel(channel);
         }
+    }
+
+    //Change "HH:mm" to milliseconds
+    public long timeToSeconds(String value) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+        LocalTime time = LocalTime.parse(value, formatter);
+        LocalDate currentDate = LocalDate.now();
+        ZonedDateTime dateTime = ZonedDateTime.of(currentDate, time, ZoneId.systemDefault());
+
+        return dateTime.toInstant().toEpochMilli();
     }
 
     //If back button is clicked twice, move out from application

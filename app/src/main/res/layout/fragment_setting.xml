@@ -23,153 +23,67 @@
             -->
 
         <LinearLayout
-            android:id="@+id/LoadDataView"
+            android:id="@+id/NotifyView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/setting_stroke"
-            android:orientation="horizontal"
-            android:visibility="gone">
+            android:orientation="horizontal">
 
             <LinearLayout
-                android:id="@+id/LoadDataTextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/LoadDataTitle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="16dp"
-                    android:layout_marginTop="16dp"
-                    android:fontFamily="@font/pretendardbold"
-                    android:text="내 수면 데이터 불러오기"
-                    android:textColor="@color/black"
-                    android:textSize="20sp" />
-
-                <TextView
-                    android:id="@+id/LoadDataDescription"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="16dp"
-                    android:text="마지막 데이터 업데이트 " />
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/LoadDataCaption"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="right"
-                android:orientation="horizontal">
-
-                <ImageView
-                    android:id="@+id/LoadDataButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:layout_marginRight="16dp"
-                    android:src="@drawable/chevron_right" />
-            </LinearLayout>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/ServiceView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/setting_stroke"
-            android:orientation="horizontal"
-            android:visibility="gone">
-
-            <LinearLayout
-                android:id="@+id/ServiceTextView"
+                android:id="@+id/NotifyTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <TextView
-                    android:id="@+id/ServiceTitle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                <LinearLayout
+                    android:id="@+id/NotifyTextCaption"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
                     android:layout_marginVertical="24dp"
                     android:layout_marginLeft="16dp"
-                    android:fontFamily="@font/pretendardbold"
-                    android:text="약관 및 개인정보 처리방침 동의"
-                    android:textColor="@color/black"
-                    android:textSize="20sp" />
+                    android:orientation="vertical">
 
+                    <TextView
+                        android:id="@+id/NotifyTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/pretendardbold"
+                        android:text="알림 시간 설정"
+                        android:textColor="@color/black"
+                        android:textSize="20sp" />
+
+                    <TextView
+                        android:id="@+id/NotifyDescription"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/pretendardvariable"
+                        android:text="권한 없음"
+                        android:layout_marginTop="4dp"
+                        android:textColor="@color/gray_4"
+                        android:textSize="14sp" />
+                </LinearLayout>
 
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/ServiceCaption"
+                android:id="@+id/NotifyCaption"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:gravity="right"
                 android:orientation="horizontal">
 
-                <ImageView
-                    android:id="@+id/ServiceButton"
+                <Button
+                    android:id="@+id/notifyButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
                     android:layout_marginRight="16dp"
-                    android:src="@drawable/chevron_right" />
-            </LinearLayout>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/VersionView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/setting_stroke"
-            android:orientation="horizontal"
-            android:visibility="gone">
-
-            <LinearLayout
-                android:id="@+id/VersionTextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/VersionTitle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="16dp"
-                    android:layout_marginTop="16dp"
-                    android:fontFamily="@font/pretendardbold"
-                    android:text="앱 버전"
+                    android:backgroundTint="@color/gray_1"
+                    android:fontFamily="@font/pretendardvariable"
+                    android:text="09:00 PM"
                     android:textColor="@color/black"
-                    android:textSize="20sp" />
-
-                <TextView
-                    android:id="@+id/VersionDescription"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="16dp"
-                    android:text="최신 버전" />
+                    android:textSize="14sp" />
             </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/VersionCaption"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="right"
-                android:orientation="horizontal">
-
-                <ImageView
-                    android:id="@+id/VersionButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:layout_marginRight="16dp"
-                    android:src="@drawable/chevron_right" />
-            </LinearLayout>
-
         </LinearLayout>
 
         <LinearLayout
