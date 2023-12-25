@@ -267,6 +267,11 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
         );
+        //Cancel the former work request
+        if (settingFragment.getRequestedId() != null) {
+            WorkManager.getInstance(this).cancelWorkById(settingFragment.getRequestedId());
+            Log.v(TAG, "Former request is canceled");
+        }
 
         //Start worker with delay
         String notifyAt = sharedPref.getString(NotifyKey, "21:00");

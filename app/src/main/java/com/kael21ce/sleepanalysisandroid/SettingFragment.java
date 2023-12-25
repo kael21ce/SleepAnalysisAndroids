@@ -30,6 +30,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.Locale;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 public class SettingFragment extends Fragment implements ButtonTextUpdater {
@@ -169,6 +170,15 @@ public class SettingFragment extends Fragment implements ButtonTextUpdater {
     //Load the push work request
     public void setRequested(OneTimeWorkRequest request) {
         this.requested = request;
+    }
+
+    //Get the push work request id
+    public UUID getRequestedId() {
+        if (this.requested != null) {
+            return this.requested.getId();
+        } else {
+            return null;
+        }
     }
 
     @Override
