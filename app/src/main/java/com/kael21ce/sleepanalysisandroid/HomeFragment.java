@@ -367,9 +367,6 @@ public class HomeFragment extends Fragment {
         //Move the view to current alertness which is shown in the center of the graph
         alertnessChart.moveViewToX(19f);
 
-        //Set the time of alertnessText
-        String originString = sdfDateTimeRecomm.format(new Date(mainActivity.getMainSleepStart()));
-        AlertnessText.setText("오늘의 권장 취침 시각은 " + originString + " 입니다");
         //Set MarkerView
         String inputOnset = sdfTime.format(new Date(mainActivity.getSleepOnset()));
         mv.setRecommendedTime(recommendedOnset);
@@ -402,6 +399,8 @@ public class HomeFragment extends Fragment {
                 };
                 alertnessChart.highlightValues(highlights);
             }
+            String originString = floatToTime(alertnessPhaseChange);
+            AlertnessText.setText("오늘의 권장 취침 시각은 " + originString + " 입니다");
         } else {
             Highlight[] highlights = new Highlight[] {
                     new Highlight(24f, 0, -1),
@@ -411,6 +410,9 @@ public class HomeFragment extends Fragment {
                     new Highlight(lMidF, 0, -1)
             };
             alertnessChart.highlightValues(highlights);
+            //Set the time of alertnessText
+            String originString = sdfDateTimeRecomm.format(new Date(mainActivity.getMainSleepStart()));
+            AlertnessText.setText("오늘의 권장 취침 시각은 " + originString + " 입니다");
         }
         //Change the description depending on current alertness
         if (barEntries.size() > 0) {
@@ -649,6 +651,19 @@ public class HomeFragment extends Fragment {
         double totalTime = hourInt + (double) minuteInt / 60;
 
         return (int) ((124/24)*totalTime);
+    }
+
+    //Convert x float to "a hh:mm"
+    public String floatToTime(float value) {
+        if (value <= 48f) {
+            float currentValue = 24f;
+            float delta = value - currentValue;
+            long target = (long) (now + delta*60*60*1000);
+            Date date = new Date(target);
+            return sdfDateTimeRecomm.format(date);
+        } else {
+            return "";
+        }
     }
 
     //Set the difference of awareness interval
