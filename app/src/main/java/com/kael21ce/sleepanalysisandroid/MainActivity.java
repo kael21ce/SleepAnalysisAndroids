@@ -724,12 +724,12 @@ public class MainActivity extends AppCompatActivity {
         List<Sleep> tempSleep = new ArrayList<>();
         List<V0> tempV0 = new ArrayList<>();
         for(Sleep sleep: sleeps){
-            if(sleep.sleepStart >= lastBackendUpdate){
+            if(sleep.sleepStart <= now){
                 tempSleep.add(sleep);
             }
         }
         for(V0 v0: v0s){
-            if(v0.time >= lastBackendUpdate){
+            if(v0.time <= now){
                 tempV0.add(v0);
             }
         }
