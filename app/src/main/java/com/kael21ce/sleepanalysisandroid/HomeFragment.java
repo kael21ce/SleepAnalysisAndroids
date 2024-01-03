@@ -141,19 +141,6 @@ public class HomeFragment extends Fragment {
         });
 
         //Initial button color setting
-        sleepButton.setBackground(ResourcesCompat
-                .getDrawable(getResources(), R.drawable.corner_8_clicked, null));
-
-
-        sleepButton.setOnClickListener(v1 -> sleepButtonClick(v1, mainActivity, startTime, endTime,
-                sleepButton, napButton, workButton, sleepTypeText, sleepImportanceText, stateDescriptionText,
-                stateDescriptionSmallText, stateDescriptionImage, clockView));
-        napButton.setOnClickListener(v1 -> napButtonClick(v1, mainActivity, startTime, endTime,
-                sleepButton, napButton, workButton, sleepTypeText, sleepImportanceText, stateDescriptionText,
-                stateDescriptionSmallText, stateDescriptionImage, clockView));
-        workButton.setOnClickListener(v1 -> workButtonClick(v1, mainActivity, startTime, endTime,
-                sleepButton, napButton, workButton, sleepTypeText, sleepImportanceText, stateDescriptionText,
-                stateDescriptionSmallText, stateDescriptionImage, clockView));
         clockView.setTypeOfInterval(1);
         mainSleepStartString = sdfTime.format(new Date(mainActivity.getMainSleepStart()));
         mainSleepEndString = sdfTime.format(new Date(mainActivity.getMainSleepEnd()));
@@ -167,7 +154,20 @@ public class HomeFragment extends Fragment {
         Log.v("work onset", sdfDateTime2.format(new Date(sharedPref.getLong("workOnset", now))));
         Log.v("work offset", sdfDateTime2.format(new Date(sharedPref.getLong("workOffset", now))));
 
-        //Just Example
+        sleepButton.setBackground(ResourcesCompat
+                .getDrawable(getResources(), R.drawable.corner_8_clicked, null));
+
+        sleepButton.setOnClickListener(v1 -> sleepButtonClick(v1, mainActivity, startTime, endTime,
+                sleepButton, napButton, workButton, sleepTypeText, sleepImportanceText, stateDescriptionText,
+                stateDescriptionSmallText, stateDescriptionImage, clockView));
+        napButton.setOnClickListener(v1 -> napButtonClick(v1, mainActivity, startTime, endTime,
+                sleepButton, napButton, workButton, sleepTypeText, sleepImportanceText, stateDescriptionText,
+                stateDescriptionSmallText, stateDescriptionImage, clockView));
+        workButton.setOnClickListener(v1 -> workButtonClick(v1, mainActivity, startTime, endTime,
+                sleepButton, napButton, workButton, sleepTypeText, sleepImportanceText, stateDescriptionText,
+                stateDescriptionSmallText, stateDescriptionImage, clockView));
+        sleepButton.performClick();
+
         clockView.setAngleFromTime(mainSleepStartString, mainSleepEndString);
 
         //we use connection because fragment and activity is connected and we don't reuse fragment for other activity
@@ -510,8 +510,13 @@ public class HomeFragment extends Fragment {
                                  ImageView stateDescriptionImage, ClockView clockView)
     {
         stateDescriptionSmallText.setVisibility(View.VISIBLE);
-        startTime.setText(sdfDateTimeRecomm.format(new Date(mainActivity.getMainSleepStart())));
-        endTime.setText(sdfDateTimeRecomm.format(new Date(mainActivity.getMainSleepEnd())));
+        long sleepStart = mainActivity.getMainSleepStart();
+        long sleepEnd = mainActivity.getMainSleepEnd();
+        startTime.setText(sdfDateTimeRecomm.format(new Date(sleepStart)));
+        endTime.setText(sdfDateTimeRecomm.format(new Date(sleepEnd)));
+        boolean isearly = mainActivity.getIsEarlySleep();
+        boolean isenough = mainActivity.getIsEnoughSleep();
+
         //Change the color of buttons
         sleepButton.setBackground(ResourcesCompat
                 .getDrawable(getResources(), R.drawable.corner_8_clicked, null));
@@ -524,9 +529,33 @@ public class HomeFragment extends Fragment {
         sleepImportanceText.setText("중요");
         sleepImportanceText.setBackground(ResourcesCompat
                 .getDrawable(getResources(), R.drawable.important_caption, null));
-        stateDescriptionText.setText("잠을 자기 좋은 시간이에요");
-        stateDescriptionSmallText.setText("기상시간을 지켜주세요");
-        stateDescriptionImage.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.sleep, null));
+        if (sleepStart == sleepEnd) {
+            stateDescriptionText.setText("잠에 들기 어려운 시각이에요");
+            stateDescriptionSmallText.setText("다른 취침 시각을 선택해보세요");
+            stateDescriptionImage.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.sad, null));
+        } else {
+            if (isenough) {
+                if (isearly) {
+                    stateDescriptionText.setText("선택하신 취침 시각이 너무 일러요");
+                    stateDescriptionSmallText.setText("조금 더 늦은 수면을 추천드려요");
+                    stateDescriptionImage.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.sad, null));
+                } else {
+                    stateDescriptionText.setText("잠을 자기 좋은 시간이에요");
+                    stateDescriptionSmallText.setText("기상시간을 지켜주세요");
+                    stateDescriptionImage.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.sleep, null));
+                }
+            } else {
+                if (isearly) {
+                    stateDescriptionText.setText("잠이 충분하지 않아요");
+                    stateDescriptionSmallText.setText("최대한 잠을 자도 피곤할 수 있어요");
+                    stateDescriptionImage.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.puke, null));
+                } else {
+                    stateDescriptionText.setText("잠이 충분하지 않아요");
+                    stateDescriptionSmallText.setText("희망 취침 시각을 앞으로 당겨보세요");
+                    stateDescriptionImage.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.puke, null));
+                }
+            }
+        }
         //Change the clock angle using setAngle and color using setTypeOfInterval
         clockView.setTypeOfInterval(1);
         //Just example
@@ -545,8 +574,13 @@ public class HomeFragment extends Fragment {
                                ImageView stateDescriptionImage, ClockView clockView)
     {
         stateDescriptionSmallText.setVisibility(View.VISIBLE);
-        startTime.setText(sdfDateTimeRecomm.format(new Date(mainActivity.getNapSleepStart())));
-        endTime.setText(sdfDateTimeRecomm.format(new Date(mainActivity.getNapSleepEnd())));
+        long napStart = mainActivity.getNapSleepStart();
+        long napEnd = mainActivity.getNapSleepEnd();
+        startTime.setText(sdfDateTimeRecomm.format(new Date(napStart)));
+        endTime.setText(sdfDateTimeRecomm.format(new Date(napEnd)));
+        boolean isearly = mainActivity.getIsEarlySleep();
+        boolean isenough = mainActivity.getIsEnoughSleep();
+
         //Change the color of buttons
         sleepButton.setBackground(ResourcesCompat
                 .getDrawable(getResources(), R.drawable.corner_8, null));
@@ -559,19 +593,24 @@ public class HomeFragment extends Fragment {
         sleepImportanceText.setText("권장");
         sleepImportanceText.setBackground(ResourcesCompat
                 .getDrawable(getResources(), R.drawable.recommend_caption, null));
-        stateDescriptionText.setText("낮잠을 주무세요");
-        stateDescriptionSmallText.setText("맑은 정신을 유지할 수 있어요");
-        stateDescriptionImage.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.sleep, null));
         clockView.setTypeOfInterval(2);
-        //Just example
         if(!napSleepStartString.equals(napSleepEndString)) {
             clockView.setIsRecommended(true);
             clockView.setAngleFromTime(napSleepStartString, napSleepEndString);
+            stateDescriptionText.setText("낮잠을 주무세요");
+            stateDescriptionSmallText.setText("이 시간에 충분히 자야해요");
+            stateDescriptionImage.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.sleep, null));
         }else{
             clockView.setIsRecommended(false);
-            stateDescriptionText.setText("낮잠이 필요하지 않아요");
-            stateDescriptionSmallText.setText("낮잠 없이도 맑은 정신을 유지할 수 있어요");
-            stateDescriptionImage.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.laugh, null));
+            if (isenough) {
+                stateDescriptionText.setText("낮잠이 필요하지 않아요");
+                stateDescriptionSmallText.setText("낮잠 없이도 맑은 정신을 유지할 수 있어요");
+                stateDescriptionImage.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.smile, null));
+            } else {
+                stateDescriptionText.setText("낮잠을 잘 수 없어요");
+                stateDescriptionSmallText.setText("수면이 충분하지 않아요");
+                stateDescriptionImage.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.puke, null));
+            }
             startTime.setText("--:--");
             endTime.setText("--:--");
         }
@@ -583,9 +622,10 @@ public class HomeFragment extends Fragment {
                                 TextView stateDescriptionText, TextView stateDescriptionSmallText,
                                 ImageView stateDescriptionImage, ClockView clockView)
     {
-        stateDescriptionSmallText.setVisibility(View.GONE);
         startTime.setText(sdfDateTimeRecomm.format(new Date(mainActivity.getWorkOnset())));
         endTime.setText(sdfDateTimeRecomm.format(new Date(mainActivity.getWorkOffset())));
+        boolean isearly = mainActivity.getIsEarlySleep();
+        boolean isenough = mainActivity.getIsEnoughSleep();
         //Change the color of buttons
         sleepButton.setBackground(ResourcesCompat
                 .getDrawable(getResources(), R.drawable.corner_8, null));
@@ -598,8 +638,15 @@ public class HomeFragment extends Fragment {
         sleepImportanceText.setText("중요");
         sleepImportanceText.setBackground(ResourcesCompat
                 .getDrawable(getResources(), R.drawable.important_caption, null));
-        stateDescriptionText.setText("가장 각성도가 높은 시간이에요");
-        stateDescriptionImage.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.smile, null));
+        if (isenough) {
+            stateDescriptionText.setText("집중을 위한 시간이에요");
+            stateDescriptionSmallText.setText("맑은 정신을 유지할 수 있어요");
+            stateDescriptionImage.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.smile, null));
+        } else {
+            stateDescriptionText.setText("집중을 위한 시간이에요");
+            stateDescriptionSmallText.setText("맑은 정신을 유지하기 어려워요");
+            stateDescriptionImage.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.puke, null));
+        }
         clockView.setTypeOfInterval(3);
         //Just example
         clockView.setIsRecommended(true);

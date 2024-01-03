@@ -88,6 +88,7 @@ public class MainActivity extends AppCompatActivity {
 
     //for fragment too
     private long mainSleepStart, mainSleepEnd, napSleepStart, napSleepEnd;
+    private boolean isearlysleep, isenoughsleep;
     private long sleepOnset, workOnset, workOffset;
     private long lastSleepUpdate, lastDataUpdate, lastBackendUpdate;
 
@@ -538,10 +539,16 @@ public class MainActivity extends AppCompatActivity {
         mainSleepEnd = sleepSuggestion[1]*(1000*60*5)+now;
         napSleepStart = sleepSuggestion[2]*(1000*60*5)+now;
         napSleepEnd = sleepSuggestion[3]*(1000*60*5)+now;
+        int isearly = sleepSuggestion[4], isenough = sleepSuggestion[5];
+        //Get isearlysleep and isenoughsleep
+        isearlysleep = isearly != 0;
+        isenoughsleep = isenough != 0;
         editor.putLong("mainSleepStart", mainSleepStart);
         editor.putLong("mainSleepEnd", mainSleepEnd);
         editor.putLong("napSleepStart", napSleepStart);
         editor.putLong("napSleepEnd", napSleepEnd);
+        editor.putBoolean("isearlysleep", isearlysleep);
+        editor.putBoolean("isenoughsleep", isenoughsleep);
         editor.apply();
 
         //get the new graph V0
@@ -932,6 +939,14 @@ public class MainActivity extends AppCompatActivity {
         editor.putLong("workOffset", workOffset);
         editor.apply();
         Log.v("work offset", sdfDateTime.format(new Date(sharedPref.getLong("workOffset", now))));
+    }
+
+    public boolean getIsEarlySleep() {
+        return this.isearlysleep;
+    }
+
+    public boolean getIsEnoughSleep() {
+        return this.isenoughsleep;
     }
 
     public long getLastSleepUpdate() {

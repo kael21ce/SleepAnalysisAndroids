@@ -120,15 +120,21 @@ public class SleepModel {
         return pcr_simulation(V0, sleep_pattern, 5 / 60.0); // run the simulation
     }
 
+    //type1: sleep is enough
+    //type2: sleep is early
+    //-> 0: false, 1: true
     public static int[] Sleep_pattern_suggestion(double[] V0, int sleep_onset, int work_onset, int work_offset, double step) {
         int buffer = (int) Math.round(1 / step); // Time between nap offset and work onset
         int unit = (int) Math.round(0.5 / step);
         int len0 = work_onset - sleep_onset; // length between work onset and work onset
         int len1 = work_offset - work_onset;
-        int[] result = {0, 0, 0, 0}; //Output 1
+        int type1 = 0, type2 = 0;
+        int[] result = {0, 0, 0, 0, 0, 0}; //Output 1
         int i, idx; // iterator
 
         if (sleep_onset <= 0 || len0 <= buffer || len1 <= 0) { // Wrong input
+            result[4] = 0;
+            result[5] = 0;
             return result;
         }
 
@@ -140,8 +146,10 @@ public class SleepModel {
         double D_up = (2.46 + 10.2 + (3.37 * 0.5) * (1.0 + coef_y * V_tmp[1] + coef_x * V_tmp[0])) / v_vh; // sleep threshold
 
         int sleep_start = 0, sleep_amount = 0; // first point where the CSS sleep is possible
+        type2 = 0;
 
         if (D_up > H) { // CSS sleep is impossible at sleep onset -> Need more awake
+            type2 = 1;
             i = 0;
             while (i < (len0 - buffer)) { // find the point where the CSS sleep is possible
                 V_tmp = rk4_wake(V_tmp, step); // simulate awake
@@ -181,6 +189,8 @@ public class SleepModel {
         if (sleep_start + sleep_amount >= (len0 - buffer)) {
             result[0] = sleep_onset + sleep_start;
             result[1] = work_onset - buffer;
+            result[4] = 0;
+            result[5] = type2;
             return result;
         }
         if (sleep_amount < unit) { // CSS sleep is impossible or meaningless
@@ -207,6 +217,8 @@ public class SleepModel {
         }
 
         if (D_up1 - H1 > 0) { //AL condition is satisfied
+            result[4] = 1;
+            result[5] = type2;
             return result;
         }
 
@@ -217,6 +229,8 @@ public class SleepModel {
             { // AL condition is not satisfied even we take full sleep
                 result[0] = sleep_onset;
                 result[1] = work_onset - buffer;
+                result[4] = 0;
+                result[5] = type2;
                 return result;
             }
 
@@ -249,6 +263,8 @@ public class SleepModel {
         if (result[2] - result[1] < buffer){
             result[1] = result[1] + result[3] - result[2];
         }
+        result[4] = 0;
+        result[5] = type2;
         return result;
     }
 }
