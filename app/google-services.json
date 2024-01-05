@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "487531113780",
+    "project_id": "sleepwake-5b917",
+    "storage_bucket": "sleepwake-5b917.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:487531113780:android:a999e9dbfaf1ba08c5c961",
+        "android_client_info": {
+          "package_name": "com.kael21ce.sleepanalysisandroid"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAgtq7M-sHIxdO6_lRryFNVBkAxzVMsZlc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

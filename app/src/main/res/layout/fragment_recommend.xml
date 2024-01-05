@@ -213,21 +213,46 @@
                             android:layout_height="wrap_content"
                             android:orientation="horizontal">
 
-                            <TextView
-                                android:id="@+id/WorkText"
+                            <LinearLayout
+                                android:id="@+id/WorkTextCaption"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_margin="16dp"
-                                android:fontFamily="@font/pretendardbold"
-                                android:text="집중을 위한 시간"
-                                android:textColor="@color/black"
-                                android:textSize="16sp" />
+                                android:orientation="vertical">
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:orientation="horizontal">
+
+                                    <TextView
+                                        android:id="@+id/WorkText"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginHorizontal="16dp"
+                                        android:layout_marginTop="16dp"
+                                        android:fontFamily="@font/pretendardbold"
+                                        android:text="근무 시간"
+                                        android:textColor="@color/black"
+                                        android:textSize="16sp" />
+                                </LinearLayout>
+
+                                <TextView
+                                    android:id="@+id/WorkSmallText"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginHorizontal="16dp"
+                                    android:layout_marginTop="4dp"
+                                    android:fontFamily="@font/pretendardvariable"
+                                    android:text="휴일이라면 집중하고 싶은 시간을 선택해주세요"
+                                    android:textColor="@color/gray_4"
+                                    android:textSize="12sp" />
+                            </LinearLayout>
 
                             <LinearLayout
                                 android:id="@+id/idcardCaption"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:gravity="right"
+                                android:gravity="right|center_vertical"
                                 android:orientation="horizontal">
 
                                 <ImageView
