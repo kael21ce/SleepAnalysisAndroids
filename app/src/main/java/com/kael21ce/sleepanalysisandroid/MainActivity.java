@@ -207,15 +207,16 @@ public class MainActivity extends AppCompatActivity {
         sleepDao = db.sleepDao();
 
         getSleepData();
+        Log.v("SLEEP Sd", Integer.toString(sleeps.size()));
         if(sleeps.size() > 0) {
             do_simulation();
             calculateAwareness();
-            if(now-lastBackendUpdate >= (1000*60*60*24)) {
+//            if(now-lastBackendUpdate >= (1000*60*60*24)) {
                 sendV0(username);
                 lastBackendUpdate = now;
                 editor.putLong("lastBackendUpdate", now);
                 editor.apply();
-            }
+//            }
         }
         /*
         //Hide navigation bar
@@ -755,7 +756,7 @@ public class MainActivity extends AppCompatActivity {
 
                 // on below line we are getting our data from modal class and adding it to our string.
                 String responseString = "Response Code : " + response.code() + "\nName : "  + "\n" ;
-                Log.v("RESPONSE", responseString);
+                Log.v("RESPONSE2", responseString);
             }
 
             @Override

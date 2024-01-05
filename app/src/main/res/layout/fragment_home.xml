@@ -83,7 +83,8 @@
                 android:layout_height="match_parent"
                 android:layout_margin="16dp"
                 android:background="@drawable/corner_16"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:visibility="gone">
 
                 <LinearLayout
                     android:id="@+id/homeNoDataCaption"
@@ -441,8 +442,7 @@
                 android:layout_marginTop="16dp"
                 android:layout_marginBottom="68dp"
                 android:background="@drawable/corner_16"
-                android:orientation="vertical"
-                android:visibility="gone">
+                android:orientation="vertical">
 
                 <TextView
                     android:id="@+id/ChartTitle"
@@ -630,6 +630,16 @@
                     </LinearLayout>
 
                 </LinearLayout>
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/sendDataButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="#2196F3"
+                    android:backgroundTint="#2196F3"
+                    android:text="Send Data"
+                    tools:text="Send Data" />
+
             </LinearLayout>
 
         </LinearLayout>

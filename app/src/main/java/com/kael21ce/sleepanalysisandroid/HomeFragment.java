@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -175,6 +176,12 @@ public class HomeFragment extends Fragment {
         //endTime.setText(mainSleepEndString);
         startTime.setText(sdfDateTimeRecomm.format(new Date(mainActivity.getMainSleepStart())));
         endTime.setText(sdfDateTimeRecomm.format(new Date(mainActivity.getMainSleepEnd())));
+
+        Button buttonSendData = v.findViewById(R.id.sendDataButton);
+
+        buttonSendData.setOnClickListener(view -> {
+            mainActivity.sendV0(user_name);
+        });
 
         //Graph showing alertness
         //Change the alertnessDescription
