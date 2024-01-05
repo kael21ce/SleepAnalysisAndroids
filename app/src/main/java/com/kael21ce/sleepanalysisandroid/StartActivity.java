@@ -6,8 +6,19 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.Toast;
+
+import com.kael21ce.sleepanalysisandroid.data.DataSurvey;
+import com.kael21ce.sleepanalysisandroid.data.DataUser;
+import com.kael21ce.sleepanalysisandroid.data.RetrofitAPI;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class StartActivity extends AppCompatActivity {
     SharedPreferences sharedPref;
@@ -26,7 +37,6 @@ public class StartActivity extends AppCompatActivity {
         sharedPref = getSharedPreferences("SleepWake", Context.MODE_PRIVATE);
         editor = sharedPref.edit();
 
-
         //Get intent from CheckActivity
         Intent emailIntent = getIntent();
         Button startButton = findViewById(R.id.startButton);
@@ -42,6 +52,7 @@ public class StartActivity extends AppCompatActivity {
             editor.apply();
 
             //Move to MainActivity
+
             Intent mainIntent = new Intent(StartActivity.this, MainActivity.class);
             mainIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(mainIntent);
