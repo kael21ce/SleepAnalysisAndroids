@@ -291,8 +291,15 @@ public class MainActivity extends AppCompatActivity {
         WorkManager.getInstance(this).enqueue(pushRequest);
         settingFragment.setRequested(pushRequest);
 
-        long surveyTime = getWorkOnset();
-        long surveyDelay = surveyTime - now - oneDay;
+        long surveyTime, surveyDelay;
+        if (!sharedPref.contains("workOnset")) {
+            surveyTime = timeToSeconds("13:00");
+            surveyDelay = surveyTime - now;
+        } else {
+            surveyTime = getWorkOnset();
+            surveyDelay = surveyTime - now - oneDay;
+        }
+
         if (surveyDelay < 0) {
             surveyDelay += oneDay;
         }
