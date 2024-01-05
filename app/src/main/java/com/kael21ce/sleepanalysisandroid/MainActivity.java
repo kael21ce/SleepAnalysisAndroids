@@ -74,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
     boolean creation = false;
     SimpleDateFormat sdfDateTime = new SimpleDateFormat("dd/MM/yyyy"+ "HH:mm", Locale.KOREA);
     private static final String TAG = "MainActivity";
-    private static final String CHECK_CHANNEL_ID = "check_recommend";
+    private static final String CHECK_CHANNEL_ID = "check_recommend", SURVEY_CHANNEL_ID = "alertness_survey";
     HealthConnectManager healthConnectManager;
     //health connect
     private static Context context;
@@ -127,6 +127,7 @@ public class MainActivity extends AppCompatActivity {
 
         //Create channel
         createNotificationChannel(this);
+        createSurveyChannel(this);
 
 
         //Request the permission of notification in context if API >= 33
@@ -289,6 +290,18 @@ public class MainActivity extends AppCompatActivity {
                 .build();
         WorkManager.getInstance(this).enqueue(pushRequest);
         settingFragment.setRequested(pushRequest);
+
+        long surveyTime = getWorkOnset();
+        long surveyDelay = surveyTime - now - oneDay;
+        if (surveyDelay < 0) {
+            surveyDelay += oneDay;
+        }
+        Log.v(TAG, "Survey delay: " + surveyDelay);
+        //Notification for survey
+        OneTimeWorkRequest surveyRequest = new OneTimeWorkRequest.Builder(SurveyWorker.class)
+                .setInitialDelay(surveyDelay, TimeUnit.MILLISECONDS)
+                .build();
+        WorkManager.getInstance(this).enqueue(surveyRequest);
     }
 
     //Create channel for notification of recommendation
@@ -296,6 +309,16 @@ public class MainActivity extends AppCompatActivity {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(CHECK_CHANNEL_ID,
                     "Check Recommendation", NotificationManager.IMPORTANCE_HIGH);
+            NotificationManager notificationManager = context.getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
+    }
+
+    //Create channel for notification for survey
+    public void createSurveyChannel(Context context) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(SURVEY_CHANNEL_ID,
+                    "Alertness Survey", NotificationManager.IMPORTANCE_HIGH);
             NotificationManager notificationManager = context.getSystemService(NotificationManager.class);
             notificationManager.createNotificationChannel(channel);
         }
