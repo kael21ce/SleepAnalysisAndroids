@@ -23,14 +23,16 @@ import java.text.SimpleDateFormat;
 public class CurrentMarker extends MarkerView {
     private Context context;
     private TextView tvContent;
-    private LinearLayout markerLayout, currentDotLayout, intervalLayout;
-    private TextView timeTypeText, intervalTypeText;
+    private LinearLayout markerLayout, lowerMarkerLayout, currentDotLayout, intervalLayout;
+    private LinearLayout timeMarkerLayout, lowerTimeMarkerLayout;
+    private TextView intervalTypeText;
     private String recommendedTime = "00:00";
     private String inputTime = "00:00";
     private float alertnessPhaseChange = 0f;
     private float sleepIntervalTimeFloat = 0f, workIntervalTimeFloat = 0f, lastIntervalTimeFloat = 0f;
     private Entry currentEntry;
     private BarChart barChart;
+    private float currentAlertness = 0;
 
     public CurrentMarker(Context context, int layoutResource, BarChart barChart) {
         super(context, layoutResource);
@@ -52,16 +54,23 @@ public class CurrentMarker extends MarkerView {
             //current alertness
             view = LayoutInflater.from(context).inflate(R.layout.current_marker, this, true);
             markerLayout = view.findViewById(R.id.MarkerLayout);
-            tvContent = view.findViewById(R.id.currentAwareness);
+            lowerMarkerLayout = view.findViewById(R.id.LowerMarkerLayout);
             currentDotLayout = view.findViewById(R.id.currentDotLayout);
+            this.currentAlertness = e.getY();
             if (e.getY() >= 0) {
+                tvContent = view.findViewById(R.id.currentAwareness);
+                markerLayout.setVisibility(VISIBLE);
+                lowerMarkerLayout.setVisibility(GONE);
                 markerLayout.setBackground(ResourcesCompat.getDrawable(getResources(),
                         R.drawable.corner_8_green, null));
                 tvContent.setTextColor(ResourcesCompat.getColor(getResources(), R.color.green_1, null));
                 currentDotLayout.setBackground(ResourcesCompat.getDrawable(getResources(),
                         R.drawable.corner_8_green_stroke, null));
             } else {
-                markerLayout.setBackground(ResourcesCompat.getDrawable(getResources(),
+                tvContent = view.findViewById(R.id.lowerCurrentAwareness);
+                markerLayout.setVisibility(GONE);
+                lowerMarkerLayout.setVisibility(VISIBLE);
+                lowerMarkerLayout.setBackground(ResourcesCompat.getDrawable(getResources(),
                         R.drawable.corner_8_red, null));
                 tvContent.setTextColor(ResourcesCompat.getColor(getResources(), R.color.red_1, null));
                 currentDotLayout.setBackground(ResourcesCompat.getDrawable(getResources(),
@@ -73,12 +82,15 @@ public class CurrentMarker extends MarkerView {
                 && e.getX() <= this.alertnessPhaseChange + 0.1f
                 && highlight.getX() == this.alertnessPhaseChange) {
             view = LayoutInflater.from(context).inflate(R.layout.time_marker, this, true);
-            timeTypeText = view.findViewById(R.id.timeTypeText);
-            timeTypeText.setText("권장 취침 시각");
-        } else if (e.getX() > xI - 0.1f && e.getX() <= xI + 0.1f) {
-            view = LayoutInflater.from(context).inflate(R.layout.time_marker, this, true);
-            timeTypeText = view.findViewById(R.id.timeTypeText);
-            timeTypeText.setText("희망 취침 시각");
+            timeMarkerLayout = view.findViewById(R.id.TimeMarkerLayout);
+            lowerTimeMarkerLayout = view.findViewById(R.id.LowerTimeMarkerLayout);
+            if (this.currentAlertness >= 0) {
+                timeMarkerLayout.setVisibility(GONE);
+                lowerTimeMarkerLayout.setVisibility(VISIBLE);
+            } else {
+                timeMarkerLayout.setVisibility(VISIBLE);
+                lowerTimeMarkerLayout.setVisibility(GONE);
+            }
         } else if (e.getX() > this.sleepIntervalTimeFloat - 0.1f && e.getX() <= this.sleepIntervalTimeFloat + 0.1f) {
             view = LayoutInflater.from(context).inflate(R.layout.interval_marker, this, true);
             intervalLayout = view.findViewById(R.id.IntervalLayout);
@@ -141,20 +153,25 @@ public class CurrentMarker extends MarkerView {
         if (currentEntry.getX() > this.sleepIntervalTimeFloat - 0.1f
                 && currentEntry.getX() <= this.sleepIntervalTimeFloat + 0.1f) {
             inSleep = true;
-        } else {
-            inSleep = false;
         }
         if (currentEntry.getX() > this.workIntervalTimeFloat - 0.1f
                 && currentEntry.getX() <= this.workIntervalTimeFloat + 0.1f) {
             inWork = true;
-        } else {
-            inWork = false;
         }
         if (currentEntry.getX() > this.lastIntervalTimeFloat - 0.1f
                 && currentEntry.getX() <= this.lastIntervalTimeFloat + 0.1f) {
             inLast = true;
-        } else {
-            inLast = false;
+        }
+
+        //Current marker and time marker
+        boolean inCurrent = false, inTime = false;
+        if (currentEntry.getX() > 23.9f
+                && currentEntry.getX() <= 24.1f) {
+            inCurrent = true;
+        }
+        if (currentEntry.getX() > this.alertnessPhaseChange - 0.1f
+                && currentEntry.getX() <= this.alertnessPhaseChange + 0.1f) {
+            inTime = true;
         }
 
         if (inSleep || inWork || inLast) {
@@ -164,10 +181,20 @@ public class CurrentMarker extends MarkerView {
             canvas.translate(-posX, -offset.y);
         } else {
             int savedId = canvas.save();
-
             canvas.clipRect(barChart.getViewPortHandler().getContentRect());
-
-            posY -= (height - 15f);
+            if (this.currentAlertness >= 0) {
+                if (inCurrent) {
+                    posY -= (height - 15f);
+                } else if (inTime) {
+                    posY -= 15f;
+                }
+            } else {
+                if (inCurrent) {
+                    posY -= 15f;
+                } else if (inTime) {
+                    posY -= (height - 15f);
+                }
+            }
             canvas.translate(posX, posY);
             draw(canvas);
             canvas.restoreToCount(savedId);

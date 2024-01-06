@@ -386,32 +386,19 @@ public class HomeFragment extends Fragment {
         //If the recommended onset and input onset exhibits little difference,
         //only display the recommended onset
         if (alertnessPhaseChange != 49f) {
-            if (Math.abs(alertnessPhaseChange - mv.timeToX(inputOnset)) > 0.1) {
-                Highlight[] highlights = new Highlight[] {
-                        new Highlight(24f, 0, -1),
-                        new Highlight(alertnessPhaseChange, 0, -1),
-                        new Highlight(mv.timeToX(inputOnset), 0, -1),
-                        new Highlight(rMidF, 0, -1),
-                        new Highlight(wMidF, 0, -1),
-                        new Highlight(lMidF, 0, -1)
-                };
-                alertnessChart.highlightValues(highlights);
-            } else {
-                Highlight[] highlights = new Highlight[] {
-                        new Highlight(24f, 0, -1),
-                        new Highlight(mv.timeToX(inputOnset), 0, -1),
-                        new Highlight(rMidF, 0, -1),
-                        new Highlight(wMidF, 0, -1),
-                        new Highlight(lMidF, 0, -1)
-                };
-                alertnessChart.highlightValues(highlights);
-            }
+            Highlight[] highlights = new Highlight[] {
+                    new Highlight(24f, 0, -1),
+                    new Highlight(alertnessPhaseChange, 0, -1),
+                    new Highlight(rMidF, 0, -1),
+                    new Highlight(wMidF, 0, -1),
+                    new Highlight(lMidF, 0, -1)
+            };
+            alertnessChart.highlightValues(highlights);
             String originString = floatToTime(alertnessPhaseChange);
             AlertnessText.setText("오늘의 권장 취침 시각은 " + originString + " 입니다");
         } else {
             Highlight[] highlights = new Highlight[] {
                     new Highlight(24f, 0, -1),
-                    new Highlight(mv.timeToX(inputOnset), 0, -1),
                     new Highlight(rMidF, 0, -1),
                     new Highlight(wMidF, 0, -1),
                     new Highlight(lMidF, 0, -1)
