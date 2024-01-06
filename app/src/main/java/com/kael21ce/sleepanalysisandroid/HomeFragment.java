@@ -647,16 +647,16 @@ public class HomeFragment extends Fragment {
         workButton.setBackground(ResourcesCompat
                 .getDrawable(getResources(), R.drawable.corner_8_clicked, null));
         //Change the content of displaying text
-        sleepTypeText.setText("활동");
+        sleepTypeText.setText("근무");
         sleepImportanceText.setText("중요");
         sleepImportanceText.setBackground(ResourcesCompat
                 .getDrawable(getResources(), R.drawable.important_caption, null));
         if (isenough) {
-            stateDescriptionText.setText("집중을 위한 시간이에요");
+            stateDescriptionText.setText("근무 시간이에요");
             stateDescriptionSmallText.setText("맑은 정신을 유지할 수 있어요");
             stateDescriptionImage.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.smile, null));
         } else {
-            stateDescriptionText.setText("집중을 위한 시간이에요");
+            stateDescriptionText.setText("근무 시간이에요");
             stateDescriptionSmallText.setText("맑은 정신을 유지하기 어려워요");
             stateDescriptionImage.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.puke, null));
         }

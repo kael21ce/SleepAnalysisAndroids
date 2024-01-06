@@ -64,7 +64,7 @@ public class IntervalFragment extends Fragment {
             alertnessHighHourString = String.valueOf(alertnessHighHour);
         }
         if (alertnessHighMinute < 10) {
-            alertnessHighString = alertnessHighHourString + "시간 0" + alertnessHighMinute + "분";
+            alertnessHighString = alertnessHighHourString + "시간  " + alertnessHighMinute + "분";
         } else {
             alertnessHighString = alertnessHighHourString + "시간 " + alertnessHighMinute + "분";
         }
@@ -76,7 +76,7 @@ public class IntervalFragment extends Fragment {
             alertnessLowHourString = String.valueOf(alertnessLowHour);
         }
         if (alertnessLowMinute < 10) {
-            alertnessLowString = alertnessLowHourString + "시간 0" + alertnessLowMinute + "분";
+            alertnessLowString = alertnessLowHourString + "시간  " + alertnessLowMinute + "분";
         } else {
             alertnessLowString = alertnessLowHourString + "시간 " + alertnessLowMinute + "분";
         }

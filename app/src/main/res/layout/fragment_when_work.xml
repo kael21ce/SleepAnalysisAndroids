@@ -47,7 +47,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:fontFamily="@font/pretendardvariable"
-                    android:text="userName의 근무 시간을 알려주세요"
+                    android:text="휴일이라면 집중하고 싶은 시각을 알려주세요"
                     android:textColor="@color/black"
                     android:textSize="16sp" />
             </LinearLayout>

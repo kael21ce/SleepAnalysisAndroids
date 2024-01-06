@@ -104,7 +104,7 @@ public class CurrentMarker extends MarkerView {
             intervalTypeText = view.findViewById(R.id.intervalTypeText);
             intervalLayout.setBackground(ResourcesCompat.getDrawable(getResources(),
                     R.drawable.corner_8_yellow_alpha, null));
-            intervalTypeText.setText("집중을 위한 시간");
+            intervalTypeText.setText("근무 시간");
         } else if (e.getX() > this.lastIntervalTimeFloat - 0.1f && e.getX() <= this.lastIntervalTimeFloat + 0.1f) {
             view = LayoutInflater.from(context).inflate(R.layout.interval_marker, this, true);
             intervalLayout = view.findViewById(R.id.IntervalLayout);

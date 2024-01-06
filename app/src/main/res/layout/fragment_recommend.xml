@@ -164,7 +164,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_margin="16dp"
                                 android:fontFamily="@font/pretendardbold"
-                                android:text="희망 취침 시각"
+                                android:text="잠에 들 수 있는 시각"
                                 android:textColor="@color/black"
                                 android:textSize="16sp" />
 

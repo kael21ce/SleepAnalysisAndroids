@@ -35,22 +35,22 @@
 
                 <TextView
                     android:id="@+id/whenSleepTitle"
-                    android:fontFamily="@font/pretendardbold"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textSize="24sp"
+                    android:fontFamily="@font/pretendardbold"
+                    android:text="언제 잠자리에 들어갈 수 있나요?"
                     android:textColor="@color/black"
-                    android:text="언제 주무시고 싶으신가요?" />
+                    android:textSize="24sp" />
 
                 <TextView
                     android:id="@+id/whenSleepDescription"
-                    android:fontFamily="@font/pretendardvariable"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textSize="16sp"
-                    android:textColor="@color/black"
                     android:layout_marginTop="8dp"
-                    android:text="userName님이 희망하시는 취침시간을 알려주세요" />
+                    android:fontFamily="@font/pretendardvariable"
+                    android:text="잠자리에 들어갈 수 있는 가장 이른 시각을 알려주세요"
+                    android:textColor="@color/black"
+                    android:textSize="16sp" />
             </LinearLayout>
         </LinearLayout>
 

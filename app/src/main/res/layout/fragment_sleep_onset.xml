@@ -91,7 +91,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/pretendardvariable"
-                        android:text="활동 시작"
+                        android:text="근무 시작"
                         android:textColor="@color/black"
                         android:textSize="16sp" />
 
@@ -131,7 +131,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/pretendardvariable"
-                        android:text="활동 종료"
+                        android:text="근무 종료"
                         android:textColor="@color/black"
                         android:textSize="16sp" />
 

@@ -163,10 +163,10 @@
                     android:id="@+id/OnsetTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="16dp"
                     android:layout_marginVertical="24dp"
+                    android:layout_marginLeft="16dp"
                     android:fontFamily="@font/pretendardbold"
-                    android:text="수면 시간 및 활동 시간 설정"
+                    android:text="수면 시간 및 근무 시간 설정"
                     android:textColor="@color/black"
                     android:textSize="20sp" />
             </LinearLayout>

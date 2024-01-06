@@ -51,23 +51,10 @@ public class WhenWorkFragment extends Fragment {
             ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
         }
 
-        TextView whenWorkTitle = v.findViewById(R.id.whenWorkTitle);
-        //Change the whenWorkTitle
-        if (isWeekend()) {
-            whenWorkTitle.setText("집중하고 싶은 시간을 알려주세요");
-        } else {
-            whenWorkTitle.setText("근무 시간을 알려주세요");
-        }
-
         //Set the user name
         SharedPreferences sharedPref = getActivity().getSharedPreferences("SleepWake", Context.MODE_PRIVATE);
         String user_name = sharedPref.getString("User_Name", "UserName");
         TextView whenSleepDescription = v.findViewById(R.id.whenWorkDescription);
-        if (isWeekend()) {
-            whenSleepDescription.setText(user_name + "님의 집중 시작 시간을 알려주세요");
-        } else {
-            whenSleepDescription.setText(user_name + "님의 근무 시간을 알려주세요");
-        }
 
         //Back to RecommendFragment
         ImageButton sleepBackButton = v.findViewById(R.id.workBackButton);
