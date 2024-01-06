@@ -135,7 +135,7 @@ public class HomeFragment extends Fragment {
         now = System.currentTimeMillis();
 
         //Survey description and button: move to SurveyActivity
-        surveyDescription.setText(user_name + "님의 상태를 알려주세요");
+        surveyDescription.setText(user_name + "님의 현재 상태를 알려주세요");
         surveyUpperButton.setOnClickListener(view -> {
             Intent surveyIntent = new Intent(v.getContext(), SurveyActivity.class);
             startActivity(surveyIntent);

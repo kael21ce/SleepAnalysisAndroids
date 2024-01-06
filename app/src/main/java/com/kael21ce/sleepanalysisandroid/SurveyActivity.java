@@ -81,6 +81,9 @@ public class SurveyActivity extends AppCompatActivity {
             startActivity(nextIntent);
         });
 
+        //Initial setting
+        setSeekColor(buttonArrayList, 5, awarenessEmoji, emojiDescription);
+
         //Seek Button
         seek1.setOnClickListener(view -> {
             setSeekColor(buttonArrayList, 1, awarenessEmoji, emojiDescription);
@@ -139,27 +142,21 @@ public class SurveyActivity extends AppCompatActivity {
             //Set the level
             level = position;
             //Set the emoji
+            description.setText("개운한 정도: " + position + " / 10");
             if (position == 1) {
                 emoji.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.puke, null));
-                description.setText("매우 졸림");
             } else if (2 == position || position == 3) {
                 emoji.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.sad, null));
-                description.setText("졸림");
             } else if (4 ==position || position ==5) {
                 emoji.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.tired, null));
-                description.setText("평소와 같음");
             } else if (6 == position || position == 7) {
                 emoji.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.smile, null));
-                description.setText("조금 개운함");
             } else if (8 == position || position == 9) {
                 emoji.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.laugh, null));
-                description.setText("개운함");
             } else if (position == 10) {
                 emoji.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.kiss, null));
-                description.setText("매우 개운함");
             } else {
                 emoji.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.puke, null));
-                description.setText("매우 졸림");
             }
         }
     }

@@ -90,9 +90,9 @@
             android:layout_marginTop="24dp"
             android:fontFamily="@font/pretendardbold"
             android:gravity="center"
-            android:text="매우 졸림"
+            android:text="개운한 정도: 1 / 10"
             android:textColor="@color/black"
-            android:textSize="24sp" />
+            android:textSize="20sp" />
 
         <LinearLayout
             android:id="@+id/seekButtonLayout"
@@ -200,7 +200,7 @@
             android:backgroundTint="@color/blue_1"
             android:fontFamily="@font/pretendardvariable"
             android:padding="16dp"
-            android:text="시작하기"
+            android:text="기록하기"
             android:textSize="16sp"
             app:cornerRadius="28dp" />
     </LinearLayout>
