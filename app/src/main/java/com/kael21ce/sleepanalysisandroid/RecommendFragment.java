@@ -108,12 +108,27 @@ public class RecommendFragment extends Fragment {
         TextView noDataDescription = v.findViewById(R.id.noDataDescription);
         noDataDescription.setText(user_name + "님에게 딱 맞는 수면 패턴을 추천해 드릴게요");
 
+        //Check whether recommendation is hidden
+        if (!sharedPref2.contains("isHidden")) {
+            editor.putBoolean("isHidden", false).apply();
+        }
+        boolean isHidden = sharedPref2.getBoolean("isHidden", false);
+
         if (sharedPref2.contains("sleepOnset") && sharedPref2.contains("workOnset") && sharedPref2.contains("workOffset")) {
             noDataLayout.setVisibility(View.GONE);
-            InfoView.setVisibility(View.VISIBLE);
-            RecommendClockView.setVisibility(View.VISIBLE);
+            if (!isHidden) {
+                InfoView.setVisibility(View.VISIBLE);
+                RecommendClockView.setVisibility(View.VISIBLE);
+            } else {
+                InfoView.setVisibility(View.GONE);
+                RecommendClockView.setVisibility(View.GONE);
+            }
         } else {
-            noDataLayout.setVisibility(View.VISIBLE);
+            if (!isHidden) {
+                noDataLayout.setVisibility(View.VISIBLE);
+            } else {
+                noDataLayout.setVisibility(View.GONE);
+            }
             InfoView.setVisibility(View.GONE);
             RecommendClockView.setVisibility(View.GONE);
         }

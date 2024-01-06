@@ -2,6 +2,7 @@ package com.kael21ce.sleepanalysisandroid;
 
 import android.animation.ObjectAnimator;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -87,6 +88,23 @@ public class SettingFragment extends Fragment implements ButtonTextUpdater {
             timePickerDialog.setData(1);
             timePickerDialog.setTimePicker(notifyAt_complex);
             timePickerDialog.show();
+        });
+
+        //Move to HideActivity
+        TextView hideDescription = v.findViewById(R.id.HideDescription);
+        ImageView hideButton = v.findViewById(R.id.HideButton);
+        if (!sharedPref.contains("isHidden")) {
+            editor.putBoolean("isHidden", false).apply();
+        }
+        boolean isHidden = sharedPref.getBoolean("isHidden", false);
+        if (!isHidden) {
+            hideDescription.setText("켜짐");
+        } else {
+            hideDescription.setText("꺼짐");
+        }
+        hideButton.setOnClickListener(view -> {
+            Intent hideIntent = new Intent(v.getContext(), HideActivity.class);
+            startActivity(hideIntent);
         });
 
         LinearLayout onsetView = v.findViewById(R.id.OnsetView);

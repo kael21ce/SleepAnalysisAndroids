@@ -101,6 +101,7 @@ public class HomeFragment extends Fragment {
         LinearLayout ChartHomeView = v.findViewById(R.id.ChartHomeView);
 
         SharedPreferences sharedPref = getActivity().getSharedPreferences("SleepWake", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
         String user_name = sharedPref.getString("User_Name", "UserName");
 
         //No data
@@ -117,15 +118,33 @@ public class HomeFragment extends Fragment {
             mainActivity.setBottomNaviItem(R.id.tabRecommend);
         });
 
+        //Check whether recommendation is hidden
+        if (!sharedPref.contains("isHidden")) {
+            editor.putBoolean("isHidden", false).apply();
+        }
+        boolean isHidden = sharedPref.getBoolean("isHidden", false);
+
         if (sharedPref.contains("sleepOnset") && sharedPref.contains("workOnset") && sharedPref.contains("workOffset")) {
-            homeNoDataView.setVisibility(View.GONE);
-            SurveyUpperView.setVisibility(View.VISIBLE);
-            RecommendHomeView.setVisibility(View.VISIBLE);
-            AlertnessHomeView.setVisibility(View.VISIBLE);
-            ChartHomeView.setVisibility(View.VISIBLE);
+            if (!isHidden) {
+                homeNoDataView.setVisibility(View.GONE);
+                SurveyUpperView.setVisibility(View.VISIBLE);
+                RecommendHomeView.setVisibility(View.VISIBLE);
+                AlertnessHomeView.setVisibility(View.VISIBLE);
+                ChartHomeView.setVisibility(View.VISIBLE);
+            } else {
+                homeNoDataView.setVisibility(View.GONE);
+                SurveyUpperView.setVisibility(View.VISIBLE);
+                RecommendHomeView.setVisibility(View.GONE);
+                AlertnessHomeView.setVisibility(View.GONE);
+                ChartHomeView.setVisibility(View.GONE);
+            }
         } else {
-            homeNoDataView.setVisibility(View.VISIBLE);
-            SurveyUpperView.setVisibility(View.GONE);
+            if (!isHidden) {
+                homeNoDataView.setVisibility(View.VISIBLE);
+            } else {
+                homeNoDataView.setVisibility(View.GONE);
+            }
+            SurveyUpperView.setVisibility(View.VISIBLE);
             RecommendHomeView.setVisibility(View.GONE);
             AlertnessHomeView.setVisibility(View.GONE);
             ChartHomeView.setVisibility(View.GONE);
