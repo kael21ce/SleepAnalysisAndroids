@@ -291,24 +291,58 @@ public class MainActivity extends AppCompatActivity {
         WorkManager.getInstance(this).enqueue(pushRequest);
         settingFragment.setRequested(pushRequest);
 
-        long surveyTime, surveyDelay;
+        //Send notification for survey in three time
+        long surveyTime, surveyDelay1, surveyDelay2, surveyDelay3;
+        //1. work onset
         if (!sharedPref.contains("workOnset")) {
             surveyTime = timeToSeconds("13:00");
-            surveyDelay = surveyTime - now;
+            surveyDelay1 = surveyTime - now;
         } else {
             surveyTime = getWorkOnset();
-            surveyDelay = surveyTime - now - oneDay;
+            surveyDelay1 = surveyTime - now - oneDay;
         }
-
-        if (surveyDelay < 0) {
-            surveyDelay += oneDay;
+        if (surveyDelay1 < 0) {
+            surveyDelay1 += oneDay;
         }
-        Log.v(TAG, "Survey delay: " + surveyDelay);
-        //Notification for survey
-        OneTimeWorkRequest surveyRequest = new OneTimeWorkRequest.Builder(SurveyWorker.class)
-                .setInitialDelay(surveyDelay, TimeUnit.MILLISECONDS)
+        OneTimeWorkRequest surveyRequest1 = new OneTimeWorkRequest.Builder(SurveyWorker.class)
+                .setInitialDelay(surveyDelay1, TimeUnit.MILLISECONDS)
                 .build();
-        WorkManager.getInstance(this).enqueue(surveyRequest);
+        WorkManager.getInstance(this).enqueue(surveyRequest1);
+        Log.v(TAG, "Survey delay 1: " + surveyDelay1);
+
+        //2. middle of work onset and offset
+        if (!sharedPref.contains("workOnset")) {
+            surveyTime = timeToSeconds("16:00");
+            surveyDelay2 = surveyTime - now;
+        } else {
+            surveyTime = (getWorkOnset() + getWorkOffset()) / 2;
+            surveyDelay2 = surveyTime - now - oneDay;
+        }
+        if (surveyDelay2 < 0) {
+            surveyDelay2 += oneDay;
+        }
+        OneTimeWorkRequest surveyRequest2 = new OneTimeWorkRequest.Builder(SurveyWorker.class)
+                .setInitialDelay(surveyDelay2, TimeUnit.MILLISECONDS)
+                .build();
+        WorkManager.getInstance(this).enqueue(surveyRequest2);
+        Log.v(TAG, "Survey delay 2: " + surveyDelay2);
+
+        //3. work offset
+        if (!sharedPref.contains("workOnset")) {
+            surveyTime = timeToSeconds("20:00");
+            surveyDelay3 = surveyTime - now;
+        } else {
+            surveyTime = getWorkOffset();
+            surveyDelay3 = surveyTime - now - oneDay;
+        }
+        if (surveyDelay3 < 0) {
+            surveyDelay3 += oneDay;
+        }
+        OneTimeWorkRequest surveyRequest3 = new OneTimeWorkRequest.Builder(SurveyWorker.class)
+                .setInitialDelay(surveyDelay3, TimeUnit.MILLISECONDS)
+                .build();
+        WorkManager.getInstance(this).enqueue(surveyRequest3);
+        Log.v(TAG, "Survey delay 3: " + surveyDelay3);
     }
 
     //Create channel for notification of recommendation
