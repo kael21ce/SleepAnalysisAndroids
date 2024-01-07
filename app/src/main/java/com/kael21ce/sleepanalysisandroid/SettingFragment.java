@@ -92,7 +92,7 @@ public class SettingFragment extends Fragment implements ButtonTextUpdater {
 
         //Move to HideActivity
         TextView hideDescription = v.findViewById(R.id.HideDescription);
-        ImageView hideButton = v.findViewById(R.id.HideButton);
+        LinearLayout hideView = v.findViewById(R.id.HideView);
         if (!sharedPref.contains("isHidden")) {
             editor.putBoolean("isHidden", false).apply();
         }
@@ -102,7 +102,7 @@ public class SettingFragment extends Fragment implements ButtonTextUpdater {
         } else {
             hideDescription.setText("꺼짐");
         }
-        hideButton.setOnClickListener(view -> {
+        hideView.setOnClickListener(view -> {
             Intent hideIntent = new Intent(v.getContext(), HideActivity.class);
             startActivity(hideIntent);
         });
