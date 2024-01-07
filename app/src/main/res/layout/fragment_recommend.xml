@@ -500,7 +500,7 @@
                             android:fontFamily="@font/pretendardbold"
                             android:text="잠을 자기 좋은 시간이에요"
                             android:textColor="@color/black"
-                            android:textSize="20dp" />
+                            android:textSize="20sp" />
 
                         <TextView
                             android:id="@+id/StateDescriptionSmallText"
