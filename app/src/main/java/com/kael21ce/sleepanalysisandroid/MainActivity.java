@@ -106,6 +106,8 @@ public class MainActivity extends AppCompatActivity {
 
     ArrayList<BarEntry> barEntries;
 
+    private OneTimeWorkRequest survey1, survey2, survey3;
+
     @SuppressLint("NonConstantResourceId")
     @Override
     protected void onCreate(Bundle saveInstanceState) {
@@ -291,6 +293,20 @@ public class MainActivity extends AppCompatActivity {
         WorkManager.getInstance(this).enqueue(pushRequest);
         settingFragment.setRequested(pushRequest);
 
+        //Cancel the former survey request
+        if (survey1 != null) {
+            WorkManager.getInstance(this).cancelWorkById(survey1.getId());
+            Log.v(TAG, "Former survey request 1 is canceled");
+        }
+        if (survey2 != null) {
+            WorkManager.getInstance(this).cancelWorkById(survey2.getId());
+            Log.v(TAG, "Former survey request 2 is canceled");
+        }
+        if (survey3 != null) {
+            WorkManager.getInstance(this).cancelWorkById(survey3.getId());
+            Log.v(TAG, "Former survey request 3 is canceled");
+        }
+
         //Send notification for survey in three time
         long surveyTime, surveyDelay1, surveyDelay2, surveyDelay3;
         //1. work onset
@@ -309,6 +325,7 @@ public class MainActivity extends AppCompatActivity {
                 .build();
         WorkManager.getInstance(this).enqueue(surveyRequest1);
         Log.v(TAG, "Survey delay 1: " + surveyDelay1);
+        this.survey1 = surveyRequest1;
 
         //2. middle of work onset and offset
         if (!sharedPref.contains("workOnset")) {
@@ -326,6 +343,7 @@ public class MainActivity extends AppCompatActivity {
                 .build();
         WorkManager.getInstance(this).enqueue(surveyRequest2);
         Log.v(TAG, "Survey delay 2: " + surveyDelay2);
+        this.survey2 = surveyRequest2;
 
         //3. work offset
         if (!sharedPref.contains("workOnset")) {
@@ -343,6 +361,7 @@ public class MainActivity extends AppCompatActivity {
                 .build();
         WorkManager.getInstance(this).enqueue(surveyRequest3);
         Log.v(TAG, "Survey delay 3: " + surveyDelay3);
+        this.survey3 = surveyRequest3;
     }
 
     //Create channel for notification of recommendation
