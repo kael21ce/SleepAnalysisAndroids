@@ -385,8 +385,8 @@
                             android:id="@+id/AlertnessDescription"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="\(userName)님의 각성도가 낮아요"
                             android:fontFamily="@font/pretendardvariable"
+                            android:text="\(userName)님의 각성도가 낮아요"
                             android:textColor="@color/black" />
 
                     </LinearLayout>
@@ -473,6 +473,19 @@
                     android:layout_marginVertical="16dp"
                     android:paddingHorizontal="8dp" />
 
+                <TextView
+                    android:id="@+id/SummaryText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginBottom="16dp"
+                    android:fontFamily="@font/pretendardvariable"
+                    android:text="자세히 보기"
+                    android:padding="4dp"
+                    android:textColor="@color/gray_4"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:textSize="12sp" />
+
                 <LinearLayout
                     android:id="@+id/ChartTextLayout"
                     android:layout_width="match_parent"
@@ -505,7 +518,7 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_gravity="center_vertical"
-                                    android:src="@drawable/bulb" />
+                                    android:src="@drawable/alertness_high" />
 
                                 <TextView
                                     android:id="@+id/positiveText"
@@ -514,7 +527,7 @@
                                     android:layout_gravity="center_vertical"
                                     android:layout_marginLeft="4dp"
                                     android:fontFamily="@font/pretendardvariable"
-                                    android:text="positive"
+                                    android:text="집중하기 좋은"
                                     android:textColor="@color/black"
                                     android:textSize="12sp" />
                             </LinearLayout>
@@ -579,7 +592,7 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_gravity="center_vertical"
-                                    android:src="@drawable/circle_warning" />
+                                    android:src="@drawable/alertness_low" />
 
                                 <TextView
                                     android:id="@+id/negativeText"
@@ -588,7 +601,7 @@
                                     android:layout_gravity="center_vertical"
                                     android:layout_marginLeft="4dp"
                                     android:fontFamily="@font/pretendardvariable"
-                                    android:text="negative"
+                                    android:text="집중이 어려운"
                                     android:textColor="@color/black"
                                     android:textSize="12sp" />
                             </LinearLayout>
@@ -642,7 +655,7 @@
                 android:layout_marginVertical="16dp"
                 android:background="@drawable/corner_16"
                 android:orientation="vertical"
-                android:visibility="visible">
+                android:visibility="gone">
 
                 <TextView
                     android:id="@+id/SleepChartTitle"
@@ -672,6 +685,19 @@
                     android:layout_marginHorizontal="24dp"
                     android:layout_marginVertical="16dp"
                     android:paddingHorizontal="8dp" />
+
+                <TextView
+                    android:id="@+id/SleepSummaryText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginBottom="16dp"
+                    android:fontFamily="@font/pretendardvariable"
+                    android:padding="4dp"
+                    android:text="자세히 보기"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:textColor="@color/gray_4"
+                    android:textSize="12sp" />
 
                 <LinearLayout
                     android:id="@+id/SleepChartTextLayout"
@@ -705,7 +731,7 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_gravity="center_vertical"
-                                    android:src="@drawable/bulb" />
+                                    android:src="@drawable/good_sleep" />
 
                                 <TextView
                                     android:id="@+id/sleepPositiveText"
@@ -714,7 +740,7 @@
                                     android:layout_gravity="center_vertical"
                                     android:layout_marginLeft="4dp"
                                     android:fontFamily="@font/pretendardvariable"
-                                    android:text="positive"
+                                    android:text="잠들기 좋은"
                                     android:textColor="@color/black"
                                     android:textSize="12sp" />
                             </LinearLayout>
@@ -779,7 +805,7 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_gravity="center_vertical"
-                                    android:src="@drawable/circle_warning" />
+                                    android:src="@drawable/bad_sleep" />
 
                                 <TextView
                                     android:id="@+id/sleepNegativeText"
@@ -788,7 +814,7 @@
                                     android:layout_gravity="center_vertical"
                                     android:layout_marginLeft="4dp"
                                     android:fontFamily="@font/pretendardvariable"
-                                    android:text="negative"
+                                    android:text="잠들기 어려운"
                                     android:textColor="@color/black"
                                     android:textSize="12sp" />
                             </LinearLayout>

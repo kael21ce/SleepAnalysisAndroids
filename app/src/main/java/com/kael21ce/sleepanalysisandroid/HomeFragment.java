@@ -530,6 +530,34 @@ public class HomeFragment extends Fragment {
 
         chartRecycler.setAdapter(barAdapter);
 
+        //Show the layout simply or not
+        TextView summaryText = v.findViewById(R.id.SummaryText);
+        LinearLayout chartTextLayout = v.findViewById(R.id.ChartTextLayout);
+        if (!sharedPref.contains("isAlertnessSimply")) {
+            editor.putBoolean("isAlertnessSimply", true);
+        }
+        boolean isAlertnessSimply = sharedPref.getBoolean("isAlertnessSimply", true);
+        if (isAlertnessSimply) {
+            chartTextLayout.setVisibility(View.GONE);
+            summaryText.setText("자세히 보기");
+        } else {
+            chartTextLayout.setVisibility(View.VISIBLE);
+            summaryText.setText("간단히 보기");
+        }
+        summaryText.setOnClickListener(view -> {
+            Log.v("HomeFragment", "clicked");
+            boolean isSimple = sharedPref.getBoolean("isAlertnessSimply", true);
+            if (isSimple) {
+                chartTextLayout.setVisibility(View.VISIBLE);
+                editor.putBoolean("isAlertnessSimply", false).apply();
+                summaryText.setText("간단히 보기");
+            } else {
+                chartTextLayout.setVisibility(View.GONE);
+                editor.putBoolean("isAlertnessSimply", true).apply();
+                summaryText.setText("자세히 보기");
+            }
+        });
+
         //Weekly sleep duration chart
         //Set the SleepChartDescription
         TextView sleepChartDescription = v.findViewById(R.id.SleepChartDescription);
@@ -598,6 +626,33 @@ public class HomeFragment extends Fragment {
         });
 
         sleepChartRecycler.setAdapter(sleepBarAdapter);
+
+        //Show the layout simply or not
+        TextView sleepSummaryText = v.findViewById(R.id.SleepSummaryText);
+        LinearLayout sleepChartTextLayout = v.findViewById(R.id.SleepChartTextLayout);
+        if (!sharedPref.contains("isSleepSimply")) {
+            editor.putBoolean("isSleepSimply", true);
+        }
+        boolean isSleepSimply = sharedPref.getBoolean("isSleepSimply", true);
+        if (isSleepSimply) {
+            sleepChartTextLayout.setVisibility(View.GONE);
+            sleepSummaryText.setText("자세히 보기");
+        } else {
+            sleepChartTextLayout.setVisibility(View.VISIBLE);
+            sleepSummaryText.setText("간단히 보기");
+        }
+        sleepSummaryText.setOnClickListener(view -> {
+            boolean isSimple = sharedPref.getBoolean("isSleepSimply", true);
+            if (isSimple) {
+                sleepChartTextLayout.setVisibility(View.VISIBLE);
+                editor.putBoolean("isSleepSimply", false).apply();
+                sleepSummaryText.setText("간단히 보기");
+            } else {
+                sleepChartTextLayout.setVisibility(View.GONE);
+                editor.putBoolean("isSleepSimply", true).apply();
+                sleepSummaryText.setText("자세히 보기");
+            }
+        });
 
         return v;
     }
