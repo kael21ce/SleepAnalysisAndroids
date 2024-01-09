@@ -103,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
     private List<V0> v0s;
     String email, username;
     long now, nineHours;
-    long twoWeeks = (1000*60*60*24*14), oneDay = 1000*60*60*24;
+    long twoWeeks = (1000*60*60*24*14), oneDay = 1000*60*60*24, oneHour = 1000*60*60;
     long fiveMinutesToMil = (1000*60*5);
     Instant ILastSleepUpdate;
     SleepDao sleepDao;
@@ -111,7 +111,7 @@ public class MainActivity extends AppCompatActivity {
 
     ArrayList<BarEntry> barEntries;
 
-    private OneTimeWorkRequest survey1, survey2, survey3;
+    private OneTimeWorkRequest survey1, survey2, survey3, survey4;
 
     @SuppressLint("NonConstantResourceId")
     @Override
@@ -313,9 +313,13 @@ public class MainActivity extends AppCompatActivity {
             WorkManager.getInstance(this).cancelWorkById(survey3.getId());
             Log.v(TAG, "Former survey request 3 is canceled");
         }
+        if (survey4 != null) {
+            WorkManager.getInstance(this).cancelWorkById(survey4.getId());
+            Log.v(TAG, "Former survey request 4 is canceled");
+        }
 
-        //Send notification for survey in three time
-        long surveyTime, surveyDelay1, surveyDelay2, surveyDelay3;
+        //Send notification for survey in four time
+        long surveyTime, surveyDelay1, surveyDelay2, surveyDelay3, surveyDelay4;
         //1. work onset
         if (!sharedPref.contains("workOnset")) {
             surveyTime = timeToSeconds("13:00");
@@ -369,6 +373,24 @@ public class MainActivity extends AppCompatActivity {
         WorkManager.getInstance(this).enqueue(surveyRequest3);
         Log.v(TAG, "Survey delay 3: " + surveyDelay3);
         this.survey3 = surveyRequest3;
+
+        //4. Before one hour to go to bed
+        if (!sharedPref.contains("sleepOnset")) {
+            surveyTime = timeToSeconds("23:00");
+            surveyDelay4 = surveyTime - now;
+        } else {
+            surveyTime = getSleepOnset();
+            surveyDelay4 = surveyTime - now - oneDay - oneHour;
+        }
+        if (surveyDelay4 < 0) {
+            surveyDelay4 += oneDay;
+        }
+        OneTimeWorkRequest surveyRequest4 = new OneTimeWorkRequest.Builder(SurveyWorker.class)
+                .setInitialDelay(surveyDelay4, TimeUnit.MILLISECONDS)
+                .build();
+        WorkManager.getInstance(this).enqueue(surveyRequest4);
+        Log.v(TAG, "Survey delay 4: " + surveyDelay4);
+        this.survey4 = surveyRequest4;
     }
 
     //Create channel for notification of recommendation
