@@ -2,6 +2,7 @@ package com.kael21ce.sleepanalysisandroid;
 
 
 import android.Manifest;
+import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -14,8 +15,12 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.text.Html;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
@@ -94,7 +99,7 @@ public class MainActivity extends AppCompatActivity {
 
     AppDatabase db;
     private List<Sleep> sleeps;
-    private List<Awareness> awarenesses;
+    private List<Awareness> awarenesses, sleepAwarenesses;
     private List<V0> v0s;
     String email, username;
     long now, nineHours;
@@ -117,6 +122,7 @@ public class MainActivity extends AppCompatActivity {
 
         healthConnectManager = new HealthConnectManager(getApplicationContext());
         awarenesses = Collections.synchronizedList(new ArrayList<>());
+        sleepAwarenesses = Collections.synchronizedList(new ArrayList<>());
 
         //get the shared preferences variable
         sharedPref = getSharedPreferences("SleepWake", Context.MODE_PRIVATE);
@@ -214,6 +220,7 @@ public class MainActivity extends AppCompatActivity {
         if(sleeps.size() > 0) {
             do_simulation();
             calculateAwareness();
+            calculateSleepAwareness();
 //            if(now-lastBackendUpdate >= (1000*60*60*24)) {
                 sendV0(username);
                 lastBackendUpdate = now;
@@ -394,6 +401,42 @@ public class MainActivity extends AppCompatActivity {
         return dateTime.toInstant().toEpochMilli();
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.action_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.refresh_button) {
+            View decorView = getWindow().getDecorView();
+            View menuItemView = decorView.findViewById(id);
+            if (menuItemView != null) {
+                //rotate
+                Animation rotateAnimation = AnimationUtils.loadAnimation(this, R.anim.rotate_animation);
+                menuItemView.startAnimation(rotateAnimation);
+
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        //refresh
+                        finish();
+                        overridePendingTransition(0, 0);
+                        Intent intent = getIntent();
+                        startActivity(intent);
+                        overridePendingTransition(0, 0);
+                    }
+                }, 400);
+            }
+
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
     //If back button is clicked twice, move out from application
     @Override
     public void onBackPressed() {
@@ -453,6 +496,7 @@ public class MainActivity extends AppCompatActivity {
             if (sleeps.size() > 0) {
                 do_simulation();
                 calculateAwareness();
+                calculateSleepAwareness();
                 if(now-lastBackendUpdate >= (1000*60*60*24)) {
                     sendV0(username);
                     lastBackendUpdate = now;
@@ -759,6 +803,99 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public void calculateSleepAwareness(){
+        //calculate the awareness in context of sleep
+        AwarenessDao awarenessDao = db.awarenessDao();
+        long oneDayToMils = 1000*60*60*24;
+        if(v0s.size() > 0){
+            long startDay = (v0s.get(0).time+nineHours)/oneDayToMils;
+            long goodDuration = 0;
+            long badDuration = 0;
+            for(V0 v0: v0s){
+                boolean isSleep = false;
+                for(Sleep sleep: sleeps){
+                    if(sleep.sleepStart <= v0.time && v0.time <= sleep.sleepEnd){
+                        isSleep = true;
+                        break;
+                    }
+                }
+                if(!isSleep){
+                    continue;
+                }
+
+                long v0StartDay = (v0.time+nineHours)/oneDayToMils;
+                //check through the sleep in O(N) time. Fix it using hash map, but for now the complexity should be fine
+                double awareness = getAwarenessValue(v0.H_val, v0.n_val, v0.y_val, v0.x_val);
+                if(startDay != v0StartDay){
+                    //if it is not in database, add, if yes, update
+                    Awareness awarenessDb = awarenessDao.findByDay(startDay);
+                    Awareness addAwareness = new Awareness();
+                    addAwareness.awarenessDay = startDay;
+                    addAwareness.goodDuration = goodDuration;
+                    addAwareness.badDuration = badDuration;
+                    boolean isInAwareness = false;
+                    for(int i = 0; i < sleepAwarenesses.size(); i ++){
+                        if(sleepAwarenesses.get(i).awarenessDay == addAwareness.awarenessDay){
+                            sleepAwarenesses.set(i, addAwareness);
+                            isInAwareness = true;
+                            break;
+                        }
+                    }
+                    if(isInAwareness == false){
+                        sleepAwarenesses.add(addAwareness);
+                    }
+                    if(awarenessDb == null){
+                        //insert
+                        List<Awareness> awarenessList = new ArrayList<>();
+                        awarenessList.add(addAwareness);
+                        awarenessDao.insertAll(awarenessList);
+                    }else {
+                        //we can make it faster by using lazy loading, but this is okay for now
+                        awarenessDao.updateAwareness(startDay, goodDuration, badDuration);
+                    }
+                    Log.v("AWARENESS", String.valueOf(startDay)+' '+ goodDuration + ' ' + badDuration);
+
+                    goodDuration = 0;
+                    badDuration = 0;
+                    startDay = v0StartDay;
+                }
+                Log.v("AWARENESS CALCULATION", (sdfDateTime.format(new Date(v0.time)))+": " + String.valueOf(awareness));
+                if(awareness <= 0.0){
+                    goodDuration += 5;
+                }else{
+                    badDuration += 5;
+                }
+            }
+            if(goodDuration > 0 || badDuration > 0){
+                Awareness awarenessDb = awarenessDao.findByDay(startDay);
+                Awareness addAwareness = new Awareness();
+                addAwareness.awarenessDay = startDay;
+                addAwareness.goodDuration = goodDuration;
+                addAwareness.badDuration = badDuration;
+                boolean isInAwareness = false;
+                for(int i = 0; i < sleepAwarenesses.size(); i ++){
+                    if(sleepAwarenesses.get(i).awarenessDay == addAwareness.awarenessDay){
+                        sleepAwarenesses.set(i, addAwareness);
+                        isInAwareness = true;
+                        break;
+                    }
+                }
+                if(isInAwareness == false){
+                    sleepAwarenesses.add(addAwareness);
+                }
+                if(awarenessDb == null){
+                    //insert
+                    List<Awareness> awarenessList = new ArrayList<>();
+                    awarenessList.add(addAwareness);
+                    awarenessDao.insertAll(awarenessList);
+                }else {
+                    //we can make it faster by using lazy loading, but this is okay for now
+                    awarenessDao.updateAwareness(startDay, goodDuration, badDuration);
+                }
+            }
+        }
+    }
+
     public static Context getAppContext() {
         return MainActivity.context;
     }
@@ -871,6 +1008,8 @@ public class MainActivity extends AppCompatActivity {
     public List<Awareness> getAwarenesses(){
         return awarenesses;
     }
+
+    public List<Awareness> getSleepAwarenesses() { return sleepAwarenesses; }
 
     public List<Sleep> getSleeps(){
         return sleeps;

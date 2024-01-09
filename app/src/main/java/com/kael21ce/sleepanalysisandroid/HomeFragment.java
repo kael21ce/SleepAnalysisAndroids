@@ -40,11 +40,14 @@ import com.github.mikephil.charting.utils.ViewPortHandler;
 import com.kael21ce.sleepanalysisandroid.data.Awareness;
 import com.kael21ce.sleepanalysisandroid.data.Sleep;
 
+import org.w3c.dom.Text;
+
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -57,7 +60,7 @@ public class HomeFragment extends Fragment {
     SimpleDateFormat sdfTime = new SimpleDateFormat("HH:mm", Locale.KOREA);
     long now, nineHours;
     String mainSleepStartString, mainSleepEndString, workOnsetString, workOffsetString, napSleepStartString, napSleepEndString, sleepOnsetString;
-    private List<Awareness> awarenesses;
+    private List<Awareness> awarenesses, sleepAwarenesses;
 
     @SuppressLint("ResourceAsColor")
     @Override
@@ -100,6 +103,16 @@ public class HomeFragment extends Fragment {
         TextView negativeNumberText = v.findViewById(R.id.negativeNumberText);
         LinearLayout ChartHomeView = v.findViewById(R.id.ChartHomeView);
 
+        //Weekly sleep chart
+        RecyclerView sleepChartRecycler = v.findViewById(R.id.SleepChartRecyclerView);
+        TextView sleepPositiveTimeText = v.findViewById(R.id.sleepPositiveTimeText);
+        TextView sleepNegativeTimeText = v.findViewById(R.id.sleepNegativeTimeText);
+        ImageView sleepPositiveImage = v.findViewById(R.id.sleepPositiveImage);
+        ImageView sleepNegativeImage = v.findViewById(R.id.sleepNegativeImage);
+        TextView sleepPositiveNumberText = v.findViewById(R.id.sleepPositiveNumberText);
+        TextView sleepNegativeNumberText = v.findViewById(R.id.sleepNegativeNumberText);
+        LinearLayout SleepChartHomeView = v.findViewById(R.id.SleepChartHomeView);
+
         SharedPreferences sharedPref = getActivity().getSharedPreferences("SleepWake", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
         String user_name = sharedPref.getString("User_Name", "UserName");
@@ -131,12 +144,14 @@ public class HomeFragment extends Fragment {
                 RecommendHomeView.setVisibility(View.VISIBLE);
                 AlertnessHomeView.setVisibility(View.VISIBLE);
                 ChartHomeView.setVisibility(View.VISIBLE);
+                SleepChartHomeView.setVisibility(View.VISIBLE);
             } else {
                 homeNoDataView.setVisibility(View.GONE);
                 SurveyUpperView.setVisibility(View.VISIBLE);
                 RecommendHomeView.setVisibility(View.GONE);
                 AlertnessHomeView.setVisibility(View.GONE);
                 ChartHomeView.setVisibility(View.GONE);
+                SleepChartHomeView.setVisibility(View.GONE);
             }
         } else {
             if (!isHidden) {
@@ -148,6 +163,7 @@ public class HomeFragment extends Fragment {
             RecommendHomeView.setVisibility(View.GONE);
             AlertnessHomeView.setVisibility(View.GONE);
             ChartHomeView.setVisibility(View.GONE);
+            SleepChartHomeView.setVisibility(View.GONE);
         }
 
         nineHours = (1000*60*60*9);
@@ -434,7 +450,7 @@ public class HomeFragment extends Fragment {
                 alertnessTitle.setText("집중하기 좋은 상태에요");
                 alertnessDescription.setText(user_name + "님의 각성도가 높아요");
             } else {
-                alertnessTitle.setText("잠시 바람 쐬는 건 어때요?");
+                alertnessTitle.setText("잠시 낮잠을 자는 건 어때요?");
                 alertnessDescription.setText(user_name + "님의 각성도가 낮아요");
             }
         } else {
@@ -444,10 +460,10 @@ public class HomeFragment extends Fragment {
 
         alertnessChart.invalidate();
 
-        //Weekly chart
+        //Weekly alertness chart
         //Set the ChartDescription
         TextView chartDescription = v.findViewById(R.id.ChartDescription);
-        chartDescription.setText("이번주 " + user_name + "님의 각성도에요");
+        chartDescription.setText(user_name + "님의 일주일 활동 시간을 요약했어요");
 
         //Load LinearLayoutManager and BarAdapter for ChartRecyclerView
         LinearLayoutManager chartLinearLayoutManager =
@@ -480,6 +496,7 @@ public class HomeFragment extends Fragment {
                 i++;
             }
         }
+        Collections.reverse(weeklyAwareness);
         //When HomeFragment appears
         if (weeklyAwareness.size() == 8) {
             Awareness todayAwareness = weeklyAwareness.get(7);
@@ -512,6 +529,75 @@ public class HomeFragment extends Fragment {
         });
 
         chartRecycler.setAdapter(barAdapter);
+
+        //Weekly sleep duration chart
+        //Set the SleepChartDescription
+        TextView sleepChartDescription = v.findViewById(R.id.SleepChartDescription);
+        sleepChartDescription.setText(user_name + "님의 일주일의 수면 시간을 요약했어요");
+
+        //Load LinearLayoutManager and BarAdapter for SleepChartRecyclerView
+        LinearLayoutManager sleepChartLinearLayoutManager =
+                new LinearLayoutManager(v.getContext(), LinearLayoutManager.HORIZONTAL, false);
+        sleepChartRecycler.setLayoutManager(sleepChartLinearLayoutManager);
+        BarAdapter sleepBarAdapter = new BarAdapter();
+
+        List<Awareness> weeklyDuration = new ArrayList<>();
+
+        sleepAwarenesses = mainActivity.getSleepAwarenesses();
+        int idx = 0;
+        for(Awareness awareness: sleepAwarenesses){
+            Log.v("SLEEP AWARENESS VALUE IN SCHEDULE", sdfDate.format(new Date(awareness.awarenessDay*oneDayToMils+oneDayToMils)));
+
+            long hourGoodDuration = awareness.goodDuration/60;
+            long minuteGoodDuration = awareness.goodDuration%60;
+            long hourBadDuration = awareness.badDuration/60;
+            long minuteBadDuration = awareness.badDuration%60;
+            Log.v("SLEEP AWARENESS VALUE IN SCHEDULE", hourGoodDuration + ":" + minuteGoodDuration);
+            Log.v("SLEEP AWARENESS VALUE IN SCHEDULE", hourBadDuration + ":" + minuteBadDuration);
+            if(curDay-8 < awareness.awarenessDay){
+                String date = sdfDate.format(new Date((awareness.awarenessDay)*oneDayToMils));
+                String goodDuration = hourGoodDuration + ":" + minuteGoodDuration;
+                String badDuration = hourBadDuration + ":" + minuteBadDuration;
+                //Add to get ONLY weekly awareness
+                weeklyDuration.add(idx, awareness);
+                sleepBarAdapter.addItem(new Bar(date, convertToWeight(goodDuration), convertToWeight(badDuration)));
+                i++;
+            }
+        }
+        Collections.reverse(weeklyDuration);
+        //When HomeFragment appears
+        Log.v("Weekly duration", String.valueOf(weeklyDuration.size()));
+        if (weeklyDuration.size() == 8) {
+            Awareness todayAwareness = weeklyDuration.get(7);
+            long todayHourGoodDuration = todayAwareness.goodDuration/60;
+            long todayMinuteGoodDuration = todayAwareness.goodDuration%60;
+            long todayHourBadDuration = todayAwareness.badDuration/60;
+            long todayMinuteBadDuration = todayAwareness.badDuration%60;
+            sleepPositiveTimeText.setText(todayHourGoodDuration + "시간 " + todayMinuteGoodDuration + "분");
+            sleepNegativeTimeText.setText(todayHourBadDuration + "시간 " + todayMinuteBadDuration + "분");
+            setDeltaAwareness(sleepPositiveNumberText, sleepPositiveImage, sleepNegativeNumberText, sleepNegativeImage,
+                    7, weeklyDuration);
+        }
+
+        //Load the clicked position in RecyclerView
+        sleepBarAdapter.setOnBarClickListener(position -> {
+            Log.d("HomeFragment", "Item clicked at position " + position);
+            Awareness clickedAwareness = weeklyDuration.get(position);
+            long hourGoodDuration = clickedAwareness.goodDuration/60;
+            long minuteGoodDuration = clickedAwareness.goodDuration%60;
+            long hourBadDuration = clickedAwareness.badDuration/60;
+            long minuteBadDuration = clickedAwareness.badDuration%60;
+            //Time for positive
+            sleepPositiveTimeText.setText(hourGoodDuration + "시간 " + minuteGoodDuration + "분");
+            //Time for negative
+            sleepNegativeTimeText.setText(hourBadDuration + "시간 " + minuteBadDuration + "분");
+            //Number for increase and decrease
+
+            setDeltaAwareness(sleepPositiveNumberText, sleepPositiveImage, sleepNegativeNumberText, sleepNegativeImage,
+                    position, weeklyDuration);
+        });
+
+        sleepChartRecycler.setAdapter(sleepBarAdapter);
 
         return v;
     }
