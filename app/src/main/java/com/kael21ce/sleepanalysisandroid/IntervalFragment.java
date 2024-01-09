@@ -1,5 +1,7 @@
 package com.kael21ce.sleepanalysisandroid;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -26,6 +28,7 @@ public class IntervalFragment extends Fragment {
     public RecyclerView intervalRecyclerView;
     public TextView AlertnessHighTimeText;
     public TextView AlertnessLowTimeText;
+    private LinearLayout alertnessLayout;
 
     SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", Locale.KOREA);
 
@@ -36,8 +39,13 @@ public class IntervalFragment extends Fragment {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_interval, container, false);
 
+        SharedPreferences sharedPref = getActivity().getSharedPreferences("SleepWake", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+
         intervalPlusButton = v.findViewById(R.id.intervalPlusButton);
         intervalRecyclerView = v.findViewById(R.id.IntervalRecyclerView);
+        alertnessLayout = v.findViewById(R.id.AlertnessLayout);
+
 
         //Set layoutManager to recyclerView
         LinearLayoutManager layoutManager = new LinearLayoutManager(v.getContext(),
@@ -49,6 +57,16 @@ public class IntervalFragment extends Fragment {
         Bundle bundle = this.getArguments();
         if(bundle == null){
             Log.v("bundle", "bundle failed to be fetched");
+        }
+
+        //Show or hide the good and bad duration
+        if (sharedPref.contains("isHidden")) {
+            boolean isHidden = sharedPref.getBoolean("isHidden", false);
+            if (isHidden) {
+                alertnessLayout.setVisibility(View.GONE);
+            } else {
+                alertnessLayout.setVisibility(View.VISIBLE);
+            }
         }
 
         //update the awareness
