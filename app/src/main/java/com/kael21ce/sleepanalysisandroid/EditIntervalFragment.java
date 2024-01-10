@@ -21,7 +21,10 @@ import com.kael21ce.sleepanalysisandroid.data.Sleep;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -37,7 +40,7 @@ public class EditIntervalFragment extends Fragment implements ButtonTextUpdater 
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd hh:mm aaa");
 
     SimpleDateFormat sdf24H = new SimpleDateFormat("HH:mm");
-    SimpleDateFormat sdfAMPM = new SimpleDateFormat("hh:mm aaa");
+    SimpleDateFormat sdfAMPM = new SimpleDateFormat("hh:mm a");
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -89,8 +92,12 @@ public class EditIntervalFragment extends Fragment implements ButtonTextUpdater 
         startTimeEditButton.setText(sdfAMPM.format(startHourD));
         endTimeEditButton.setText(sdfAMPM.format(endHourD));
         //Set the text of editIntervalText
-        intervalTextView.setText("수면 시간: "
-               + getInterval(v.getContext(), sdfAMPM.format(startHourD), sdfAMPM.format(endHourD)));
+        try {
+            intervalTextView.setText("수면 시간: "
+                   + getInterval(sdfAMPM.format(startHourD), sdfAMPM.format(endHourD)));
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
 
         Date finalStartHourD = startHourD;
         startTimeEditButton.setOnClickListener(view -> {
@@ -188,41 +195,25 @@ public class EditIntervalFragment extends Fragment implements ButtonTextUpdater 
     }
 
     //Convert Format of "aaa HH:mm" to "HH:mm"
-    public String convertAToFormat(String time) {
-        int index = time.indexOf(" ");
-        String aaa = time.substring(index + 1);
-        String hrmm = time.substring(0, index);
-        if (aaa.equals("AM")) {
-            return hrmm;
-        } else {
-            int indexhr = hrmm.indexOf(":");
-            String hr = hrmm.substring(0, indexhr);
-            String convertedHr = hr;
-            if (!hr.equals("12")) {
-                convertedHr = String.valueOf(Integer.parseInt(hr) + 12);
-            }
-            return convertedHr + ":" + hrmm.substring(indexhr + 1);
-        }
+    public String convertAToFormat(String time) throws ParseException {
+        Date date = sdfAMPM.parse(time);
+        return sdf24H.format(date);
     }
 
     //Calculate the interval between two time in format of "HH:mm"
-    public String getInterval(Context context, String start, String end) {
-        ClockView clockView = new ClockView(context);
-        String startTime = convertAToFormat(start);
-        String endTime = convertAToFormat(end);
-        List<Integer> startInts = clockView.convertTimeFormat(startTime);
-        List<Integer> endInts = clockView.convertTimeFormat(endTime);
-        String intervalHour;
-        String intervalMinute;
+    public String getInterval(String start, String end) throws ParseException {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("hh:mm a");
 
-        //Calculate interval
-        if (startInts.get(1) > endInts.get(1)) {
-            intervalMinute = String.valueOf(60 - (startInts.get(1) - endInts.get(1)));
-            intervalHour = String.valueOf(endInts.get(0) - startInts.get(0) - 1);
-        } else {
-            intervalMinute = String.valueOf(endInts.get(1) - startInts.get(1));
-            intervalHour = String.valueOf(endInts.get(0) - startInts.get(0));
+        LocalTime startTime = LocalTime.parse(start, formatter);
+        LocalTime endTime = LocalTime.parse(end, formatter);
+
+        long differenceInMinutes = ChronoUnit.MINUTES.between(startTime, endTime);
+        if (differenceInMinutes < 0) {
+            differenceInMinutes = differenceInMinutes + 24*60;
         }
+
+        long intervalHour = differenceInMinutes / 60;
+        long intervalMinute = differenceInMinutes % 60;
 
         return intervalHour + "시간 " + intervalMinute + "분";
     }
