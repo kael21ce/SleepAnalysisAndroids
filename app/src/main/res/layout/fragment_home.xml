@@ -127,7 +127,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="24dp"
                     android:fontFamily="@font/pretendardvariable"
-                    android:text="userName님의 수면 추천 정보가 없어요"
+                    android:text="추천 수면 탭으로 이동하여 시작해보세요"
                     android:textColor="@color/black"
                     android:textSize="14sp" />
 

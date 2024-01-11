@@ -2,7 +2,6 @@ package com.kael21ce.sleepanalysisandroid;
 
 
 import android.Manifest;
-import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -20,7 +19,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
@@ -46,7 +44,6 @@ import com.kael21ce.sleepanalysisandroid.data.SleepModel;
 import com.kael21ce.sleepanalysisandroid.data.V0;
 import com.kael21ce.sleepanalysisandroid.data.V0Dao;
 
-import java.security.Permission;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -119,6 +116,8 @@ public class MainActivity extends AppCompatActivity {
 
         super.onCreate(saveInstanceState);
         setContentView(R.layout.activity_main);
+
+        Log.v("MainActivity", "onCreate() is called");
 
         healthConnectManager = new HealthConnectManager(getApplicationContext());
         awarenesses = Collections.synchronizedList(new ArrayList<>());
@@ -441,16 +440,13 @@ public class MainActivity extends AppCompatActivity {
                 menuItemView.startAnimation(rotateAnimation);
 
                 Handler handler = new Handler();
-                handler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        //refresh
-                        finish();
-                        overridePendingTransition(0, 0);
-                        Intent intent = getIntent();
-                        startActivity(intent);
-                        overridePendingTransition(0, 0);
-                    }
+                handler.postDelayed(() -> {
+                    //refresh
+                    finish();
+                    overridePendingTransition(0, 0);
+                    Intent intent = getIntent();
+                    startActivity(intent);
+                    overridePendingTransition(0, 0);
                 }, 400);
             }
 

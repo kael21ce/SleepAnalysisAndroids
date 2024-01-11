@@ -119,12 +119,10 @@ public class HomeFragment extends Fragment {
 
         //No data
         LinearLayout homeNoDataView = v.findViewById(R.id.homeNoDataView);
-        TextView homeNoDataDescription = v.findViewById(R.id.homeNoDataDescription);
         ImageButton toRecommendButton = v.findViewById(R.id.toRecommendButton);
         ImageView no_data = v.findViewById(R.id.no_data_home);
         Glide.with(v.getContext()).load(R.raw.no_data).into(no_data);
 
-        homeNoDataDescription.setText(user_name + "님의 수면 추천 정보가 없어요");
         toRecommendButton.setOnClickListener(view -> {
             RecommendFragment recommendFragment = new RecommendFragment();
             getParentFragmentManager().beginTransaction().replace(R.id.mainFrame, recommendFragment).commit();
