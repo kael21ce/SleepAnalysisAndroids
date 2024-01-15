@@ -950,7 +950,7 @@ public class MainActivity extends AppCompatActivity {
             if(sleepEx == sleep.sleep_id){
                 continue;
             }
-            if(!(sleepX.sleepEnd <= sleep.sleepStart || sleepX.sleepStart >= sleep.sleepEnd)){
+            if(!(sleepX.sleepEnd < sleep.sleepStart || sleepX.sleepStart > sleep.sleepEnd)){
                 return true;
             }
         }
