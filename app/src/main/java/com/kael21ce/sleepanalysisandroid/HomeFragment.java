@@ -497,7 +497,7 @@ public class HomeFragment extends Fragment {
         Collections.reverse(weeklyAwareness);
         //When HomeFragment appears
         if (weeklyAwareness.size() == 8) {
-            Awareness todayAwareness = weeklyAwareness.get(7);
+            Awareness todayAwareness = weeklyAwareness.get(0);
             long todayHourGoodDuration = todayAwareness.goodDuration/60;
             long todayMinuteGoodDuration = todayAwareness.goodDuration%60;
             long todayHourBadDuration = todayAwareness.badDuration/60;
@@ -511,7 +511,8 @@ public class HomeFragment extends Fragment {
         //Load the clicked position in RecyclerView
         barAdapter.setOnBarClickListener(position -> {
             Log.d("HomeFragment", "Item clicked at position " + position);
-            Awareness clickedAwareness = weeklyAwareness.get(position);
+            int size = weeklyAwareness.size();
+            Awareness clickedAwareness = weeklyAwareness.get(size - position - 1);
             long hourGoodDuration = clickedAwareness.goodDuration/60;
             long minuteGoodDuration = clickedAwareness.goodDuration%60;
             long hourBadDuration = clickedAwareness.badDuration/60;
