@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".SQMoodSendingActivity">
+
+    <LinearLayout
+        android:id="@+id/SQMoodCaption"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="24dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/sQMoodTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/pretendardbold"
+            android:text="얼마나 우울한 감정이 들었나요?"
+            android:textSize="24sp" />
+
+        <TextView
+            android:id="@+id/sQMoodDescription"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:fontFamily="@font/pretendardvariable"
+            android:text="오늘 느낀 가장 우울한 정도를 입력해주세요"
+            android:textSize="16sp"
+            android:textColor="@color/gray_4" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/SQMoodButtonCaption"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="24dp"
+        android:layout_marginTop="48dp"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@+id/firstButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/corner_8_gray_stroke"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/firstContent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/pretendardbold"
+                android:gravity="center_horizontal"
+                android:padding="16dp"
+                android:text="매우 심하다"
+                android:textColor="@color/gray_4"
+                android:textSize="16sp"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/secondButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/corner_8_gray_stroke"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/secondContent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/pretendardbold"
+                android:gravity="center_horizontal"
+                android:padding="16dp"
+                android:text="매우 심하다"
+                android:textColor="@color/gray_4"
+                android:textSize="16sp"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/thirdButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/corner_8_gray_stroke"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/thirdContent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/pretendardbold"
+                android:gravity="center_horizontal"
+                android:padding="16dp"
+                android:text="매우 심하다"
+                android:textColor="@color/gray_4"
+                android:textSize="16sp"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/fourthButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/corner_8_gray_stroke"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/fourthContent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/pretendardbold"
+                android:gravity="center_horizontal"
+                android:padding="16dp"
+                android:text="매우 심하다"
+                android:textColor="@color/gray_4"
+                android:textSize="16sp"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/fifthButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/corner_8_gray_stroke"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/fifthContent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/pretendardbold"
+                android:gravity="center_horizontal"
+                android:padding="16dp"
+                android:text="매우 심하다"
+                android:textColor="@color/gray_4"
+                android:textSize="16sp"/>
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="bottom"
+        android:orientation="vertical">
+
+        <Button
+            android:id="@+id/SQMoodButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="24dp"
+            android:backgroundTint="@color/blue_1"
+            android:fontFamily="@font/pretendardvariable"
+            android:paddingVertical="16dp"
+            android:text="다음"
+            android:textSize="16sp"
+            android:textColor="@color/white"
+            app:cornerRadius="28dp" />
+    </LinearLayout>
+
+</LinearLayout>
