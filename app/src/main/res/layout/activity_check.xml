@@ -34,6 +34,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:fontFamily="@font/pretendardbold"
+            android:gravity="center_horizontal"
             android:text="이메일을 알려주세요"
             android:textColor="@color/black"
             android:textSize="24sp" />
@@ -45,6 +46,7 @@
             android:layout_marginTop="8dp"
             android:layout_marginBottom="32dp"
             android:fontFamily="@font/pretendardvariable"
+            android:gravity="center_horizontal"
             android:text="SleepWake가 수면 정보를 기억해둘게요"
             android:textColor="@color/gray_4"
             android:textSize="16sp" />
