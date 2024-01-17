@@ -496,7 +496,7 @@ public class HomeFragment extends Fragment {
         }
         Collections.reverse(weeklyAwareness);
         //When HomeFragment appears
-        if (weeklyAwareness.size() == 8) {
+        if (weeklyAwareness.size() >= 8) {
             Awareness todayAwareness = weeklyAwareness.get(0);
             long todayHourGoodDuration = todayAwareness.goodDuration/60;
             long todayMinuteGoodDuration = todayAwareness.goodDuration%60;
@@ -594,7 +594,7 @@ public class HomeFragment extends Fragment {
         Collections.reverse(weeklyDuration);
         //When HomeFragment appears
         Log.v("Weekly duration", String.valueOf(weeklyDuration.size()));
-        if (weeklyDuration.size() == 8) {
+        if (weeklyDuration.size() >= 8) {
             Awareness todayAwareness = weeklyDuration.get(7);
             long todayHourGoodDuration = todayAwareness.goodDuration/60;
             long todayMinuteGoodDuration = todayAwareness.goodDuration%60;

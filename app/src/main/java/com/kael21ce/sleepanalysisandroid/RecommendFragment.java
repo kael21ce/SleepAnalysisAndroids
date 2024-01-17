@@ -263,6 +263,7 @@ public class RecommendFragment extends Fragment {
             clockView.setAngleFromTime(mainSleepStartString, mainSleepEndString);
         }else{
             Log.v("GONE", "GONE");
+            clockView.setTypeOfInterval(1);
             clockView.setIsRecommended(false);
         }
     }
