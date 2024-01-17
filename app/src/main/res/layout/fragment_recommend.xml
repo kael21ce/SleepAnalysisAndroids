@@ -113,8 +113,9 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/pretendardvariable"
-                            android:text="말씀하신 내용을 바탕으로 추천해드려요"
-                            android:textColor="@color/black" />
+                            android:text="오늘 밤 수면과 내일 근무 일정에 맞춰 설정해주세요"
+                            android:textColor="@color/gray_4"
+                            android:textSize="12sp" />
 
                     </LinearLayout>
 
