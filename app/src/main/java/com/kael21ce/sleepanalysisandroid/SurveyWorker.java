@@ -4,6 +4,7 @@ import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.util.Log;
 
@@ -31,9 +32,21 @@ public class SurveyWorker extends Worker {
     public Result doWork() {
         Context context = getApplicationContext();
 
+        SharedPreferences sharedPref =
+                context.getSharedPreferences("SleepWake", Context.MODE_PRIVATE);
+
         try {
             //Code for notification
-            sendNotification(context);
+            if (sharedPref.contains("isNotifyOn")) {
+                if (sharedPref.getBoolean("isNotifyOn", true)) {
+                    sendNotification(context);
+                    Log.v(TAG, "SurveyWorker is aloud");
+                } else {
+                    Log.v(TAG, "SurveyWorker is quiet");
+                }
+            } else {
+                Log.v(TAG, "SurveyWorker cannot call SharedPreference");
+            }
             return Result.success();
 
         } catch (Exception e) {

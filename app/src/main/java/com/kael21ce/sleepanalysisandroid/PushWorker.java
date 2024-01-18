@@ -46,9 +46,21 @@ public class PushWorker extends Worker {
     public Result doWork() {
         Context context = getApplicationContext();
 
+        SharedPreferences sharedPref =
+                context.getSharedPreferences("SleepWake", Context.MODE_PRIVATE);
+
         try {
             //Code for notification
-            sendNotification(context);
+            if (sharedPref.contains("isNotifyOn")) {
+                if (sharedPref.getBoolean("isNotifyOn", true)) {
+                    sendNotification(context);
+                    Log.v(TAG, "PushWorker is aloud");
+                } else {
+                    Log.v(TAG, "PushWorker is quiet");
+                }
+            } else {
+                Log.v(TAG, "PushWorker cannot call SharedPreference");
+            }
             return Result.success();
 
         } catch (Exception e) {

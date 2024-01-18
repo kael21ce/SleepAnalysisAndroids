@@ -23,6 +23,7 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -114,6 +115,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String survey_name = "SurveyType";
     private static final String survey_key = "SQMood";
+    private SharedPreferences.OnSharedPreferenceChangeListener prefListener;
 
     @SuppressLint("NonConstantResourceId")
     @Override
@@ -287,122 +289,28 @@ public class MainActivity extends AppCompatActivity {
         if (settingFragment.getRequestedId() != null) {
             WorkManager.getInstance(this).cancelWorkById(settingFragment.getRequestedId());
             Log.v(TAG, "Former request is canceled");
+        } else {
+            Log.v(TAG, "No former request");
         }
 
-        Log.v("MainActivity", "is notification on: " +
+        Log.v("MainActivity", "Is notification on: " +
                 sharedPref.getBoolean("isNotifyOn", true));
 
-        if (sharedPref.getBoolean("isNotifyOn", true)) {
-            //Start worker with delay
-            String notifyAt = sharedPref.getString(NotifyKey, "21:00");
-            long targetTime = timeToSeconds(notifyAt);
-            long delay = targetTime - now;
-            if (delay < 0) {
-                delay += oneDay;
+        //Send notification
+        sendNotification(sharedPref);
+        prefListener = (sharedPref, key) -> {
+            if (key.equals("isNotifyOn")) {
+                sendNotification(sharedPref);
+                Log.v(TAG, "SharedPreference listener is called");
             }
-            Log.v(TAG, "Delay of the notification: " + delay);
-
-            OneTimeWorkRequest pushRequest = new OneTimeWorkRequest.Builder(PushWorker.class)
-                    .setInitialDelay(delay, TimeUnit.MILLISECONDS)
-                    .build();
-            WorkManager.getInstance(this).enqueue(pushRequest);
-            settingFragment.setRequested(pushRequest);
-
-            //Cancel the former survey request
-            if (survey1 != null) {
-                WorkManager.getInstance(this).cancelWorkById(survey1.getId());
-                Log.v(TAG, "Former survey request 1 is canceled");
+            if (key.equals(NotifyKey)) {
+                sendNotification(sharedPref);
+                Log.v(TAG, "SharedPreference listener is called");
             }
-            if (survey2 != null) {
-                WorkManager.getInstance(this).cancelWorkById(survey2.getId());
-                Log.v(TAG, "Former survey request 2 is canceled");
-            }
-            if (survey3 != null) {
-                WorkManager.getInstance(this).cancelWorkById(survey3.getId());
-                Log.v(TAG, "Former survey request 3 is canceled");
-            }
-            if (survey4 != null) {
-                WorkManager.getInstance(this).cancelWorkById(survey4.getId());
-                Log.v(TAG, "Former survey request 4 is canceled");
-            }
-
-            //Send notification for survey in four time
-            long surveyTime, surveyDelay1, surveyDelay2, surveyDelay3, surveyDelay4;
-            //1. work onset
-            if (!sharedPref.contains("workOnset")) {
-                surveyTime = timeToSeconds("13:00");
-                surveyDelay1 = surveyTime - now;
-            } else {
-                surveyTime = getWorkOnset();
-                surveyDelay1 = surveyTime - now - oneDay;
-            }
-            if (surveyDelay1 < 0) {
-                surveyDelay1 += oneDay;
-            }
-            OneTimeWorkRequest surveyRequest1 = new OneTimeWorkRequest.Builder(SurveyWorker.class)
-                    .setInitialDelay(surveyDelay1, TimeUnit.MILLISECONDS)
-                    .build();
-            WorkManager.getInstance(this).enqueue(surveyRequest1);
-            Log.v(TAG, "Survey delay 1: " + surveyDelay1);
-            this.survey1 = surveyRequest1;
-
-            //2. middle of work onset and offset
-            if (!sharedPref.contains("workOnset")) {
-                surveyTime = timeToSeconds("16:00");
-                surveyDelay2 = surveyTime - now;
-            } else {
-                surveyTime = (getWorkOnset() + getWorkOffset()) / 2;
-                surveyDelay2 = surveyTime - now - oneDay;
-            }
-            if (surveyDelay2 < 0) {
-                surveyDelay2 += oneDay;
-            }
-            OneTimeWorkRequest surveyRequest2 = new OneTimeWorkRequest.Builder(SurveyWorker.class)
-                    .setInitialDelay(surveyDelay2, TimeUnit.MILLISECONDS)
-                    .build();
-            WorkManager.getInstance(this).enqueue(surveyRequest2);
-            Log.v(TAG, "Survey delay 2: " + surveyDelay2);
-            this.survey2 = surveyRequest2;
-
-            //3. work offset
-            if (!sharedPref.contains("workOnset")) {
-                surveyTime = timeToSeconds("20:00");
-                surveyDelay3 = surveyTime - now;
-            } else {
-                surveyTime = getWorkOffset();
-                surveyDelay3 = surveyTime - now - oneDay;
-            }
-            if (surveyDelay3 < 0) {
-                surveyDelay3 += oneDay;
-            }
-            OneTimeWorkRequest surveyRequest3 = new OneTimeWorkRequest.Builder(SurveyWorker.class)
-                    .setInitialDelay(surveyDelay3, TimeUnit.MILLISECONDS)
-                    .build();
-            WorkManager.getInstance(this).enqueue(surveyRequest3);
-            Log.v(TAG, "Survey delay 3: " + surveyDelay3);
-            this.survey3 = surveyRequest3;
-
-            //4. Before one hour to go to bed
-            if (!sharedPref.contains("sleepOnset")) {
-                surveyTime = timeToSeconds("23:00");
-                surveyDelay4 = surveyTime - now;
-            } else {
-                surveyTime = getSleepOnset();
-                surveyDelay4 = surveyTime - now - oneDay - oneHour/2;
-            }
-            if (surveyDelay4 < 0) {
-                surveyDelay4 += oneDay;
-            }
-            OneTimeWorkRequest surveyRequest4 = new OneTimeWorkRequest.Builder(SurveyWorker.class)
-                    .setInitialDelay(surveyDelay4, TimeUnit.MILLISECONDS)
-                    .build();
-            WorkManager.getInstance(this).enqueue(surveyRequest4);
-            Log.v(TAG, "Survey delay 4: " + surveyDelay4);
-            this.survey4 = surveyRequest4;
-        }
+        };
+        sharedPref.registerOnSharedPreferenceChangeListener(prefListener);
 
         //Open the mood and sleep quality survey if the app is open after 12 p.m.
-
         Calendar calendar = Calendar.getInstance();
         int hour = calendar.get(Calendar.HOUR_OF_DAY);
         int day = calendar.get(Calendar.DAY_OF_MONTH);
@@ -442,6 +350,117 @@ public class MainActivity extends AppCompatActivity {
             NotificationManager notificationManager = context.getSystemService(NotificationManager.class);
             notificationManager.createNotificationChannel(channel);
         }
+    }
+
+    public void sendNotification(SharedPreferences sharedPref) {
+        long now = System.currentTimeMillis();
+
+        //Start worker with delay
+        String notifyAt = sharedPref.getString(NotifyKey, "21:00");
+        long targetTime = timeToSeconds(notifyAt);
+        long delay = targetTime - now;
+        if (delay < 0) {
+            delay += oneDay;
+        }
+        Log.v(TAG, "Delay of the notification: " + delay);
+
+        OneTimeWorkRequest pushRequest = new OneTimeWorkRequest.Builder(PushWorker.class)
+                .setInitialDelay(delay, TimeUnit.MILLISECONDS)
+                .build();
+        WorkManager.getInstance(this).enqueue(pushRequest);
+        settingFragment.setRequested(pushRequest);
+
+        //Cancel the former survey request
+        if (survey1 != null) {
+            WorkManager.getInstance(this).cancelWorkById(survey1.getId());
+            Log.v(TAG, "Former survey request 1 is canceled");
+        }
+        if (survey2 != null) {
+            WorkManager.getInstance(this).cancelWorkById(survey2.getId());
+            Log.v(TAG, "Former survey request 2 is canceled");
+        }
+        if (survey3 != null) {
+            WorkManager.getInstance(this).cancelWorkById(survey3.getId());
+            Log.v(TAG, "Former survey request 3 is canceled");
+        }
+        if (survey4 != null) {
+            WorkManager.getInstance(this).cancelWorkById(survey4.getId());
+            Log.v(TAG, "Former survey request 4 is canceled");
+        }
+
+        //Send notification for survey in four time
+        long surveyTime, surveyDelay1, surveyDelay2, surveyDelay3, surveyDelay4;
+        //1. work onset
+        if (!sharedPref.contains("workOnset")) {
+            surveyTime = timeToSeconds("13:00");
+            surveyDelay1 = surveyTime - now;
+        } else {
+            surveyTime = getWorkOnset();
+            surveyDelay1 = surveyTime - now - oneDay;
+        }
+        if (surveyDelay1 < 0) {
+            surveyDelay1 += oneDay;
+        }
+        OneTimeWorkRequest surveyRequest1 = new OneTimeWorkRequest.Builder(SurveyWorker.class)
+                .setInitialDelay(surveyDelay1, TimeUnit.MILLISECONDS)
+                .build();
+        WorkManager.getInstance(this).enqueue(surveyRequest1);
+        Log.v(TAG, "Survey delay 1: " + surveyDelay1);
+        this.survey1 = surveyRequest1;
+
+        //2. middle of work onset and offset
+        if (!sharedPref.contains("workOnset")) {
+            surveyTime = timeToSeconds("16:00");
+            surveyDelay2 = surveyTime - now;
+        } else {
+            surveyTime = (getWorkOnset() + getWorkOffset()) / 2;
+            surveyDelay2 = surveyTime - now - oneDay;
+        }
+        if (surveyDelay2 < 0) {
+            surveyDelay2 += oneDay;
+        }
+        OneTimeWorkRequest surveyRequest2 = new OneTimeWorkRequest.Builder(SurveyWorker.class)
+                .setInitialDelay(surveyDelay2, TimeUnit.MILLISECONDS)
+                .build();
+        WorkManager.getInstance(this).enqueue(surveyRequest2);
+        Log.v(TAG, "Survey delay 2: " + surveyDelay2);
+        this.survey2 = surveyRequest2;
+
+        //3. work offset
+        if (!sharedPref.contains("workOnset")) {
+            surveyTime = timeToSeconds("20:00");
+            surveyDelay3 = surveyTime - now;
+        } else {
+            surveyTime = getWorkOffset();
+            surveyDelay3 = surveyTime - now - oneDay;
+        }
+        if (surveyDelay3 < 0) {
+            surveyDelay3 += oneDay;
+        }
+        OneTimeWorkRequest surveyRequest3 = new OneTimeWorkRequest.Builder(SurveyWorker.class)
+                .setInitialDelay(surveyDelay3, TimeUnit.MILLISECONDS)
+                .build();
+        WorkManager.getInstance(this).enqueue(surveyRequest3);
+        Log.v(TAG, "Survey delay 3: " + surveyDelay3);
+        this.survey3 = surveyRequest3;
+
+        //4. Before 30 min to go to bed
+        if (!sharedPref.contains("sleepOnset")) {
+            surveyTime = timeToSeconds("23:00");
+            surveyDelay4 = surveyTime - now;
+        } else {
+            surveyTime = getSleepOnset();
+            surveyDelay4 = surveyTime - now - oneDay - oneHour/2;
+        }
+        if (surveyDelay4 < 0) {
+            surveyDelay4 += oneDay;
+        }
+        OneTimeWorkRequest surveyRequest4 = new OneTimeWorkRequest.Builder(SurveyWorker.class)
+                .setInitialDelay(surveyDelay4, TimeUnit.MILLISECONDS)
+                .build();
+        WorkManager.getInstance(this).enqueue(surveyRequest4);
+        Log.v(TAG, "Survey delay 4: " + surveyDelay4);
+        this.survey4 = surveyRequest4;
     }
 
     //Change "HH:mm" to milliseconds
@@ -561,6 +580,7 @@ public class MainActivity extends AppCompatActivity {
     public void onDestroy(){
         super.onDestroy();
         db.close();
+        sharedPref.unregisterOnSharedPreferenceChangeListener(prefListener);
         Log.v(TAG, "onDestroy() is called");
     }
 
