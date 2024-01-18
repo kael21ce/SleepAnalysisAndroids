@@ -59,7 +59,7 @@ public class SQMoodSendingActivity extends AppCompatActivity {
 
         //Button click
         firstButton.setOnClickListener(view -> {
-            position = 1;
+            position = 4;
             isChosen = true;
             firstButton.setBackground(ResourcesCompat.getDrawable(getResources(),
                     R.drawable.corner_8_black_stroke, null));
@@ -87,7 +87,7 @@ public class SQMoodSendingActivity extends AppCompatActivity {
         });
 
         secondButton.setOnClickListener(view -> {
-            position = 2;
+            position = 3;
             isChosen = true;
             firstButton.setBackground(ResourcesCompat.getDrawable(getResources(),
                     R.drawable.corner_8_gray_stroke, null));
@@ -115,7 +115,7 @@ public class SQMoodSendingActivity extends AppCompatActivity {
         });
 
         thirdButton.setOnClickListener(view -> {
-            position = 3;
+            position = 2;
             isChosen = true;
             firstButton.setBackground(ResourcesCompat.getDrawable(getResources(),
                     R.drawable.corner_8_gray_stroke, null));
@@ -143,7 +143,7 @@ public class SQMoodSendingActivity extends AppCompatActivity {
         });
 
         fourthButton.setOnClickListener(view -> {
-            position = 4;
+            position = 1;
             isChosen = true;
             firstButton.setBackground(ResourcesCompat.getDrawable(getResources(),
                     R.drawable.corner_8_gray_stroke, null));
@@ -171,7 +171,7 @@ public class SQMoodSendingActivity extends AppCompatActivity {
         });
 
         fifthButton.setOnClickListener(view -> {
-            position = 5;
+            position = 0;
             isChosen = true;
             firstButton.setBackground(ResourcesCompat.getDrawable(getResources(),
                     R.drawable.corner_8_gray_stroke, null));
@@ -292,7 +292,7 @@ public class SQMoodSendingActivity extends AppCompatActivity {
                 endIntent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                 startActivity(endIntent);
                 //Save the survey result
-                sendMood(position, moodData.getInt("mood_high"), moodData.getInt("mood_low"), moodData.getInt("mood_anx"), moodData.getInt("mood_irr"));
+                sendMood(position+1, moodData.getInt("mood_high"), moodData.getInt("mood_low"), moodData.getInt("mood_anx"), moodData.getInt("mood_irr"));
 
             });
         }
