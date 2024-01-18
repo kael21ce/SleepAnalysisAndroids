@@ -384,7 +384,7 @@ public class MainActivity extends AppCompatActivity {
             surveyDelay4 = surveyTime - now;
         } else {
             surveyTime = getSleepOnset();
-            surveyDelay4 = surveyTime - now - oneDay - oneHour;
+            surveyDelay4 = surveyTime - now - oneDay - oneHour/2;
         }
         if (surveyDelay4 < 0) {
             surveyDelay4 += oneDay;
