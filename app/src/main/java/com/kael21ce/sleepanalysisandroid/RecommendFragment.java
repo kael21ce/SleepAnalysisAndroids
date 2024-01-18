@@ -110,9 +110,9 @@ public class RecommendFragment extends Fragment {
 
         //Check whether recommendation is hidden
         if (!sharedPref2.contains("isHidden")) {
-            editor.putBoolean("isHidden", false).apply();
+            editor.putBoolean("isHidden", true).apply();
         }
-        boolean isHidden = sharedPref2.getBoolean("isHidden", false);
+        boolean isHidden = sharedPref2.getBoolean("isHidden", true);
 
         if (sharedPref2.contains("sleepOnset") && sharedPref2.contains("workOnset") && sharedPref2.contains("workOffset")) {
             noDataLayout.setVisibility(View.GONE);

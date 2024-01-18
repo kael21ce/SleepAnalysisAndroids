@@ -94,9 +94,9 @@ public class SettingFragment extends Fragment implements ButtonTextUpdater {
         TextView hideDescription = v.findViewById(R.id.HideDescription);
         LinearLayout hideView = v.findViewById(R.id.HideView);
         if (!sharedPref.contains("isHidden")) {
-            editor.putBoolean("isHidden", false).apply();
+            editor.putBoolean("isHidden", true).apply();
         }
-        boolean isHidden = sharedPref.getBoolean("isHidden", false);
+        boolean isHidden = sharedPref.getBoolean("isHidden", true);
         if (!isHidden) {
             hideDescription.setText("켜짐");
         } else {

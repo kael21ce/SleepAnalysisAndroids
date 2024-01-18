@@ -131,7 +131,7 @@ public class HomeFragment extends Fragment {
 
         //Check whether recommendation is hidden
         if (!sharedPref.contains("isHidden")) {
-            editor.putBoolean("isHidden", false).apply();
+            editor.putBoolean("isHidden", true).apply();
         }
         boolean isHidden = sharedPref.getBoolean("isHidden", false);
 
