@@ -36,6 +36,7 @@ public class WhenSleepFragment extends Fragment {
         SharedPreferences sharedPref = getActivity().getSharedPreferences("SleepWake", Context.MODE_PRIVATE);
         String user_name = sharedPref.getString("User_Name", "UserName");
         TextView whenSleepDescription = v.findViewById(R.id.whenSleepDescription);
+        whenSleepDescription.setText(user_name + "님이 주무실 수 있는 가장 이른 시각을 알려주세요");
 
         //Back to RecommendFragment
         ImageButton sleepBackButton = v.findViewById(R.id.sleepBackButton);

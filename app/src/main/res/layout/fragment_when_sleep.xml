@@ -38,7 +38,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/pretendardbold"
-                    android:text="언제 잠자리에 들어갈 수 있나요?"
+                    android:text="언제부터 주무실 수 있나요?"
                     android:textColor="@color/black"
                     android:textSize="24sp" />
 
@@ -48,9 +48,9 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:fontFamily="@font/pretendardvariable"
-                    android:text="잠자리에 들어갈 수 있는 가장 이른 시각을 알려주세요"
+                    android:text="userName님이 주무실 수 있는 가장 이른 시각을 알려주세요"
                     android:textColor="@color/black"
-                    android:textSize="16sp" />
+                    android:textSize="14sp" />
             </LinearLayout>
         </LinearLayout>
 

@@ -5,11 +5,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".WhenWorkFragment">
+
     <LinearLayout
         android:id="@+id/whenWorkLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
+
         <LinearLayout
             android:id="@+id/workBackButtonCaption"
             android:layout_width="match_parent"
@@ -20,8 +22,8 @@
                 android:id="@+id/workBackButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:backgroundTint="@color/white"
                 android:layout_marginVertical="8dp"
+                android:backgroundTint="@color/white"
                 android:src="@drawable/chevron_left" />
 
             <LinearLayout
@@ -37,7 +39,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/pretendardbold"
-                    android:text="근무 시간을 알려주세요"
+                    android:text="근무 시간이 언제인가요?"
                     android:textColor="@color/black"
                     android:textSize="24sp" />
 
@@ -47,19 +49,28 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:fontFamily="@font/pretendardvariable"
-                    android:text="휴일이라면 집중하고 싶은 시각을 알려주세요"
+                    android:text="휴무일이라면 활동하는 시간을 알려주세요"
                     android:textColor="@color/black"
-                    android:textSize="16sp" />
+                    android:textSize="14sp" />
             </LinearLayout>
         </LinearLayout>
+
+        <TextView
+            android:id="@+id/workOnsetDescription"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="64dp"
+            android:layout_marginBottom="8dp"
+            android:gravity="center_horizontal"
+            android:text="시작 시간"
+            android:textSize="16sp" />
 
         <LinearLayout
             android:id="@+id/whenWorkCaption"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="64dp"
-            android:layout_marginBottom="32dp"
             android:layout_marginHorizontal="32dp"
+            android:layout_marginBottom="32dp"
             android:orientation="horizontal">
 
             <EditText
@@ -148,22 +159,21 @@
         </LinearLayout>
 
         <TextView
-            android:id="@+id/fromToText"
+            android:id="@+id/workOffsetDescription"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:layout_marginBottom="8dp"
             android:gravity="center_horizontal"
-            android:text="~"
-            android:textSize="32sp"
-            android:fontFamily="@font/pretendardbold"
-            android:textColor="@color/black" />
+            android:text="종료 시간"
+            android:textSize="16sp" />
 
         <LinearLayout
             android:id="@+id/whenWorkOffCaption"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
-            android:layout_marginBottom="32dp"
             android:layout_marginHorizontal="32dp"
+            android:layout_marginBottom="32dp"
             android:orientation="horizontal">
 
             <EditText

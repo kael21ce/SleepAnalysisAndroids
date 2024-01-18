@@ -53,7 +53,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:fontFamily="@font/pretendardbold"
-            android:text="오늘은 얼마나 가뿐하신가요?"
+            android:text="지금 얼마나 개운하신가요?"
             android:textColor="@color/black"
             android:textSize="24dp" />
 
@@ -62,7 +62,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:fontFamily="@font/pretendardbold"
+            android:fontFamily="@font/pretendardvariable"
             android:text="지금의 각성도를 잘 메모해둘게요 :)"
             android:textColor="@color/gray_4" />
 

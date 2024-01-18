@@ -106,7 +106,7 @@ public class RecommendFragment extends Fragment {
         InfoView = v.findViewById(R.id.InfoView);
         RecommendClockView = v.findViewById(R.id.RecommendClockView);
         TextView noDataDescription = v.findViewById(R.id.noDataDescription);
-        noDataDescription.setText(user_name + "님에게 딱 맞는 수면 패턴을 추천해 드릴게요");
+        noDataDescription.setText(user_name + "님에게 딱 맞는 \n수면 패턴을 추천해 드릴게요");
 
         //Check whether recommendation is hidden
         if (!sharedPref2.contains("isHidden")) {

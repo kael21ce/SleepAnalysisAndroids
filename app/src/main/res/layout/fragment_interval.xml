@@ -88,8 +88,8 @@
                             android:layout_height="wrap_content"
                             android:layout_gravity="center_horizontal"
                             android:fontFamily="@font/pretendardvariable"
-                            android:text="집중하기 좋은 시간"
-                            android:textColor="@color/black"
+                            android:text="집중하기 좋은"
+                            android:textColor="@color/gray_4"
                             android:textSize="12sp" />
 
                         <TextView
@@ -136,8 +136,8 @@
                             android:layout_height="wrap_content"
                             android:layout_gravity="center_horizontal"
                             android:fontFamily="@font/pretendardvariable"
-                            android:text="집중이 어려운 시간"
-                            android:textColor="@color/black"
+                            android:text="집중이 어려운"
+                            android:textColor="@color/gray_4"
                             android:textSize="12sp" />
 
                         <TextView

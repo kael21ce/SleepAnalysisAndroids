@@ -36,6 +36,33 @@
                 android:text="수면 정보"
                 android:textColor="@color/black"
                 android:textSize="20sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/EditSleepTextCaption"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="16dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/editSleepTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="수면 시작 및 종료 시각"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/editSleepDescription"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:fontFamily="@font/pretendardvariable"
+                android:text="기존 수면의 시작 및 종료 시각을 변경할 수 있습니다"
+                android:textColor="@color/gray_4"
+                android:textSize="12sp" />
         </LinearLayout>
 
         <LinearLayout
@@ -58,8 +85,8 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="top"
                     android:layout_marginLeft="16dp"
-                    android:fontFamily="@font/pretendardbold"
-                    android:text="수면 시작:"
+                    android:fontFamily="@font/pretendardvariable"
+                    android:text="시작:"
                     android:textColor="@color/black"
                     android:textSize="16sp" />
 
@@ -90,8 +117,8 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="top"
                     android:layout_marginLeft="16dp"
-                    android:fontFamily="@font/pretendardbold"
-                    android:text="수면 종료:"
+                    android:fontFamily="@font/pretendardvariable"
+                    android:text="종료:"
                     android:textColor="@color/black"
                     android:textSize="16sp" />
 
@@ -123,7 +150,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="top"
             android:layout_marginLeft="16dp"
-            android:fontFamily="@font/pretendardbold"
+            android:fontFamily="@font/pretendardvariable"
             android:text="수면 시간: 7시간 51분"
             android:textColor="@color/black"
             android:textSize="16sp" />
