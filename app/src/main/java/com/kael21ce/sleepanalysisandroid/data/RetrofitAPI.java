@@ -14,8 +14,11 @@ public interface RetrofitAPI {
 
     Call<DataUser> createUser(@Body DataUser dataUser);
 
-
     @POST("survey/")
 
     Call<DataSurvey> createSurvey(@Body DataSurvey dataSurvey);
+
+    @POST("survey/sleep_quality/")
+
+    Call<DataMood> createMood(@Body DataMood dataMood);
 }

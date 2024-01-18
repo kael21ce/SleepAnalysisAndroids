@@ -3,12 +3,26 @@ package com.kael21ce.sleepanalysisandroid;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.res.ResourcesCompat;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.kael21ce.sleepanalysisandroid.data.DataMood;
+import com.kael21ce.sleepanalysisandroid.data.DataSurvey;
+import com.kael21ce.sleepanalysisandroid.data.RetrofitAPI;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class SQMoodSendingActivity extends AppCompatActivity {
 
@@ -16,6 +30,8 @@ public class SQMoodSendingActivity extends AppCompatActivity {
     int position = 1;
     boolean isChosen = false;
     private static final String name = "SurveyType";
+
+    Bundle moodData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -195,6 +211,7 @@ public class SQMoodSendingActivity extends AppCompatActivity {
         //Get the sent survey type
         Intent sentIntent = getIntent();
         this.surveyType = sentIntent.getIntExtra(name, 0);
+        this.moodData = sentIntent.getBundleExtra("moodData");
 
         if (surveyType == 0) {
             sQMoodTitle.setText("얼마나 우울한 감정이 들었나요?");
@@ -205,8 +222,10 @@ public class SQMoodSendingActivity extends AppCompatActivity {
             thirdContent.setText("가볍다");
             fourthContent.setText("없다");
             sQMoodButton.setOnClickListener(view -> {
+                moodData.putInt("mood_high", position);
                 Intent nextIntent = new Intent(this, SQMoodSendingActivity.class);
                 nextIntent.putExtra(name, 1);
+                nextIntent.putExtra("moodData", moodData);
                 startActivity(nextIntent);
                 //Save the survey result
 
@@ -220,8 +239,10 @@ public class SQMoodSendingActivity extends AppCompatActivity {
             thirdContent.setText("가볍다");
             fourthContent.setText("없다");
             sQMoodButton.setOnClickListener(view -> {
+                moodData.putInt("mood_low", position);
                 Intent nextIntent = new Intent(this, SQMoodSendingActivity.class);
                 nextIntent.putExtra(name, 2);
+                nextIntent.putExtra("moodData", moodData);
                 startActivity(nextIntent);
                 //Save the survey result
             });
@@ -234,8 +255,10 @@ public class SQMoodSendingActivity extends AppCompatActivity {
             thirdContent.setText("가볍다");
             fourthContent.setText("없다");
             sQMoodButton.setOnClickListener(view -> {
+                moodData.putInt("mood_anx", position);
                 Intent nextIntent = new Intent(this, SQMoodSendingActivity.class);
                 nextIntent.putExtra(name, 3);
+                nextIntent.putExtra("moodData", moodData);
                 startActivity(nextIntent);
                 //Save the survey result
             });
@@ -248,8 +271,10 @@ public class SQMoodSendingActivity extends AppCompatActivity {
             thirdContent.setText("가볍다");
             fourthContent.setText("없다");
             sQMoodButton.setOnClickListener(view -> {
+                moodData.putInt("mood_irr", position);
                 Intent nextIntent = new Intent(this, SQMoodSendingActivity.class);
                 nextIntent.putExtra(name, 4);
+                nextIntent.putExtra("moodData", moodData);
                 startActivity(nextIntent);
                 //Save the survey result
             });
@@ -267,8 +292,51 @@ public class SQMoodSendingActivity extends AppCompatActivity {
                 endIntent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                 startActivity(endIntent);
                 //Save the survey result
+                sendMood(position, moodData.getInt("mood_high"), moodData.getInt("mood_low"), moodData.getInt("mood_anx"), moodData.getInt("mood_irr"));
 
             });
         }
+    }
+
+    private void sendMood(Integer sleep_quality, Integer mood_high, Integer mood_low, Integer mood_anx, Integer mood_irr){
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("https://sleep-math.com/sleepapp/")
+                // as we are sending data in json format so
+                // we have to add Gson converter factory
+                .addConverterFactory(GsonConverterFactory.create())
+                // at last we are building our retrofit builder.
+                .build();
+        RetrofitAPI retrofitAPI = retrofit.create(RetrofitAPI.class);
+        SharedPreferences sharedPref = getSharedPreferences("SleepWake", Context.MODE_PRIVATE);
+        String username = sharedPref.getString("User_Name", "tester33");
+        long time = System.currentTimeMillis();
+
+        DataMood mood = new DataMood(username, sleep_quality, mood_high, mood_low, mood_anx, mood_irr , time);
+        Call<DataMood> call = retrofitAPI.createMood(mood);
+        call.enqueue(new Callback<DataMood>() {
+            @Override
+            public void onResponse(Call<DataMood> call, Response<DataMood> response) {
+                // this method is called when we get response from our api.
+                if(response.code() <= 300) {
+                    Toast.makeText(SQMoodSendingActivity.this, "Data added to API", Toast.LENGTH_SHORT).show();
+                }else {
+                    Toast.makeText(SQMoodSendingActivity.this, "Data sending failed", Toast.LENGTH_SHORT).show();
+                    // we are getting response from our body
+                    // and passing it to our modal class.
+                    DataMood responseFromAPI = response.body();
+
+                    // on below line we are getting our data from modal class and adding it to our string.
+                    String responseString = "Response Code : " + response.code() + "\nName : " + "\n";
+                    Log.v("RESPONSE", responseString);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<DataMood> call, Throwable t) {
+                // setting text to our text view when
+                // we get error response from API.
+                Log.v("ERROR", "Error found is : " + t.getMessage());
+            }
+        });
     }
 }

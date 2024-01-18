@@ -15,6 +15,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.kael21ce.sleepanalysisandroid.data.DataModal;
+import com.kael21ce.sleepanalysisandroid.data.DataMood;
 import com.kael21ce.sleepanalysisandroid.data.DataSurvey;
 import com.kael21ce.sleepanalysisandroid.data.RetrofitAPI;
 
@@ -183,15 +184,18 @@ public class SurveyActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<DataSurvey> call, Response<DataSurvey> response) {
                 // this method is called when we get response from our api.
-                Toast.makeText(SurveyActivity.this, "Data added to API", Toast.LENGTH_SHORT).show();
+                if(response.code() <= 300) {
+                    Toast.makeText(SurveyActivity.this, "Data added to API", Toast.LENGTH_SHORT).show();
+                }else {
+                    Toast.makeText(SurveyActivity.this, "Data sending failed", Toast.LENGTH_SHORT).show();
+                    // we are getting response from our body
+                    // and passing it to our modal class.
+                    DataSurvey responseFromAPI = response.body();
 
-                // we are getting response from our body
-                // and passing it to our modal class.
-                DataSurvey responseFromAPI = response.body();
-
-                // on below line we are getting our data from modal class and adding it to our string.
-                String responseString = "Response Code : " + response.code() + "\nName : "  + "\n" ;
-                Log.v("RESPONSE", responseString);
+                    // on below line we are getting our data from modal class and adding it to our string.
+                    String responseString = "Response Code : " + response.code() + "\nName : " + "\n";
+                    Log.v("RESPONSE", responseString);
+                }
             }
 
             @Override

@@ -36,6 +36,7 @@ import com.kael21ce.sleepanalysisandroid.data.AppDatabase;
 import com.kael21ce.sleepanalysisandroid.data.Awareness;
 import com.kael21ce.sleepanalysisandroid.data.AwarenessDao;
 import com.kael21ce.sleepanalysisandroid.data.DataModal;
+import com.kael21ce.sleepanalysisandroid.data.DataMood;
 import com.kael21ce.sleepanalysisandroid.data.HealthConnectManager;
 import com.kael21ce.sleepanalysisandroid.data.RetrofitAPI;
 import com.kael21ce.sleepanalysisandroid.data.Sleep;
@@ -408,8 +409,10 @@ public class MainActivity extends AppCompatActivity {
 
         if (surveyDay != day) {
             if (hour >= 12) {
+                Bundle temp = new Bundle();
                 Intent surveyIntent = new Intent(this, SQMoodSendingActivity.class);
                 surveyIntent.putExtra(survey_name, 0);
+                surveyIntent.putExtra("moodData", temp);
                 startActivity(surveyIntent);
                 editor.putInt(survey_key, day).apply();
             }
@@ -1010,15 +1013,18 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<DataModal> call, Response<DataModal> response) {
                 // this method is called when we get response from our api.
-                Toast.makeText(MainActivity.this, "Data added to API", Toast.LENGTH_SHORT).show();
+                if(response.code() <= 300) {
+                    Toast.makeText(MainActivity.this, "Data added to API", Toast.LENGTH_SHORT).show();
+                }else {
+                    Toast.makeText(MainActivity.this, "Data sending failed", Toast.LENGTH_SHORT).show();
+                    // we are getting response from our body
+                    // and passing it to our modal class.
+                    DataModal responseFromAPI = response.body();
 
-                // we are getting response from our body
-                // and passing it to our modal class.
-                DataModal responseFromAPI = response.body();
-
-                // on below line we are getting our data from modal class and adding it to our string.
-                String responseString = "Response Code : " + response.code() + "\nName : "  + "\n" ;
-                Log.v("RESPONSE2", responseString);
+                    // on below line we are getting our data from modal class and adding it to our string.
+                    String responseString = "Response Code : " + response.code() + "\nName : " + "\n";
+                    Log.v("RESPONSE2", responseString);
+                }
             }
 
             @Override
