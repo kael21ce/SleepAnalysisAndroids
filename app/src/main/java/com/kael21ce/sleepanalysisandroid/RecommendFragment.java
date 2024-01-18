@@ -120,15 +120,10 @@ public class RecommendFragment extends Fragment {
                 InfoView.setVisibility(View.VISIBLE);
                 RecommendClockView.setVisibility(View.VISIBLE);
             } else {
-                InfoView.setVisibility(View.GONE);
+                InfoView.setVisibility(View.VISIBLE);
                 RecommendClockView.setVisibility(View.GONE);
             }
         } else {
-            if (!isHidden) {
-                noDataLayout.setVisibility(View.VISIBLE);
-            } else {
-                noDataLayout.setVisibility(View.GONE);
-            }
             InfoView.setVisibility(View.GONE);
             RecommendClockView.setVisibility(View.GONE);
         }
