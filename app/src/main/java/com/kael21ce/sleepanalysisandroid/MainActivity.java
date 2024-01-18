@@ -53,6 +53,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -109,6 +110,9 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<BarEntry> barEntries;
 
     private OneTimeWorkRequest survey1, survey2, survey3, survey4;
+
+    private static final String survey_name = "SurveyType";
+    private static final String survey_key = "SQMood";
 
     @SuppressLint("NonConstantResourceId")
     @Override
@@ -390,6 +394,26 @@ public class MainActivity extends AppCompatActivity {
         WorkManager.getInstance(this).enqueue(surveyRequest4);
         Log.v(TAG, "Survey delay 4: " + surveyDelay4);
         this.survey4 = surveyRequest4;
+
+        //Open the mood and sleep quality survey if the app is open after 12 p.m.
+
+        Calendar calendar = Calendar.getInstance();
+        int hour = calendar.get(Calendar.HOUR_OF_DAY);
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+
+        if (!sharedPref.contains(survey_key)) {
+            editor.putInt(survey_key, 0).apply();
+        }
+        int surveyDay = sharedPref.getInt(survey_key, 0);
+
+        if (surveyDay != day) {
+            if (hour >= 12) {
+                Intent surveyIntent = new Intent(this, SQMoodSendingActivity.class);
+                surveyIntent.putExtra(survey_name, 0);
+                startActivity(surveyIntent);
+                editor.putInt(survey_key, day).apply();
+            }
+        }
     }
 
     //Create channel for notification of recommendation
