@@ -289,112 +289,117 @@ public class MainActivity extends AppCompatActivity {
             Log.v(TAG, "Former request is canceled");
         }
 
-        //Start worker with delay
-        String notifyAt = sharedPref.getString(NotifyKey, "21:00");
-        long targetTime = timeToSeconds(notifyAt);
-        long delay = targetTime - now;
-        if (delay < 0) {
-            delay += oneDay;
-        }
-        Log.v(TAG, "Delay of the notification: " + delay);
+        Log.v("MainActivity", "is notification on: " +
+                sharedPref.getBoolean("isNotifyOn", true));
 
-        OneTimeWorkRequest pushRequest = new OneTimeWorkRequest.Builder(PushWorker.class)
-                .setInitialDelay(delay, TimeUnit.MILLISECONDS)
-                .build();
-        WorkManager.getInstance(this).enqueue(pushRequest);
-        settingFragment.setRequested(pushRequest);
+        if (sharedPref.getBoolean("isNotifyOn", true)) {
+            //Start worker with delay
+            String notifyAt = sharedPref.getString(NotifyKey, "21:00");
+            long targetTime = timeToSeconds(notifyAt);
+            long delay = targetTime - now;
+            if (delay < 0) {
+                delay += oneDay;
+            }
+            Log.v(TAG, "Delay of the notification: " + delay);
 
-        //Cancel the former survey request
-        if (survey1 != null) {
-            WorkManager.getInstance(this).cancelWorkById(survey1.getId());
-            Log.v(TAG, "Former survey request 1 is canceled");
-        }
-        if (survey2 != null) {
-            WorkManager.getInstance(this).cancelWorkById(survey2.getId());
-            Log.v(TAG, "Former survey request 2 is canceled");
-        }
-        if (survey3 != null) {
-            WorkManager.getInstance(this).cancelWorkById(survey3.getId());
-            Log.v(TAG, "Former survey request 3 is canceled");
-        }
-        if (survey4 != null) {
-            WorkManager.getInstance(this).cancelWorkById(survey4.getId());
-            Log.v(TAG, "Former survey request 4 is canceled");
-        }
+            OneTimeWorkRequest pushRequest = new OneTimeWorkRequest.Builder(PushWorker.class)
+                    .setInitialDelay(delay, TimeUnit.MILLISECONDS)
+                    .build();
+            WorkManager.getInstance(this).enqueue(pushRequest);
+            settingFragment.setRequested(pushRequest);
 
-        //Send notification for survey in four time
-        long surveyTime, surveyDelay1, surveyDelay2, surveyDelay3, surveyDelay4;
-        //1. work onset
-        if (!sharedPref.contains("workOnset")) {
-            surveyTime = timeToSeconds("13:00");
-            surveyDelay1 = surveyTime - now;
-        } else {
-            surveyTime = getWorkOnset();
-            surveyDelay1 = surveyTime - now - oneDay;
-        }
-        if (surveyDelay1 < 0) {
-            surveyDelay1 += oneDay;
-        }
-        OneTimeWorkRequest surveyRequest1 = new OneTimeWorkRequest.Builder(SurveyWorker.class)
-                .setInitialDelay(surveyDelay1, TimeUnit.MILLISECONDS)
-                .build();
-        WorkManager.getInstance(this).enqueue(surveyRequest1);
-        Log.v(TAG, "Survey delay 1: " + surveyDelay1);
-        this.survey1 = surveyRequest1;
+            //Cancel the former survey request
+            if (survey1 != null) {
+                WorkManager.getInstance(this).cancelWorkById(survey1.getId());
+                Log.v(TAG, "Former survey request 1 is canceled");
+            }
+            if (survey2 != null) {
+                WorkManager.getInstance(this).cancelWorkById(survey2.getId());
+                Log.v(TAG, "Former survey request 2 is canceled");
+            }
+            if (survey3 != null) {
+                WorkManager.getInstance(this).cancelWorkById(survey3.getId());
+                Log.v(TAG, "Former survey request 3 is canceled");
+            }
+            if (survey4 != null) {
+                WorkManager.getInstance(this).cancelWorkById(survey4.getId());
+                Log.v(TAG, "Former survey request 4 is canceled");
+            }
 
-        //2. middle of work onset and offset
-        if (!sharedPref.contains("workOnset")) {
-            surveyTime = timeToSeconds("16:00");
-            surveyDelay2 = surveyTime - now;
-        } else {
-            surveyTime = (getWorkOnset() + getWorkOffset()) / 2;
-            surveyDelay2 = surveyTime - now - oneDay;
-        }
-        if (surveyDelay2 < 0) {
-            surveyDelay2 += oneDay;
-        }
-        OneTimeWorkRequest surveyRequest2 = new OneTimeWorkRequest.Builder(SurveyWorker.class)
-                .setInitialDelay(surveyDelay2, TimeUnit.MILLISECONDS)
-                .build();
-        WorkManager.getInstance(this).enqueue(surveyRequest2);
-        Log.v(TAG, "Survey delay 2: " + surveyDelay2);
-        this.survey2 = surveyRequest2;
+            //Send notification for survey in four time
+            long surveyTime, surveyDelay1, surveyDelay2, surveyDelay3, surveyDelay4;
+            //1. work onset
+            if (!sharedPref.contains("workOnset")) {
+                surveyTime = timeToSeconds("13:00");
+                surveyDelay1 = surveyTime - now;
+            } else {
+                surveyTime = getWorkOnset();
+                surveyDelay1 = surveyTime - now - oneDay;
+            }
+            if (surveyDelay1 < 0) {
+                surveyDelay1 += oneDay;
+            }
+            OneTimeWorkRequest surveyRequest1 = new OneTimeWorkRequest.Builder(SurveyWorker.class)
+                    .setInitialDelay(surveyDelay1, TimeUnit.MILLISECONDS)
+                    .build();
+            WorkManager.getInstance(this).enqueue(surveyRequest1);
+            Log.v(TAG, "Survey delay 1: " + surveyDelay1);
+            this.survey1 = surveyRequest1;
 
-        //3. work offset
-        if (!sharedPref.contains("workOnset")) {
-            surveyTime = timeToSeconds("20:00");
-            surveyDelay3 = surveyTime - now;
-        } else {
-            surveyTime = getWorkOffset();
-            surveyDelay3 = surveyTime - now - oneDay;
-        }
-        if (surveyDelay3 < 0) {
-            surveyDelay3 += oneDay;
-        }
-        OneTimeWorkRequest surveyRequest3 = new OneTimeWorkRequest.Builder(SurveyWorker.class)
-                .setInitialDelay(surveyDelay3, TimeUnit.MILLISECONDS)
-                .build();
-        WorkManager.getInstance(this).enqueue(surveyRequest3);
-        Log.v(TAG, "Survey delay 3: " + surveyDelay3);
-        this.survey3 = surveyRequest3;
+            //2. middle of work onset and offset
+            if (!sharedPref.contains("workOnset")) {
+                surveyTime = timeToSeconds("16:00");
+                surveyDelay2 = surveyTime - now;
+            } else {
+                surveyTime = (getWorkOnset() + getWorkOffset()) / 2;
+                surveyDelay2 = surveyTime - now - oneDay;
+            }
+            if (surveyDelay2 < 0) {
+                surveyDelay2 += oneDay;
+            }
+            OneTimeWorkRequest surveyRequest2 = new OneTimeWorkRequest.Builder(SurveyWorker.class)
+                    .setInitialDelay(surveyDelay2, TimeUnit.MILLISECONDS)
+                    .build();
+            WorkManager.getInstance(this).enqueue(surveyRequest2);
+            Log.v(TAG, "Survey delay 2: " + surveyDelay2);
+            this.survey2 = surveyRequest2;
 
-        //4. Before one hour to go to bed
-        if (!sharedPref.contains("sleepOnset")) {
-            surveyTime = timeToSeconds("23:00");
-            surveyDelay4 = surveyTime - now;
-        } else {
-            surveyTime = getSleepOnset();
-            surveyDelay4 = surveyTime - now - oneDay - oneHour/2;
+            //3. work offset
+            if (!sharedPref.contains("workOnset")) {
+                surveyTime = timeToSeconds("20:00");
+                surveyDelay3 = surveyTime - now;
+            } else {
+                surveyTime = getWorkOffset();
+                surveyDelay3 = surveyTime - now - oneDay;
+            }
+            if (surveyDelay3 < 0) {
+                surveyDelay3 += oneDay;
+            }
+            OneTimeWorkRequest surveyRequest3 = new OneTimeWorkRequest.Builder(SurveyWorker.class)
+                    .setInitialDelay(surveyDelay3, TimeUnit.MILLISECONDS)
+                    .build();
+            WorkManager.getInstance(this).enqueue(surveyRequest3);
+            Log.v(TAG, "Survey delay 3: " + surveyDelay3);
+            this.survey3 = surveyRequest3;
+
+            //4. Before one hour to go to bed
+            if (!sharedPref.contains("sleepOnset")) {
+                surveyTime = timeToSeconds("23:00");
+                surveyDelay4 = surveyTime - now;
+            } else {
+                surveyTime = getSleepOnset();
+                surveyDelay4 = surveyTime - now - oneDay - oneHour/2;
+            }
+            if (surveyDelay4 < 0) {
+                surveyDelay4 += oneDay;
+            }
+            OneTimeWorkRequest surveyRequest4 = new OneTimeWorkRequest.Builder(SurveyWorker.class)
+                    .setInitialDelay(surveyDelay4, TimeUnit.MILLISECONDS)
+                    .build();
+            WorkManager.getInstance(this).enqueue(surveyRequest4);
+            Log.v(TAG, "Survey delay 4: " + surveyDelay4);
+            this.survey4 = surveyRequest4;
         }
-        if (surveyDelay4 < 0) {
-            surveyDelay4 += oneDay;
-        }
-        OneTimeWorkRequest surveyRequest4 = new OneTimeWorkRequest.Builder(SurveyWorker.class)
-                .setInitialDelay(surveyDelay4, TimeUnit.MILLISECONDS)
-                .build();
-        WorkManager.getInstance(this).enqueue(surveyRequest4);
-        Log.v(TAG, "Survey delay 4: " + surveyDelay4);
-        this.survey4 = surveyRequest4;
 
         //Open the mood and sleep quality survey if the app is open after 12 p.m.
 

@@ -74,14 +74,49 @@ public class SettingFragment extends Fragment implements ButtonTextUpdater {
         notifyButton = v.findViewById(R.id.notifyButton);
 
         //initifal setting of notifySetting
+        if (!sharedPref.contains("isNotifyOn")) {
+            editor.putBoolean("isNotifyOn", true).apply();
+        }
+
         notifyButton.setText(notifyAt_complex);
         TextView notifyDescription = v.findViewById(R.id.NotifyDescription);
+        TextView noNotifyDescription = v.findViewById(R.id.NoNotifyDescription);
+        LinearLayout notifyView = v.findViewById(R.id.NotifyView);
+
         if (ActivityCompat.checkSelfPermission(context, android.Manifest.permission.POST_NOTIFICATIONS)
                 != PackageManager.PERMISSION_GRANTED) {
             notifyDescription.setText("권한 없음");
+            notifyButton.setVisibility(View.INVISIBLE);
+            noNotifyDescription.setVisibility(View.VISIBLE);
         } else {
-            notifyDescription.setText("알림 허용");
+            notifyDescription.setText("알림 켜짐");
+            notifyButton.setVisibility(View.VISIBLE);
+            noNotifyDescription.setVisibility(View.GONE);
         }
+
+        //Initial setting
+        Log.v("SettingFragment", String.valueOf(sharedPref.getBoolean("isNotifyOn", true)));
+        if (sharedPref.getBoolean("isNotifyOn", true)) {
+            notifyDescription.setText("알림 켜짐");
+            notifyButton.setVisibility(View.VISIBLE);
+        } else {
+            notifyDescription.setText("알림 꺼짐");
+            notifyButton.setVisibility(View.INVISIBLE);
+        }
+
+        //On/Off the notification
+        notifyView.setOnClickListener(view -> {
+            if (sharedPref.getBoolean("isNotifyOn", true)) {
+                editor.putBoolean("isNotifyOn", false).apply();
+                notifyDescription.setText("알림 꺼짐");
+                notifyButton.setVisibility(View.INVISIBLE);
+            } else {
+                editor.putBoolean("isNotifyOn", true).apply();
+                notifyDescription.setText("알림 켜짐");
+                notifyButton.setVisibility(View.VISIBLE);
+            }
+        });
+
 
         notifyButton.setOnClickListener(view -> {
             TimePickerDialog timePickerDialog = new TimePickerDialog(v.getContext(), settingFragment);
