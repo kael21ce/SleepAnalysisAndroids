@@ -28,6 +28,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.room.Room;
+import androidx.work.ExistingWorkPolicy;
 import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkManager;
 
@@ -86,6 +87,8 @@ public class MainActivity extends AppCompatActivity {
     SharedPreferences sharedPref;
     SharedPreferences.Editor editor;
     private static final String NotifyKey = "Notify_At";
+    private static final String RecommendName = "Recommend";
+    private static final String SurveyName1 = "Survey1", SurveyName2 = "Survey2", SurveyName3 = "Survey3", SurveyName4 = "Survey4";
     //Time after click back button
     private boolean doubleBackToExitPressedOnce = false;
 
@@ -285,13 +288,6 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
         );
-        //Cancel the former work request
-        if (settingFragment.getRequestedId() != null) {
-            WorkManager.getInstance(this).cancelWorkById(settingFragment.getRequestedId());
-            Log.v(TAG, "Former request is canceled");
-        } else {
-            Log.v(TAG, "No former request");
-        }
 
         Log.v("MainActivity", "Is notification on: " +
                 sharedPref.getBoolean("isNotifyOn", true));
@@ -301,11 +297,11 @@ public class MainActivity extends AppCompatActivity {
         prefListener = (sharedPref, key) -> {
             if (key.equals("isNotifyOn")) {
                 sendNotification(sharedPref);
-                Log.v(TAG, "SharedPreference listener is called");
+                Log.v(TAG, "SharedPreference listener is called 1");
             }
             if (key.equals(NotifyKey)) {
                 sendNotification(sharedPref);
-                Log.v(TAG, "SharedPreference listener is called");
+                Log.v(TAG, "SharedPreference listener is called 2");
             }
         };
         sharedPref.registerOnSharedPreferenceChangeListener(prefListener);
@@ -367,26 +363,8 @@ public class MainActivity extends AppCompatActivity {
         OneTimeWorkRequest pushRequest = new OneTimeWorkRequest.Builder(PushWorker.class)
                 .setInitialDelay(delay, TimeUnit.MILLISECONDS)
                 .build();
-        WorkManager.getInstance(this).enqueue(pushRequest);
-        settingFragment.setRequested(pushRequest);
-
-        //Cancel the former survey request
-        if (survey1 != null) {
-            WorkManager.getInstance(this).cancelWorkById(survey1.getId());
-            Log.v(TAG, "Former survey request 1 is canceled");
-        }
-        if (survey2 != null) {
-            WorkManager.getInstance(this).cancelWorkById(survey2.getId());
-            Log.v(TAG, "Former survey request 2 is canceled");
-        }
-        if (survey3 != null) {
-            WorkManager.getInstance(this).cancelWorkById(survey3.getId());
-            Log.v(TAG, "Former survey request 3 is canceled");
-        }
-        if (survey4 != null) {
-            WorkManager.getInstance(this).cancelWorkById(survey4.getId());
-            Log.v(TAG, "Former survey request 4 is canceled");
-        }
+        WorkManager.getInstance(this).enqueueUniqueWork(RecommendName,
+                ExistingWorkPolicy.REPLACE, pushRequest);
 
         //Send notification for survey in four time
         long surveyTime, surveyDelay1, surveyDelay2, surveyDelay3, surveyDelay4;
@@ -404,9 +382,9 @@ public class MainActivity extends AppCompatActivity {
         OneTimeWorkRequest surveyRequest1 = new OneTimeWorkRequest.Builder(SurveyWorker.class)
                 .setInitialDelay(surveyDelay1, TimeUnit.MILLISECONDS)
                 .build();
-        WorkManager.getInstance(this).enqueue(surveyRequest1);
+        WorkManager.getInstance(this).enqueueUniqueWork(SurveyName1,
+                ExistingWorkPolicy.REPLACE, surveyRequest1);
         Log.v(TAG, "Survey delay 1: " + surveyDelay1);
-        this.survey1 = surveyRequest1;
 
         //2. middle of work onset and offset
         if (!sharedPref.contains("workOnset")) {
@@ -422,7 +400,8 @@ public class MainActivity extends AppCompatActivity {
         OneTimeWorkRequest surveyRequest2 = new OneTimeWorkRequest.Builder(SurveyWorker.class)
                 .setInitialDelay(surveyDelay2, TimeUnit.MILLISECONDS)
                 .build();
-        WorkManager.getInstance(this).enqueue(surveyRequest2);
+        WorkManager.getInstance(this).enqueueUniqueWork(SurveyName2,
+                ExistingWorkPolicy.REPLACE, surveyRequest2);
         Log.v(TAG, "Survey delay 2: " + surveyDelay2);
         this.survey2 = surveyRequest2;
 
@@ -440,7 +419,8 @@ public class MainActivity extends AppCompatActivity {
         OneTimeWorkRequest surveyRequest3 = new OneTimeWorkRequest.Builder(SurveyWorker.class)
                 .setInitialDelay(surveyDelay3, TimeUnit.MILLISECONDS)
                 .build();
-        WorkManager.getInstance(this).enqueue(surveyRequest3);
+        WorkManager.getInstance(this).enqueueUniqueWork(SurveyName3,
+                ExistingWorkPolicy.REPLACE, surveyRequest3);
         Log.v(TAG, "Survey delay 3: " + surveyDelay3);
         this.survey3 = surveyRequest3;
 
@@ -458,7 +438,8 @@ public class MainActivity extends AppCompatActivity {
         OneTimeWorkRequest surveyRequest4 = new OneTimeWorkRequest.Builder(SurveyWorker.class)
                 .setInitialDelay(surveyDelay4, TimeUnit.MILLISECONDS)
                 .build();
-        WorkManager.getInstance(this).enqueue(surveyRequest4);
+        WorkManager.getInstance(this).enqueueUniqueWork(SurveyName4,
+                ExistingWorkPolicy.REPLACE, surveyRequest4);
         Log.v(TAG, "Survey delay 4: " + surveyDelay4);
         this.survey4 = surveyRequest4;
     }

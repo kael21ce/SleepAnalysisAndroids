@@ -19,6 +19,7 @@ import android.widget.Toast;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
+import androidx.work.ExistingWorkPolicy;
 import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkManager;
 
@@ -50,6 +51,7 @@ public class SettingFragment extends Fragment implements ButtonTextUpdater {
     OneTimeWorkRequest requested;
     Context context;
     long oneDay = 1000*60*60*24;
+    private static final String RecommendName = "Recommend";
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -96,24 +98,30 @@ public class SettingFragment extends Fragment implements ButtonTextUpdater {
 
         //Initial setting
         Log.v("SettingFragment", String.valueOf(sharedPref.getBoolean("isNotifyOn", true)));
-        if (sharedPref.getBoolean("isNotifyOn", true)) {
-            notifyDescription.setText("알림 켜짐");
-            notifyButton.setVisibility(View.VISIBLE);
-        } else {
-            notifyDescription.setText("알림 꺼짐");
-            notifyButton.setVisibility(View.INVISIBLE);
+        if (ActivityCompat.checkSelfPermission(context, android.Manifest.permission.POST_NOTIFICATIONS)
+                == PackageManager.PERMISSION_GRANTED) {
+            if (sharedPref.getBoolean("isNotifyOn", true)) {
+                notifyDescription.setText("알림 켜짐");
+                notifyButton.setVisibility(View.VISIBLE);
+            } else {
+                notifyDescription.setText("알림 꺼짐");
+                notifyButton.setVisibility(View.INVISIBLE);
+            }
         }
 
         //On/Off the notification
         notifyView.setOnClickListener(view -> {
-            if (sharedPref.getBoolean("isNotifyOn", true)) {
-                editor.putBoolean("isNotifyOn", false).apply();
-                notifyDescription.setText("알림 꺼짐");
-                notifyButton.setVisibility(View.INVISIBLE);
-            } else {
-                editor.putBoolean("isNotifyOn", true).apply();
-                notifyDescription.setText("알림 켜짐");
-                notifyButton.setVisibility(View.VISIBLE);
+            if (ActivityCompat.checkSelfPermission(context, android.Manifest.permission.POST_NOTIFICATIONS)
+                    == PackageManager.PERMISSION_GRANTED) {
+                if (sharedPref.getBoolean("isNotifyOn", true)) {
+                    editor.putBoolean("isNotifyOn", false).apply();
+                    notifyDescription.setText("알림 꺼짐");
+                    notifyButton.setVisibility(View.INVISIBLE);
+                } else {
+                    editor.putBoolean("isNotifyOn", true).apply();
+                    notifyDescription.setText("알림 켜짐");
+                    notifyButton.setVisibility(View.VISIBLE);
+                }
             }
         });
 
@@ -220,20 +228,6 @@ public class SettingFragment extends Fragment implements ButtonTextUpdater {
         }
     }
 
-    //Load the push work request
-    public void setRequested(OneTimeWorkRequest request) {
-        this.requested = request;
-    }
-
-    //Get the push work request id
-    public UUID getRequestedId() {
-        if (this.requested != null) {
-            return this.requested.getId();
-        } else {
-            return null;
-        }
-    }
-
     @Override
     public void setDateButtonText(String text, int isStartButton) {
     }
@@ -263,8 +257,8 @@ public class SettingFragment extends Fragment implements ButtonTextUpdater {
                         OneTimeWorkRequest pushRequest = new OneTimeWorkRequest.Builder(PushWorker.class)
                                 .setInitialDelay(delay, TimeUnit.MILLISECONDS)
                                 .build();
-                        WorkManager.getInstance(context).enqueue(pushRequest);
-                        setRequested(pushRequest);
+                        WorkManager.getInstance(context).enqueueUniqueWork(RecommendName,
+                                ExistingWorkPolicy.REPLACE, pushRequest);
                     }
                 }
             }
