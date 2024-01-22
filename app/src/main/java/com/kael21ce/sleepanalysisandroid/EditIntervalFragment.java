@@ -35,6 +35,7 @@ public class EditIntervalFragment extends Fragment implements ButtonTextUpdater 
     public Button endTimeEditButton;
     private String buttonStartText;
     private String buttonEndText;
+    private TextView intervalTextView;
 
     SimpleDateFormat sdfDateTime = new SimpleDateFormat( "yyyy/MM/dd HH:mm", Locale.KOREA);
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd hh:mm aaa");
@@ -48,7 +49,7 @@ public class EditIntervalFragment extends Fragment implements ButtonTextUpdater 
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_edit_interval, container, false);
         ImageButton backButtonEdit = v.findViewById(R.id.backButtonEdit);
-        TextView intervalTextView = v.findViewById(R.id.editIntervalText);
+        intervalTextView = v.findViewById(R.id.editIntervalText);
         Button deleteButton = v.findViewById(R.id.deleteButton);
         Button editButton = v.findViewById(R.id.editButton);
         startTimeEditButton = v.findViewById(R.id.startTimeEditButton);
@@ -184,12 +185,47 @@ public class EditIntervalFragment extends Fragment implements ButtonTextUpdater 
 
     public void setTimeButtonText(String text, int isStartButton) {
         if (isStartButton==1) {
-            if (startTimeEditButton != null) {
+            if (startTimeEditButton != null && endTimeEditButton != null) {
                 startTimeEditButton.setText(text);
+
+                Date startHourD = new Date();
+                Date endHourD = new Date();
+                try {
+                    startHourD = sdfAMPM.parse(text);
+                    endHourD = sdfAMPM.parse(endTimeEditButton.getText().toString());
+                } catch (ParseException e) {
+                    throw new RuntimeException(e);
+                }
+
+                try {
+                    intervalTextView.setText("수면 시간: "
+                            + getInterval(sdfAMPM.format(startHourD),
+                            sdfAMPM.format(endHourD)));
+                } catch (ParseException e) {
+                    throw new RuntimeException(e);
+                }
             }
         } else {
-            if (endTimeEditButton != null) {
+            if (startTimeEditButton != null && endTimeEditButton != null) {
                 endTimeEditButton.setText(text);
+
+                Date startHourD = new Date();
+                Date endHourD = new Date();
+
+                try {
+                    startHourD = sdfAMPM.parse(startTimeEditButton.getText().toString());
+                    endHourD = sdfAMPM.parse(text);
+                } catch (ParseException e) {
+                    throw new RuntimeException(e);
+                }
+
+                try {
+                    intervalTextView.setText("수면 시간: "
+                            + getInterval(sdfAMPM.format(startHourD),
+                            sdfAMPM.format(endHourD)));
+                } catch (ParseException e) {
+                    throw new RuntimeException(e);
+                }
             }
         }
     }
