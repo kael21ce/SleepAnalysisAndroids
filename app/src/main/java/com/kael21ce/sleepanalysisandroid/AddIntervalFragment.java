@@ -23,6 +23,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -39,6 +40,7 @@ public class AddIntervalFragment extends Fragment implements ButtonTextUpdater {
     public DatePickerDialog datePickerDialog;
     public TimePickerDialog timePickerDialog;
     SimpleDateFormat sdfDateTimeSchedule = new SimpleDateFormat( "yyyy/MM/dd", Locale.KOREA);
+    private static final String TAG = "AddIntervalFragment";
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -74,13 +76,15 @@ public class AddIntervalFragment extends Fragment implements ButtonTextUpdater {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd hh:mm aaa");
 
         //Set the initial added time to current time
-        Date curDate = null;
+        var ref = new Object() {
+            Date curDate = null;
+        };
         try {
-            curDate = sdfDateTimeSchedule.parse(bundle.getString("date"));
+            ref.curDate = sdfDateTimeSchedule.parse(bundle.getString("date"));
         } catch (ParseException e) {
             throw new RuntimeException(e);
         }
-        String current_date = new SimpleDateFormat("yyyy.MM.dd").format(curDate);
+        String current_date = new SimpleDateFormat("yyyy.MM.dd").format(ref.curDate);
         String current_time = new SimpleDateFormat("hh:mm aaa").format(new Date(1000*60*60*15));
         startDateButton.setText(current_date);
         endDateButton.setText(current_date);
@@ -144,7 +148,22 @@ public class AddIntervalFragment extends Fragment implements ButtonTextUpdater {
                 mainActivity.addSleep(add_sleep);
 
                 mainActivity.finish();
-                startActivity(new Intent(mainActivity, SplashActivity.class));
+                Intent scheduleIntent = new Intent(mainActivity, SplashActivity.class);
+
+                //Send the information of the selected date
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTime(ref.curDate);
+                int year = calendar.get(Calendar.YEAR);
+                int month = calendar.get(Calendar.MONTH);
+                int day = calendar.get(Calendar.DAY_OF_MONTH);
+
+                Log.v(TAG, "Selected: " + year + "-" + month + 1 + "-" + day);
+
+                scheduleIntent.putExtra("Year", year);
+                scheduleIntent.putExtra("Month", month);
+                scheduleIntent.putExtra("Day", day);
+
+                startActivity(scheduleIntent);
             }else{
                 AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
                 builder.setCancelable(true);

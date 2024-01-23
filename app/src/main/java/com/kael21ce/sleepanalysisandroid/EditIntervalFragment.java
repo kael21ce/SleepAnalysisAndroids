@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -25,6 +26,7 @@ import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -39,9 +41,12 @@ public class EditIntervalFragment extends Fragment implements ButtonTextUpdater 
 
     SimpleDateFormat sdfDateTime = new SimpleDateFormat( "yyyy/MM/dd HH:mm", Locale.KOREA);
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd hh:mm aaa");
+    SimpleDateFormat sdfSimple = new SimpleDateFormat("yyyy/MM/dd");
 
     SimpleDateFormat sdf24H = new SimpleDateFormat("HH:mm");
     SimpleDateFormat sdfAMPM = new SimpleDateFormat("hh:mm a");
+
+    private static final String TAG = "EditIntervalFragment";
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -67,6 +72,12 @@ public class EditIntervalFragment extends Fragment implements ButtonTextUpdater 
 
         //Set the time picker to each timeEditButton
         EditIntervalFragment editIntervalFragment = this;
+
+        SharedPreferences sharedPref = getActivity().getSharedPreferences("SleepWake", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+
+        editor.putBoolean("isSchedule", true);
+        editor.apply();
 
         //get the bundle
         if(bundle == null){
@@ -123,7 +134,28 @@ public class EditIntervalFragment extends Fragment implements ButtonTextUpdater 
         deleteButton.setOnClickListener(view -> {
             Log.v("DELETED", "DELETED");
             mainActivity.deleteSleep(initSleep);
-            startActivity(new Intent(mainActivity, SplashActivity.class));
+
+            Intent scheduleIntent = new Intent(mainActivity, SplashActivity.class);
+
+            //Send the information of the selected date
+            Calendar calendar = Calendar.getInstance();
+            try {
+                Date curDate = sdfSimple.parse(date);
+                calendar.setTime(curDate);
+                int year = calendar.get(Calendar.YEAR);
+                int month = calendar.get(Calendar.MONTH);
+                int day = calendar.get(Calendar.DAY_OF_MONTH);
+
+                Log.v(TAG, "Selected: " + year + "-" + month + 1 + "-" + day);
+
+                scheduleIntent.putExtra("Year", year);
+                scheduleIntent.putExtra("Month", month);
+                scheduleIntent.putExtra("Day", day);
+            } catch (ParseException e) {
+                throw new RuntimeException(e);
+            }
+
+            startActivity(scheduleIntent);
         });
 
         //Edit interval if editButton is clicked
@@ -159,7 +191,28 @@ public class EditIntervalFragment extends Fragment implements ButtonTextUpdater 
                 edit_sleep.sleepEnd = sleepEndDate.getTime();
 
                 mainActivity.editSleep(initSleep, edit_sleep);
-                startActivity(new Intent(mainActivity, SplashActivity.class));
+
+                Intent scheduleIntent = new Intent(mainActivity, SplashActivity.class);
+
+                //Send the information of the selected date
+                Calendar calendar = Calendar.getInstance();
+                try {
+                    Date curDate = sdfSimple.parse(date);
+                    calendar.setTime(curDate);
+                    int year = calendar.get(Calendar.YEAR);
+                    int month = calendar.get(Calendar.MONTH);
+                    int day = calendar.get(Calendar.DAY_OF_MONTH);
+
+                    Log.v(TAG, "Selected: " + year + "-" + month + 1 + "-" + day);
+
+                    scheduleIntent.putExtra("Year", year);
+                    scheduleIntent.putExtra("Month", month);
+                    scheduleIntent.putExtra("Day", day);
+                } catch (ParseException e) {
+                    throw new RuntimeException(e);
+                }
+
+                startActivity(scheduleIntent);
             }else{
                 AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
                 builder.setCancelable(true);

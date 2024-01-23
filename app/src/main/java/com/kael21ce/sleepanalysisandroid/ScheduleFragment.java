@@ -40,6 +40,7 @@ public class ScheduleFragment extends Fragment {
 
     SimpleDateFormat sdfDateTime = new SimpleDateFormat( "yyyy/MM/dd", Locale.KOREA);
     long now, nineHours;
+    private static final String TAG = "ScheduleFragment";
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -139,6 +140,67 @@ public class ScheduleFragment extends Fragment {
         calendarView = v.findViewById(R.id.CalendarView);
         calendarView.setSelectedDate(CalendarDay.today());
         getChildFragmentManager().beginTransaction().replace(R.id.IntervalFrame, intervalFragment).commit();
+
+        //Get the selected date after editing, adding and deleting the sleep data
+        Bundle selectedBundle = getArguments();
+        if (selectedBundle != null) {
+            int year = selectedBundle.getInt("Year");
+            int month = selectedBundle.getInt("Month");
+            int day = selectedBundle.getInt("Day");
+            Log.v(TAG, "Selected: " + year + "-" + month + 1 + "-" + day);
+            calendarView.setSelectedDate(CalendarDay.from(year, month + 1, day));
+
+            //Load IntervalFragment
+            String myDate = year + "/" + month + 1 + "/" + day;
+            Date date = null;
+            try {
+                date = sdfDateTime.parse(myDate);
+            } catch (ParseException e) {
+                throw new RuntimeException(e);
+            }
+            assert date != null;
+            long dayInMillis = date.getTime();
+            Log.v("DATE CHOSEN", String.valueOf(dayInMillis));
+            long selectedDay = (dayInMillis+nineHours) / oneDayToMils;
+            Log.v("day", String.valueOf(selectedDay));
+
+            //get awareness
+            List<Awareness> awarenesses1 = mainActivity.getAwarenesses();
+            long goodDuration1 = 0;
+            long badDuration1 = 0;
+            for(Awareness awareness: awarenesses1){
+                if(awareness.awarenessDay == selectedDay){
+                    Log.v("SELECTED", "SELECTED");
+                    goodDuration1 = awareness.goodDuration;
+                    badDuration1 = awareness.badDuration;
+                    break;
+                }
+            }
+
+            Bundle bundle1 = new Bundle();
+            //put awareness
+            bundle1.putLong("goodDuration", goodDuration1);
+            bundle1.putLong("badDuration", badDuration1);
+
+            List<Sleep> initSleepData1 = sleepsData.get(selectedDay);
+            if(initSleepData1 == null){
+                initSleepData1 = new ArrayList<>();
+            }
+            int count1 = 0;
+            for(Sleep sleep: initSleepData1){
+                Log.v("THE INTERVAL'S SLEEP", String.valueOf(sleep.sleepStart));
+                bundle1.putLong("sleepStart"+ count1, sleep.sleepStart);
+                bundle1.putLong("sleepEnd"+ count1, sleep.sleepEnd);
+                count1++;
+            }
+            bundle1.putInt("count", count1);
+            bundle1.putString("date", myDate);
+
+            intervalFragment = new IntervalFragment();
+            intervalFragment.setArguments(bundle1);
+
+            getChildFragmentManager().beginTransaction().replace(R.id.IntervalFrame, intervalFragment).commit();
+        }
 
         //Add decorator
         ReportedDecorator reportedDecorator = new ReportedDecorator();

@@ -17,10 +17,14 @@ import com.kael21ce.sleepanalysisandroid.data.HealthConnectManager;
 import com.kael21ce.sleepanalysisandroid.data.HealthConnectManagerKt;
 
 import java.time.Instant;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 public class SplashActivity extends AppCompatActivity {
+
+    private static final String TAG = "SplashActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,8 +59,27 @@ public class SplashActivity extends AppCompatActivity {
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                startActivity(new Intent(SplashActivity.this, MainActivity.class));
-                finish();
+                if (getIntent() != null) {
+                    Date date = new Date();
+                    Calendar calendar = Calendar.getInstance();
+
+                    Intent scheduleIntent = getIntent();
+                    int year = scheduleIntent.getIntExtra("Year", calendar.get(Calendar.YEAR));
+                    int month = scheduleIntent.getIntExtra("Month", calendar.get(Calendar.MONTH));
+                    int day = scheduleIntent.getIntExtra("Day", calendar.get(Calendar.DAY_OF_MONTH));
+
+                    Log.v(TAG, "Selected: " + year + "-" + month + 1 + "-" + day);
+
+                    Intent mainIntent = new Intent(SplashActivity.this, MainActivity.class);
+                    mainIntent.putExtra("Year", year);
+                    mainIntent.putExtra("Month", month);
+                    mainIntent.putExtra("Day", day);
+                    startActivity(mainIntent);
+                    finish();
+                } else {
+                    startActivity(new Intent(SplashActivity.this, MainActivity.class));
+                    finish();
+                }
             }
         }, 1000);
     }

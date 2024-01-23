@@ -247,11 +247,29 @@ public class MainActivity extends AppCompatActivity {
 
         bottomNavigationView = findViewById(R.id.bottomNavigationView);
         boolean isSchedule = sharedPref.getBoolean("isSchedule", false);
-        if(isSchedule == true){
+        if(isSchedule){
             editor.putBoolean("isSchedule", false);
             editor.apply();
             getSupportFragmentManager().beginTransaction().replace(R.id.mainFrame, scheduleFragment).commit();
             setBottomNaviItem(R.id.tabSchedule);
+
+            if (getIntent() != null) {
+                Intent scheduleIntent = getIntent();
+                Date date = new Date();
+                Calendar calendar = Calendar.getInstance();
+
+                int year = scheduleIntent.getIntExtra("Year", calendar.get(Calendar.YEAR));
+                int month = scheduleIntent.getIntExtra("Month", calendar.get(Calendar.MONTH));
+                int day = scheduleIntent.getIntExtra("Day", calendar.get(Calendar.DAY_OF_MONTH));
+
+                Log.v(TAG, "Selected: " + year + "-" + month + 1 + "-" + day);
+
+                Bundle scheduleBundle = new Bundle();
+                scheduleBundle.putInt("Year", year);
+                scheduleBundle.putInt("Month", month);
+                scheduleBundle.putInt("Day", day);
+                scheduleFragment.setArguments(scheduleBundle);
+            }
         }else {
             getSupportFragmentManager().beginTransaction().replace(R.id.mainFrame, homeFragment).commit();
             setBottomNaviItem(R.id.tabHome);
