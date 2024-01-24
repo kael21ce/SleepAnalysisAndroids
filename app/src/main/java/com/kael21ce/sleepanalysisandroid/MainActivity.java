@@ -28,8 +28,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.room.Room;
+import androidx.work.ExistingPeriodicWorkPolicy;
 import androidx.work.ExistingWorkPolicy;
 import androidx.work.OneTimeWorkRequest;
+import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkManager;
 
 import com.github.mikephil.charting.data.BarEntry;
@@ -114,7 +116,6 @@ public class MainActivity extends AppCompatActivity {
 
     ArrayList<BarEntry> barEntries;
 
-    private OneTimeWorkRequest survey1, survey2, survey3, survey4;
 
     private static final String survey_name = "SurveyType";
     private static final String survey_key = "SQMood";
@@ -321,6 +322,10 @@ public class MainActivity extends AppCompatActivity {
                 sendNotification(sharedPref);
                 Log.v(TAG, "SharedPreference listener is called 2");
             }
+            if (key.equals("workOnset") || key.equals("workOffset")) {
+                sendNotification(sharedPref);
+                Log.v(TAG, "SharedPreference listener is called 3");
+            }
         };
         sharedPref.registerOnSharedPreferenceChangeListener(prefListener);
 
@@ -397,15 +402,16 @@ public class MainActivity extends AppCompatActivity {
         if (surveyDelay1 < 0) {
             surveyDelay1 += oneDay;
         }
-        OneTimeWorkRequest surveyRequest1 = new OneTimeWorkRequest.Builder(SurveyWorker.class)
+        PeriodicWorkRequest surveyRequest1 = new PeriodicWorkRequest.Builder(SurveyWorker.class,
+                15, TimeUnit.MINUTES)
                 .setInitialDelay(surveyDelay1, TimeUnit.MILLISECONDS)
-                .build();
-        WorkManager.getInstance(this).enqueueUniqueWork(SurveyName1,
-                ExistingWorkPolicy.REPLACE, surveyRequest1);
+                        .build();
+        WorkManager.getInstance(this).enqueueUniquePeriodicWork(SurveyName1,
+                ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE, surveyRequest1);
         Log.v(TAG, "Survey delay 1: " + surveyDelay1);
 
         //2. middle of work onset and offset
-        if (!sharedPref.contains("workOnset")) {
+        if (!sharedPref.contains("workOnset") || !sharedPref.contains("workOffset")) {
             surveyTime = timeToSeconds("16:00");
             surveyDelay2 = surveyTime - now;
         } else {
@@ -415,16 +421,16 @@ public class MainActivity extends AppCompatActivity {
         if (surveyDelay2 < 0) {
             surveyDelay2 += oneDay;
         }
-        OneTimeWorkRequest surveyRequest2 = new OneTimeWorkRequest.Builder(SurveyWorker.class)
+        PeriodicWorkRequest surveyRequest2 = new PeriodicWorkRequest.Builder(SurveyWorker.class,
+                24, TimeUnit.HOURS)
                 .setInitialDelay(surveyDelay2, TimeUnit.MILLISECONDS)
                 .build();
-        WorkManager.getInstance(this).enqueueUniqueWork(SurveyName2,
-                ExistingWorkPolicy.REPLACE, surveyRequest2);
+        WorkManager.getInstance(this).enqueueUniquePeriodicWork(SurveyName2,
+                ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE, surveyRequest2);
         Log.v(TAG, "Survey delay 2: " + surveyDelay2);
-        this.survey2 = surveyRequest2;
 
         //3. work offset
-        if (!sharedPref.contains("workOnset")) {
+        if (!sharedPref.contains("workOffset")) {
             surveyTime = timeToSeconds("20:00");
             surveyDelay3 = surveyTime - now;
         } else {
@@ -434,13 +440,13 @@ public class MainActivity extends AppCompatActivity {
         if (surveyDelay3 < 0) {
             surveyDelay3 += oneDay;
         }
-        OneTimeWorkRequest surveyRequest3 = new OneTimeWorkRequest.Builder(SurveyWorker.class)
+        PeriodicWorkRequest surveyRequest3 = new PeriodicWorkRequest.Builder(SurveyWorker.class,
+                24, TimeUnit.HOURS)
                 .setInitialDelay(surveyDelay3, TimeUnit.MILLISECONDS)
                 .build();
-        WorkManager.getInstance(this).enqueueUniqueWork(SurveyName3,
-                ExistingWorkPolicy.REPLACE, surveyRequest3);
+        WorkManager.getInstance(this).enqueueUniquePeriodicWork(SurveyName3,
+                ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE, surveyRequest3);
         Log.v(TAG, "Survey delay 3: " + surveyDelay3);
-        this.survey3 = surveyRequest3;
 
         //4. Before 30 min to go to bed
         if (!sharedPref.contains("sleepOnset")) {
@@ -453,13 +459,13 @@ public class MainActivity extends AppCompatActivity {
         if (surveyDelay4 < 0) {
             surveyDelay4 += oneDay;
         }
-        OneTimeWorkRequest surveyRequest4 = new OneTimeWorkRequest.Builder(SurveyWorker.class)
+        PeriodicWorkRequest surveyRequest4 = new PeriodicWorkRequest.Builder(SurveyWorker.class,
+                24, TimeUnit.HOURS)
                 .setInitialDelay(surveyDelay4, TimeUnit.MILLISECONDS)
                 .build();
-        WorkManager.getInstance(this).enqueueUniqueWork(SurveyName4,
-                ExistingWorkPolicy.REPLACE, surveyRequest4);
+        WorkManager.getInstance(this).enqueueUniquePeriodicWork(SurveyName4,
+                ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE, surveyRequest4);
         Log.v(TAG, "Survey delay 4: " + surveyDelay4);
-        this.survey4 = surveyRequest4;
     }
 
     //Change "HH:mm" to milliseconds

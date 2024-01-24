@@ -169,6 +169,10 @@ public class HomeFragment extends Fragment {
 
         //Survey description and button: move to SurveyActivity
         surveyDescription.setText(user_name + "님의 현재 상태를 알려주세요");
+        SurveyUpperView.setOnClickListener(view -> {
+            Intent surveyIntent = new Intent(v.getContext(), SurveyActivity.class);
+            startActivity(surveyIntent);
+        });
         surveyUpperButton.setOnClickListener(view -> {
             Intent surveyIntent = new Intent(v.getContext(), SurveyActivity.class);
             startActivity(surveyIntent);
