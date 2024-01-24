@@ -47,6 +47,7 @@ public class EditIntervalFragment extends Fragment implements ButtonTextUpdater 
     SimpleDateFormat sdfAMPM = new SimpleDateFormat("hh:mm a");
 
     private static final String TAG = "EditIntervalFragment";
+    private static long oneDay = 1000*60*60*24;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -186,30 +187,55 @@ public class EditIntervalFragment extends Fragment implements ButtonTextUpdater 
             Log.v("END DATE", sleepEndDate.toString());
             assert sleepStartDate != null;
             assert sleepEndDate != null;
-            if(sleepStartDate.getTime() <= sleepEndDate.getTime()) {
-                edit_sleep.sleepStart = sleepStartDate.getTime();
-                edit_sleep.sleepEnd = sleepEndDate.getTime();
+
+            Date curDate = null;
+            try {
+                curDate = sdfSimple.parse(date);
+            } catch (ParseException e) {
+                throw new RuntimeException(e);
+            }
+
+            long sleepStartMillis = sleepStartDate.getTime();
+            long sleepEndMillis = sleepEndDate.getTime();
+
+            Calendar midnightCalendar = Calendar.getInstance();
+            midnightCalendar.setTime(curDate);
+
+            midnightCalendar.set(Calendar.HOUR_OF_DAY, 0);
+            midnightCalendar.set(Calendar.MINUTE, 0);
+            midnightCalendar.set(Calendar.SECOND, 0);
+            midnightCalendar.set(Calendar.MILLISECOND, 0);
+
+            long midnight = midnightCalendar.getTimeInMillis();
+            boolean isMidnight = false;
+
+            if (sleepEndDate.getTime() == midnight) {
+                sleepEndMillis += oneDay;
+                isMidnight = true;
+            }
+            if(sleepStartMillis <= sleepEndMillis) {
+                edit_sleep.sleepStart = sleepStartMillis;
+                edit_sleep.sleepEnd = sleepEndMillis;
+
+                if (isMidnight) {
+                    initSleep.sleepEnd += oneDay;
+                }
 
                 Intent scheduleIntent = new Intent(mainActivity, SplashActivity.class);
 
                 //Send the information of the selected date
                 Calendar calendar = Calendar.getInstance();
                 int year = -1, month = -1, day = -1;
-                try {
-                    Date curDate = sdfSimple.parse(date);
-                    calendar.setTime(curDate);
-                    year = calendar.get(Calendar.YEAR);
-                    month = calendar.get(Calendar.MONTH);
-                    day = calendar.get(Calendar.DAY_OF_MONTH);
+                calendar.setTime(curDate);
+                year = calendar.get(Calendar.YEAR);
+                month = calendar.get(Calendar.MONTH);
+                day = calendar.get(Calendar.DAY_OF_MONTH);
 
-                    Log.v(TAG, "Selected: " + year + "-" + month + 1 + "-" + day);
+                Log.v(TAG, "Selected: " + year + "-" + month + 1 + "-" + day);
 
-                    scheduleIntent.putExtra("Year", year);
-                    scheduleIntent.putExtra("Month", month);
-                    scheduleIntent.putExtra("Day", day);
-                } catch (ParseException e) {
-                    throw new RuntimeException(e);
-                }
+                scheduleIntent.putExtra("Year", year);
+                scheduleIntent.putExtra("Month", month);
+                scheduleIntent.putExtra("Day", day);
                 mainActivity.editSleep(initSleep, edit_sleep);
 
                 startActivity(scheduleIntent);
