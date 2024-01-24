@@ -89,6 +89,7 @@ public class MainActivity extends AppCompatActivity {
     SharedPreferences sharedPref;
     SharedPreferences.Editor editor;
     private static final String NotifyKey = "Notify_At";
+    private static final String NotifySettingKey = "IsNotifySet";
     private static final String RecommendName = "Recommend";
     private static final String SurveyName1 = "Survey1", SurveyName2 = "Survey2", SurveyName3 = "Survey3", SurveyName4 = "Survey4";
     //Time after click back button
@@ -312,7 +313,15 @@ public class MainActivity extends AppCompatActivity {
                 sharedPref.getBoolean("isNotifyOn", true));
 
         //Send notification
-        sendNotification(sharedPref);
+        if (!sharedPref.contains(NotifySettingKey)) {
+            editor.putBoolean(NotifySettingKey, false).apply();
+        }
+        boolean isNotifySet = sharedPref.getBoolean(NotifySettingKey, false);
+        if (!isNotifySet) {
+            sendNotification(sharedPref);
+            editor.putBoolean(NotifySettingKey, true).apply();
+        }
+
         prefListener = (sharedPref, key) -> {
             if (key.equals("isNotifyOn")) {
                 sendNotification(sharedPref);
@@ -383,11 +392,14 @@ public class MainActivity extends AppCompatActivity {
         }
         Log.v(TAG, "Delay of the notification: " + delay);
 
-        OneTimeWorkRequest pushRequest = new OneTimeWorkRequest.Builder(PushWorker.class)
+        editor.putLong("Delay", delay).apply();
+
+        PeriodicWorkRequest pushRequest = new PeriodicWorkRequest.Builder(PushWorker.class,
+                24, TimeUnit.HOURS)
                 .setInitialDelay(delay, TimeUnit.MILLISECONDS)
                 .build();
-        WorkManager.getInstance(this).enqueueUniqueWork(RecommendName,
-                ExistingWorkPolicy.REPLACE, pushRequest);
+        WorkManager.getInstance(this).enqueueUniquePeriodicWork(RecommendName,
+                ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE, pushRequest);
 
         //Send notification for survey in four time
         long surveyTime, surveyDelay1, surveyDelay2, surveyDelay3, surveyDelay4;
@@ -410,6 +422,8 @@ public class MainActivity extends AppCompatActivity {
                 ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE, surveyRequest1);
         Log.v(TAG, "Survey delay 1: " + surveyDelay1);
 
+        editor.putLong("SurveyDelay1", surveyDelay1).apply();
+
         //2. middle of work onset and offset
         if (!sharedPref.contains("workOnset") || !sharedPref.contains("workOffset")) {
             surveyTime = timeToSeconds("16:00");
@@ -428,6 +442,8 @@ public class MainActivity extends AppCompatActivity {
         WorkManager.getInstance(this).enqueueUniquePeriodicWork(SurveyName2,
                 ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE, surveyRequest2);
         Log.v(TAG, "Survey delay 2: " + surveyDelay2);
+
+        editor.putLong("SurveyDelay2", surveyDelay2).apply();
 
         //3. work offset
         if (!sharedPref.contains("workOffset")) {
@@ -448,6 +464,8 @@ public class MainActivity extends AppCompatActivity {
                 ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE, surveyRequest3);
         Log.v(TAG, "Survey delay 3: " + surveyDelay3);
 
+        editor.putLong("SurveyDelay3", surveyDelay3).apply();
+
         //4. Before 30 min to go to bed
         if (!sharedPref.contains("sleepOnset")) {
             surveyTime = timeToSeconds("23:00");
@@ -466,6 +484,8 @@ public class MainActivity extends AppCompatActivity {
         WorkManager.getInstance(this).enqueueUniquePeriodicWork(SurveyName4,
                 ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE, surveyRequest4);
         Log.v(TAG, "Survey delay 4: " + surveyDelay4);
+
+        editor.putLong("SurveyDelay4", surveyDelay4).apply();
     }
 
     //Change "HH:mm" to milliseconds
