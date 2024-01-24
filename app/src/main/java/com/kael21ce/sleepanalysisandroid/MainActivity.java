@@ -614,18 +614,17 @@ public class MainActivity extends AppCompatActivity {
         long befSleepStart = 0;
         long befSleepEnd = 0;
         for(Sleep sleep: sleeps){
-            String sleepStart = sdfDateTime.format(new Date(sleep.sleepStart));
-            String sleepEnd = sdfDateTime.format(new Date(sleep.sleepEnd));
-            Date sleepEndD = new Date(sleep.sleepEnd);
-            lastSleep1 = sleepEndD.getTime();
             //synchronize the sleep
-            if(befSleepStart == sleep.sleepStart && befSleepEnd != sleep.sleepEnd){
+            if(befSleepStart == sleep.sleepStart && befSleepEnd == sleep.sleepEnd){
                 sleepDao.delete(sleep);
+                this.sleeps.remove(sleep);
+                Log.v("same data", "same data");
+                befSleepStart = sleep.sleepStart;
+                befSleepEnd = sleep.sleepEnd;
+                continue;
             }
             befSleepStart = sleep.sleepStart;
             befSleepEnd = sleep.sleepEnd;
-        }
-        for(Sleep sleep: sleeps){
             String sleepStart = sdfDateTime.format(new Date(sleep.sleepStart));
             String sleepEnd = sdfDateTime.format(new Date(sleep.sleepEnd));
             Date sleepEndD = new Date(sleep.sleepEnd);
@@ -1126,6 +1125,7 @@ public class MainActivity extends AppCompatActivity {
         long sleepDayStart = (sleep.sleepStart + nineHours)/(1000*60*60*24);
         long sleepDayEnd = (sleep.sleepEnd + nineHours)/(1000*60*60*24);
         if(sleepDayStart != sleepDayEnd){
+            Log.v("DIFFERENT DAY", "DIFFERENT DAY");
             long midnight = sleepDayEnd * 1000*60*60*24;
             midnight = midnight - nineHours;
             Sleep sleep2 = new Sleep();
