@@ -611,6 +611,20 @@ public class MainActivity extends AppCompatActivity {
         sleeps = Collections.synchronizedList(sleepDao.getAll());
         boolean check = false;
         long lastSleep1 = 0;
+        long befSleepStart = 0;
+        long befSleepEnd = 0;
+        for(Sleep sleep: sleeps){
+            String sleepStart = sdfDateTime.format(new Date(sleep.sleepStart));
+            String sleepEnd = sdfDateTime.format(new Date(sleep.sleepEnd));
+            Date sleepEndD = new Date(sleep.sleepEnd);
+            lastSleep1 = sleepEndD.getTime();
+            //synchronize the sleep
+            if(befSleepStart == sleep.sleepStart && befSleepEnd != sleep.sleepEnd){
+                sleepDao.delete(sleep);
+            }
+            befSleepStart = sleep.sleepStart;
+            befSleepEnd = sleep.sleepEnd;
+        }
         for(Sleep sleep: sleeps){
             String sleepStart = sdfDateTime.format(new Date(sleep.sleepStart));
             String sleepEnd = sdfDateTime.format(new Date(sleep.sleepEnd));
