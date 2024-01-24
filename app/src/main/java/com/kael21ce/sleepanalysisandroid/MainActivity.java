@@ -403,7 +403,7 @@ public class MainActivity extends AppCompatActivity {
             surveyDelay1 += oneDay;
         }
         PeriodicWorkRequest surveyRequest1 = new PeriodicWorkRequest.Builder(SurveyWorker.class,
-                15, TimeUnit.MINUTES)
+                24, TimeUnit.HOURS)
                 .setInitialDelay(surveyDelay1, TimeUnit.MILLISECONDS)
                         .build();
         WorkManager.getInstance(this).enqueueUniquePeriodicWork(SurveyName1,
@@ -1007,7 +1007,7 @@ public class MainActivity extends AppCompatActivity {
             if(sleepEx == sleep.sleep_id){
                 continue;
             }
-            if(!(sleepX.sleepEnd < sleep.sleepStart || sleepX.sleepStart > sleep.sleepEnd)){
+            if(!(sleepX.sleepEnd <= sleep.sleepStart || sleepX.sleepStart >= sleep.sleepEnd)){
                 return true;
             }
         }
@@ -1131,11 +1131,14 @@ public class MainActivity extends AppCompatActivity {
                     editor.putLong("lastDataUpdate", lastDataUpdate);
                     editor.apply();
 
+                    Log.v("UPDATED", "PREVIOUS SLEEP IS UPDATED");
+
                     updatedSleep.sleep_id = sleepId;
                     sleepDao.updateSleep(sleepId, updatedSleep.sleepStart, updatedSleep.sleepEnd);
                     this.sleeps.set(count, updatedSleep);
                     return true;
                 }else{
+                    Log.v("UPDATED", "PREVIOUS SLEEP IS NOT UPDATED");
                     return false;
                 }
             }
@@ -1149,6 +1152,10 @@ public class MainActivity extends AppCompatActivity {
         long sleepDelEnd = sleepDel.sleepEnd/60000;
         Log.v("SLEEP DELETE START", String.valueOf(sleepDel.sleepStart));
         Log.v("SLEEP DELETE END", String.valueOf(sleepDel.sleepEnd));
+
+        if (sleepDelStart > sleepDelEnd) {
+            sleepDelEnd += oneDay/60000;
+        }
 
         for(Sleep sleep: this.sleeps){
             long sSleepStart = sleep.sleepStart/60000;

@@ -190,18 +190,17 @@ public class EditIntervalFragment extends Fragment implements ButtonTextUpdater 
                 edit_sleep.sleepStart = sleepStartDate.getTime();
                 edit_sleep.sleepEnd = sleepEndDate.getTime();
 
-                mainActivity.editSleep(initSleep, edit_sleep);
-
                 Intent scheduleIntent = new Intent(mainActivity, SplashActivity.class);
 
                 //Send the information of the selected date
                 Calendar calendar = Calendar.getInstance();
+                int year = -1, month = -1, day = -1;
                 try {
                     Date curDate = sdfSimple.parse(date);
                     calendar.setTime(curDate);
-                    int year = calendar.get(Calendar.YEAR);
-                    int month = calendar.get(Calendar.MONTH);
-                    int day = calendar.get(Calendar.DAY_OF_MONTH);
+                    year = calendar.get(Calendar.YEAR);
+                    month = calendar.get(Calendar.MONTH);
+                    day = calendar.get(Calendar.DAY_OF_MONTH);
 
                     Log.v(TAG, "Selected: " + year + "-" + month + 1 + "-" + day);
 
@@ -211,6 +210,7 @@ public class EditIntervalFragment extends Fragment implements ButtonTextUpdater 
                 } catch (ParseException e) {
                     throw new RuntimeException(e);
                 }
+                mainActivity.editSleep(initSleep, edit_sleep);
 
                 startActivity(scheduleIntent);
             }else{
