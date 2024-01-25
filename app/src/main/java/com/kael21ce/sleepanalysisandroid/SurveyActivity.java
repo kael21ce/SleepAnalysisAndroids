@@ -42,7 +42,6 @@ public class SurveyActivity extends AppCompatActivity {
 
         //Back button
         ImageButton backSurveyButton = findViewById(R.id.surveyBackButton);
-        TextView nextText = findViewById(R.id.nextText);
         Button endSurveyButton = findViewById(R.id.endSurveyButton);
         //Emoji
         ImageView awarenessEmoji = findViewById(R.id.AwarenessEmoji);
@@ -72,13 +71,8 @@ public class SurveyActivity extends AppCompatActivity {
 
         //Click back button
         backSurveyButton.setOnClickListener(view -> {
-            finish();
-        });
-
-        //Click nextText
-        nextText.setOnClickListener(view -> {
-            Intent nextIntent = new Intent(SurveyActivity.this, MainActivity.class);
-            nextIntent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+            Intent nextIntent = new Intent(SurveyActivity.this, SplashActivity.class);
+            nextIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(nextIntent);
         });
 
@@ -119,10 +113,10 @@ public class SurveyActivity extends AppCompatActivity {
 
         //endSurveyButton
         endSurveyButton.setOnClickListener(view -> {
-            Intent endIntent = new Intent(SurveyActivity.this, MainActivity.class);
-            endIntent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+            Intent endIntent = new Intent(SurveyActivity.this, SplashActivity.class);
+            endIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             sendSurvey();
-            //Need to add level to dataseet
+            //Need to add level to dataset
             startActivity(endIntent);
         });
     }
