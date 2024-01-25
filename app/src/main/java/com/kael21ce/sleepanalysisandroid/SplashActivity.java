@@ -11,7 +11,10 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.widget.ImageView;
+import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.kael21ce.sleepanalysisandroid.data.HealthConnectAvailability;
 import com.kael21ce.sleepanalysisandroid.data.HealthConnectManager;
 import com.kael21ce.sleepanalysisandroid.data.HealthConnectManagerKt;
@@ -25,11 +28,26 @@ import java.util.concurrent.ExecutionException;
 public class SplashActivity extends AppCompatActivity {
 
     private static final String TAG = "SplashActivity";
+    private Handler dotHandler = new Handler();
+    private int dotCount = 0;
+    private final int MAX_DOTS = 3;
+    private TextView loadingText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
+
+        //Hide action bar
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().hide();
+        }
+
+        //Set the gif image
+        ImageView loadingImage = findViewById(R.id.LoadingImage);
+        Glide.with(this).load(R.raw.loading).into(loadingImage);
+        loadingText = findViewById(R.id.LoadingText);
+        updateDots();
 
         HealthConnectManager healthConnectManager = new HealthConnectManager(getApplicationContext());
 
@@ -82,5 +100,24 @@ public class SplashActivity extends AppCompatActivity {
                 }
             }
         }, 1000);
+    }
+
+    private void updateDots() {
+        dotHandler.postDelayed(() -> {
+            dotCount++;
+            if (dotCount > MAX_DOTS) {
+                loadingText.setText("Processing");
+            } else {
+                loadingText.setText("Processing"
+                        + new String(new char[dotCount]).replace("\0", "."));
+            }
+            updateDots();
+        },500);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        dotHandler.removeCallbacksAndMessages(null);
     }
 }

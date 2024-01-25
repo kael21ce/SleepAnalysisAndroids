@@ -331,7 +331,7 @@ public class MainActivity extends AppCompatActivity {
                 sendNotification(sharedPref);
                 Log.v(TAG, "SharedPreference listener is called 2");
             }
-            if (key.equals("workOnset") || key.equals("workOffset")) {
+            if (key.equals("sleepOnset") || key.equals("workOnset") || key.equals("workOffset")) {
                 sendNotification(sharedPref);
                 Log.v(TAG, "SharedPreference listener is called 3");
             }
@@ -393,7 +393,7 @@ public class MainActivity extends AppCompatActivity {
         Log.v(TAG, "Delay of the notification: " + delay);
 
         PeriodicWorkRequest pushRequest = new PeriodicWorkRequest.Builder(PushWorker.class,
-                24, TimeUnit.HOURS)
+                16, TimeUnit.MINUTES)
                 .setInitialDelay(delay, TimeUnit.MILLISECONDS)
                 .build();
         WorkManager.getInstance(this).enqueueUniquePeriodicWork(RecommendName,
