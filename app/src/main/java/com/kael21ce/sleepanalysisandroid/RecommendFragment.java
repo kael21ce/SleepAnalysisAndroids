@@ -167,6 +167,9 @@ public class RecommendFragment extends Fragment {
             Bundle settingBundle = new Bundle();
             settingFragment.setArguments(settingBundle);
             settingBundle.putString("isClicked", "Yes");
+            if (mainActivity.bottomNavigationView != null) {
+                mainActivity.bottomNavigationView.setSelectedItemId(R.id.tabSetting);
+            }
             getParentFragmentManager().beginTransaction().replace(R.id.mainFrame, settingFragment).commit();
         });
 
