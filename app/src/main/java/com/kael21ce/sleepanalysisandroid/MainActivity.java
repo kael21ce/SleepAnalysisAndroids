@@ -393,7 +393,7 @@ public class MainActivity extends AppCompatActivity {
         Log.v(TAG, "Delay of the notification: " + delay);
 
         PeriodicWorkRequest pushRequest = new PeriodicWorkRequest.Builder(PushWorker.class,
-                16, TimeUnit.MINUTES)
+                24, TimeUnit.HOURS)
                 .setInitialDelay(delay, TimeUnit.MILLISECONDS)
                 .build();
         WorkManager.getInstance(this).enqueueUniquePeriodicWork(RecommendName,
