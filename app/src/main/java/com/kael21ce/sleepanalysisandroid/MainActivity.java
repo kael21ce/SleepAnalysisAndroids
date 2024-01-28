@@ -692,7 +692,9 @@ public class MainActivity extends AppCompatActivity {
             Sleep firstSleep = sleeps.get(0);
             long firstSleepDayStart = (firstSleep.sleepStart + nineHours)/ (1000*60*60*24);
             long firstSleepNoon = (firstSleepDayStart*(1000*60*60*24)) + (1000*60*60*12);
-            if(firstSleep.sleepStart > firstSleepNoon){
+            Log.v("FIRST SLEEP DAY START", String.valueOf(firstSleepNoon));
+            Log.v("FIRST SLEEP", String.valueOf(firstSleep.sleepStart));
+            if(firstSleep.sleepStart+nineHours >= firstSleepNoon){
                 startProcess = firstSleepNoon-nineHours;
                 initV0=new double[]{0.8958, 0.5219, 0.5792, 12.4225};
             }else{
