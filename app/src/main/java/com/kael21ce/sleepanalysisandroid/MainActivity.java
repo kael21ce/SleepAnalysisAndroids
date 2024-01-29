@@ -804,6 +804,16 @@ public class MainActivity extends AppCompatActivity {
             barEntries.add(new BarEntry(barIdx, fAwarenessVal*100f/3.0f));
             barIdx += addBarIdx;
         }
+
+        Log.v("BAR ENTRIES SIZE", String.valueOf(barEntries.size()));
+
+        if(barEntries.size() < 576){
+            int need = 576 - barEntries.size();
+            float thePlus = need * addBarIdx;
+            for (int i = 0; i < barEntries.size(); i++) {
+                barEntries.set(i, new BarEntry(barEntries.get(i).getX() + thePlus, barEntries.get(i).getY()));
+            }
+        }
     }
 
     public ArrayList<BarEntry> getBarEntries(){
