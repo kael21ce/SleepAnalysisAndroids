@@ -152,11 +152,7 @@ public class HomeFragment extends Fragment {
                 SleepChartHomeView.setVisibility(View.GONE);
             }
         } else {
-            if (!isHidden) {
-                homeNoDataView.setVisibility(View.VISIBLE);
-            } else {
-                homeNoDataView.setVisibility(View.GONE);
-            }
+            homeNoDataView.setVisibility(View.VISIBLE);
             SurveyUpperView.setVisibility(View.VISIBLE);
             RecommendHomeView.setVisibility(View.GONE);
             AlertnessHomeView.setVisibility(View.GONE);
