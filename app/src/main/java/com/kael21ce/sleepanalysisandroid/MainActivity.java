@@ -1066,10 +1066,15 @@ public class MainActivity extends AppCompatActivity {
                 tempSleep.add(sleep);
             }
         }
-        for(V0 v0: v0s){
-            if(v0.time <= now){
-                tempV0.add(v0);
+        if (v0s != null) {
+            for(V0 v0: v0s){
+                if(v0.time <= now){
+                    tempV0.add(v0);
+                }
             }
+        } else {
+            Toast.makeText(this, "전송할 수면 데이터가 존재하지 않습니다",
+                    Toast.LENGTH_SHORT).show();
         }
 
         DataModal modal = new DataModal(username, tempSleep, tempV0);
