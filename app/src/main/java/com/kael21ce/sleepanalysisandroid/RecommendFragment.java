@@ -227,7 +227,7 @@ public class RecommendFragment extends Fragment {
         } else {
             if (isenough) {
                 if (isearly) {
-                    stateDescriptionText.setText("선택하신 취침 시각이 너무 일러요");
+                    stateDescriptionText.setText("선택하신 취침 시각이\n너무 일러요");
                     stateDescriptionSmallText.setText("조금 더 늦은 수면을 추천드려요");
                     stateDescriptionImage.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.sad, null));
                 } else {
