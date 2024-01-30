@@ -1083,10 +1083,20 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<DataModal> call, Response<DataModal> response) {
                 // this method is called when we get response from our api.
+                Locale currentLocale = Locale.getDefault();
+                String language = currentLocale.getLanguage();
                 if(response.code() <= 300) {
-                    Toast.makeText(MainActivity.this, "Data added to API", Toast.LENGTH_SHORT).show();
+                    if (language.equals("ko")) {
+                        Toast.makeText(MainActivity.this, "데이터가 전송되었습니다", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(MainActivity.this, "Data added to API", Toast.LENGTH_SHORT).show();
+                    }
                 }else {
-                    Toast.makeText(MainActivity.this, "Data sending failed", Toast.LENGTH_SHORT).show();
+                    if (language.equals("ko")) {
+                        Toast.makeText(MainActivity.this, "데이터 전송에 실패했습니다", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(MainActivity.this, "Data sending failed", Toast.LENGTH_SHORT).show();
+                    }
                     // we are getting response from our body
                     // and passing it to our modal class.
                     DataModal responseFromAPI = response.body();
