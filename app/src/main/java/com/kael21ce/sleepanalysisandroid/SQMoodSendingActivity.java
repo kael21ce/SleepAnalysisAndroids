@@ -288,55 +288,17 @@ public class SQMoodSendingActivity extends AppCompatActivity {
             fourthContent.setText("좋지 않음");
             fifthContent.setText("매우 좋지 않음");
             sQMoodButton.setOnClickListener(view -> {
-                Intent endIntent = new Intent(this, MainActivity.class);
-                endIntent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                moodData.putInt("sleep_quality", position);
+                Intent endIntent = new Intent(this, SurveyActivity.class);
+//                endIntent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                endIntent.putExtra("firstDone", 1);
+                endIntent.putExtra("moodData", moodData);
                 startActivity(endIntent);
                 //Save the survey result
-                sendMood(position+1, moodData.getInt("mood_high"), moodData.getInt("mood_low"), moodData.getInt("mood_anx"), moodData.getInt("mood_irr"));
+//                sendMood(position+1, moodData.getInt("mood_high"), moodData.getInt("mood_low"), moodData.getInt("mood_anx"), moodData.getInt("mood_irr"));
 
             });
         }
-    }
 
-    private void sendMood(Integer sleep_quality, Integer mood_high, Integer mood_low, Integer mood_anx, Integer mood_irr){
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("https://sleep-math.com/sleepapp/")
-                // as we are sending data in json format so
-                // we have to add Gson converter factory
-                .addConverterFactory(GsonConverterFactory.create())
-                // at last we are building our retrofit builder.
-                .build();
-        RetrofitAPI retrofitAPI = retrofit.create(RetrofitAPI.class);
-        SharedPreferences sharedPref = getSharedPreferences("SleepWake", Context.MODE_PRIVATE);
-        String username = sharedPref.getString("User_Name", "tester33");
-        long time = System.currentTimeMillis();
-
-        DataMood mood = new DataMood(username, sleep_quality, mood_high, mood_low, mood_anx, mood_irr , time);
-        Call<DataMood> call = retrofitAPI.createMood(mood);
-        call.enqueue(new Callback<DataMood>() {
-            @Override
-            public void onResponse(Call<DataMood> call, Response<DataMood> response) {
-                // this method is called when we get response from our api.
-                if(response.code() <= 300) {
-                    Toast.makeText(SQMoodSendingActivity.this, "Data added to API", Toast.LENGTH_SHORT).show();
-                }else {
-                    Toast.makeText(SQMoodSendingActivity.this, "Data sending failed", Toast.LENGTH_SHORT).show();
-                    // we are getting response from our body
-                    // and passing it to our modal class.
-                    DataMood responseFromAPI = response.body();
-
-                    // on below line we are getting our data from modal class and adding it to our string.
-                    String responseString = "Response Code : " + response.code() + "\nName : " + "\n";
-                    Log.v("RESPONSE", responseString);
-                }
-            }
-
-            @Override
-            public void onFailure(Call<DataMood> call, Throwable t) {
-                // setting text to our text view when
-                // we get error response from API.
-                Log.v("ERROR", "Error found is : " + t.getMessage());
-            }
-        });
     }
 }

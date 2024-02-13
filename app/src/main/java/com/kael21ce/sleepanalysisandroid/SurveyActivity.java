@@ -120,7 +120,7 @@ public class SurveyActivity extends AppCompatActivity {
         //endSurveyButton
         Intent sentIntent = getIntent();
         if(sentIntent.getIntExtra("firstDone", 0) != 0){
-            level = sentIntent.getIntExtra("firstDone", 0);
+//            level = sentIntent.getIntExtra("firstDone", 0);
             surveyLevel = 2;
             surveyTitle.setText("어제 하루 얼마나 개운하셨나요?");
             surveyDescription.setText("어제의 전반적인 개운한 정도를 평가해주세요");
@@ -128,15 +128,18 @@ public class SurveyActivity extends AppCompatActivity {
         Log.v("SURVEY LEVEL", String.valueOf(surveyLevel));
         if(surveyLevel == 1) {
             endSurveyButton.setOnClickListener(view -> {
-                Intent nextIntent = new Intent(this, SurveyActivity.class);
-                nextIntent.putExtra("firstDone", level);
+                Intent nextIntent = new Intent(this, SplashActivity.class);
+                nextIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                sendSurvey();
                 startActivity(nextIntent);
             });
         }else{
             endSurveyButton.setOnClickListener(view -> {
-                Intent endIntent = new Intent(SurveyActivity.this, SplashActivity.class);
-                endIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                sendSurvey();
+                Intent endIntent = new Intent(SurveyActivity.this, MainActivity.class);
+                endIntent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                Bundle moodData = sentIntent.getBundleExtra("moodData");
+                sendMood(moodData.getInt("sleep_quality"), moodData.getInt("mood_high"), moodData.getInt("mood_low"), moodData.getInt("mood_anx"), moodData.getInt("mood_irr"));
+
                 //Need to add level to dataset
                 startActivity(endIntent);
             });
@@ -220,6 +223,48 @@ public class SurveyActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<DataSurvey> call, Throwable t) {
+                // setting text to our text view when
+                // we get error response from API.
+                Log.v("ERROR", "Error found is : " + t.getMessage());
+            }
+        });
+    }
+
+    private void sendMood(Integer sleep_quality, Integer mood_high, Integer mood_low, Integer mood_anx, Integer mood_irr) {
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("https://sleep-math.com/sleepapp/")
+                // as we are sending data in json format so
+                // we have to add Gson converter factory
+                .addConverterFactory(GsonConverterFactory.create())
+                // at last we are building our retrofit builder.
+                .build();
+        RetrofitAPI retrofitAPI = retrofit.create(RetrofitAPI.class);
+        SharedPreferences sharedPref = getSharedPreferences("SleepWake", Context.MODE_PRIVATE);
+        String username = sharedPref.getString("User_Name", "tester33");
+        long time = System.currentTimeMillis();
+
+        DataMood mood = new DataMood(username, sleep_quality, mood_high, mood_low, mood_anx, mood_irr, time);
+        Call<DataMood> call = retrofitAPI.createMood(mood);
+        call.enqueue(new Callback<DataMood>() {
+            @Override
+            public void onResponse(Call<DataMood> call, Response<DataMood> response) {
+                // this method is called when we get response from our api.
+                if (response.code() <= 300) {
+                    Toast.makeText(SurveyActivity.this, "Data added to API", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(SurveyActivity.this, "Data sending failed", Toast.LENGTH_SHORT).show();
+                    // we are getting response from our body
+                    // and passing it to our modal class.
+                    DataMood responseFromAPI = response.body();
+
+                    // on below line we are getting our data from modal class and adding it to our string.
+                    String responseString = "Response Code : " + response.code() + "\nName : " + "\n";
+                    Log.v("RESPONSE", responseString);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<DataMood> call, Throwable t) {
                 // setting text to our text view when
                 // we get error response from API.
                 Log.v("ERROR", "Error found is : " + t.getMessage());
