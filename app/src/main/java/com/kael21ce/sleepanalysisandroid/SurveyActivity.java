@@ -201,7 +201,7 @@ public class SurveyActivity extends AppCompatActivity {
         long work_onset = sharedPref.getLong("workOnset", time);
         long work_offset = sharedPref.getLong("workOffset", time);
 
-        DataSurvey survey = new DataSurvey(username, sleep_onset, work_onset, work_offset, getLevel(), getLevel2(), time);
+        DataSurvey survey = new DataSurvey(username, sleep_onset, work_onset, work_offset, getLevel(), time);
         Call<DataSurvey> call = retrofitAPI.createSurvey(survey);
         call.enqueue(new Callback<DataSurvey>() {
             @Override
@@ -243,7 +243,7 @@ public class SurveyActivity extends AppCompatActivity {
         String username = sharedPref.getString("User_Name", "tester33");
         long time = System.currentTimeMillis();
 
-        DataMood mood = new DataMood(username, sleep_quality, mood_high, mood_low, mood_anx, mood_irr, time);
+        DataMood mood = new DataMood(username,getLevel2(), sleep_quality, mood_high, mood_low, mood_anx, mood_irr, time);
         Call<DataMood> call = retrofitAPI.createMood(mood);
         call.enqueue(new Callback<DataMood>() {
             @Override
