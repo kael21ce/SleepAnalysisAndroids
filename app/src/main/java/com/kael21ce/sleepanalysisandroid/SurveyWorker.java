@@ -57,6 +57,7 @@ public class SurveyWorker extends Worker {
     public void sendNotification(Context context) {
         //Set the intent called when the notification is tapped
         Intent intent = new Intent(context, SurveyActivity.class);
+        intent.putExtra("firstDone", 0);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE);
 

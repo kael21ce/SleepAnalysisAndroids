@@ -29,6 +29,9 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class SurveyActivity extends AppCompatActivity {
     private int level = 1;
+    private int level2 = 1;
+
+    private int surveyLevel = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +43,9 @@ public class SurveyActivity extends AppCompatActivity {
             getSupportActionBar().hide();
         }
 
+        //Text
+        TextView surveyTitle = findViewById(R.id.SurveyTitle);
+        TextView surveyDescription = findViewById(R.id.SurveyDescription);
         //Back button
         ImageButton backSurveyButton = findViewById(R.id.surveyBackButton);
         Button endSurveyButton = findViewById(R.id.endSurveyButton);
@@ -112,13 +118,29 @@ public class SurveyActivity extends AppCompatActivity {
         });
 
         //endSurveyButton
-        endSurveyButton.setOnClickListener(view -> {
-            Intent endIntent = new Intent(SurveyActivity.this, SplashActivity.class);
-            endIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            sendSurvey();
-            //Need to add level to dataset
-            startActivity(endIntent);
-        });
+        Intent sentIntent = getIntent();
+        if(sentIntent.getIntExtra("firstDone", 0) != 0){
+            level = sentIntent.getIntExtra("firstDone", 0);
+            surveyLevel = 2;
+            surveyTitle.setText("어제 하루 얼마나 개운하셨나요?");
+            surveyDescription.setText("어제의 전반적인 개운한 정도를 평가해주세요");
+        }
+        Log.v("SURVEY LEVEL", String.valueOf(surveyLevel));
+        if(surveyLevel == 1) {
+            endSurveyButton.setOnClickListener(view -> {
+                Intent nextIntent = new Intent(this, SurveyActivity.class);
+                nextIntent.putExtra("firstDone", level);
+                startActivity(nextIntent);
+            });
+        }else{
+            endSurveyButton.setOnClickListener(view -> {
+                Intent endIntent = new Intent(SurveyActivity.this, SplashActivity.class);
+                endIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                sendSurvey();
+                //Need to add level to dataset
+                startActivity(endIntent);
+            });
+        }
     }
     //Set the level, seek button color and emoji
     private void setSeekColor(ArrayList<Button> buttonArrayList, int position, ImageView emoji, TextView description) {
@@ -135,7 +157,11 @@ public class SurveyActivity extends AppCompatActivity {
                 }
             }
             //Set the level
-            level = position;
+            if(surveyLevel == 1) {
+                level = position;
+            }else{
+                level2 = position;
+            }
             //Set the emoji
             description.setText("개운한 정도: " + position + " / 10");
             if (position == 1) {
@@ -172,7 +198,7 @@ public class SurveyActivity extends AppCompatActivity {
         long work_onset = sharedPref.getLong("workOnset", time);
         long work_offset = sharedPref.getLong("workOffset", time);
 
-        DataSurvey survey = new DataSurvey(username, sleep_onset, work_onset, work_offset, getLevel(), time);
+        DataSurvey survey = new DataSurvey(username, sleep_onset, work_onset, work_offset, getLevel(), getLevel2(), time);
         Call<DataSurvey> call = retrofitAPI.createSurvey(survey);
         call.enqueue(new Callback<DataSurvey>() {
             @Override
@@ -205,4 +231,5 @@ public class SurveyActivity extends AppCompatActivity {
     private int getLevel() {
         return this.level;
     }
+    private int getLevel2() {return this.level2;}
 }

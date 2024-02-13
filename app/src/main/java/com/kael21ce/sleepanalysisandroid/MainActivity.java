@@ -581,7 +581,7 @@ public class MainActivity extends AppCompatActivity {
                 do_simulation();
                 calculateAwareness();
                 calculateSleepAwareness();
-                if(now-lastBackendUpdate >= (1000*60*60*24)) {
+                if(now-lastBackendUpdate >= (1000*60*60*12)) {
                     sendV0(username);
                     lastBackendUpdate = now;
                     editor.putLong("lastBackendUpdate", now);
