@@ -400,9 +400,10 @@
                 <!--Time and suggestion displaying-->
                 <LinearLayout
                     android:id="@+id/TimeDisplayingView"
-                    android:layout_width="310dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
+                    android:layout_marginHorizontal="24dp"
                     android:layout_marginTop="16dp"
                     android:orientation="vertical">
 
@@ -471,9 +472,10 @@
 
                 <LinearLayout
                     android:id="@+id/TextDisplayingView"
-                    android:layout_width="310dp"
-                    android:layout_height="93dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
                     android:layout_gravity="center"
+                    android:layout_marginHorizontal="24dp"
                     android:layout_marginVertical="16dp"
                     android:background="@drawable/corner_8"
                     android:orientation="horizontal">
@@ -492,6 +494,7 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
                         android:layout_marginHorizontal="12dp"
+                        android:layout_marginVertical="16dp"
                         android:orientation="vertical">
 
                         <TextView
