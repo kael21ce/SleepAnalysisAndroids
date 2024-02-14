@@ -28,8 +28,8 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class SurveyActivity extends AppCompatActivity {
-    private int level = 1;
-    private int level2 = 1;
+    private int level = 5;
+    private int level2 = 5;
 
     private int surveyLevel = 1;
 

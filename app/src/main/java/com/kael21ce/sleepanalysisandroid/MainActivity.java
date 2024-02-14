@@ -171,6 +171,11 @@ public class MainActivity extends AppCompatActivity {
         if (!sharedPref.contains("User_Name") || !sharedPref.contains("User_Email")) {
             Intent signIntent = new Intent(MainActivity.this, BeginRegisterActivity.class);
             startActivity(signIntent);
+        } else {
+            if (sharedPref.getString("User_Name","UserName").equals("UserName")) {
+                Intent signIntent = new Intent(MainActivity.this, BeginRegisterActivity.class);
+                startActivity(signIntent);
+            }
         }
 
         //Show action bar
