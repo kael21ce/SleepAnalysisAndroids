@@ -269,7 +269,7 @@ public class MainActivity extends AppCompatActivity {
                 int month = scheduleIntent.getIntExtra("Month", calendar.get(Calendar.MONTH));
                 int day = scheduleIntent.getIntExtra("Day", calendar.get(Calendar.DAY_OF_MONTH));
 
-                Log.v(TAG, "Selected: " + year + "-" + month + 1 + "-" + day);
+                Log.v(TAG, "Selected: " + year + "-" + (month+1) + "-" + day);
 
                 Bundle scheduleBundle = new Bundle();
                 scheduleBundle.putInt("Year", year);
@@ -772,7 +772,7 @@ public class MainActivity extends AppCompatActivity {
         mainSleepEnd = sleepSuggestion[1]*(1000*60*5)+now;
         napSleepStart = sleepSuggestion[2]*(1000*60*5)+now;
         napSleepEnd = sleepSuggestion[3]*(1000*60*5)+now;
-        int isearly = sleepSuggestion[4], isenough = sleepSuggestion[5];
+        int isenough = sleepSuggestion[4], isearly = sleepSuggestion[5];
         //Get isearlysleep and isenoughsleep
         isearlysleep = isearly != 0;
         isenoughsleep = isenough != 0;
@@ -1308,10 +1308,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public boolean getIsEarlySleep() {
+        Log.v("MainActivity", "IsEarly: " + this.isearlysleep);
         return this.isearlysleep;
     }
 
     public boolean getIsEnoughSleep() {
+        Log.v("MainActivity", "IsEnough: " + this.isenoughsleep);
         return this.isenoughsleep;
     }
 

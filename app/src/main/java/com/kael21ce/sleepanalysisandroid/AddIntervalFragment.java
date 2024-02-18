@@ -157,7 +157,7 @@ public class AddIntervalFragment extends Fragment implements ButtonTextUpdater {
                 int month = calendar.get(Calendar.MONTH);
                 int day = calendar.get(Calendar.DAY_OF_MONTH);
 
-                Log.v(TAG, "Selected: " + year + "-" + month + 1 + "-" + day);
+                Log.v(TAG, "Selected: " + year + "-" + (month + 1) + "-" + day);
 
                 scheduleIntent.putExtra("Year", year);
                 scheduleIntent.putExtra("Month", month);

@@ -147,11 +147,11 @@ public class ScheduleFragment extends Fragment {
             int year = selectedBundle.getInt("Year");
             int month = selectedBundle.getInt("Month");
             int day = selectedBundle.getInt("Day");
-            Log.v(TAG, "Selected: " + year + "-" + month + 1 + "-" + day);
+            Log.v(TAG, "Selected: " + year + "-" + (month + 1) + "-" + day);
             calendarView.setSelectedDate(CalendarDay.from(year, month + 1, day));
 
             //Load IntervalFragment
-            String myDate = year + "/" + month + 1 + "/" + day;
+            String myDate = year + "/" + (month + 1) + "/" + day;
             Date date = null;
             try {
                 date = sdfDateTime.parse(myDate);

@@ -1,5 +1,7 @@
 package com.kael21ce.sleepanalysisandroid.data;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -263,7 +265,7 @@ public class SleepModel {
         if (result[2] - result[1] < buffer){
             result[1] = result[1] + result[3] - result[2];
         }
-        result[4] = 0;
+        result[4] = 1;
         result[5] = type2;
         return result;
     }

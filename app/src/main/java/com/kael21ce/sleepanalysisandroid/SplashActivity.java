@@ -86,7 +86,7 @@ public class SplashActivity extends AppCompatActivity {
                     int month = scheduleIntent.getIntExtra("Month", calendar.get(Calendar.MONTH));
                     int day = scheduleIntent.getIntExtra("Day", calendar.get(Calendar.DAY_OF_MONTH));
 
-                    Log.v(TAG, "Selected: " + year + "-" + month + 1 + "-" + day);
+                    Log.v(TAG, "Selected: " + year + "-" + (month + 1) + "-" + day);
 
                     Intent mainIntent = new Intent(SplashActivity.this, MainActivity.class);
                     mainIntent.putExtra("Year", year);
