@@ -613,14 +613,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void getSleepData(){
-        sleeps = Collections.synchronizedList(sleepDao.getAll());
+        this.sleeps = Collections.synchronizedList(sleepDao.getAll());
         boolean check = false;
         long lastSleep1 = 0;
         long befSleepStart = 0;
         long befSleepEnd = 0;
-        for(Sleep sleep: sleeps){
+        ArrayList<Sleep> deleteTheSleeps = new ArrayList<>();
+        for(Sleep sleep: new ArrayList<Sleep>(this.sleeps)){
             //synchronize the sleep
-            if(befSleepStart == sleep.sleepStart && befSleepEnd == sleep.sleepEnd){
+            if(befSleepStart == sleep.sleepStart && befSleepEnd == sleep.sleepEnd) {
                 sleepDao.delete(sleep);
                 this.sleeps.remove(sleep);
                 Log.v("same data", "same data");
