@@ -20,6 +20,7 @@ import com.kael21ce.sleepanalysisandroid.data.DataSurvey;
 import com.kael21ce.sleepanalysisandroid.data.RetrofitAPI;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -32,6 +33,9 @@ public class SurveyActivity extends AppCompatActivity {
     private int level2 = 5;
 
     private int surveyLevel = 1;
+    SharedPreferences sharedPref;
+    SharedPreferences.Editor editor;
+    private static final String survey_key = "SQMood";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +46,9 @@ public class SurveyActivity extends AppCompatActivity {
         if (getSupportActionBar() != null) {
             getSupportActionBar().hide();
         }
+
+        sharedPref = getSharedPreferences("SleepWake", Context.MODE_PRIVATE);
+        editor = sharedPref.edit();
 
         //Text
         TextView surveyTitle = findViewById(R.id.SurveyTitle);
@@ -135,11 +142,15 @@ public class SurveyActivity extends AppCompatActivity {
             });
         }else{
             endSurveyButton.setOnClickListener(view -> {
+                //Get the survey day
+                Calendar calendar = Calendar.getInstance();
+                int day = calendar.get(Calendar.DAY_OF_MONTH);
+
                 Intent endIntent = new Intent(SurveyActivity.this, MainActivity.class);
                 endIntent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                 Bundle moodData = sentIntent.getBundleExtra("moodData");
                 sendMood(moodData.getInt("sleep_quality"), moodData.getInt("mood_high"), moodData.getInt("mood_low"), moodData.getInt("mood_anx"), moodData.getInt("mood_irr"));
-
+                editor.putInt(survey_key, day).apply();
                 //Need to add level to dataset
                 startActivity(endIntent);
             });

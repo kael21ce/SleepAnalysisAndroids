@@ -30,6 +30,7 @@ import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.UUID;
@@ -52,6 +53,8 @@ public class SettingFragment extends Fragment implements ButtonTextUpdater {
     Context context;
     long oneDay = 1000*60*60*24;
     private static final String RecommendName = "Recommend";
+    private static final String survey_name = "SurveyType";
+    private static final String survey_key = "SQMood";
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -174,6 +177,27 @@ public class SettingFragment extends Fragment implements ButtonTextUpdater {
                 getChildFragmentManager().beginTransaction().remove(sleepOnsetFragment).commit();
                 onsetView.setBackgroundResource(R.drawable.setting_stroke);
                 ObjectAnimator.ofFloat(onsetButton, View.ROTATION, 90f, 0f).setDuration(100).start();
+            }
+        });
+
+        //Do SQMood survey again
+        if (!sharedPref.contains(survey_key)) {
+            editor.putInt(survey_key, 0).apply();
+        }
+        int surveyDay = sharedPref.getInt(survey_key, 0);
+        Calendar calendar = Calendar.getInstance();
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+
+        LinearLayout sqMoodVisitView = v.findViewById(R.id.SQMoodVisitView);
+        sqMoodVisitView.setOnClickListener(view -> {
+            if (surveyDay != day) {
+                Bundle temp = new Bundle();
+                Intent surveyIntent = new Intent(v.getContext(), SQMoodSendingActivity.class);
+                surveyIntent.putExtra(survey_name, 0);
+                surveyIntent.putExtra("moodData", temp);
+                startActivity(surveyIntent);
+            } else {
+                Toast.makeText(v.getContext(), "설문을 이미 완료했습니다",Toast.LENGTH_SHORT).show();
             }
         });
 

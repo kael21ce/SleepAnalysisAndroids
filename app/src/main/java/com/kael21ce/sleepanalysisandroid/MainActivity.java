@@ -354,13 +354,14 @@ public class MainActivity extends AppCompatActivity {
         int surveyDay = sharedPref.getInt(survey_key, 0);
 
         if (surveyDay != day && (sharedPref.contains("User_Name") && sharedPref.contains("User_Email"))) {
-            if (hour >= 12) {
-                Bundle temp = new Bundle();
-                Intent surveyIntent = new Intent(this, SQMoodSendingActivity.class);
-                surveyIntent.putExtra(survey_name, 0);
-                surveyIntent.putExtra("moodData", temp);
-                startActivity(surveyIntent);
-                editor.putInt(survey_key, day).apply();
+            if (!sharedPref.getString("User_Name","UserName").equals("UserName")) {
+                if (hour >= 12) {
+                    Bundle temp = new Bundle();
+                    Intent surveyIntent = new Intent(this, SQMoodSendingActivity.class);
+                    surveyIntent.putExtra(survey_name, 0);
+                    surveyIntent.putExtra("moodData", temp);
+                    startActivity(surveyIntent);
+                }
             }
         }
     }
