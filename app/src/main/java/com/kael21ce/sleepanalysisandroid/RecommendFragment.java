@@ -191,8 +191,13 @@ public class RecommendFragment extends Fragment {
 
         //startTime.setText(mainSleepStartString);
         //endTime.setText(mainSleepEndString);
-        startTime.setText(sdfDateTimeRecomm.format(new Date(mainActivity.getMainSleepStart())));
-        endTime.setText(sdfDateTimeRecomm.format(new Date(mainActivity.getMainSleepEnd())));
+        if (mainActivity.getMainSleepStart() == mainActivity.getMainSleepEnd()) {
+            startTime.setText("--:--");
+            endTime.setText("--:--");
+        } else {
+            startTime.setText(sdfDateTimeRecomm.format(new Date(mainActivity.getMainSleepStart())));
+            endTime.setText(sdfDateTimeRecomm.format(new Date(mainActivity.getMainSleepEnd())));
+        }
 
         return v;
     }
@@ -208,8 +213,6 @@ public class RecommendFragment extends Fragment {
         //startTime.setText(mainSleepStartString);
         //endTime.setText(mainSleepEndString);
         stateDescriptionSmallText.setVisibility(View.VISIBLE);
-        startTime.setText(sdfDateTimeRecomm.format(new Date(mainActivity.getMainSleepStart())));
-        endTime.setText(sdfDateTimeRecomm.format(new Date(mainActivity.getMainSleepEnd())));
         boolean isearly = mainActivity.getIsEarlySleep();
         boolean isenough = mainActivity.getIsEnoughSleep();
         //Change the color of buttons
@@ -221,10 +224,14 @@ public class RecommendFragment extends Fragment {
                 .getDrawable(getResources(), R.drawable.corner_8, null));
         //Change the content of displaying text
         if (mainSleepStartString.equals(mainSleepEndString)) {
+            startTime.setText("--:--");
+            endTime.setText("--:--");
             stateDescriptionText.setText("잠에 들기 어려운 시각이에요");
             stateDescriptionSmallText.setText("다른 취침 시각을 선택해보세요");
             stateDescriptionImage.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.sad, null));
         } else {
+            startTime.setText(sdfDateTimeRecomm.format(new Date(mainActivity.getMainSleepStart())));
+            endTime.setText(sdfDateTimeRecomm.format(new Date(mainActivity.getMainSleepEnd())));
             if (isenough) {
                 if (isearly) {
                     stateDescriptionText.setText("선택하신 취침 시각이\n너무 일러요");

@@ -33,6 +33,7 @@ public class CurrentMarker extends MarkerView {
     private Entry currentEntry;
     private BarChart barChart;
     private float currentAlertness = 0;
+    private boolean isHardToSleep = false;
 
     public CurrentMarker(Context context, int layoutResource, BarChart barChart) {
         super(context, layoutResource);
@@ -98,6 +99,11 @@ public class CurrentMarker extends MarkerView {
             intervalLayout.setBackground(ResourcesCompat.getDrawable(getResources(),
                     R.drawable.corner_8_black_alpha, null));
             intervalTypeText.setText("추천 수면 시간");
+            if (isHardToSleep) {
+                intervalLayout.setVisibility(GONE);
+            } else {
+                intervalLayout.setVisibility(VISIBLE);
+            }
         } else if (e.getX() > this.workIntervalTimeFloat - 0.1f && e.getX() <= this.workIntervalTimeFloat + 0.1f) {
             view = LayoutInflater.from(context).inflate(R.layout.interval_marker, this, true);
             intervalLayout = view.findViewById(R.id.IntervalLayout);
@@ -260,6 +266,11 @@ public class CurrentMarker extends MarkerView {
         this.sleepIntervalTimeFloat = sleepF;
         this.workIntervalTimeFloat = workF;
         this.lastIntervalTimeFloat = lastF;
+    }
+
+    //Set whether the recommendation is impossible
+    public void setIsHardToSleep(boolean isHardToSleep) {
+        this.isHardToSleep = isHardToSleep;
     }
 
     //Set alertnessPhaseChange

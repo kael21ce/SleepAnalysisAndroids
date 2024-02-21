@@ -209,8 +209,13 @@ public class HomeFragment extends Fragment {
         //we use connection because fragment and activity is connected and we don't reuse fragment for other activity
         //startTime.setText(mainSleepStartString);
         //endTime.setText(mainSleepEndString);
-        startTime.setText(sdfDateTimeRecomm.format(new Date(mainActivity.getMainSleepStart())));
-        endTime.setText(sdfDateTimeRecomm.format(new Date(mainActivity.getMainSleepEnd())));
+        if (mainActivity.getMainSleepStart() == mainActivity.getMainSleepEnd()) {
+            startTime.setText("--:--");
+            endTime.setText("--:--");
+        } else {
+            startTime.setText(sdfDateTimeRecomm.format(new Date(mainActivity.getMainSleepStart())));
+            endTime.setText(sdfDateTimeRecomm.format(new Date(mainActivity.getMainSleepEnd())));
+        }
 
         Button buttonSendData = v.findViewById(R.id.sendDataButton);
 
@@ -411,10 +416,17 @@ public class HomeFragment extends Fragment {
 
         //Set MarkerView
         String inputOnset = sdfTime.format(new Date(mainActivity.getSleepOnset()));
+        boolean isHardToSleep;
+        if (mainActivity.getMainSleepStart() == mainActivity.getMainSleepEnd()) {
+            isHardToSleep = true;
+        } else {
+            isHardToSleep = false;
+        }
         mv.setRecommendedTime(recommendedOnset);
         mv.setInputTime(inputOnset);
         mv.setIntervalFloat(rMidF, wMidF, lMidF);
         mv.setAlertnessPhaseChange(alertnessPhaseChange);
+        mv.setIsHardToSleep(isHardToSleep);
         mv.setChartView(alertnessChart);
         alertnessChart.setMarker(mv);
         //Set the Highlight
@@ -667,8 +679,6 @@ public class HomeFragment extends Fragment {
         stateDescriptionSmallText.setVisibility(View.VISIBLE);
         long sleepStart = mainActivity.getMainSleepStart();
         long sleepEnd = mainActivity.getMainSleepEnd();
-        startTime.setText(sdfDateTimeRecomm.format(new Date(sleepStart)));
-        endTime.setText(sdfDateTimeRecomm.format(new Date(sleepEnd)));
         boolean isearly = mainActivity.getIsEarlySleep();
         boolean isenough = mainActivity.getIsEnoughSleep();
 
@@ -685,10 +695,14 @@ public class HomeFragment extends Fragment {
         sleepImportanceText.setBackground(ResourcesCompat
                 .getDrawable(getResources(), R.drawable.important_caption, null));
         if (sleepStart == sleepEnd) {
+            startTime.setText("--:--");
+            endTime.setText("--:--");
             stateDescriptionText.setText("잠에 들기 어려운 시각이에요");
             stateDescriptionSmallText.setText("다른 취침 시각을 선택해보세요");
             stateDescriptionImage.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.sad, null));
         } else {
+            startTime.setText(sdfDateTimeRecomm.format(new Date(sleepStart)));
+            endTime.setText(sdfDateTimeRecomm.format(new Date(sleepEnd)));
             if (isenough) {
                 if (isearly) {
                     stateDescriptionText.setText("선택하신 취침 시각이\n너무 일러요");
