@@ -21,6 +21,7 @@ import com.kael21ce.sleepanalysisandroid.data.RetrofitAPI;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Locale;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -218,10 +219,20 @@ public class SurveyActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<DataSurvey> call, Response<DataSurvey> response) {
                 // this method is called when we get response from our api.
+                Locale currentLocale = Locale.getDefault();
+                String language = currentLocale.getLanguage();
                 if(response.code() <= 300) {
-                    Toast.makeText(SurveyActivity.this, "Data added to API", Toast.LENGTH_SHORT).show();
+                    if (language.equals("ko")) {
+                        Toast.makeText(SurveyActivity.this, "데이터가 전송되었습니다", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(SurveyActivity.this, "Data added to API", Toast.LENGTH_SHORT).show();
+                    }
                 }else {
-                    Toast.makeText(SurveyActivity.this, "Data sending failed", Toast.LENGTH_SHORT).show();
+                    if (language.equals("ko")) {
+                        Toast.makeText(SurveyActivity.this, "데이터 전송에 실패했습니다", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(SurveyActivity.this, "Data sending failed", Toast.LENGTH_SHORT).show();
+                    }
                     // we are getting response from our body
                     // and passing it to our modal class.
                     DataSurvey responseFromAPI = response.body();
