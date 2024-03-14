@@ -241,7 +241,14 @@
                         android:layout_marginRight="16dp"
                         android:src="@drawable/chevron_right" />
                 </LinearLayout>
+
             </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/SettingOnsetView"
+                android:layout_width="match_parent"
+                android:layout_height="400dp"
+                android:orientation="vertical"></LinearLayout>
 
         </LinearLayout>
     </ScrollView>
