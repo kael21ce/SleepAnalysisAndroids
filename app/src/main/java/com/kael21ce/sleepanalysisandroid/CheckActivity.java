@@ -16,6 +16,9 @@ import android.widget.Toast;
 import com.kael21ce.sleepanalysisandroid.data.DataUser;
 import com.kael21ce.sleepanalysisandroid.data.RetrofitAPI;
 
+import java.util.concurrent.TimeUnit;
+
+import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -91,11 +94,18 @@ public class CheckActivity extends AppCompatActivity {
     }
 
     private void sendUser(){
+        OkHttpClient client = new OkHttpClient.Builder()
+                .connectTimeout(20, TimeUnit.SECONDS)
+                .writeTimeout(20, TimeUnit.SECONDS)
+                .readTimeout(20, TimeUnit.SECONDS)
+                .build();
+
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("https://sleep-math.com/sleepapp/")
                 // as we are sending data in json format so
                 // we have to add Gson converter factory
                 .addConverterFactory(GsonConverterFactory.create())
+                .client(client)
                 // at last we are building our retrofit builder.
                 .build();
         RetrofitAPI retrofitAPI = retrofit.create(RetrofitAPI.class);

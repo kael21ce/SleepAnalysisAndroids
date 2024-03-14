@@ -65,6 +65,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
+import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -1057,11 +1058,19 @@ public class MainActivity extends AppCompatActivity {
     }
 
     protected void sendV0(String username) {
+
+        OkHttpClient client = new OkHttpClient.Builder()
+                .connectTimeout(20, TimeUnit.SECONDS)
+                .writeTimeout(20, TimeUnit.SECONDS)
+                .readTimeout(20, TimeUnit.SECONDS)
+                .build();
+
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("https://sleep-math.com/sleepapp/")
                 // as we are sending data in json format so
                 // we have to add Gson converter factory
                 .addConverterFactory(GsonConverterFactory.create())
+                .client(client)
                 // at last we are building our retrofit builder.
                 .build();
         RetrofitAPI retrofitAPI = retrofit.create(RetrofitAPI.class);
@@ -1069,13 +1078,13 @@ public class MainActivity extends AppCompatActivity {
         List<Sleep> tempSleep = new ArrayList<>();
         List<V0> tempV0 = new ArrayList<>();
         for(Sleep sleep: sleeps){
-            if(sleep.sleepStart <= now){
+            if(sleep.sleepStart >= (1000*60*60*24*14) && sleep.sleepStart <= now){
                 tempSleep.add(sleep);
             }
         }
         if (v0s != null) {
             for(V0 v0: v0s){
-                if(v0.time <= now){
+                if(v0.time >= (1000*60*60*24*14) && v0.time <= now){
                     tempV0.add(v0);
                 }
             }
