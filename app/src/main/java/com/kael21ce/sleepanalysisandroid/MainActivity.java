@@ -147,7 +147,6 @@ public class MainActivity extends AppCompatActivity {
 
         //Create channel
         createNotificationChannel(this);
-        createSurveyChannel(this);
 
 
         //Request the permission of notification in context if API >= 33
@@ -377,16 +376,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    //Create channel for notification for survey
-    public void createSurveyChannel(Context context) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel channel = new NotificationChannel(SURVEY_CHANNEL_ID,
-                    "Alertness Survey", NotificationManager.IMPORTANCE_HIGH);
-            NotificationManager notificationManager = context.getSystemService(NotificationManager.class);
-            notificationManager.createNotificationChannel(channel);
-        }
-    }
-
     public void sendNotification(SharedPreferences sharedPref) {
         long now = System.currentTimeMillis();
 
@@ -405,84 +394,6 @@ public class MainActivity extends AppCompatActivity {
                 .build();
         WorkManager.getInstance(this).enqueueUniquePeriodicWork(RecommendName,
                 ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE, pushRequest);
-
-        //Send notification for survey in four time
-        long surveyTime, surveyDelay1, surveyDelay2, surveyDelay3, surveyDelay4;
-        //1. work onset
-        if (!sharedPref.contains("workOnset")) {
-            surveyTime = timeToSeconds("13:00");
-            surveyDelay1 = surveyTime - now;
-        } else {
-            surveyTime = getWorkOnset();
-            surveyDelay1 = surveyTime - now - oneDay;
-        }
-        if (surveyDelay1 < 0) {
-            surveyDelay1 += oneDay;
-        }
-        PeriodicWorkRequest surveyRequest1 = new PeriodicWorkRequest.Builder(SurveyWorker.class,
-                24, TimeUnit.HOURS)
-                .setInitialDelay(surveyDelay1, TimeUnit.MILLISECONDS)
-                        .build();
-        WorkManager.getInstance(this).enqueueUniquePeriodicWork(SurveyName1,
-                ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE, surveyRequest1);
-        Log.v(TAG, "Survey delay 1: " + surveyDelay1);
-
-        //2. middle of work onset and offset
-        if (!sharedPref.contains("workOnset") || !sharedPref.contains("workOffset")) {
-            surveyTime = timeToSeconds("16:00");
-            surveyDelay2 = surveyTime - now;
-        } else {
-            surveyTime = (getWorkOnset() + getWorkOffset()) / 2;
-            surveyDelay2 = surveyTime - now - oneDay;
-        }
-        if (surveyDelay2 < 0) {
-            surveyDelay2 += oneDay;
-        }
-        PeriodicWorkRequest surveyRequest2 = new PeriodicWorkRequest.Builder(SurveyWorker.class,
-                24, TimeUnit.HOURS)
-                .setInitialDelay(surveyDelay2, TimeUnit.MILLISECONDS)
-                .build();
-        WorkManager.getInstance(this).enqueueUniquePeriodicWork(SurveyName2,
-                ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE, surveyRequest2);
-        Log.v(TAG, "Survey delay 2: " + surveyDelay2);
-
-        //3. work offset
-        if (!sharedPref.contains("workOffset")) {
-            surveyTime = timeToSeconds("20:00");
-            surveyDelay3 = surveyTime - now;
-        } else {
-            surveyTime = getWorkOffset();
-            surveyDelay3 = surveyTime - now - oneDay;
-        }
-        if (surveyDelay3 < 0) {
-            surveyDelay3 += oneDay;
-        }
-        PeriodicWorkRequest surveyRequest3 = new PeriodicWorkRequest.Builder(SurveyWorker.class,
-                24, TimeUnit.HOURS)
-                .setInitialDelay(surveyDelay3, TimeUnit.MILLISECONDS)
-                .build();
-        WorkManager.getInstance(this).enqueueUniquePeriodicWork(SurveyName3,
-                ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE, surveyRequest3);
-        Log.v(TAG, "Survey delay 3: " + surveyDelay3);
-
-        //4. Before 30 min to go to bed
-        if (!sharedPref.contains("sleepOnset")) {
-            surveyTime = timeToSeconds("23:00");
-            surveyDelay4 = surveyTime - now;
-        } else {
-            surveyTime = getSleepOnset();
-            surveyDelay4 = surveyTime - now - oneDay - oneHour/2;
-        }
-        if (surveyDelay4 < 0) {
-            surveyDelay4 += oneDay;
-        }
-        PeriodicWorkRequest surveyRequest4 = new PeriodicWorkRequest.Builder(SurveyWorker.class,
-                24, TimeUnit.HOURS)
-                .setInitialDelay(surveyDelay4, TimeUnit.MILLISECONDS)
-                .build();
-        WorkManager.getInstance(this).enqueueUniquePeriodicWork(SurveyName4,
-                ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE, surveyRequest4);
-        Log.v(TAG, "Survey delay 4: " + surveyDelay4);
     }
 
     //Change "HH:mm" to milliseconds
