@@ -301,7 +301,7 @@ public class MainActivity extends AppCompatActivity {
                         } else if (item.getItemId() == R.id.tabRecommend) {
                             getSupportFragmentManager().beginTransaction()
                                     .replace(R.id.mainFrame, recommendFragment).commit();
-                            getSupportActionBar().setTitle(Html.fromHtml("<font color='#223047'>추천 수면</font>"));
+                            getSupportActionBar().setTitle(Html.fromHtml("<font color='#223047'>일정 변경</font>"));
                             return true;
                         } else if (item.getItemId() == R.id.tabSetting) {
                             getSupportFragmentManager().beginTransaction()

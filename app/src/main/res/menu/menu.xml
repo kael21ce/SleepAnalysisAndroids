@@ -25,7 +25,7 @@
         android:enabled="true"
         android:icon="@drawable/moon"
         android:fontFamily="@font/pretendardvariable"
-        android:title="추천 수면"
+        android:title="일정 변경"
         />
 
     <item

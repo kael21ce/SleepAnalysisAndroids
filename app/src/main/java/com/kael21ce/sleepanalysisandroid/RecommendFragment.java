@@ -127,6 +127,7 @@ public class RecommendFragment extends Fragment {
             InfoView.setVisibility(View.GONE);
             RecommendClockView.setVisibility(View.GONE);
         }
+        RecommendClockView.setVisibility(View.GONE);
 
         //Move to WhenSleepFragment
         addDataButton.setOnClickListener(view -> {
