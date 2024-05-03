@@ -1,6 +1,7 @@
 package com.kael21ce.sleepanalysisandroid;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
@@ -68,6 +69,14 @@ public class IntervalFragment extends Fragment {
                 alertnessLayout.setVisibility(View.VISIBLE);
             }
         }
+
+        //Schedule information
+        ImageButton scheduleInfoButton = v.findViewById(R.id.ScheduleInfoButton);
+        scheduleInfoButton.setOnClickListener(view->{
+            Intent infoIntent = new Intent(v.getContext(), InfoActivity.class);
+            infoIntent.putExtra("Location",4);
+            startActivity(infoIntent);
+        });
 
         //update the awareness
         AlertnessHighTimeText = v.findViewById(R.id.AlertnessHighTimeText);

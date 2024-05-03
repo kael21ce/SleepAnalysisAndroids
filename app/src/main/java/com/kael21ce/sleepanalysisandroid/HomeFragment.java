@@ -169,6 +169,21 @@ public class HomeFragment extends Fragment {
             startActivity(surveyIntent);
         });
 
+        //Move to SleepOnsetActivity
+        ImageButton clockOnsetButton = v.findViewById(R.id.ClockOnsetButton);
+        clockOnsetButton.setOnClickListener(view -> {
+            Intent onsetIntent = new Intent(v.getContext(), SleepOnsetActivity.class);
+            startActivity(onsetIntent);
+        });
+
+        Intent infoIntent = new Intent(v.getContext(), InfoActivity.class);
+        //Clock information
+        ImageButton clockInfoButton = v.findViewById(R.id.ClockInfoButton);
+        clockInfoButton.setOnClickListener(view -> {
+            infoIntent.putExtra("Location",0);
+            startActivity(infoIntent);
+        });
+
         //Initial button color setting
         clockView.setTypeOfInterval(1);
         mainSleepStartString = sdfTime.format(new Date(mainActivity.getMainSleepStart()));
@@ -217,7 +232,12 @@ public class HomeFragment extends Fragment {
         });
 
         //Graph showing alertness
-        //Change the alertnessDescription
+        //Alertness information
+        ImageButton alertnessInfoButton = v.findViewById(R.id.AlertnessInfoButton);
+        alertnessInfoButton.setOnClickListener(view -> {
+            infoIntent.putExtra("Location",1);
+            startActivity(infoIntent);
+        });
 
         TextView alertnessDescription = v.findViewById(R.id.AlertnessDescription);
         TextView alertnessTitle = v.findViewById(R.id.AlertnessRecommend);
@@ -466,6 +486,12 @@ public class HomeFragment extends Fragment {
         alertnessChart.invalidate();
 
         //Weekly alertness chart
+        //Alertness chart information
+        ImageButton chartInfoButton = v.findViewById(R.id.ChartInfoButton);
+        chartInfoButton.setOnClickListener(view -> {
+            infoIntent.putExtra("Location",2);
+            startActivity(infoIntent);
+        });
         //Set the ChartDescription
         TextView chartDescription = v.findViewById(R.id.ChartDescription);
         chartDescription.setText(user_name + "님의 일주일 활동 시간을 요약했어요");
@@ -565,6 +591,12 @@ public class HomeFragment extends Fragment {
         });
 
         //Weekly sleep duration chart
+        //Alertness chart information
+        ImageButton sleepChartInfoButton = v.findViewById(R.id.SleepChartInfoButton);
+        sleepChartInfoButton.setOnClickListener(view -> {
+            infoIntent.putExtra("Location",3);
+            startActivity(infoIntent);
+        });
         //Set the SleepChartDescription
         TextView sleepChartDescription = v.findViewById(R.id.SleepChartDescription);
         sleepChartDescription.setText(user_name + "님의 일주일의 수면 시간을 요약했어요");

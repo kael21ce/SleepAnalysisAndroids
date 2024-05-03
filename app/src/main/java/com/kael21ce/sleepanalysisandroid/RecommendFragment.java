@@ -3,6 +3,7 @@ package com.kael21ce.sleepanalysisandroid;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.media.Image;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -162,6 +163,14 @@ public class RecommendFragment extends Fragment {
         //User name setting
         infoText.setText(user_name + "님의 일정");
         clockTitleRecommend.setText(user_name + "님을 위한 추천 수면");
+
+        //Recommendation information
+        ImageButton recommendInfoButton = v.findViewById(R.id.RecommendInfoButton);
+        recommendInfoButton.setOnClickListener(view->{
+            Intent infoIntent = new Intent(v.getContext(), InfoActivity.class);
+            infoIntent.putExtra("Location",5);
+            startActivity(infoIntent);
+        });
 
         //Move to setting if infoButton is clicked
         infoButton.setOnClickListener(view -> {
