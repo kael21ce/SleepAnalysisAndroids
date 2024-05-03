@@ -190,15 +190,11 @@ public class SettingFragment extends Fragment implements ButtonTextUpdater {
 
         LinearLayout sqMoodVisitView = v.findViewById(R.id.SQMoodVisitView);
         sqMoodVisitView.setOnClickListener(view -> {
-            if (surveyDay != day) {
-                Bundle temp = new Bundle();
-                Intent surveyIntent = new Intent(v.getContext(), SQMoodSendingActivity.class);
-                surveyIntent.putExtra(survey_name, 0);
-                surveyIntent.putExtra("moodData", temp);
-                startActivity(surveyIntent);
-            } else {
-                Toast.makeText(v.getContext(), "설문을 이미 완료했습니다",Toast.LENGTH_SHORT).show();
-            }
+            Bundle temp = new Bundle();
+            Intent surveyIntent = new Intent(v.getContext(), SQMoodSendingActivity.class);
+            surveyIntent.putExtra(survey_name, 0);
+            surveyIntent.putExtra("moodData", temp);
+            startActivity(surveyIntent);
         });
 
         return v;

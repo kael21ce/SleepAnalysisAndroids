@@ -45,7 +45,7 @@ public class SplashActivity extends AppCompatActivity {
 
         //Set the gif image
         ImageView loadingImage = findViewById(R.id.LoadingImage);
-        Glide.with(this).load(R.raw.loading).into(loadingImage);
+        loadingImage.setImageDrawable(getDrawable(R.drawable.sleepwake_logo2));
         loadingText = findViewById(R.id.LoadingText);
         updateDots();
 

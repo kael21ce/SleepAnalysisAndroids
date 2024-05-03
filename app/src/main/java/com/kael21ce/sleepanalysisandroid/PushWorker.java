@@ -77,7 +77,7 @@ public class PushWorker extends Worker {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHECK_CHANNEL_ID)
                 .setSmallIcon(R.drawable.moon)
                 .setContentTitle("SleepWake")
-                .setContentText("추천 수면 시간을 확인해주세요")
+                .setContentText("오늘의 추천 수면을 확인하세요!")
                 .setContentIntent(pendingIntent)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE)

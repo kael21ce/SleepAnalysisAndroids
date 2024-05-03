@@ -180,7 +180,7 @@
                         android:layout_marginVertical="24dp"
                         android:layout_marginLeft="16dp"
                         android:fontFamily="@font/pretendardbold"
-                        android:text="기분 및 수면의 질 설문 재생성"
+                        android:text="설문조사 다시하기"
                         android:textColor="@color/black"
                         android:textSize="20sp" />
                 </LinearLayout>
