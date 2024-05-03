@@ -4,8 +4,6 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
-import android.graphics.DashPathEffect;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.util.Log;
@@ -25,7 +23,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.github.mikephil.charting.charts.BarChart;
-import com.github.mikephil.charting.charts.CombinedChart;
 import com.github.mikephil.charting.components.Description;
 import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.components.XAxis;
@@ -33,14 +30,10 @@ import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
-import com.github.mikephil.charting.data.CombinedData;
 import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.github.mikephil.charting.highlight.Highlight;
-import com.github.mikephil.charting.utils.ViewPortHandler;
 import com.kael21ce.sleepanalysisandroid.data.Awareness;
 import com.kael21ce.sleepanalysisandroid.data.Sleep;
-
-import org.w3c.dom.Text;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -133,7 +126,7 @@ public class HomeFragment extends Fragment {
         if (!sharedPref.contains("isHidden")) {
             editor.putBoolean("isHidden", true).apply();
         }
-        boolean isHidden = sharedPref.getBoolean("isHidden", false);
+        boolean isHidden = false;
 
         if (sharedPref.contains("sleepOnset") && sharedPref.contains("workOnset") && sharedPref.contains("workOffset")) {
             if (!isHidden) {
