@@ -1,6 +1,7 @@
 package com.kael21ce.sleepanalysisandroid;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
@@ -159,19 +160,13 @@ public class RecommendFragment extends Fragment {
         workTimeEnd.setText(workOffsetDisplaying);
 
         //User name setting
-        infoText.setText(user_name + "님을 위한 정보");
+        infoText.setText(user_name + "님의 일정");
         clockTitleRecommend.setText(user_name + "님을 위한 추천 수면");
 
         //Move to setting if infoButton is clicked
-        SettingFragment settingFragment = new SettingFragment();
         infoButton.setOnClickListener(view -> {
-            Bundle settingBundle = new Bundle();
-            settingFragment.setArguments(settingBundle);
-            settingBundle.putString("isClicked", "Yes");
-            if (mainActivity.bottomNavigationView != null) {
-                mainActivity.bottomNavigationView.setSelectedItemId(R.id.tabSetting);
-            }
-            getParentFragmentManager().beginTransaction().replace(R.id.mainFrame, settingFragment).commit();
+            Intent sleepOnsetIntent = new Intent(v.getContext(), SleepOnsetActivity.class);
+            startActivity(sleepOnsetIntent);
         });
 
         //Initial Button Setting

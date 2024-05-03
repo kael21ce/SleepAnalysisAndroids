@@ -4,29 +4,22 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.Build;
 import android.os.Bundle;
 
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
+import androidx.appcompat.app.AppCompatActivity;
 
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-
-import com.kael21ce.sleepanalysisandroid.data.Sleep;
+import android.widget.ImageButton;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.Date;
 
-public class SleepOnsetFragment extends Fragment implements ButtonTextUpdater{
+public class SleepOnsetActivity extends AppCompatActivity implements ButtonTextUpdater{
 
     private Button sleepOnsetDateButton;
     private Button sleepOnsetTimeButton;
@@ -44,24 +37,38 @@ public class SleepOnsetFragment extends Fragment implements ButtonTextUpdater{
     long now, nineHours;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_sleep_onset, container, false);
+    protected void onCreate(Bundle saveInstanceState) {
 
-        MainActivity mainActivity = (MainActivity)getActivity();
+        super.onCreate(saveInstanceState);
+        setContentView(R.layout.activity_sleep_onset);
 
-        sleepOnsetDateButton = v.findViewById(R.id.sleepOnsetDateButton);
-        sleepOnsetTimeButton = v.findViewById(R.id.sleepOnsetTimeButton);
-        workOnsetDateButton = v.findViewById(R.id.workOnsetDateButton);
-        workOnsetTimeButton = v.findViewById(R.id.workOnsetTimeButton);
-        workOffsetDateButton = v.findViewById(R.id.workOffsetDateButton);
-        workOffsetTimeButton = v.findViewById(R.id.workOffsetTimeButton);
-        sleepSettingSubmitButton = v.findViewById(R.id.sleepSettingSubmitButton);
+        //Hide action bar
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().hide();
+        }
+
+        ImageButton sleepOnsetBackButton = findViewById(R.id.SleepOnsetBackButton);
+        //Click back button
+        sleepOnsetBackButton.setOnClickListener(view -> {
+            Intent nextIntent = new Intent(SleepOnsetActivity.this, SplashActivity.class);
+            nextIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(nextIntent);
+        });
+
+        sleepOnsetDateButton = findViewById(R.id.sleepOnsetDateButton);
+        sleepOnsetTimeButton = findViewById(R.id.sleepOnsetTimeButton);
+        workOnsetDateButton = findViewById(R.id.workOnsetDateButton);
+        workOnsetTimeButton = findViewById(R.id.workOnsetTimeButton);
+        workOffsetDateButton = findViewById(R.id.workOffsetDateButton);
+        workOffsetTimeButton = findViewById(R.id.workOffsetTimeButton);
+        sleepSettingSubmitButton = findViewById(R.id.sleepSettingSubmitButton);
 
         nineHours = (1000*60*60*9);
         now = System.currentTimeMillis();
 
-        SharedPreferences sharedPref = getActivity().getSharedPreferences("SleepWake", Context.MODE_PRIVATE);
+        MainActivity mainActivity = new MainActivity();
+
+        SharedPreferences sharedPref = getSharedPreferences("SleepWake", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
         sleepOnset = sharedPref.getLong("sleepOnset", now);
         workOnset = sharedPref.getLong("workOnset", now);
@@ -78,39 +85,39 @@ public class SleepOnsetFragment extends Fragment implements ButtonTextUpdater{
         workOffsetDateButton.setText(sdfDate.format(new Date(workOffset)));
         workOffsetTimeButton.setText(sdfTime.format(new Date(workOffset)));
 
-        SleepOnsetFragment sleepOnsetFragment = this;
+        SleepOnsetActivity sleepOnsetActivity = this;
         sleepOnsetDateButton.setOnClickListener(view -> {
-            datePickerDialog = new DatePickerDialog(v.getContext(), sleepOnsetFragment);
+            datePickerDialog = new DatePickerDialog(this, sleepOnsetActivity);
             datePickerDialog.setData(0);
             datePickerDialog.setDatePicker((String) sleepOnsetDateButton.getText());
             datePickerDialog.show();
         });
         sleepOnsetTimeButton.setOnClickListener(view -> {
-            timePickerDialog = new TimePickerDialog(v.getContext(), sleepOnsetFragment);
+            timePickerDialog = new TimePickerDialog(this, sleepOnsetActivity);
             timePickerDialog.setData(0);
             timePickerDialog.setTimePicker((String) sleepOnsetTimeButton.getText());
             timePickerDialog.show();
         });
         workOnsetDateButton.setOnClickListener(view -> {
-            datePickerDialog = new DatePickerDialog(v.getContext(), sleepOnsetFragment);
+            datePickerDialog = new DatePickerDialog(this, sleepOnsetActivity);
             datePickerDialog.setData(1);
             datePickerDialog.setDatePicker((String) workOnsetDateButton.getText());
             datePickerDialog.show();
         });
         workOnsetTimeButton.setOnClickListener(view -> {
-            timePickerDialog = new TimePickerDialog(v.getContext(), sleepOnsetFragment);
+            timePickerDialog = new TimePickerDialog(this, sleepOnsetActivity);
             timePickerDialog.setData(1);
             timePickerDialog.setTimePicker((String) workOnsetTimeButton.getText());
             timePickerDialog.show();
         });
         workOffsetDateButton.setOnClickListener(view -> {
-            datePickerDialog = new DatePickerDialog(v.getContext(), sleepOnsetFragment);
+            datePickerDialog = new DatePickerDialog(this, sleepOnsetActivity);
             datePickerDialog.setData(2);
             datePickerDialog.setDatePicker((String) workOffsetDateButton.getText());
             datePickerDialog.show();
         });
         workOffsetTimeButton.setOnClickListener(view -> {
-            timePickerDialog = new TimePickerDialog(v.getContext(), sleepOnsetFragment);
+            timePickerDialog = new TimePickerDialog(this, sleepOnsetActivity);
             timePickerDialog.setData(2);
             timePickerDialog.setTimePicker((String) workOffsetTimeButton.getText());
             timePickerDialog.show();
@@ -159,7 +166,7 @@ public class SleepOnsetFragment extends Fragment implements ButtonTextUpdater{
                 mainActivity.finish();
                 startActivity(new Intent(mainActivity, SplashActivity.class));
             }else{
-                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setCancelable(true);
                 builder.setTitle("ERROR");
                 builder.setMessage("INVALID INPUT");
@@ -173,9 +180,6 @@ public class SleepOnsetFragment extends Fragment implements ButtonTextUpdater{
                 alert.show();
             }
         });
-
-        // Inflate the layout for this fragment
-        return v;
     }
 
     public boolean isValid(long sleepOnset1, long workOnset1, long workOffset1){

@@ -39,7 +39,6 @@ import java.util.concurrent.TimeUnit;
 public class SettingFragment extends Fragment implements ButtonTextUpdater {
 
     Boolean isFolded = true;
-    SleepOnsetFragment sleepOnsetFragment = new SleepOnsetFragment();
     private static final String NotifyKey = "Notify_At";
     Button notifyButton;
     SimpleDateFormat sdfComplexTime = new SimpleDateFormat( "hh:mm a", Locale.KOREA);
@@ -154,30 +153,9 @@ public class SettingFragment extends Fragment implements ButtonTextUpdater {
         });
 
         LinearLayout onsetView = v.findViewById(R.id.OnsetView);
-        ImageView onsetButton = v.findViewById(R.id.OnsetButton);
-
-        //Get the information about whether infoButton is clicked
-        if (getArguments() != null) {
-            String reply = getArguments().getString("isClicked");
-            if (reply.equals("Yes")) {
-                isFolded = false;
-                getChildFragmentManager().beginTransaction().replace(R.id.SettingOnsetView, sleepOnsetFragment).commit();
-                onsetView.setBackground(AppCompatResources.getDrawable(v.getContext(), R.color.gray_1));
-                ObjectAnimator.ofFloat(onsetButton, View.ROTATION, 0f, 90f).setDuration(100).start();
-            }
-        }
         onsetView.setOnClickListener(view -> {
-            if (isFolded) {
-                isFolded = false;
-                getChildFragmentManager().beginTransaction().replace(R.id.SettingOnsetView, sleepOnsetFragment).commit();
-                onsetView.setBackground(AppCompatResources.getDrawable(v.getContext(), R.color.gray_1));
-                ObjectAnimator.ofFloat(onsetButton, View.ROTATION, 0f, 90f).setDuration(100).start();
-            } else {
-                isFolded = true;
-                getChildFragmentManager().beginTransaction().remove(sleepOnsetFragment).commit();
-                onsetView.setBackgroundResource(R.drawable.setting_stroke);
-                ObjectAnimator.ofFloat(onsetButton, View.ROTATION, 90f, 0f).setDuration(100).start();
-            }
+            Intent sleepOnsetIntent = new Intent(v.getContext(), SleepOnsetActivity.class);
+            startActivity(sleepOnsetIntent);
         });
 
         //Do SQMood survey again
