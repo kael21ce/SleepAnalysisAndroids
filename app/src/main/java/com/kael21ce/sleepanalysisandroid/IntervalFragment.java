@@ -61,7 +61,7 @@ public class IntervalFragment extends Fragment {
 
         //Show or hide the good and bad duration
         if (sharedPref.contains("isHidden")) {
-            boolean isHidden = sharedPref.getBoolean("isHidden", false);
+            boolean isHidden = false;
             if (isHidden) {
                 alertnessLayout.setVisibility(View.GONE);
             } else {
