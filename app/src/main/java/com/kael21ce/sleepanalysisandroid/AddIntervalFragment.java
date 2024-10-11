@@ -183,10 +183,15 @@ public class AddIntervalFragment extends Fragment implements ButtonTextUpdater {
             }else{
                 AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
                 builder.setCancelable(true);
-                builder.setTitle("ERROR");
-                builder.setMessage("INVALID SLEEP VALUE");
-
-                builder.setNegativeButton("OK", (dialogInterface, i) -> dialogInterface.cancel());
+                if (languageSetting.equals("ko")) {
+                    builder.setTitle("경고");
+                    builder.setMessage("잘못된 수면 입력값입니다");
+                    builder.setNegativeButton("확인", (dialogInterface, i) -> dialogInterface.cancel());
+                } else {
+                    builder.setTitle("ERROR");
+                    builder.setMessage("INVALID SLEEP VALUE");
+                    builder.setNegativeButton("OK", (dialogInterface, i) -> dialogInterface.cancel());
+                }
 
                 AlertDialog alert = builder.create();
                 alert.setOnShowListener(arg0 -> {

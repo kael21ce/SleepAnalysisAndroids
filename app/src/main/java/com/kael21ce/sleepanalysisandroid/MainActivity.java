@@ -1086,7 +1086,7 @@ public class MainActivity extends AppCompatActivity {
             midnight = midnight - nineHours;
             Sleep sleep2 = new Sleep();
             sleep2.sleepStart = sleep.sleepStart;
-            sleep2.sleepEnd = midnight;
+            sleep2.sleepEnd = midnight - 1000*60;
             sleep.sleepStart = midnight;
             listSleep.add(sleep2);
             listSleep.add(sleep);
