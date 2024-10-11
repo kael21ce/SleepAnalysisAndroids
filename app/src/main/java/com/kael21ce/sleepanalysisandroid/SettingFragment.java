@@ -41,7 +41,7 @@ public class SettingFragment extends Fragment implements ButtonTextUpdater {
     Boolean isFolded = true;
     private static final String NotifyKey = "Notify_At";
     Button notifyButton;
-    SimpleDateFormat sdfComplexTime = new SimpleDateFormat( "hh:mm a", Locale.KOREA);
+    SimpleDateFormat sdfComplexTime = new SimpleDateFormat( "a hh:mm", Locale.KOREA);
     SimpleDateFormat sdfComplexTime_En = new SimpleDateFormat( "hh:mm a");
     SimpleDateFormat sdfSimpleTime = new SimpleDateFormat("HH:mm", Locale.KOREA);
     SimpleDateFormat sdfSimpleTime_En = new SimpleDateFormat("HH:mm");

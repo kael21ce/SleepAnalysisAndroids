@@ -7,6 +7,9 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TimePicker;
 
+import java.text.SimpleDateFormat;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
 import io.reactivex.annotations.NonNull;
@@ -47,13 +50,13 @@ public class TimePickerDialog extends Dialog {
                     if(languageSetting == "en") {
                         format = "0" + (hour - 12) + ":" + minuteStr + " PM";
                     }else{
-                        format = "0" + (hour - 12) + ":" + minuteStr + " 오후";
+                        format = "오후 0" + (hour - 12) + ":" + minuteStr;
                     }
                 } else {
                     if(languageSetting == "en") {
                         format = (hour - 12) + ":" + minuteStr + " PM";
                     }else{
-                        format = (hour - 12) + ":" + minuteStr + " 오후";
+                        format = "오후 " + (hour - 12) + ":" + minuteStr;
                     }
                 }
             } else {
@@ -61,13 +64,13 @@ public class TimePickerDialog extends Dialog {
                     if(languageSetting == "en") {
                         format = "0" + hour + ":" + minuteStr + " AM";
                     }else{
-                        format = "0" + hour + ":" + minuteStr + " 오전";
+                        format = "오전 0" + hour + ":" + minuteStr;
                     }
                 } else {
                     if(languageSetting == "en") {
                         format = hour + ":" + minuteStr + " AM";
                     }else{
-                        format = hour + ":" + minuteStr + " 오전";
+                        format = "오전 " + hour + ":" + minuteStr;
                     }
                 }
             }
@@ -86,13 +89,21 @@ public class TimePickerDialog extends Dialog {
     }
 
     public void setTimePicker(String current_time){
-//        Log.v("CURRENT TIME", current_time);
-        int hour = Integer.parseInt(current_time.substring(0, 2));
-        int minutes = Integer.parseInt(current_time.substring(3,5));
-        if(current_time.substring(6, 8).equals("PM") || current_time.substring(6, 8).equals("오후")){
-            hour += 12;
+        DateTimeFormatter df;
+        String languageSetting = Locale.getDefault().getLanguage();
+        if (languageSetting.equals("ko")) {
+            df = DateTimeFormatter.ofPattern( "a hh:mm", Locale.KOREA);
+        } else {
+            df = DateTimeFormatter.ofPattern( "hh:mm a");
         }
-//        Log.v("THE INT", hour + " " + minutes + " " + current_time.substring(6, 8));
+        LocalTime time = LocalTime.parse(current_time, df);
+//        int hour = Integer.parseInt(current_time.substring(0, 2));
+//        int minutes = Integer.parseInt(current_time.substring(3,5));
+//        if(current_time.substring(6, 8).equals("PM") || current_time.substring(0, 2).equals("오후")){
+//            hour += 12;
+//        }
+        int hour = time.getHour();
+        int minutes = time.getMinute();
         timePicker.setHour(hour);
         timePicker.setMinute(minutes);
     }

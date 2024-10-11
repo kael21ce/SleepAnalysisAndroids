@@ -30,17 +30,14 @@ import java.util.TimeZone;
 
 public class AddIntervalFragment extends Fragment implements ButtonTextUpdater {
 
-    public ImageButton backButton;
-    public Button startDateButton;
-    public Button startTimeButton;
-    public Button endDateButton;
-    public Button endTimeButton;
-    public Button addButton;
-    public IntervalFragment intervalFragment;
-    public DatePickerDialog datePickerDialog;
-    public TimePickerDialog timePickerDialog;
+    private Button startDateButton, startTimeButton, endDateButton, endTimeButton;
+    private IntervalFragment intervalFragment;
+    private DatePickerDialog datePickerDialog;
+    private TimePickerDialog timePickerDialog;
+    SimpleDateFormat sdf;
     SimpleDateFormat sdfDateTimeSchedule = new SimpleDateFormat( "yyyy/MM/dd", Locale.KOREA);
     private static final String TAG = "AddIntervalFragment";
+    private String languageSetting = Locale.getDefault().getLanguage();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -60,7 +57,7 @@ public class AddIntervalFragment extends Fragment implements ButtonTextUpdater {
         startTimeButton = v.findViewById(R.id.startTimeButton);
         endDateButton = v.findViewById(R.id.endDateButton);
         endTimeButton = v.findViewById(R.id.endTimeButton);
-        addButton = v.findViewById(R.id.addButton);
+        Button addButton = v.findViewById(R.id.addButton);
 
         //Return to IntervalFragment if backButton is clicked
         intervalFragment = new IntervalFragment();
@@ -70,10 +67,15 @@ public class AddIntervalFragment extends Fragment implements ButtonTextUpdater {
             Log.v("bundle", "bundle failed to be fetched");
         }
         intervalFragment.setArguments(bundle);
-        backButton = v.findViewById(R.id.backButton);
+        ImageButton backButton = v.findViewById(R.id.backButton);
         backButton.setOnClickListener(view -> getParentFragmentManager().beginTransaction().replace(R.id.IntervalFrame, intervalFragment).commit());
+        
+        if (languageSetting.equals("ko")) {
+            sdf = new SimpleDateFormat("yyyy.MM.dd aaa hh:mm");
+        } else {
+            sdf = new SimpleDateFormat("yyyy.MM.dd hh:mm aaa");
+        }
 
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd hh:mm aaa");
 
         //Set the initial added time to current time
         var ref = new Object() {
@@ -84,8 +86,14 @@ public class AddIntervalFragment extends Fragment implements ButtonTextUpdater {
         } catch (ParseException e) {
             throw new RuntimeException(e);
         }
+        String current_time;
+        if (languageSetting.equals("ko")) {
+            current_time = new SimpleDateFormat("aaa hh:mm").format(new Date(1000*60*60*15));
+        } else {
+            current_time = new SimpleDateFormat("hh:mm aaa").format(new Date(1000*60*60*15));
+        }
         String current_date = new SimpleDateFormat("yyyy.MM.dd").format(ref.curDate);
-        String current_time = new SimpleDateFormat("hh:mm aaa").format(new Date(1000*60*60*15));
+
         startDateButton.setText(current_date);
         endDateButton.setText(current_date);
         startTimeButton.setText(current_time);
@@ -106,13 +114,21 @@ public class AddIntervalFragment extends Fragment implements ButtonTextUpdater {
         startTimeButton.setOnClickListener(view -> {
             timePickerDialog = new TimePickerDialog(v.getContext(), addIntervalFragment);
             timePickerDialog.setData(1);
-            timePickerDialog.setTimePicker("00:00 AM");
+            if (languageSetting.equals("ko")) {
+                timePickerDialog.setTimePicker("오전 00:00");
+            } else {
+                timePickerDialog.setTimePicker("00:00 AM");
+            }
             timePickerDialog.show();
         });
         endTimeButton.setOnClickListener(view -> {
             timePickerDialog = new TimePickerDialog(v.getContext(), addIntervalFragment);
             timePickerDialog.setData(0);
-            timePickerDialog.setTimePicker("00:00 AM");
+            if (languageSetting.equals("ko")) {
+                timePickerDialog.setTimePicker("오전 00:00");
+            } else {
+                timePickerDialog.setTimePicker("00:00 AM");
+            }
             timePickerDialog.show();
         });
         addButton.setOnClickListener(view -> {

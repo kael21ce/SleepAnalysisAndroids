@@ -40,14 +40,15 @@ public class EditIntervalFragment extends Fragment implements ButtonTextUpdater 
     private TextView intervalTextView;
 
     SimpleDateFormat sdfDateTime = new SimpleDateFormat( "yyyy/MM/dd HH:mm", Locale.KOREA);
-    SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd hh:mm aaa");
+    SimpleDateFormat sdf;
     SimpleDateFormat sdfSimple = new SimpleDateFormat("yyyy/MM/dd");
 
     SimpleDateFormat sdf24H = new SimpleDateFormat("HH:mm");
-    SimpleDateFormat sdfAMPM = new SimpleDateFormat("hh:mm a");
+    SimpleDateFormat sdfAMPM;
 
     private static final String TAG = "EditIntervalFragment";
     private static long oneDay = 1000*60*60*24;
+    private String languageSetting = Locale.getDefault().getLanguage();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -99,6 +100,15 @@ public class EditIntervalFragment extends Fragment implements ButtonTextUpdater 
         } catch (ParseException e) {
             throw new RuntimeException(e);
         }
+
+        if (languageSetting.equals("ko")) {
+            sdf = new SimpleDateFormat("yyyy/MM/dd a hh:mm");
+            sdfAMPM = new SimpleDateFormat("a hh:mm", Locale.KOREA);
+        } else {
+            sdf = new SimpleDateFormat("yyyy/MM/dd hh:mm aaa");
+            sdfAMPM = new SimpleDateFormat("hh:mm a");
+        }
+
         Log.v("AM PM FORMAT", sdfAMPM.format(startHourD));
         Log.v("AM PM FORMAT", sdfAMPM.format(endHourD));
 
@@ -317,7 +327,13 @@ public class EditIntervalFragment extends Fragment implements ButtonTextUpdater 
 
     //Calculate the interval between two time in format of "HH:mm"
     public String getInterval(String start, String end) throws ParseException {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("hh:mm a");
+        String languageSetting = Locale.getDefault().getLanguage();
+        DateTimeFormatter formatter;
+        if (languageSetting.equals("ko")) {
+            formatter = DateTimeFormatter.ofPattern("a hh:mm", Locale.KOREA);
+        } else {
+            formatter = DateTimeFormatter.ofPattern("hh:mm a");
+        }
 
         LocalTime startTime = LocalTime.parse(start, formatter);
         LocalTime endTime = LocalTime.parse(end, formatter);
