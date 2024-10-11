@@ -226,4 +226,27 @@ public class SleepOnsetActivity extends AppCompatActivity implements ButtonTextU
             }
         }
     }
+
+    public String getDateButtonText(int isStartButton) {
+        String nullString = "2024.01.01";
+        if (isStartButton==0) {
+            if (sleepOnsetDateButton != null) {
+                return (String) sleepOnsetDateButton.getText();
+            } else {
+                return nullString;
+            }
+        } else if(isStartButton == 1) {
+            if (workOnsetDateButton != null) {
+                return (String) workOnsetDateButton.getText();
+            } else {
+                return nullString;
+            }
+        } else {
+            if (workOffsetDateButton != null) {
+                return (String) workOffsetDateButton.getText();
+            } else {
+                return nullString;
+            }
+        }
+    }
 }

@@ -319,6 +319,8 @@ public class EditIntervalFragment extends Fragment implements ButtonTextUpdater 
         }
     }
 
+    public String getDateButtonText(int isStartButton) {return "";}
+
     //Convert Format of "aaa HH:mm" to "HH:mm"
     public String convertAToFormat(String time) throws ParseException {
         Date date = sdfAMPM.parse(time);

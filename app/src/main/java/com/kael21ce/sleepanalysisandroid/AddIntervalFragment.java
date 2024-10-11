@@ -228,4 +228,21 @@ public class AddIntervalFragment extends Fragment implements ButtonTextUpdater {
             }
         }
     }
+
+    public String getDateButtonText(int isStartButton) {
+        String nullString = "2024.01.01";
+        if (isStartButton==1) {
+            if (startDateButton != null) {
+                return (String) startDateButton.getText();
+            } else {
+                return nullString;
+            }
+        } else {
+            if (endDateButton != null) {
+                return (String) endDateButton.getText();
+            } else {
+                return nullString;
+            }
+        }
+    }
 }

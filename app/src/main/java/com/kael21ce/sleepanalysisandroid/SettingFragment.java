@@ -262,4 +262,6 @@ public class SettingFragment extends Fragment implements ButtonTextUpdater {
             }
         }
     }
+
+    public String getDateButtonText(int isStartButton) {return "";}
 }

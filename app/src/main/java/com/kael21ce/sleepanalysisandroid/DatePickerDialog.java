@@ -7,6 +7,11 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.ImageButton;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+
 import io.reactivex.annotations.NonNull;
 
 public class DatePickerDialog extends Dialog {
@@ -28,31 +33,38 @@ public class DatePickerDialog extends Dialog {
         backPopButton.setOnClickListener(view -> dismiss());
 
         //Send selected date to AddIntervalFragment when checkDateButton is clicked
-        datePicker.setOnDateChangedListener((datePicker, year, month, dayOfMonth) -> {
-            //Get date in format
-            String format;
-            if (month + 1 < 10) {
-                if (dayOfMonth < 10) {
-                    format = year + ".0" + (month + 1) + ".0" + dayOfMonth;
-                } else {
-                    format = year + ".0" + (month + 1) + "." + dayOfMonth;
-                }
-            } else {
-                if (dayOfMonth < 10) {
-                    format = year + "." + (month + 1) + ".0" + dayOfMonth;
-                } else {
-                    format = year + "." + (month + 1) + "." + dayOfMonth;
-                }
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd");
+        String initialDateStr = buttonTextUpdater.getDateButtonText(isStartButton);
+        Log.d("DatePickerDialog", initialDateStr);
+        int initialYear = 0;
+        int initialMonth = 1;
+        int initialDay = 0;
+        try {
+            Date initialDate = sdf.parse(initialDateStr);
+            Calendar initialCalendar = Calendar.getInstance();
+            initialCalendar.setTime(initialDate);
+
+            initialYear = initialCalendar.get(Calendar.YEAR);
+            initialMonth = initialCalendar.get(Calendar.MONTH);
+            initialDay = initialCalendar.get(Calendar.DAY_OF_MONTH);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        datePicker.init(initialYear, initialMonth, initialDay, new DatePicker.OnDateChangedListener() {
+            @Override
+            public void onDateChanged(DatePicker v, int year, int month, int dayOfMonth) {
+                //Get date in format
+                Calendar calendar = Calendar.getInstance();
+                calendar.set(year, month, dayOfMonth);
+                String format = sdf.format(calendar.getTime());
+                checkDateButton.setOnClickListener(view -> {
+                    //Send date to AddIntervalFragment
+                    buttonTextUpdater.setDateButtonText(format, isStartButton);
+                    Log.w("Date Text Setting", format);
+                    dismiss();
+                });
             }
-            checkDateButton.setOnClickListener(view -> {
-                //Send date to AddIntervalFragment
-                buttonTextUpdater.setDateButtonText(format, isStartButton);
-                Log.w("Date Text Setting", format);
-                dismiss();
-            });
         });
-
-
     }
 
     public void setDatePicker(String theDate){
