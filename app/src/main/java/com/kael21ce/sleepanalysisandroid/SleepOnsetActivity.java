@@ -18,6 +18,7 @@ import android.widget.ImageButton;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 public class SleepOnsetActivity extends AppCompatActivity implements ButtonTextUpdater{
 
@@ -31,10 +32,11 @@ public class SleepOnsetActivity extends AppCompatActivity implements ButtonTextU
     public DatePickerDialog datePickerDialog;
     public TimePickerDialog timePickerDialog;
     long sleepOnset, workOnset, workOffset;
-    SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd hh:mm aaa");
+    SimpleDateFormat sdf;
     SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy.MM.dd");
-    SimpleDateFormat sdfTime = new SimpleDateFormat("hh:mm aaa");
+    SimpleDateFormat sdfTime;
     long now, nineHours;
+    private String languageSetting = Locale.getDefault().getLanguage();
 
     @Override
     protected void onCreate(Bundle saveInstanceState) {
@@ -77,6 +79,14 @@ public class SleepOnsetActivity extends AppCompatActivity implements ButtonTextU
 //        String sleepOnsetString = sdf.format(new Date(sleepOnset));
 //        String workOnsetString = sdf.format(new Date(workOnset));
 //        String workOffsetString = sdf.format(new Date(workOffset));
+
+        if (languageSetting.equals("ko")) {
+            sdf = new SimpleDateFormat("yyyy.MM.dd a hh:mm", Locale.KOREA);
+            sdfTime = new SimpleDateFormat("a hh:mm", Locale.KOREA);
+        } else {
+            sdf = new SimpleDateFormat("yyyy.MM.dd hh:mm a");
+            sdfTime = new SimpleDateFormat("hh:mm a");
+        }
 
         sleepOnsetDateButton.setText(sdfDate.format(new Date(sleepOnset)));
         sleepOnsetTimeButton.setText(sdfTime.format(new Date(sleepOnset)));
@@ -137,34 +147,27 @@ public class SleepOnsetActivity extends AppCompatActivity implements ButtonTextU
             Log.v("WORK ONSET SDF", workOnsetSDF);
             Log.v("WORK OFFSET SDF", workOffsetSDF);
 
-            Date sleepOnset = null;
-            Date workOnset = null;
-            Date workOffset = null;
+            Date sleepOnsetEdit = new Date(sleepOnset);
+            Date workOnsetEdit = new Date(workOnset);
+            Date workOffsetEdit = new Date(workOffset);
             try {
-                sleepOnset = sdf.parse(sleepOnsetSDF);
-                workOnset = sdf.parse(workOnsetSDF);
-                workOffset = sdf.parse(workOffsetSDF);
-                //translate to local date time
-//                LocalDateTime ldt1 = LocalDateTime.ofInstant(sleepOnset.toInstant(), ZoneId.systemDefault());
-//                LocalDateTime ldt2 = LocalDateTime.ofInstant(workOnset.toInstant(), ZoneId.systemDefault());
-//                LocalDateTime ldt3 = LocalDateTime.ofInstant(workOffset.toInstant(), ZoneId.systemDefault());
-//                sleepOnset = Date.from(ldt1.atZone(ZoneId.systemDefault()).toInstant());
-//                workOnset = Date.from(ldt2.atZone(ZoneId.systemDefault()).toInstant());
-//                workOffset = Date.from(ldt3.atZone(ZoneId.systemDefault()).toInstant());
+                sleepOnsetEdit = sdf.parse(sleepOnsetSDF);
+                workOnsetEdit = sdf.parse(workOnsetSDF);
+                workOffsetEdit = sdf.parse(workOffsetSDF);
             } catch (ParseException e) {
                 throw new RuntimeException(e);
             }
-            assert sleepOnset != null;
-            assert workOnset != null;
-            assert workOffset != null;
+            assert sleepOnsetEdit != null;
+            assert workOnsetEdit != null;
+            assert workOffsetEdit != null;
 
-            if(isValid(sleepOnset.getTime(), workOnset.getTime(), workOffset.getTime())) {
-                mainActivity.setSleepOnset(sleepOnset.getTime());
-                mainActivity.setWorkOnset(workOnset.getTime());
-                mainActivity.setWorkOffset(workOffset.getTime());
+            if(isValid(sleepOnsetEdit.getTime(), workOnsetEdit.getTime(), workOffsetEdit.getTime())) {
+                mainActivity.setSleepOnset(sleepOnsetEdit.getTime());
+                mainActivity.setWorkOnset(workOnsetEdit.getTime());
+                mainActivity.setWorkOffset(workOffsetEdit.getTime());
 
                 mainActivity.finish();
-                startActivity(new Intent(mainActivity, SplashActivity.class));
+                startActivity(new Intent(this, SplashActivity.class));
             }else{
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setCancelable(true);

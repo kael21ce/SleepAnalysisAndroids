@@ -130,6 +130,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(saveInstanceState);
         setContentView(R.layout.activity_main);
 
+        context = getApplicationContext();
+
         Log.v("MainActivity", "onCreate() is called");
 
         healthConnectManager = new HealthConnectManager(getApplicationContext());
@@ -1202,6 +1204,9 @@ public class MainActivity extends AppCompatActivity {
 
     public void setSleepOnset(long sleepOnset) {
         this.sleepOnset = sleepOnset;
+        Context context = MainActivity.context;
+        sharedPref = context.getSharedPreferences("SleepWake", Context.MODE_PRIVATE);
+        editor = sharedPref.edit();
         editor.putLong("sleepOnset", sleepOnset);
         editor.apply();
         Log.v("sleep onset", sdfDateTime.format(new Date(sharedPref.getLong("sleepOnset", now))));
@@ -1213,6 +1218,9 @@ public class MainActivity extends AppCompatActivity {
 
     public void setWorkOnset(long workOnset){
         this.workOnset = workOnset;
+        Context context = MainActivity.context;
+        sharedPref = context.getSharedPreferences("SleepWake", Context.MODE_PRIVATE);
+        editor = sharedPref.edit();
         editor.putLong("workOnset", workOnset);
         editor.apply();
         Log.v("work onset", sdfDateTime.format(new Date(sharedPref.getLong("workOnset", now))));
@@ -1224,6 +1232,9 @@ public class MainActivity extends AppCompatActivity {
 
     public void setWorkOffset(long workOffset) {
         this.workOffset = workOffset;
+        Context context = MainActivity.context;
+        sharedPref = context.getSharedPreferences("SleepWake", Context.MODE_PRIVATE);
+        editor = sharedPref.edit();
         editor.putLong("workOffset", workOffset);
         editor.apply();
         Log.v("work offset", sdfDateTime.format(new Date(sharedPref.getLong("workOffset", now))));
