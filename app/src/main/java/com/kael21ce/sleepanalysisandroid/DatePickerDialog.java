@@ -9,8 +9,11 @@ import android.widget.ImageButton;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import io.reactivex.annotations.NonNull;
 
@@ -36,20 +39,18 @@ public class DatePickerDialog extends Dialog {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd");
         String initialDateStr = buttonTextUpdater.getDateButtonText(isStartButton);
         Log.d("DatePickerDialog", initialDateStr);
-        int initialYear = 0;
-        int initialMonth = 1;
-        int initialDay = 0;
-        try {
-            Date initialDate = sdf.parse(initialDateStr);
-            Calendar initialCalendar = Calendar.getInstance();
-            initialCalendar.setTime(initialDate);
+        List<Integer> initialList = str2Date(initialDateStr);
+        int initialYear = initialList.get(0);
+        int initialMonth = initialList.get(1);
+        int initialDay = initialList.get(2);
 
-            initialYear = initialCalendar.get(Calendar.YEAR);
-            initialMonth = initialCalendar.get(Calendar.MONTH);
-            initialDay = initialCalendar.get(Calendar.DAY_OF_MONTH);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
+        //CheckDateButton without datePicker
+        checkDateButton.setOnClickListener(v -> {
+            Log.w("DatePickerDialog", "Without selection");
+            dismiss();
+        });
+
+        //Select date via datePicker
         datePicker.init(initialYear, initialMonth, initialDay, new DatePicker.OnDateChangedListener() {
             @Override
             public void onDateChanged(DatePicker v, int year, int month, int dayOfMonth) {
@@ -78,5 +79,30 @@ public class DatePickerDialog extends Dialog {
     //To get the data from AddIntervalFragment
     public void setData(int isStartButton) {
         this.isStartButton = isStartButton;
+    }
+
+    //Convert string into year, month, and day
+    public List<Integer> str2Date(String theDate) {
+        List<Integer> dateList = new ArrayList<>();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd");
+        int year = 0;
+        int month = 1;
+        int day = 0;
+        try {
+            Date date = sdf.parse(theDate);
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(date);
+
+            year = calendar.get(Calendar.YEAR);
+            month = calendar.get(Calendar.MONTH);
+            day = calendar.get(Calendar.DAY_OF_MONTH);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        dateList.add(0, year);
+        dateList.add(1, month);
+        dateList.add(2, day);
+
+        return dateList;
     }
 }

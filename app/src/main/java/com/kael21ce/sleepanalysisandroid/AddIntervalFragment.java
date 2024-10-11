@@ -104,11 +104,13 @@ public class AddIntervalFragment extends Fragment implements ButtonTextUpdater {
         startDateButton.setOnClickListener(view -> {
             datePickerDialog = new DatePickerDialog(v.getContext(), addIntervalFragment);
             datePickerDialog.setData(1);
+            datePickerDialog.setDatePicker((String) startDateButton.getText());
             datePickerDialog.show();
         });
         endDateButton.setOnClickListener(view -> {
             datePickerDialog = new DatePickerDialog(v.getContext(), addIntervalFragment);
             datePickerDialog.setData(0);
+            datePickerDialog.setDatePicker((String) endDateButton.getText());
             datePickerDialog.show();
         });
         startTimeButton.setOnClickListener(view -> {
