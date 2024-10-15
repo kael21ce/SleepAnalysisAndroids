@@ -427,12 +427,10 @@ public class MainActivity extends AppCompatActivity {
 
                 Handler handler = new Handler();
                 handler.postDelayed(() -> {
-                    //refresh
+                    //refresh through calling splashActivity
                     finish();
-                    overridePendingTransition(0, 0);
-                    Intent intent = getIntent();
-                    startActivity(intent);
-                    overridePendingTransition(0, 0);
+                    Intent refreshIntent = new Intent(context, SplashActivity.class);
+                    startActivity(refreshIntent);
                 }, 400);
             }
 
