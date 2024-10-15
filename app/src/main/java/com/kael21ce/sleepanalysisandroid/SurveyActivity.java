@@ -149,7 +149,7 @@ public class SurveyActivity extends AppCompatActivity {
                 Calendar calendar = Calendar.getInstance();
                 int day = calendar.get(Calendar.DAY_OF_MONTH);
 
-                Intent endIntent = new Intent(SurveyActivity.this, MainActivity.class);
+                Intent endIntent = new Intent(SurveyActivity.this, SplashActivity.class);
                 endIntent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                 Bundle moodData = sentIntent.getBundleExtra("moodData");
                 sendMood(moodData.getInt("sleep_quality"), moodData.getInt("mood_high"), moodData.getInt("mood_low"), moodData.getInt("mood_anx"), moodData.getInt("mood_irr"));
