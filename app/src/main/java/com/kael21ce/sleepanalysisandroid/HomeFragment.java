@@ -722,30 +722,36 @@ public class HomeFragment extends Fragment {
         if (sleepStart == sleepEnd) {
             startTime.setText("--:--");
             endTime.setText("--:--");
-            stateDescriptionText.setText("잠에 들기 어려운 시각이에요");
-            stateDescriptionSmallText.setText("다른 취침 시각을 선택해보세요");
-            stateDescriptionImage.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.sad, null));
+            if (!napSleepStartString.equals(napSleepEndString)) {
+                stateDescriptionText.setText("밤잠을 자기 어려운 일정이에요");
+                stateDescriptionSmallText.setText("대신 낮잠을 충분히 자야해요");
+                stateDescriptionImage.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.sad, null));
+            } else {
+                if (isenough) {
+                    stateDescriptionText.setText("근무 전까지 잠이 필요하지 않아요");
+                    stateDescriptionSmallText.setText("잠을 자지 않아도 맑은 정신을 유지할 수 있어요");
+                    stateDescriptionImage.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.smile, null));
+                } else {
+                    stateDescriptionText.setText("밤잠을 자기 어려운 일정이에요");
+                    stateDescriptionSmallText.setText("근무 중에 피곤할 수 있어요");
+                    stateDescriptionImage.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.sad, null));
+                }
+            }
         } else {
             startTime.setText(sdfDateTimeRecomm.format(new Date(sleepStart)));
             endTime.setText(sdfDateTimeRecomm.format(new Date(sleepEnd)));
             if (isenough) {
-                if (isearly) {
-                    stateDescriptionText.setText("선택하신 취침 시각이\n너무 일러요");
-                    stateDescriptionSmallText.setText("조금 더 늦은 수면을 추천드려요");
-                    stateDescriptionImage.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.sad, null));
-                } else {
-                    stateDescriptionText.setText("잠을 자기 좋은 시간이에요");
-                    stateDescriptionSmallText.setText("기상시간을 지켜주세요");
-                    stateDescriptionImage.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.sleep, null));
-                }
+                stateDescriptionText.setText("오늘의 추천 밤잠 일정이에요");
+                stateDescriptionSmallText.setText("추천보다 너무 늦지 않게 일어나주세요");
+                stateDescriptionImage.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.sleep, null));
             } else {
                 if (isearly) {
-                    stateDescriptionText.setText("잠이 충분하지 않아요");
-                    stateDescriptionSmallText.setText("최대한 잠을 자도 피곤할 수 있어요");
+                    stateDescriptionText.setText("근무 전까지 최대한 많이 자야해요");
+                    stateDescriptionSmallText.setText("내일 근무 시간에 피곤할 수 있어요");
                     stateDescriptionImage.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.puke, null));
                 } else {
-                    stateDescriptionText.setText("잠이 충분하지 않아요");
-                    stateDescriptionSmallText.setText("희망 취침 시각을 앞으로 당겨보세요");
+                    stateDescriptionText.setText("근무 전까지 최대한 많이 자야해요");
+                    stateDescriptionSmallText.setText("가능하면 더 일찍 자러 들어가 보세요");
                     stateDescriptionImage.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.puke, null));
                 }
             }
@@ -791,18 +797,24 @@ public class HomeFragment extends Fragment {
         if(!napSleepStartString.equals(napSleepEndString)) {
             clockView.setIsRecommended(true);
             clockView.setAngleFromTime(napSleepStartString, napSleepEndString);
-            stateDescriptionText.setText("낮잠을 주무세요");
-            stateDescriptionSmallText.setText("이 시간에 충분히 자야해요");
-            stateDescriptionImage.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.sleep, null));
+            if (isenough) {
+                stateDescriptionText.setText("오늘의 추천 낮잠 일정이에요");
+                stateDescriptionSmallText.setText("맑은 정신을 위해선 낮잠이 필요해요");
+                stateDescriptionImage.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.sleep, null));
+            } else {
+                stateDescriptionText.setText("근무 전까지 최대한 많이 자야해요");
+                stateDescriptionSmallText.setText("근무 중에 피곤할 수 있어요");
+                stateDescriptionImage.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.puke, null));
+            }
         }else{
             clockView.setIsRecommended(false);
             if (isenough) {
-                stateDescriptionText.setText("낮잠이 필요하지 않아요");
+                stateDescriptionText.setText("근무 전까지 잠이 필요하지 않아요");
                 stateDescriptionSmallText.setText("낮잠 없이도 맑은 정신을 유지할 수 있어요");
                 stateDescriptionImage.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.smile, null));
             } else {
-                stateDescriptionText.setText("낮잠을 잘 수 없어요");
-                stateDescriptionSmallText.setText("수면이 충분하지 않아요");
+                stateDescriptionText.setText("낮잠을 자기 어려운 일정이에요");
+                stateDescriptionSmallText.setText("근무 중에 피곤할 수 있어요");
                 stateDescriptionImage.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.puke, null));
             }
             startTime.setText("--:--");
@@ -833,12 +845,12 @@ public class HomeFragment extends Fragment {
         sleepImportanceText.setBackground(ResourcesCompat
                 .getDrawable(getResources(), R.drawable.important_caption, null));
         if (isenough) {
-            stateDescriptionText.setText("근무 시간이에요");
-            stateDescriptionSmallText.setText("맑은 정신을 유지할 수 있어요");
+            stateDescriptionText.setText("예정된 근무 시간이에요");
+            stateDescriptionSmallText.setText("근무 동안 맑은 정신을 유지할 수 있어요");
             stateDescriptionImage.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.smile, null));
         } else {
-            stateDescriptionText.setText("근무 시간이에요");
-            stateDescriptionSmallText.setText("맑은 정신을 유지하기 어려워요");
+            stateDescriptionText.setText("예정된 근무 시간이에요");
+            stateDescriptionSmallText.setText("근무 동안 피곤할 수 있어요");
             stateDescriptionImage.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.puke, null));
         }
         clockView.setTypeOfInterval(3);
