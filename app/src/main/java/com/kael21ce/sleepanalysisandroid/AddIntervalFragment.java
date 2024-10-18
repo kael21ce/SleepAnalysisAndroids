@@ -163,25 +163,45 @@ public class AddIntervalFragment extends Fragment implements ButtonTextUpdater {
             add_sleep.sleepStart = sleepStartDate.getTime();
             add_sleep.sleepEnd = sleepEndDate.getTime();
             if(sleepStartDate.getTime() <= sleepEndDate.getTime() && !mainActivity.isOverlap(mainActivity.getSleeps(), add_sleep, -1)) {
-                mainActivity.addSleep(add_sleep);
+                if (Math.abs(sleepStartDate.getTime()-sleepEndDate.getTime()) > 24*60*60*1000) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                    builder.setCancelable(true);
+                    if (languageSetting.equals("ko")) {
+                        builder.setTitle("경고");
+                        builder.setMessage("24시간 미만으로 수면을 입력해주세요");
+                        builder.setNegativeButton("확인", (dialogInterface, i) -> dialogInterface.cancel());
+                    } else {
+                        builder.setTitle("ERROR");
+                        builder.setMessage("Please enter sleep time of less than 24 hours");
+                        builder.setNegativeButton("OK", (dialogInterface, i) -> dialogInterface.cancel());
+                    }
 
-                mainActivity.finish();
-                Intent scheduleIntent = new Intent(mainActivity, SplashActivity.class);
+                    AlertDialog alert = builder.create();
+                    alert.setOnShowListener(arg0 -> {
+                        alert.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(getResources().getColor(R.color.black));
+                    });
+                    alert.show();
+                } else {
+                    mainActivity.addSleep(add_sleep);
 
-                //Send the information of the selected date
-                Calendar calendar = Calendar.getInstance();
-                calendar.setTime(ref.curDate);
-                int year = calendar.get(Calendar.YEAR);
-                int month = calendar.get(Calendar.MONTH);
-                int day = calendar.get(Calendar.DAY_OF_MONTH);
+                    mainActivity.finish();
+                    Intent scheduleIntent = new Intent(mainActivity, SplashActivity.class);
 
-                Log.v(TAG, "Selected: " + year + "-" + (month + 1) + "-" + day);
+                    //Send the information of the selected date
+                    Calendar calendar = Calendar.getInstance();
+                    calendar.setTime(ref.curDate);
+                    int year = calendar.get(Calendar.YEAR);
+                    int month = calendar.get(Calendar.MONTH);
+                    int day = calendar.get(Calendar.DAY_OF_MONTH);
 
-                scheduleIntent.putExtra("Year", year);
-                scheduleIntent.putExtra("Month", month);
-                scheduleIntent.putExtra("Day", day);
+                    Log.v(TAG, "Selected: " + year + "-" + (month + 1) + "-" + day);
 
-                startActivity(scheduleIntent);
+                    scheduleIntent.putExtra("Year", year);
+                    scheduleIntent.putExtra("Month", month);
+                    scheduleIntent.putExtra("Day", day);
+
+                    startActivity(scheduleIntent);
+                }
             }else{
                 AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
                 builder.setCancelable(true);
