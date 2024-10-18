@@ -223,9 +223,9 @@ public class HomeFragment extends Fragment {
         mainSleepEndString = sdfTime.format(new Date(mainActivity.getMainSleepEnd()));
         napSleepStartString = sdfTime.format(new Date(mainActivity.getNapSleepStart()));
         napSleepEndString = sdfTime.format(new Date(mainActivity.getNapSleepEnd()));
-        workOnsetString = sdfTime.format(new Date(mainActivity.getWorkOnset()));
-        workOffsetString = sdfTime.format(new Date(mainActivity.getWorkOffset()));
-        sleepOnsetString = sdfDateTime.format(new Date(mainActivity.getSleepOnset()));
+        workOnsetString = sdfTime.format(new Date(sharedPref.getLong("workOnset", now)));
+        workOffsetString = sdfTime.format(new Date(sharedPref.getLong("workOffset", now)));
+        sleepOnsetString = sdfDateTime.format(new Date(sharedPref.getLong("sleepOnset", now)));
 
         Log.v("sleep onset", sdfDateTime2.format(new Date(sharedPref.getLong("sleepOnset", now))));
         Log.v("work onset", sdfDateTime2.format(new Date(sharedPref.getLong("workOnset", now))));
@@ -310,8 +310,8 @@ public class HomeFragment extends Fragment {
         barDataSet.setHighLightAlpha(0);
 
         //BarDataSet 2: Recommended sleep interval
-        String recommendedOnset = sdfTime.format(new Date(mainActivity.getMainSleepStart()));
-        String recommendedOffset = sdfTime.format(new Date(mainActivity.getMainSleepEnd()));
+        Date recommendedOnset = new Date(mainActivity.getMainSleepStart());
+        Date recommendedOffset = new Date(mainActivity.getMainSleepEnd());
         float rOnsetF = mv.timeToX(recommendedOnset);
         float rOffsetF = mv.timeToX(recommendedOffset);
         float rMidF = (rOnsetF + rOffsetF) / 2f;
@@ -334,8 +334,8 @@ public class HomeFragment extends Fragment {
         sleepSet2.setColors(rBarColors, 20);
 
         //BarDataSet 3: Work interval
-        String workOnset = sdfTime.format(new Date(mainActivity.getWorkOnset()));
-        String workOffset = sdfTime.format(new Date(mainActivity.getWorkOffset()));
+        Date workOnset = new Date(sharedPref.getLong("workOnset", now));
+        Date workOffset = new Date(sharedPref.getLong("workOffset", now));
         float wOnsetF = mv.timeToX(workOnset);
         float wOffsetF = mv.timeToX(workOffset);
         float wMidF = 0f;
@@ -383,10 +383,10 @@ public class HomeFragment extends Fragment {
         float lMidF = 0f;
         if (sleeps.size() > 0) {
             Sleep lastSleep = sleeps.get(sleeps.size() - 1);
-            String lastOnset = sdfTime.format(new Date(lastSleep.sleepStart));
-            String lastOffset = sdfTime.format(new Date(lastSleep.sleepEnd));
-            float lOnsetF = mv.pastTimeToX(lastOnset);
-            float lOffsetF = mv.pastTimeToX(lastOffset);
+            Date lastOnset = new Date(lastSleep.sleepStart);
+            Date lastOffset = new Date(lastSleep.sleepEnd);
+            float lOnsetF = mv.timeToX(lastOnset);
+            float lOffsetF = mv.timeToX(lastOffset);
             lMidF = (lOnsetF + lOffsetF) / 2f;
             Log.v("LastSleep", "Onset: " + lOnsetF + " / Offset: " + lOffsetF);
             ArrayList lastIntervalEntries1 = new ArrayList<BarEntry>();
@@ -423,8 +423,8 @@ public class HomeFragment extends Fragment {
         //BarDataSet 5: Nap Interval
         long napStart = mainActivity.getNapSleepStart();
         long napEnd = mainActivity.getNapSleepEnd();
-        String napOnset = sdfTime.format(new Date(napStart));
-        String napOffset = sdfTime.format(new Date(napEnd));
+        Date napOnset = new Date(napStart);
+        Date napOffset = new Date(napEnd);
         float nOnsetF = mv.timeToX(napOnset);
         float nOffsetF = mv.timeToX(napOffset);
         float nMidF = (nOnsetF + nOffsetF) / 2f;
@@ -495,7 +495,7 @@ public class HomeFragment extends Fragment {
         alertnessChart.moveViewToX(19f);
 
         //Set MarkerView
-        String inputOnset = sdfTime.format(new Date(mainActivity.getSleepOnset()));
+        Date inputOnset = new Date(mainActivity.getSleepOnset());
         boolean isHardToSleep, isHardToNap;
         if (mainActivity.getMainSleepStart() == mainActivity.getMainSleepEnd()) {
             isHardToSleep = true;
@@ -507,7 +507,6 @@ public class HomeFragment extends Fragment {
         } else {
             isHardToNap = false;
         }
-        Log.v("HomeFragment", String.valueOf(isHardToSleep) + " / " + isHardToNap);
         mv.setRecommendedTime(recommendedOnset);
         mv.setInputTime(inputOnset);
         mv.setIntervalFloat(rMidF, wMidF, lMidF, nMidF);

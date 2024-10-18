@@ -90,11 +90,11 @@ public class RecommendFragment extends Fragment {
         napSleepStartString = sdfTime.format(new Date(mainActivity.getNapSleepStart()));
         napSleepEndString = sdfTime.format(new Date(mainActivity.getNapSleepEnd()));
         sleepOnsetString = sdfTime.format(new Date(mainActivity.getSleepOnset()));
-        workOnsetString = sdfTime.format(new Date(mainActivity.getWorkOnset()));
-        workOffsetString = sdfTime.format(new Date(mainActivity.getWorkOffset()));
-        sleepOnsetDisplaying = sdfDateTimeRecomm2.format(new Date(mainActivity.getSleepOnset()));
-        workOnsetDisplaying = sdfDateTimeRecomm2.format(new Date(mainActivity.getWorkOnset()));
-        workOffsetDisplaying = sdfDateTimeRecomm2.format(new Date(mainActivity.getWorkOffset()));
+        workOnsetString = sdfTime.format(new Date(sharedPref2.getLong("workOnset", now)));
+        workOffsetString = sdfTime.format(new Date(sharedPref2.getLong("workOffset", now)));
+        sleepOnsetDisplaying = sdfDateTimeRecomm2.format(new Date(sharedPref2.getLong("sleepOnset", now)));
+        workOnsetDisplaying = sdfDateTimeRecomm2.format(new Date(sharedPref2.getLong("workOnset", now)));
+        workOffsetDisplaying = sdfDateTimeRecomm2.format(new Date(sharedPref2.getLong("workOffset", now)));
 
         View v = inflater.inflate(R.layout.fragment_recommend, container, false);
 

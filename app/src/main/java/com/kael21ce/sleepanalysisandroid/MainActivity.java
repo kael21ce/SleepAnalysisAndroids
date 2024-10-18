@@ -200,20 +200,55 @@ public class MainActivity extends AppCompatActivity {
 
         barEntries = new ArrayList<BarEntry>();
 
-        if(now > sleepOnset && now < workOnset){
-            Log.v("SLEEP ONSET", "SLEEP ONSET IS NOW");
-            sleepOnset = now + 1000*60*15;
-        }else if(now > workOnset){
-            Log.v("NOW", "NOW IS BIGGER THAN WORK ONSET");
-            while(now > workOnset){
-                sleepOnset += 1000*60*60*24;
-                workOnset += 1000*60*60*24;
-                workOffset += 1000*60*60*24;
+        if (now > sleepOnset && now < workOnset) {
+            if (workOnset - now < oneHour) {
+                Log.v("NOW", "NOW IS CLOSE TO WORK ONSET AND ONSET");
+                while(workOnset - now < oneHour){
+                    sleepOnset += 1000*60*60*24;
+                    workOnset += 1000*60*60*24;
+                    workOffset += 1000*60*60*24;
+                }
+                editor.putLong("sleepOnset", sleepOnset);
+                editor.putLong("workOnset", workOnset);
+                editor.putLong("workOffset", workOffset);
+                editor.apply();
+            } else {
+                Log.v("SLEEP ONSET", "SLEEP ONSET IS NOW");
+                sleepOnset = now + 1000*60*15;
             }
-            editor.putLong("sleepOnset", sleepOnset);
-            editor.putLong("workOnset", workOnset);
-            editor.putLong("workOffset", workOffset);
-            editor.apply();
+        } else if (now <= sleepOnset && now < workOnset) {
+            if (workOnset - now < oneHour) {
+                Log.v("NOW", "NOW IS CLOSE TO WORK ONSET");
+                while(workOnset - now < oneHour){
+                    workOnset += 1000*60*60*24;
+                    workOffset += 1000*60*60*24;
+                }
+                editor.putLong("workOnset", workOnset);
+                editor.putLong("workOffset", workOffset);
+                editor.apply();
+            }
+        } else if (now > workOnset) {
+            if (now <= sleepOnset) {
+                Log.v("NOW", "NOW IS BIGGER THAN WORK ONSET");
+                while(now > workOnset){
+                    workOnset += 1000*60*60*24;
+                    workOffset += 1000*60*60*24;
+                }
+                editor.putLong("workOnset", workOnset);
+                editor.putLong("workOffset", workOffset);
+                editor.apply();
+            } else {
+                Log.v("NOW", "NOW IS BIGGER THAN WORK ONSET AND ONSET");
+                while(now > workOnset){
+                    sleepOnset += 1000*60*60*24;
+                    workOnset += 1000*60*60*24;
+                    workOffset += 1000*60*60*24;
+                }
+                editor.putLong("sleepOnset", sleepOnset);
+                editor.putLong("workOnset", workOnset);
+                editor.putLong("workOffset", workOffset);
+                editor.apply();
+            }
         }
 
         //sleep result variables
@@ -460,21 +495,57 @@ public class MainActivity extends AppCompatActivity {
         if(creation == false) {
             Log.v("RESUMING", "RESUMING");
             barEntries = new ArrayList<BarEntry>();
+            now = System.currentTimeMillis();
 
             if (now > sleepOnset && now < workOnset) {
-                Log.v("SLEEP ONSET", "SLEEP ONSET IS NOW");
-                sleepOnset = now + 1000 * 60 * 15;
-            } else if (now > workOnset) {
-                Log.v("NOW", "NOW IS BIGGER THAN WORK ONSET");
-                while (now > workOnset) {
-                    sleepOnset += 1000 * 60 * 60 * 24;
-                    workOnset += 1000 * 60 * 60 * 24;
-                    workOffset += 1000 * 60 * 60 * 24;
+                if (workOnset - now < oneHour) {
+                    Log.v("NOW", "NOW IS CLOSE TO WORK ONSET AND ONSET");
+                    while(workOnset - now < oneHour){
+                        sleepOnset += 1000*60*60*24;
+                        workOnset += 1000*60*60*24;
+                        workOffset += 1000*60*60*24;
+                    }
+                    editor.putLong("sleepOnset", sleepOnset);
+                    editor.putLong("workOnset", workOnset);
+                    editor.putLong("workOffset", workOffset);
+                    editor.apply();
+                } else {
+                    Log.v("SLEEP ONSET", "SLEEP ONSET IS NOW");
+                    sleepOnset = now + 1000*60*15;
                 }
-                editor.putLong("sleepOnset", sleepOnset);
-                editor.putLong("workOnset", workOnset);
-                editor.putLong("workOffset", workOffset);
-                editor.apply();
+            } else if (now <= sleepOnset && now < workOnset) {
+                if (workOnset - now < oneHour) {
+                    Log.v("NOW", "NOW IS CLOSE TO WORK ONSET");
+                    while(workOnset - now < oneHour){
+                        workOnset += 1000*60*60*24;
+                        workOffset += 1000*60*60*24;
+                    }
+                    editor.putLong("workOnset", workOnset);
+                    editor.putLong("workOffset", workOffset);
+                    editor.apply();
+                }
+            } else if (now > workOnset) {
+                if (now <= sleepOnset) {
+                    Log.v("NOW", "NOW IS BIGGER THAN WORK ONSET");
+                    while(now > workOnset){
+                        workOnset += 1000*60*60*24;
+                        workOffset += 1000*60*60*24;
+                    }
+                    editor.putLong("workOnset", workOnset);
+                    editor.putLong("workOffset", workOffset);
+                    editor.apply();
+                } else {
+                    Log.v("NOW", "NOW IS BIGGER THAN WORK ONSET AND ONSET");
+                    while(now > workOnset){
+                        sleepOnset += 1000*60*60*24;
+                        workOnset += 1000*60*60*24;
+                        workOffset += 1000*60*60*24;
+                    }
+                    editor.putLong("sleepOnset", sleepOnset);
+                    editor.putLong("workOnset", workOnset);
+                    editor.putLong("workOffset", workOffset);
+                    editor.apply();
+                }
             }
 
             //sleep result variables

@@ -2,6 +2,7 @@ package com.kael21ce.sleepanalysisandroid;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
@@ -18,7 +19,7 @@ import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
 import com.github.mikephil.charting.utils.MPPointD;
 import com.github.mikephil.charting.utils.MPPointF;
 
-import java.sql.Date;
+import java.util.Date;
 import java.text.SimpleDateFormat;
 
 public class CurrentMarker extends MarkerView {
@@ -27,8 +28,8 @@ public class CurrentMarker extends MarkerView {
     private LinearLayout markerLayout, lowerMarkerLayout, currentDotLayout, intervalLayout;
     private ImageView timeMarker, lowerTimeMarker;
     private TextView intervalTypeText;
-    private String recommendedTime = "00:00";
-    private String inputTime = "00:00";
+    private Date recommendedTime = new Date();
+    private Date inputTime = new Date();
     private float alertnessPhaseChange = 0f;
     private float sleepIntervalTimeFloat = 0f, workIntervalTimeFloat = 0f, lastIntervalTimeFloat = 0f, napIntervalTimeFloat = 0f;
     private Entry currentEntry;
@@ -170,9 +171,11 @@ public class CurrentMarker extends MarkerView {
 
         //Make interval marker move to top of the chart
         boolean inSleep = false, inWork = false, inLast = false, inNap = false;
-        if (currentEntry.getX() > this.sleepIntervalTimeFloat - 0.1f
-                && currentEntry.getX() <= this.sleepIntervalTimeFloat + 0.1f) {
-            inSleep = true;
+        if (!isHardToSleep) {
+            if (currentEntry.getX() > this.sleepIntervalTimeFloat - 0.1f
+                    && currentEntry.getX() <= this.sleepIntervalTimeFloat + 0.1f) {
+                inSleep = true;
+            }
         }
         if (currentEntry.getX() > this.workIntervalTimeFloat - 0.1f
                 && currentEntry.getX() <= this.workIntervalTimeFloat + 0.1f) {
@@ -182,9 +185,11 @@ public class CurrentMarker extends MarkerView {
                 && currentEntry.getX() <= this.lastIntervalTimeFloat + 0.1f) {
             inLast = true;
         }
-        if (currentEntry.getX() > this.napIntervalTimeFloat - 0.1f
-                && currentEntry.getX() <= this.napIntervalTimeFloat + 0.1f) {
-            inNap = true;
+        if (!isHardToNap) {
+            if (currentEntry.getX() > this.napIntervalTimeFloat - 0.1f
+                    && currentEntry.getX() <= this.napIntervalTimeFloat + 0.1f) {
+                inNap = true;
+            }
         }
 
         //Current marker and time marker
@@ -197,7 +202,6 @@ public class CurrentMarker extends MarkerView {
                 && currentEntry.getX() <= this.alertnessPhaseChange + 0.1f) {
             inTime = true;
         }
-
         if (inSleep || inWork || inLast || inNap) {
             offset.y = 0;
             canvas.translate(posX, offset.y);
@@ -227,35 +231,23 @@ public class CurrentMarker extends MarkerView {
 
 
     //Set the recommended time: format should be "hh:mm"
-    public void setRecommendedTime(String time) {
+    public void setRecommendedTime(Date time) {
         this.recommendedTime = time;
     }
     //Set the input time: format should be "hh:mm"
-    public void setInputTime(String time) {
+    public void setInputTime(Date time) {
         this.inputTime = time;
     }
 
     //Compute the x value of time
-    public float timeToX(String time) {
+    public float timeToX(Date time) {
         long now = System.currentTimeMillis();
         Date date = new Date(now);
-        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
-        String currentTime = sdf.format(date);
-        int currentHour = Integer.parseInt(currentTime.substring(0, currentTime.indexOf(":")));
-        int currentMinute = Integer.parseInt(currentTime.substring(currentTime.indexOf(":") + 1));
-        int hour = Integer.parseInt(time.substring(0, currentTime.indexOf(":")));
-        int minute = Integer.parseInt(time.substring(currentTime.indexOf(":") + 1));
-        float currentFloat = currentHour + currentMinute / 60f;
-        float timeFloat = hour + minute / 60f;
-        if (currentFloat < timeFloat) {
-            //Time is in today
-            float delta = timeFloat - currentFloat;
-            return 24f + delta;
-        } else {
-            //Time is in tomorrow
-            float remainedTime = 24f - currentFloat;
-            return 24f + remainedTime + timeFloat;
-        }
+        float delta = (float) time.getTime() - date.getTime();
+        float x = delta/(1000f*60f*60f) + 24f;
+        if (x < 0f) {
+            return 0f;
+        } else return Math.min(x, 48f);
     }
 
     public float pastTimeToX(String time) {
