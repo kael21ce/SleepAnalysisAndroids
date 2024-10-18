@@ -420,6 +420,35 @@ public class HomeFragment extends Fragment {
             barData.addDataSet(lastSet2);
         }
 
+        //BarDataSet 5: Nap Interval
+        long napStart = mainActivity.getNapSleepStart();
+        long napEnd = mainActivity.getNapSleepEnd();
+        String napOnset = sdfTime.format(new Date(napStart));
+        String napOffset = sdfTime.format(new Date(napEnd));
+        float nOnsetF = mv.timeToX(napOnset);
+        float nOffsetF = mv.timeToX(napOffset);
+        float nMidF = (nOnsetF + nOffsetF) / 2f;
+        ArrayList napIntervalEntries1 = new ArrayList<BarEntry>();
+        ArrayList napIntervalEntries2 = new ArrayList<BarEntry>();
+        int[] nBarColors = new int[barEntries.size()];
+        for (int i = 0; i < barEntries.size(); i++) {
+            if (barEntries.get(i).getX() >= nOnsetF && barEntries.get(i).getX() <= nOffsetF) {
+                napIntervalEntries1.add(new BarEntry(barEntries.get(i).getX(), -100f));
+                napIntervalEntries2.add(new BarEntry(barEntries.get(i).getX(), 100f));
+            } else {
+                napIntervalEntries1.add(new BarEntry(barEntries.get(i).getX(), 0f));
+                napIntervalEntries2.add(new BarEntry(barEntries.get(i).getX(), 0f));
+            }
+            nBarColors[i] = ResourcesCompat.getColor(getResources(), R.color.black, null);
+        }
+        BarDataSet napSet1 = new BarDataSet(napIntervalEntries1, "Nap_Interval_1");
+        BarDataSet napSet2 = new BarDataSet(napIntervalEntries2, "Nap_Interval_2");
+        napSet1.setColors(nBarColors, 20);
+        napSet2.setColors(nBarColors, 20);
+
+        barData.addDataSet(napSet1);
+        barData.addDataSet(napSet2);
+
 
         //Set the width of each bar
         barData.setBarWidth(0.2f);
@@ -467,17 +496,24 @@ public class HomeFragment extends Fragment {
 
         //Set MarkerView
         String inputOnset = sdfTime.format(new Date(mainActivity.getSleepOnset()));
-        boolean isHardToSleep;
+        boolean isHardToSleep, isHardToNap;
         if (mainActivity.getMainSleepStart() == mainActivity.getMainSleepEnd()) {
             isHardToSleep = true;
         } else {
             isHardToSleep = false;
         }
+        if (mainActivity.getNapSleepStart() == mainActivity.getNapSleepEnd()) {
+            isHardToNap = true;
+        } else {
+            isHardToNap = false;
+        }
+        Log.v("HomeFragment", String.valueOf(isHardToSleep) + " / " + isHardToNap);
         mv.setRecommendedTime(recommendedOnset);
         mv.setInputTime(inputOnset);
-        mv.setIntervalFloat(rMidF, wMidF, lMidF);
+        mv.setIntervalFloat(rMidF, wMidF, lMidF, nMidF);
         mv.setAlertnessPhaseChange(alertnessPhaseChange);
         mv.setIsHardToSleep(isHardToSleep);
+        mv.setIsHardToNap(isHardToNap);
         mv.setChartView(alertnessChart);
         alertnessChart.setMarker(mv);
         //Set the Highlight
@@ -492,7 +528,8 @@ public class HomeFragment extends Fragment {
                     new Highlight(alertnessPhaseChange, 0, -1),
                     new Highlight(rMidF, 0, -1),
                     new Highlight(wMidF, 0, -1),
-                    new Highlight(lMidF, 0, -1)
+                    new Highlight(lMidF, 0, -1),
+                    new Highlight(nMidF, 0, -1)
             };
             alertnessChart.highlightValues(highlights);
             String originString = floatToTime(alertnessPhaseChange);
@@ -502,7 +539,8 @@ public class HomeFragment extends Fragment {
                     new Highlight(24f, 0, -1),
                     new Highlight(rMidF, 0, -1),
                     new Highlight(wMidF, 0, -1),
-                    new Highlight(lMidF, 0, -1)
+                    new Highlight(lMidF, 0, -1),
+                    new Highlight(nMidF, 0, -1)
             };
             alertnessChart.highlightValues(highlights);
             //Set the time of alertnessText

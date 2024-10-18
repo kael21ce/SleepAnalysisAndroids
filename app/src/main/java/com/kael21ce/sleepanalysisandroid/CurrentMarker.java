@@ -30,11 +30,12 @@ public class CurrentMarker extends MarkerView {
     private String recommendedTime = "00:00";
     private String inputTime = "00:00";
     private float alertnessPhaseChange = 0f;
-    private float sleepIntervalTimeFloat = 0f, workIntervalTimeFloat = 0f, lastIntervalTimeFloat = 0f;
+    private float sleepIntervalTimeFloat = 0f, workIntervalTimeFloat = 0f, lastIntervalTimeFloat = 0f, napIntervalTimeFloat = 0f;
     private Entry currentEntry;
     private BarChart barChart;
     private float currentAlertness = 0;
     private boolean isHardToSleep = false;
+    private boolean isHardToNap = false;
 
     public CurrentMarker(Context context, int layoutResource, BarChart barChart) {
         super(context, layoutResource);
@@ -119,6 +120,18 @@ public class CurrentMarker extends MarkerView {
             intervalLayout.setBackground(ResourcesCompat.getDrawable(getResources(),
                     R.drawable.corner_8_blue_alpha, null));
             intervalTypeText.setText("지난 수면 시간");
+        } else if (e.getX() > this.napIntervalTimeFloat - 0.1f && e.getX() <= this.napIntervalTimeFloat + 0.1f) {
+            view = LayoutInflater.from(context).inflate(R.layout.interval_marker, this, true);
+            intervalLayout = view.findViewById(R.id.IntervalLayout);
+            intervalTypeText = view.findViewById(R.id.intervalTypeText);
+            intervalLayout.setBackground(ResourcesCompat.getDrawable(getResources(),
+                    R.drawable.corner_8_black_alpha, null));
+            intervalTypeText.setText("추천 낮잠 시간");
+            if (isHardToNap) {
+                intervalLayout.setVisibility(GONE);
+            } else {
+                intervalLayout.setVisibility(VISIBLE);
+            }
         }
 
         // this will perform necessary layouting
@@ -156,7 +169,7 @@ public class CurrentMarker extends MarkerView {
         posX -= width / 2.0f;
 
         //Make interval marker move to top of the chart
-        boolean inSleep = false, inWork = false, inLast = false;
+        boolean inSleep = false, inWork = false, inLast = false, inNap = false;
         if (currentEntry.getX() > this.sleepIntervalTimeFloat - 0.1f
                 && currentEntry.getX() <= this.sleepIntervalTimeFloat + 0.1f) {
             inSleep = true;
@@ -168,6 +181,10 @@ public class CurrentMarker extends MarkerView {
         if (currentEntry.getX() > this.lastIntervalTimeFloat - 0.1f
                 && currentEntry.getX() <= this.lastIntervalTimeFloat + 0.1f) {
             inLast = true;
+        }
+        if (currentEntry.getX() > this.napIntervalTimeFloat - 0.1f
+                && currentEntry.getX() <= this.napIntervalTimeFloat + 0.1f) {
+            inNap = true;
         }
 
         //Current marker and time marker
@@ -181,7 +198,7 @@ public class CurrentMarker extends MarkerView {
             inTime = true;
         }
 
-        if (inSleep || inWork || inLast) {
+        if (inSleep || inWork || inLast || inNap) {
             offset.y = 0;
             canvas.translate(posX, offset.y);
             draw(canvas);
@@ -263,15 +280,20 @@ public class CurrentMarker extends MarkerView {
     }
 
     //Set the interval time float
-    public void setIntervalFloat(float sleepF, float workF, float lastF) {
+    public void setIntervalFloat(float sleepF, float workF, float lastF, float lastN) {
         this.sleepIntervalTimeFloat = sleepF;
         this.workIntervalTimeFloat = workF;
         this.lastIntervalTimeFloat = lastF;
+        this.napIntervalTimeFloat = lastN;
     }
 
     //Set whether the recommendation is impossible
     public void setIsHardToSleep(boolean isHardToSleep) {
         this.isHardToSleep = isHardToSleep;
+    }
+
+    public void setIsHardToNap(boolean isHardToNap) {
+        this.isHardToNap = isHardToNap;
     }
 
     //Set alertnessPhaseChange
