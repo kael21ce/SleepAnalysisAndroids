@@ -19,11 +19,13 @@
 
             <ImageButton
                 android:id="@+id/sleepBackButton"
+                style="@style/NoClickEffect"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:backgroundTint="@color/white"
-                android:layout_marginVertical="8dp"
-                android:src="@drawable/chevron_left" />
+                android:padding="8dp"
+                android:src="@drawable/chevron_left"
+                tools:ignore="SpeakableTextPresentCheck" />
 
             <LinearLayout
                 android:id="@+id/sleepTextCaption"
@@ -67,6 +69,7 @@
                 android:id="@+id/whenSleepHour1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginRight="3.5dp"
                 android:layout_weight="1"
                 android:background="@drawable/corner_16_gray"
                 android:ems="10"
@@ -79,12 +82,13 @@
                 android:paddingVertical="18dp"
                 android:textColor="@color/black"
                 android:textSize="32sp"
-                android:layout_marginRight="3.5dp"/>
+                tools:ignore="SpeakableTextPresentCheck" />
 
             <EditText
                 android:id="@+id/whenSleepHour2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="3.5dp"
                 android:layout_weight="1"
                 android:background="@drawable/corner_16_gray"
                 android:ems="10"
@@ -97,7 +101,7 @@
                 android:paddingVertical="18dp"
                 android:textColor="@color/black"
                 android:textSize="32sp"
-                android:layout_marginLeft="3.5dp"/>
+                tools:ignore="SpeakableTextPresentCheck" />
 
             <TextView
                 android:id="@+id/whenSleepHalf"
@@ -114,6 +118,7 @@
                 android:id="@+id/whenSleepMinute1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginRight="3.5dp"
                 android:layout_weight="1"
                 android:background="@drawable/corner_16_gray"
                 android:ems="10"
@@ -126,12 +131,13 @@
                 android:paddingVertical="18dp"
                 android:textColor="@color/black"
                 android:textSize="32sp"
-                android:layout_marginRight="3.5dp"/>
+                tools:ignore="SpeakableTextPresentCheck" />
 
             <EditText
                 android:id="@+id/whenSleepMinute2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="3.5dp"
                 android:layout_weight="1"
                 android:background="@drawable/corner_16_gray"
                 android:ems="10"
@@ -144,7 +150,7 @@
                 android:paddingVertical="18dp"
                 android:textColor="@color/black"
                 android:textSize="32sp"
-                android:layout_marginLeft="3.5dp"/>
+                tools:ignore="SpeakableTextPresentCheck" />
 
         </LinearLayout>
 

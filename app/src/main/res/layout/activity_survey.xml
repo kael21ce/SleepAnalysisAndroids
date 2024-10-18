@@ -15,10 +15,13 @@
 
         <ImageButton
             android:id="@+id/surveyBackButton"
+            style="@style/NoClickEffect"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:backgroundTint="@color/white"
-            android:src="@drawable/chevron_left" />
+            android:padding="8dp"
+            android:src="@drawable/chevron_left"
+            tools:ignore="SpeakableTextPresentCheck" />
 
         <LinearLayout
             android:id="@+id/nextTextCaption"
@@ -95,7 +98,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginRight="2dp"
                 android:layout_weight="1"
-                android:backgroundTint="@color/black" />
+                android:backgroundTint="@color/black"
+                tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck" />
 
             <Button
                 android:id="@+id/seek2"
@@ -103,7 +107,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginRight="2dp"
                 android:layout_weight="1"
-                android:backgroundTint="@color/gray_3" />
+                android:backgroundTint="@color/gray_3"
+                tools:ignore="SpeakableTextPresentCheck" />
 
             <Button
                 android:id="@+id/seek3"
@@ -111,7 +116,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginRight="2dp"
                 android:layout_weight="1"
-                android:backgroundTint="@color/gray_3" />
+                android:backgroundTint="@color/gray_3"
+                tools:ignore="SpeakableTextPresentCheck" />
 
             <Button
                 android:id="@+id/seek4"
@@ -119,7 +125,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginRight="2dp"
                 android:layout_weight="1"
-                android:backgroundTint="@color/gray_3" />
+                android:backgroundTint="@color/gray_3"
+                tools:ignore="SpeakableTextPresentCheck" />
 
             <Button
                 android:id="@+id/seek5"
@@ -127,7 +134,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginRight="2dp"
                 android:layout_weight="1"
-                android:backgroundTint="@color/gray_3" />
+                android:backgroundTint="@color/gray_3"
+                tools:ignore="SpeakableTextPresentCheck" />
 
             <Button
                 android:id="@+id/seek6"
@@ -135,7 +143,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginRight="2dp"
                 android:layout_weight="1"
-                android:backgroundTint="@color/gray_3" />
+                android:backgroundTint="@color/gray_3"
+                tools:ignore="TouchTargetSizeCheck" />
 
             <Button
                 android:id="@+id/seek7"
@@ -143,7 +152,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginRight="2dp"
                 android:layout_weight="1"
-                android:backgroundTint="@color/gray_3" />
+                android:backgroundTint="@color/gray_3"
+                tools:ignore="SpeakableTextPresentCheck" />
 
             <Button
                 android:id="@+id/seek8"
@@ -151,16 +161,18 @@
                 android:layout_height="wrap_content"
                 android:layout_marginRight="2dp"
                 android:layout_weight="1"
-                android:backgroundTint="@color/gray_3" />
+                android:backgroundTint="@color/gray_3"
+                tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck" />
 
             <Button
                 android:id="@+id/seek9"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginRight="2dp"
-                android:text=""
                 android:layout_weight="1"
-                android:backgroundTint="@color/gray_3" />
+                android:backgroundTint="@color/gray_3"
+                android:text=""
+                tools:ignore="SpeakableTextPresentCheck" />
 
             <Button
                 android:id="@+id/seek10"
@@ -168,7 +180,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginRight="2dp"
                 android:layout_weight="1"
-                android:backgroundTint="@color/gray_3" />
+                android:backgroundTint="@color/gray_3"
+                tools:ignore="SpeakableTextPresentCheck" />
 
         </LinearLayout>
     </LinearLayout>

@@ -370,8 +370,8 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/pretendardbold"
-                            android:text="잠을 자기 좋은 시간이에요"
                             android:maxLines="1"
+                            android:text="잠을 자기 좋은 시간이에요"
                             android:textColor="@color/black"
                             android:textSize="20sp" />
 

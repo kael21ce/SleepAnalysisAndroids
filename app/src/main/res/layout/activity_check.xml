@@ -15,11 +15,13 @@
 
         <ImageButton
             android:id="@+id/checkBackButton"
+            style="@style/NoClickEffect"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:backgroundTint="@color/white"
-            android:layout_marginVertical="8dp"
-            android:src="@drawable/chevron_left" />
+            android:padding="8dp"
+            android:src="@drawable/chevron_left"
+            tools:ignore="SpeakableTextPresentCheck" />
     </LinearLayout>
 
     <LinearLayout

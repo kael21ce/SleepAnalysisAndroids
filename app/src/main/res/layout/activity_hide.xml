@@ -14,10 +14,13 @@
 
         <ImageButton
             android:id="@+id/HideBackButton"
+            style="@style/NoClickEffect"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:backgroundTint="@color/white"
-            android:src="@drawable/chevron_left" />
+            android:padding="8dp"
+            android:src="@drawable/chevron_left"
+            tools:ignore="SpeakableTextPresentCheck" />
 
     </LinearLayout>
 
@@ -49,7 +52,8 @@
                 android:contentDescription="PassWord"
                 android:ems="10"
                 android:inputType="textPassword"
-                android:textAlignment="center" />
+                android:textAlignment="center"
+                tools:ignore="EditableContentDescCheck" />
 
             <Button
                 android:id="@+id/HideCheckButton"
