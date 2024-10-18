@@ -64,7 +64,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="16dp"
                     android:fontFamily="@font/pretendardvariable"
-                    android:text="오늘 밤 잠에 들 수 있는 가장 이른 시각을 알려주세요"
+                    android:text="오늘 밤 잠자리에 들 수 있는 가장 이른 시각을 알려주세요"
                     android:textColor="@color/gray_4"
                     android:textSize="12sp" />
 
