@@ -571,6 +571,14 @@ public class MainActivity extends AppCompatActivity {
         v0Dao = db.v0Dao();
         v0s = Collections.synchronizedList(v0Dao.getAll());
 
+        for (V0 v0 : v0s) {
+            Log.v("V0s", String.valueOf(v0));
+        }
+
+        if (lastDataUpdate < now - twoWeeks) {
+            lastDataUpdate = now - twoWeeks;
+        }
+
         //do pcr simulation
         long yesterday = now - (1000*60*60*24);
         Log.v("LAST DATA UPDATE", lastDataUpdate + " " + sdfDateTime.format(new Date(lastDataUpdate)));
@@ -584,8 +592,18 @@ public class MainActivity extends AppCompatActivity {
         long processDuration = (endProcess - startProcess) / fiveMinutesToMil;
         boolean gotInitV0 = false;
         double[] initV0 = {-0.8990, -0.6153, 0.0961, 14.2460};
-        //get init V0
+
+        //Clean entries
         List<V0> deleteV0 = new ArrayList<>();
+        if (sleeps.size() > 1) {
+            for (int i = 1; i < sleeps.size(); i++) {
+                if (sleeps.get(sleeps.size() - i).sleepStart <= sleeps.get(sleeps.size() - i - 1).sleepEnd) {
+                    deleteV0.add(v0s.get(i));
+                }
+            }
+        }
+
+        //get init V0
         for(V0 v0: v0s){
 //            Log.v("V0", "H: "+ v0.H_val + ", n: " + v0.n_val + ", y: "+v0.y_val + ", x: " + v0.x_val);
             if(v0.time >= startProcess){
@@ -644,7 +662,7 @@ public class MainActivity extends AppCompatActivity {
             v0.y_val = res[1];
             v0.n_val = res[2];
             v0.H_val = res[3];
-            v0.time = startProcess + (i*fiveMinutesToMil);
+            v0.time = startProcess + (Long) (i + Math.max(0, (int) endProcess-startProcess/fiveMinutesToMil + 1))*fiveMinutesToMil;
             Log.v("VO TIME", i*5 + " " + getAwarenessValue(res[3], res[2], res[1], res[0]));
             newV0.add(v0);
             v0s.add(v0);
