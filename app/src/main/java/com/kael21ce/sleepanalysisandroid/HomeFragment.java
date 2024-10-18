@@ -36,6 +36,8 @@ import com.github.mikephil.charting.highlight.Highlight;
 import com.kael21ce.sleepanalysisandroid.data.Awareness;
 import com.kael21ce.sleepanalysisandroid.data.Sleep;
 
+import org.w3c.dom.Text;
+
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -111,9 +113,10 @@ public class HomeFragment extends Fragment {
         SharedPreferences.Editor editor = sharedPref.edit();
         String user_name = sharedPref.getString("User_Name", "UserName");
 
-        //No data
+        //No onset, offset schedule data
         LinearLayout homeNoDataView = v.findViewById(R.id.homeNoDataView);
         ImageButton toRecommendButton = v.findViewById(R.id.toRecommendButton);
+        TextView homeNoDataDescription = v.findViewById(R.id.homeNoDataDescription);
         ImageView no_data = v.findViewById(R.id.no_data_home);
         Glide.with(v.getContext()).load(R.raw.no_data).into(no_data);
 
@@ -123,31 +126,60 @@ public class HomeFragment extends Fragment {
             mainActivity.setBottomNaviItem(R.id.tabRecommend);
         });
 
+        //No sleep data
+        LinearLayout alertnessNoDataView = v.findViewById(R.id.alertnessNoDataView);
+        ImageButton toScheduleButton = v.findViewById(R.id.alertnessToScheduleButton);
+        ImageView no_data_alertness = v.findViewById(R.id.no_data_alertness);
+        Glide.with(v.getContext()).load(R.raw.no_data).into(no_data_alertness);
+
+        toScheduleButton.setOnClickListener(view -> {
+            ScheduleFragment scheduleFragment = new ScheduleFragment();
+            getParentFragmentManager().beginTransaction().replace(R.id.mainFrame, scheduleFragment).commit();
+            mainActivity.setBottomNaviItem(R.id.tabSchedule);
+        });
+
         //Check whether recommendation is hidden
         if (!sharedPref.contains("isHidden")) {
             editor.putBoolean("isHidden", true).apply();
         }
         boolean isHidden = false;
 
+        List<Sleep> sleeps = mainActivity.getSleeps();
+
         if (sharedPref.contains("sleepOnset") && sharedPref.contains("workOnset") && sharedPref.contains("workOffset")) {
-            if (!isHidden) {
-                homeNoDataView.setVisibility(View.GONE);
-                SurveyUpperView.setVisibility(View.VISIBLE);
-                RecommendHomeView.setVisibility(View.VISIBLE);
-                AlertnessHomeView.setVisibility(View.VISIBLE);
-                ChartHomeView.setVisibility(View.VISIBLE);
-                SleepChartHomeView.setVisibility(View.VISIBLE);
+            if (sleeps != null && sleeps.size() > 0) {
+                if (!isHidden) {
+                    homeNoDataView.setVisibility(View.GONE);
+                    SurveyUpperView.setVisibility(View.VISIBLE);
+                    alertnessNoDataView.setVisibility(View.GONE);
+                    RecommendHomeView.setVisibility(View.VISIBLE);
+                    AlertnessHomeView.setVisibility(View.VISIBLE);
+                    ChartHomeView.setVisibility(View.VISIBLE);
+                    SleepChartHomeView.setVisibility(View.VISIBLE);
+                } else {
+                    homeNoDataView.setVisibility(View.GONE);
+                    SurveyUpperView.setVisibility(View.VISIBLE);
+                    alertnessNoDataView.setVisibility(View.GONE);
+                    RecommendHomeView.setVisibility(View.GONE);
+                    AlertnessHomeView.setVisibility(View.GONE);
+                    ChartHomeView.setVisibility(View.GONE);
+                    SleepChartHomeView.setVisibility(View.GONE);
+                }
             } else {
-                homeNoDataView.setVisibility(View.GONE);
-                SurveyUpperView.setVisibility(View.VISIBLE);
+                homeNoDataView.setVisibility(View.VISIBLE);
+                alertnessNoDataView.setVisibility(View.VISIBLE);
                 RecommendHomeView.setVisibility(View.GONE);
                 AlertnessHomeView.setVisibility(View.GONE);
                 ChartHomeView.setVisibility(View.GONE);
                 SleepChartHomeView.setVisibility(View.GONE);
+
+                //Change text in homeNoDataView
+                homeNoDataDescription.setText("수면 기록을 추가해보세요");
             }
         } else {
             homeNoDataView.setVisibility(View.VISIBLE);
             SurveyUpperView.setVisibility(View.VISIBLE);
+            alertnessNoDataView.setVisibility(View.GONE);
             RecommendHomeView.setVisibility(View.GONE);
             AlertnessHomeView.setVisibility(View.GONE);
             ChartHomeView.setVisibility(View.GONE);
@@ -345,7 +377,7 @@ public class HomeFragment extends Fragment {
         BarData barData = new BarData(barDataSet, sleepSet1, sleepSet2, workSet1, workSet2);
 
         //BarDataSet 4: Last sleep interval
-        List<Sleep> sleeps = mainActivity.getSleeps();
+        sleeps = mainActivity.getSleeps();
         float alertnessPhaseChange = 49f;
         boolean calculateMore = true;
         float lMidF = 0f;
