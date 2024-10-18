@@ -32,17 +32,17 @@ public class InfoActivity extends AppCompatActivity {
         MainActivity mainActivity = new MainActivity();
 
         if (location == 0) {
-            guidelineImage.setImageDrawable(getDrawable(R.drawable.guideline0));
+            guidelineImage.setImageDrawable(getDrawable(R.drawable.guide_suggestion));
         } else if (location == 1) {
-            guidelineImage.setImageDrawable(getDrawable(R.drawable.guideline1));
+            guidelineImage.setImageDrawable(getDrawable(R.drawable.guide_graph));
         } else if (location == 2) {
-            guidelineImage.setImageDrawable(getDrawable(R.drawable.guideline2));
+            guidelineImage.setImageDrawable(getDrawable(R.drawable.guide_wake));
         } else if (location == 3) {
-            guidelineImage.setImageDrawable(getDrawable(R.drawable.guideline3));
+            guidelineImage.setImageDrawable(getDrawable(R.drawable.guide_sleep));
         } else if (location == 4) {
-            guidelineImage.setImageDrawable(getDrawable(R.drawable.guideline4));
+            guidelineImage.setImageDrawable(getDrawable(R.drawable.guide_data));
         } else {
-            guidelineImage.setImageDrawable(getDrawable(R.drawable.guideline5));
+            guidelineImage.setImageDrawable(getDrawable(R.drawable.guide_schedule));
         }
 
 
