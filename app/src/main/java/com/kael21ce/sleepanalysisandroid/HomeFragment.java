@@ -202,6 +202,11 @@ public class HomeFragment extends Fragment {
         sleepButton.setBackground(ResourcesCompat
                 .getDrawable(getResources(), R.drawable.corner_8_clicked, null));
 
+        //Make the state scrollable horizontally
+        stateDescriptionText.setMovementMethod(new ScrollingMovementMethod());
+        stateDescriptionText.setHorizontallyScrolling(true);
+        stateDescriptionText.setSelected(true);
+
         sleepButton.setOnClickListener(v1 -> sleepButtonClick(v1, mainActivity, startTime, endTime,
                 sleepButton, napButton, workButton, sleepTypeText, sleepImportanceText, stateDescriptionText,
                 stateDescriptionSmallText, stateDescriptionImage, clockView));
