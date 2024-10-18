@@ -511,7 +511,7 @@ public class HomeFragment extends Fragment {
         }
         //Change the description depending on current alertness
         if (barEntries.size() > 0) {
-            float currentAlertness = barEntries.get(288).getY();
+            float currentAlertness = barEntries.get((int) barEntries.size()/2).getY();
             if (currentAlertness >= 0) {
                 alertnessTitle.setText("집중하기 좋은 상태에요");
                 alertnessDescription.setText(user_name + "님의 각성도가 높아요");
