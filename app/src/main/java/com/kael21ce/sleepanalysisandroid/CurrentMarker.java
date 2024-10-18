@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -24,7 +25,7 @@ public class CurrentMarker extends MarkerView {
     private Context context;
     private TextView tvContent;
     private LinearLayout markerLayout, lowerMarkerLayout, currentDotLayout, intervalLayout;
-    private LinearLayout timeMarkerLayout, lowerTimeMarkerLayout;
+    private ImageView timeMarker, lowerTimeMarker;
     private TextView intervalTypeText;
     private String recommendedTime = "00:00";
     private String inputTime = "00:00";
@@ -83,14 +84,14 @@ public class CurrentMarker extends MarkerView {
                 && e.getX() <= this.alertnessPhaseChange + 0.1f
                 && highlight.getX() == this.alertnessPhaseChange) {
             view = LayoutInflater.from(context).inflate(R.layout.time_marker, this, true);
-            timeMarkerLayout = view.findViewById(R.id.TimeMarkerLayout);
-            lowerTimeMarkerLayout = view.findViewById(R.id.LowerTimeMarkerLayout);
+            timeMarker = view.findViewById(R.id.TimeMarker);
+            lowerTimeMarker = view.findViewById(R.id.LowerTimeMarker);
             if (this.currentAlertness >= 0) {
-                timeMarkerLayout.setVisibility(GONE);
-                lowerTimeMarkerLayout.setVisibility(VISIBLE);
+                timeMarker.setVisibility(GONE);
+                lowerTimeMarker.setVisibility(VISIBLE);
             } else {
-                timeMarkerLayout.setVisibility(VISIBLE);
-                lowerTimeMarkerLayout.setVisibility(GONE);
+                timeMarker.setVisibility(VISIBLE);
+                lowerTimeMarker.setVisibility(GONE);
             }
         } else if (e.getX() > this.sleepIntervalTimeFloat - 0.1f && e.getX() <= this.sleepIntervalTimeFloat + 0.1f) {
             view = LayoutInflater.from(context).inflate(R.layout.interval_marker, this, true);

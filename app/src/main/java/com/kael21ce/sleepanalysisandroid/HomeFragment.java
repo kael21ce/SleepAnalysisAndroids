@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -445,6 +446,9 @@ public class HomeFragment extends Fragment {
         //Set the Highlight
         //If the recommended onset and input onset exhibits little difference,
         //only display the recommended onset
+        AlertnessText.setMovementMethod(new ScrollingMovementMethod());
+        AlertnessText.setHorizontallyScrolling(true);
+        AlertnessText.setSelected(true);
         if (alertnessPhaseChange != 49f) {
             Highlight[] highlights = new Highlight[] {
                     new Highlight(24f, 0, -1),
@@ -455,7 +459,7 @@ public class HomeFragment extends Fragment {
             };
             alertnessChart.highlightValues(highlights);
             String originString = floatToTime(alertnessPhaseChange);
-            AlertnessText.setText("오늘의 권장 취침 시각은 " + originString + " 입니다");
+            AlertnessText.setText(originString + " 이전에는 잠자리에 들기 어려울 수 있어요");
         } else {
             Highlight[] highlights = new Highlight[] {
                     new Highlight(24f, 0, -1),
@@ -466,7 +470,7 @@ public class HomeFragment extends Fragment {
             alertnessChart.highlightValues(highlights);
             //Set the time of alertnessText
             String originString = sdfDateTimeRecomm.format(new Date(mainActivity.getMainSleepStart()));
-            AlertnessText.setText("오늘의 권장 취침 시각은 " + originString + " 입니다");
+            AlertnessText.setText(originString + " 이전에는 잠자리에 들기 어려울 수 있어요");
         }
         //Change the description depending on current alertness
         if (barEntries.size() > 0) {
