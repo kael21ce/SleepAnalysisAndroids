@@ -496,16 +496,21 @@ public class HomeFragment extends Fragment {
 
         //Set MarkerView
         Date inputOnset = new Date(mainActivity.getSleepOnset());
-        boolean isHardToSleep, isHardToNap;
-        if (mainActivity.getMainSleepStart() == mainActivity.getMainSleepEnd()) {
+        boolean isHardToSleep, isHardToNap, isHardToWork;
+        if (mainActivity.getMainSleepStart() == mainActivity.getMainSleepEnd() || rOnsetF == 48f) {
             isHardToSleep = true;
         } else {
             isHardToSleep = false;
         }
-        if (mainActivity.getNapSleepStart() == mainActivity.getNapSleepEnd()) {
+        if (mainActivity.getNapSleepStart() == mainActivity.getNapSleepEnd() || nOnsetF == 48f) {
             isHardToNap = true;
         } else {
             isHardToNap = false;
+        }
+        if (wOnsetF == 48f) {
+            isHardToWork = true;
+        } else {
+            isHardToWork = false;
         }
         mv.setRecommendedTime(recommendedOnset);
         mv.setInputTime(inputOnset);
@@ -513,6 +518,7 @@ public class HomeFragment extends Fragment {
         mv.setAlertnessPhaseChange(alertnessPhaseChange);
         mv.setIsHardToSleep(isHardToSleep);
         mv.setIsHardToNap(isHardToNap);
+        mv.setIsHardToWork(isHardToWork);
         mv.setChartView(alertnessChart);
         alertnessChart.setMarker(mv);
         //Set the Highlight

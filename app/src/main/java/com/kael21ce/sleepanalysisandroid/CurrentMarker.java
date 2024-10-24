@@ -37,6 +37,7 @@ public class CurrentMarker extends MarkerView {
     private float currentAlertness = 0;
     private boolean isHardToSleep = false;
     private boolean isHardToNap = false;
+    private boolean isHardToWork = false;
 
     public CurrentMarker(Context context, int layoutResource, BarChart barChart) {
         super(context, layoutResource);
@@ -114,6 +115,11 @@ public class CurrentMarker extends MarkerView {
             intervalLayout.setBackground(ResourcesCompat.getDrawable(getResources(),
                     R.drawable.corner_8_yellow_alpha, null));
             intervalTypeText.setText("근무 시간");
+            if (isHardToWork) {
+                intervalLayout.setVisibility(GONE);
+            } else {
+                intervalLayout.setVisibility(VISIBLE);
+            }
         } else if (e.getX() > this.lastIntervalTimeFloat - 0.1f && e.getX() <= this.lastIntervalTimeFloat + 0.1f) {
             view = LayoutInflater.from(context).inflate(R.layout.interval_marker, this, true);
             intervalLayout = view.findViewById(R.id.IntervalLayout);
@@ -286,6 +292,9 @@ public class CurrentMarker extends MarkerView {
 
     public void setIsHardToNap(boolean isHardToNap) {
         this.isHardToNap = isHardToNap;
+    }
+    public void setIsHardToWork(boolean isHardToWork) {
+        this.isHardToWork = isHardToWork;
     }
 
     //Set alertnessPhaseChange
