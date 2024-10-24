@@ -419,6 +419,7 @@ public class HomeFragment extends Fragment {
             barData.addDataSet(lastSet1);
             barData.addDataSet(lastSet2);
         }
+        Log.v("HomeFragment", "AlertnessPhaseChange: " + alertnessPhaseChange);
 
         //BarDataSet 5: Nap Interval
         long napStart = mainActivity.getNapSleepStart();
@@ -538,7 +539,11 @@ public class HomeFragment extends Fragment {
             };
             alertnessChart.highlightValues(highlights);
             String originString = floatToTime(alertnessPhaseChange);
-            AlertnessText.setText(originString + " 이전에는 잠자리에 들기 어려울 수 있어요");
+            if (Math.abs(alertnessPhaseChange - 24f) < 6f/60f) {
+                AlertnessText.setText("지금도 충분히 잠에 들 수 있어요");
+            } else {
+                AlertnessText.setText(originString + " 이전에는 잠에 들기 어려울 수 있어요");
+            }
         } else {
             Highlight[] highlights = new Highlight[] {
                     new Highlight(24f, 0, -1),
@@ -550,7 +555,7 @@ public class HomeFragment extends Fragment {
             alertnessChart.highlightValues(highlights);
             //Set the time of alertnessText
             String originString = sdfDateTimeRecomm.format(new Date(mainActivity.getMainSleepStart()));
-            AlertnessText.setText(originString + " 이전에는 잠자리에 들기 어려울 수 있어요");
+            AlertnessText.setText("지금도 충분히 잠에 들 수 있어요");
         }
         //Change the description depending on current alertness
         if (barEntries.size() > 0) {
