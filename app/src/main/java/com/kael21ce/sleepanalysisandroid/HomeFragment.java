@@ -419,7 +419,6 @@ public class HomeFragment extends Fragment {
             barData.addDataSet(lastSet1);
             barData.addDataSet(lastSet2);
         }
-        Log.v("HomeFragment", "AlertnessPhaseChange: " + alertnessPhaseChange);
 
         //BarDataSet 5: Nap Interval
         long napStart = mainActivity.getNapSleepStart();
@@ -835,8 +834,8 @@ public class HomeFragment extends Fragment {
                 stateDescriptionImage.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.sleep, null));
             } else {
                 if (isearly) {
-                    stateDescriptionText.setText("근무 전까지 최대한 많이 자야해요");
-                    stateDescriptionSmallText.setText("내일 근무 시간에 피곤할 수 있어요");
+                    stateDescriptionText.setText("오늘의 추천 밤잠 일정이에요");
+                    stateDescriptionSmallText.setText("다만 충분히 자도 근무 중에 피곤할 수 있어요");
                     stateDescriptionImage.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.puke, null));
                 } else {
                     stateDescriptionText.setText("근무 전까지 최대한 많이 자야해요");
