@@ -361,7 +361,14 @@ public class SleepModel {
         result[3] = work_onset - buffer; // just in case of numerical error, add 30 min sleep
 
         if (result[2] - result[1] < buffer) {
-            result[1] = result[1] + result[3] - result[2];
+            if (result[1] == result[0]){
+                result[2] = result[0];
+                result[3] = result[1] + result[3] - result[2];
+            }else{
+                result[1] = result[1] + result[3] - result[2];
+                result[2] = 0;
+                result[3] = 0;
+            }
 
             sleep_pattern1 = new double[work_offset - CSS_end + 1];
 
