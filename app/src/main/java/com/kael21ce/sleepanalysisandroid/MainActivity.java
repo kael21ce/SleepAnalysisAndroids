@@ -1062,7 +1062,7 @@ public class MainActivity extends AppCompatActivity {
                 .build();
 
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("https://sleep-math.com/sleepapp/")
+                .baseUrl("https://sleep-math.com/sleepapp/android/")
                 // as we are sending data in json format so
                 // we have to add Gson converter factory
                 .addConverterFactory(GsonConverterFactory.create())
@@ -1089,7 +1089,8 @@ public class MainActivity extends AppCompatActivity {
                     Toast.LENGTH_SHORT).show();
         }
 
-        DataModal modal = new DataModal(username, tempSleep, tempV0);
+        //DataModal modal = new DataModal(username, tempSleep, tempV0);
+        DataModal modal = new DataModal(username, tempSleep);
         Call<DataModal> call = retrofitAPI.createPost(modal);
         call.enqueue(new Callback<DataModal>() {
             @Override
