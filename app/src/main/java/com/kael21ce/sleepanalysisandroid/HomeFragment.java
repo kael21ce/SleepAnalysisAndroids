@@ -65,6 +65,8 @@ public class HomeFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_home, container, false);
         MainActivity mainActivity = (MainActivity)getActivity();
 
+        List<Sleep> sleeps = mainActivity.getSleeps();
+
         //Survey Caption
         LinearLayout SurveyUpperView = v.findViewById(R.id.SurveyUpperView);
         TextView surveyDescription = v.findViewById(R.id.surveyDescription);
@@ -120,11 +122,19 @@ public class HomeFragment extends Fragment {
         ImageView no_data = v.findViewById(R.id.no_data_home);
         Glide.with(v.getContext()).load(R.raw.no_data).into(no_data);
 
-        toRecommendButton.setOnClickListener(view -> {
-            RecommendFragment recommendFragment = new RecommendFragment();
-            getParentFragmentManager().beginTransaction().replace(R.id.mainFrame, recommendFragment).commit();
-            mainActivity.setBottomNaviItem(R.id.tabRecommend);
-        });
+        if (sleeps != null && sleeps.size() > 0) {
+            toRecommendButton.setOnClickListener(view -> {
+                RecommendFragment recommendFragment = new RecommendFragment();
+                getParentFragmentManager().beginTransaction().replace(R.id.mainFrame, recommendFragment).commit();
+                mainActivity.setBottomNaviItem(R.id.tabRecommend);
+            });
+        } else {
+            toRecommendButton.setOnClickListener(view -> {
+                ScheduleFragment scheduleFragment = new ScheduleFragment();
+                getParentFragmentManager().beginTransaction().replace(R.id.mainFrame, scheduleFragment).commit();
+                mainActivity.setBottomNaviItem(R.id.tabSchedule);
+            });
+        }
 
         //No sleep data
         LinearLayout alertnessNoDataView = v.findViewById(R.id.alertnessNoDataView);
@@ -143,8 +153,6 @@ public class HomeFragment extends Fragment {
             editor.putBoolean("isHidden", true).apply();
         }
         boolean isHidden = false;
-
-        List<Sleep> sleeps = mainActivity.getSleeps();
 
         if (sharedPref.contains("sleepOnset") && sharedPref.contains("workOnset") && sharedPref.contains("workOffset")) {
             if (sleeps != null && sleeps.size() > 0) {
