@@ -289,7 +289,7 @@ public class SQMoodSendingActivity extends AppCompatActivity {
             fifthContent.setText("매우 좋지 않음");
             sQMoodButton.setOnClickListener(view -> {
                 moodData.putInt("sleep_quality", position);
-                Intent endIntent = new Intent(this, SurveyActivity.class);
+                Intent endIntent = new Intent(this, LatencyActivity.class);
 //                endIntent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                 endIntent.putExtra("firstDone", 1);
                 endIntent.putExtra("moodData", moodData);

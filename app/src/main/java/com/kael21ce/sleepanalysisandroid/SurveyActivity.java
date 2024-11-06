@@ -152,7 +152,9 @@ public class SurveyActivity extends AppCompatActivity {
                 Intent endIntent = new Intent(SurveyActivity.this, SplashActivity.class);
                 endIntent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                 Bundle moodData = sentIntent.getBundleExtra("moodData");
-                sendMood(moodData.getInt("sleep_quality"), moodData.getInt("mood_high"), moodData.getInt("mood_low"), moodData.getInt("mood_anx"), moodData.getInt("mood_irr"));
+                sendMood(moodData.getInt("sleep_quality"), moodData.getInt("mood_high"),
+                        moodData.getInt("mood_low"), moodData.getInt("mood_anx"),
+                        moodData.getInt("mood_irr"), moodData.getInt("latency"));
                 editor.putInt(survey_key, day).apply();
                 //Need to add level to dataset
                 startActivity(endIntent);
@@ -254,14 +256,14 @@ public class SurveyActivity extends AppCompatActivity {
         });
     }
 
-    private void sendMood(Integer sleep_quality, Integer mood_high, Integer mood_low, Integer mood_anx, Integer mood_irr) {
+    private void sendMood(Integer sleep_quality, Integer mood_high, Integer mood_low, Integer mood_anx, Integer mood_irr, Integer latency) {
         OkHttpClient client = new OkHttpClient.Builder()
                 .connectTimeout(20, TimeUnit.SECONDS)
                 .writeTimeout(20, TimeUnit.SECONDS)
                 .readTimeout(20, TimeUnit.SECONDS)
                 .build();
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("https://sleep-math.com/sleepapp/")
+                .baseUrl("https://www.sleep-math.com/sleepapp/daily_survey/")
                 // as we are sending data in json format so
                 // we have to add Gson converter factory
                 .addConverterFactory(GsonConverterFactory.create())
@@ -273,16 +275,27 @@ public class SurveyActivity extends AppCompatActivity {
         String username = sharedPref.getString("User_Name", "tester33");
         long time = System.currentTimeMillis();
 
-        DataMood mood = new DataMood(username,getLevel2(), sleep_quality, mood_high, mood_low, mood_anx, mood_irr, time);
+        Locale currentLocale = Locale.getDefault();
+        String language = currentLocale.getLanguage();
+
+        DataMood mood = new DataMood(username,getLevel2(), sleep_quality, mood_high, mood_low, mood_anx, mood_irr, time, latency);
         Call<DataMood> call = retrofitAPI.createMood(mood);
         call.enqueue(new Callback<DataMood>() {
             @Override
             public void onResponse(Call<DataMood> call, Response<DataMood> response) {
                 // this method is called when we get response from our api.
                 if (response.code() <= 300) {
-                    Toast.makeText(SurveyActivity.this, "Data added to API", Toast.LENGTH_SHORT).show();
+                    if (language.equals("ko")) {
+                        Toast.makeText(SurveyActivity.this, "설문이 전송되었습니다", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(SurveyActivity.this, "Survey added to API", Toast.LENGTH_SHORT).show();
+                    }
                 } else {
-                    Toast.makeText(SurveyActivity.this, "Data sending failed", Toast.LENGTH_SHORT).show();
+                    if (language.equals("ko")) {
+                        Toast.makeText(SurveyActivity.this, "설문 전송에 실패했습니다", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(SurveyActivity.this, "Survey sending failed", Toast.LENGTH_SHORT).show();
+                    }
                     // we are getting response from our body
                     // and passing it to our modal class.
                     DataMood responseFromAPI = response.body();

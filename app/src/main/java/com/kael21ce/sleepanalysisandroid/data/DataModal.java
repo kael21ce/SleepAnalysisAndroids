@@ -13,7 +13,7 @@ public class DataModal {
     public DataModal(String username, List<Sleep> sleeps) {
         this.user = username;
         sleep = new ArrayList<>();
-        v0 = new ArrayList<>();
+        //v0 = new ArrayList<>();
         for(Sleep sleep: sleeps){
             SleepBackend tempSleep = new SleepBackend();
             tempSleep.sleepStart = sleep.sleepStart;

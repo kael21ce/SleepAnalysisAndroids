@@ -1062,7 +1062,7 @@ public class MainActivity extends AppCompatActivity {
                 .build();
 
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("https://sleep-math.com/sleepapp/android/")
+                .baseUrl("https://www.sleep-math.com/sleepapp/android/")
                 // as we are sending data in json format so
                 // we have to add Gson converter factory
                 .addConverterFactory(GsonConverterFactory.create())
@@ -1098,6 +1098,7 @@ public class MainActivity extends AppCompatActivity {
                 // this method is called when we get response from our api.
                 Locale currentLocale = Locale.getDefault();
                 String language = currentLocale.getLanguage();
+                Log.v("MainActivity", "Response code: " + response.code());
                 if(response.code() <= 300) {
                     if (language.equals("ko")) {
                         Toast.makeText(MainActivity.this, "데이터가 전송되었습니다", Toast.LENGTH_SHORT).show();
