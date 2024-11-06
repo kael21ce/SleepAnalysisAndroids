@@ -28,6 +28,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class CheckActivity extends AppCompatActivity {
 
     String user_email;
+    String user_password;
     String user_name;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,28 +45,48 @@ public class CheckActivity extends AppCompatActivity {
         checkButton.setEnabled(false);
         checkButton.setBackgroundColor(getResources().getColor(R.color.blue_2, null));
         EditText emailText = findViewById(R.id.emailText);
-        emailText.addTextChangedListener(new TextWatcher() {
+        EditText passwordText = findViewById(R.id.passwordText);
+
+        //Enable checkButton if email and password are valid
+        TextWatcher textWatcher = new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
             @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                boolean validEmail = isValidEmail(emailText);
+                String email = emailText.getText().toString().trim();
+
+                String password = passwordText.getText().toString().trim();
                 //If text is put, change the color of text
                 if (!emailText.getText().toString().isEmpty()) {
                     emailText.setTextColor(getResources().getColor(R.color.black, null));
                 } else {
                     emailText.setTextColor(getResources().getColor(R.color.gray_4, null));
                 }
-                //Check validity of text
-                if (isValidEmail(emailText)) {
+                //If text is put, change the color of text
+                if (!passwordText.getText().toString().isEmpty()) {
+                    passwordText.setTextColor(getResources().getColor(R.color.black, null));
+                } else {
+                    passwordText.setTextColor(getResources().getColor(R.color.gray_4, null));
+                }
+
+                if (validEmail && !email.isEmpty() && !password.isEmpty()) {
                     checkButton.setEnabled(true);
                     checkButton.setBackgroundColor(getResources().getColor(R.color.blue_1, null));
+                } else {
+                    checkButton.setEnabled(false);
+                    checkButton.setBackgroundColor(getResources().getColor(R.color.blue_2, null));
                 }
+
             }
 
             @Override
-            public void afterTextChanged(Editable editable) {}
-        });
+            public void afterTextChanged(Editable s) {}
+        };
+
+        emailText.addTextChangedListener(textWatcher);
+        passwordText.addTextChangedListener(textWatcher);
 
         //Move to StartActivity if checkButton is clicked
         checkButton.setOnClickListener(view -> {
