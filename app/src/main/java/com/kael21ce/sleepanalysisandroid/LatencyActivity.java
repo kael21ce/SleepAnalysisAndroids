@@ -21,11 +21,17 @@ public class LatencyActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_latency);
 
+        //Hide action bar
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().hide();
+        }
+
         EditText latencyMinutes = findViewById(R.id.latencyMinutes);
         Button latencyButton = findViewById(R.id.latencyButton);
 
         //Turn off the latencyButton if there is no input
         latencyButton.setEnabled(false);
+        latencyButton.setBackgroundColor(getResources().getColor(R.color.blue_2, null));
 
         //Get mood data from SQMoodSendingActivity
         Intent sentIntent = getIntent();
@@ -41,8 +47,10 @@ public class LatencyActivity extends AppCompatActivity {
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if (latencyMinutes.getText().toString().isEmpty()) {
                     latencyButton.setEnabled(false);
+                    latencyButton.setBackgroundColor(getResources().getColor(R.color.blue_2, null));
                 } else {
                     latencyButton.setEnabled(true);
+                    latencyButton.setBackgroundColor(getResources().getColor(R.color.blue_1, null));
                     latency = Integer.parseInt(latencyMinutes.getText().toString());
 
                     latencyButton.setOnClickListener(v -> {
