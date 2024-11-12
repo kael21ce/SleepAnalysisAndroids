@@ -36,6 +36,7 @@ public class LatencyActivity extends AppCompatActivity {
         //Get mood data from SQMoodSendingActivity
         Intent sentIntent = getIntent();
         Bundle moodData = sentIntent.getBundleExtra("moodData");
+        int firstDone = sentIntent.getIntExtra("firstDone", 1);
         Intent endIntent = new Intent(this, SurveyActivity.class);
 
 
@@ -57,6 +58,7 @@ public class LatencyActivity extends AppCompatActivity {
                         assert moodData != null;
                         moodData.putInt("latency", latency);
                         endIntent.putExtra("moodData", moodData);
+                        endIntent.putExtra("firstDone", 1);
                         startActivity(endIntent);
                     });
                 }
