@@ -45,6 +45,9 @@ public class SurveyActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_survey);
 
+        MainActivity mainActivity = new MainActivity();
+        mainActivity.surveyList().add(this);
+
         //Hide action bar
         if (getSupportActionBar() != null) {
             getSupportActionBar().hide();
@@ -142,6 +145,9 @@ public class SurveyActivity extends AppCompatActivity {
                 nextIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 sendSurvey();
                 startActivity(nextIntent);
+                for (int i = 0; i < mainActivity.surveyList().size(); i++) {
+                    mainActivity.surveyList().get(i).finish();
+                }
             });
         }else{
             endSurveyButton.setOnClickListener(view -> {
@@ -158,6 +164,9 @@ public class SurveyActivity extends AppCompatActivity {
                 editor.putInt(survey_key, day).apply();
                 //Need to add level to dataset
                 startActivity(endIntent);
+                for (int i = 0; i < mainActivity.surveyList().size(); i++) {
+                    mainActivity.surveyList().get(i).finish();
+                }
             });
         }
     }

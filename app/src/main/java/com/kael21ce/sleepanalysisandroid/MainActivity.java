@@ -3,6 +3,7 @@ package com.kael21ce.sleepanalysisandroid;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
@@ -118,6 +119,10 @@ public class MainActivity extends AppCompatActivity {
     private static final String survey_name = "SurveyType";
     private static final String survey_key = "SQMood";
     private SharedPreferences.OnSharedPreferenceChangeListener prefListener;
+    public static ArrayList<Activity> surveyList = new ArrayList<>();
+    public ArrayList<Activity> surveyList() {
+        return surveyList;
+    }
 
     @SuppressLint("NonConstantResourceId")
     @Override
@@ -361,17 +366,19 @@ public class MainActivity extends AppCompatActivity {
         }
 
         prefListener = (sharedPref, key) -> {
-            if (key.equals("isNotifyOn")) {
-                sendNotification(sharedPref);
-                Log.v(TAG, "SharedPreference listener is called 1");
-            }
-            if (key.equals(NotifyKey)) {
-                sendNotification(sharedPref);
-                Log.v(TAG, "SharedPreference listener is called 2");
-            }
-            if (key.equals("sleepOnset") || key.equals("workOnset") || key.equals("workOffset")) {
-                sendNotification(sharedPref);
-                Log.v(TAG, "SharedPreference listener is called 3");
+            if (key != null) {
+                if (key.equals("isNotifyOn")) {
+                    sendNotification(sharedPref);
+                    Log.v(TAG, "SharedPreference listener is called 1");
+                }
+                if (key.equals(NotifyKey)) {
+                    sendNotification(sharedPref);
+                    Log.v(TAG, "SharedPreference listener is called 2");
+                }
+                if (key.equals("sleepOnset") || key.equals("workOnset") || key.equals("workOffset")) {
+                    sendNotification(sharedPref);
+                    Log.v(TAG, "SharedPreference listener is called 3");
+                }
             }
         };
         sharedPref.registerOnSharedPreferenceChangeListener(prefListener);
@@ -669,7 +676,10 @@ public class MainActivity extends AppCompatActivity {
         if (sleeps.size() > 1) {
             for (int i = 1; i < sleeps.size(); i++) {
                 if (sleeps.get(sleeps.size() - i).sleepStart <= sleeps.get(sleeps.size() - i - 1).sleepEnd) {
-                    deleteV0.add(v0s.get(i));
+                    // Fix later
+                    if (v0s.size() >= sleeps.size()) {
+                        deleteV0.add(v0s.get(i));
+                    }
                 }
             }
         }

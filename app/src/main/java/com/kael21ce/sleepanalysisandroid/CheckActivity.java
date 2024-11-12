@@ -92,6 +92,7 @@ public class CheckActivity extends AppCompatActivity {
         checkButton.setOnClickListener(view -> {
             user_email = emailText.getText().toString();
             user_name = user_email.substring(0, user_email.indexOf("@"));
+            user_password = passwordText.getText().toString();
             sendUser();
         });
 
@@ -131,7 +132,7 @@ public class CheckActivity extends AppCompatActivity {
                 .build();
         RetrofitAPI retrofitAPI = retrofit.create(RetrofitAPI.class);
 
-        DataUser dataUser = new DataUser(user_name);
+        DataUser dataUser = new DataUser(user_email, user_password);
         Call<DataUser> call = retrofitAPI.createUser(dataUser);
         call.enqueue(new Callback<DataUser>() {
             @Override
@@ -151,6 +152,7 @@ public class CheckActivity extends AppCompatActivity {
                     Intent startIntent = new Intent(CheckActivity.this, StartActivity.class);
                     startIntent.putExtra("User_Email", user_email);
                     startActivity(startIntent);
+                    finish();
                 }else{
                     Toast.makeText(CheckActivity.this, "Username is already taken", Toast.LENGTH_SHORT).show();
                 }

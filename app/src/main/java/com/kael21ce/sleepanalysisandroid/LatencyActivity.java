@@ -21,6 +21,9 @@ public class LatencyActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_latency);
 
+        MainActivity mainActivity = new MainActivity();
+        mainActivity.surveyList().add(this);
+
         //Hide action bar
         if (getSupportActionBar() != null) {
             getSupportActionBar().hide();

@@ -175,6 +175,16 @@ public class SettingFragment extends Fragment implements ButtonTextUpdater {
             startActivity(surveyIntent);
         });
 
+        // Log out
+        LinearLayout logOutView = v.findViewById(R.id.LogOutView);
+        logOutView.setOnClickListener(v1 -> {
+            //Move to BeginRegisterActivity
+            Intent logOutIntent = new Intent(v.getContext(), BeginRegisterActivity.class);
+            logOutIntent.putExtra("LogOut", true);
+            startActivity(logOutIntent);
+            getActivity().finish();
+        });
+
         return v;
     }
 

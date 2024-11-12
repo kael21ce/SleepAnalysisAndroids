@@ -38,6 +38,9 @@ public class SQMoodSendingActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sqmood_sending);
 
+        MainActivity mainActivity = new MainActivity();
+        mainActivity.surveyList().add(this);
+
         TextView sQMoodTitle = findViewById(R.id.sQMoodTitle);
         TextView sQDescription = findViewById(R.id.sQMoodDescription);
         LinearLayout firstButton = findViewById(R.id.firstButton);

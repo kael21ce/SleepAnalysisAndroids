@@ -246,10 +246,53 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/LogOutView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/setting_stroke"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:id="@+id/LogOutTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/LogOutTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginVertical="24dp"
+                        android:layout_marginLeft="16dp"
+                        android:fontFamily="@font/pretendardbold"
+                        android:text="로그아웃"
+                        android:textColor="@color/black"
+                        android:textSize="20sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/LogOutCaption"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="right"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:id="@+id/LogOutButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginRight="16dp"
+                        android:src="@drawable/chevron_right" />
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
                 android:id="@+id/SettingOnsetView"
                 android:layout_width="match_parent"
                 android:layout_height="400dp"
-                android:orientation="vertical"></LinearLayout>
+                android:orientation="vertical"/>
 
         </LinearLayout>
     </ScrollView>
