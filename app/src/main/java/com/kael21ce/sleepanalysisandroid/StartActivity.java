@@ -56,6 +56,7 @@ public class StartActivity extends AppCompatActivity {
             Intent mainIntent = new Intent(StartActivity.this, MainActivity.class);
             mainIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(mainIntent);
+            finish();
         });
     }
 }

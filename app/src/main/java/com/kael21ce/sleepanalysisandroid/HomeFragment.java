@@ -114,6 +114,7 @@ public class HomeFragment extends Fragment {
         SharedPreferences sharedPref = getActivity().getSharedPreferences("SleepWake", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
         String user_name = sharedPref.getString("User_Name", "UserName");
+        String email = sharedPref.getString("User_Email", "tester33");
 
         //No onset, offset schedule data
         LinearLayout homeNoDataView = v.findViewById(R.id.homeNoDataView);
@@ -274,7 +275,7 @@ public class HomeFragment extends Fragment {
         Button buttonSendData = v.findViewById(R.id.sendDataButton);
 
         buttonSendData.setOnClickListener(view -> {
-            mainActivity.sendV0(user_name);
+            mainActivity.sendV0(email);
         });
 
         //Graph showing alertness

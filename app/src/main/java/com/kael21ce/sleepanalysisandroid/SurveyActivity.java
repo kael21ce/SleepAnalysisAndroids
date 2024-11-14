@@ -220,13 +220,13 @@ public class SurveyActivity extends AppCompatActivity {
                 .build();
         RetrofitAPI retrofitAPI = retrofit.create(RetrofitAPI.class);
         SharedPreferences sharedPref = getSharedPreferences("SleepWake", Context.MODE_PRIVATE);
-        String username = sharedPref.getString("User_Name", "tester33");
+        String userEmail = sharedPref.getString("User_Email", "tester33");
         long time = System.currentTimeMillis();
         long sleep_onset = sharedPref.getLong("sleepOnset", time);
         long work_onset = sharedPref.getLong("workOnset", time);
         long work_offset = sharedPref.getLong("workOffset", time);
 
-        DataSurvey survey = new DataSurvey(username, sleep_onset, work_onset, work_offset, getLevel(), time);
+        DataSurvey survey = new DataSurvey(userEmail, sleep_onset, work_onset, work_offset, getLevel(), time);
         Call<DataSurvey> call = retrofitAPI.createSurvey(survey);
         call.enqueue(new Callback<DataSurvey>() {
             @Override
@@ -281,13 +281,13 @@ public class SurveyActivity extends AppCompatActivity {
                 .build();
         RetrofitAPI retrofitAPI = retrofit.create(RetrofitAPI.class);
         SharedPreferences sharedPref = getSharedPreferences("SleepWake", Context.MODE_PRIVATE);
-        String username = sharedPref.getString("User_Name", "tester33");
+        String userEmail = sharedPref.getString("User_Email", "tester33");
         long time = System.currentTimeMillis();
 
         Locale currentLocale = Locale.getDefault();
         String language = currentLocale.getLanguage();
 
-        DataMood mood = new DataMood(username,getLevel2(), sleep_quality, mood_high, mood_low, mood_anx, mood_irr, time, latency);
+        DataMood mood = new DataMood(userEmail,getLevel2(), sleep_quality, mood_high, mood_low, mood_anx, mood_irr, time, latency);
         Call<DataMood> call = retrofitAPI.createMood(mood);
         call.enqueue(new Callback<DataMood>() {
             @Override

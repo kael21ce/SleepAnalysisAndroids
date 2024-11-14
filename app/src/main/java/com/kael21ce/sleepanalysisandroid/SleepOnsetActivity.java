@@ -279,10 +279,10 @@ public class SleepOnsetActivity extends AppCompatActivity implements ButtonTextU
                 .build();
         RetrofitAPI retrofitAPI = retrofit.create(RetrofitAPI.class);
         SharedPreferences sharedPref = getSharedPreferences("SleepWake", Context.MODE_PRIVATE);
-        String username = sharedPref.getString("User_Name", "tester33");
+        String userEmail = sharedPref.getString("User_Email", "tester33");
         long time = System.currentTimeMillis();
 
-        DataSurvey survey = new DataSurvey(username, sleep_onset, work_onset, work_offset, -1, time);
+        DataSurvey survey = new DataSurvey(userEmail, sleep_onset, work_onset, work_offset, -1, time);
         Call<DataSurvey> call = retrofitAPI.createSurvey(survey);
         call.enqueue(new Callback<DataSurvey>() {
             @Override

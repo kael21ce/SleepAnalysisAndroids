@@ -123,7 +123,7 @@ public class CheckActivity extends AppCompatActivity {
                 .build();
 
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("https://sleep-math.com/sleepapp/")
+                .baseUrl("https://www.sleep-math.com/sleepapp/")
                 // as we are sending data in json format so
                 // we have to add Gson converter factory
                 .addConverterFactory(GsonConverterFactory.create())
@@ -154,7 +154,7 @@ public class CheckActivity extends AppCompatActivity {
                     startActivity(startIntent);
                     finish();
                 }else{
-                    Toast.makeText(CheckActivity.this, "Username is already taken", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(CheckActivity.this, "비밀번호가 다릅니다", Toast.LENGTH_SHORT).show();
                 }
             }
 

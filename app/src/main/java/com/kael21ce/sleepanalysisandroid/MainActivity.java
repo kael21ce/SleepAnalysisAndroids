@@ -276,7 +276,7 @@ public class MainActivity extends AppCompatActivity {
             calculateAwareness();
             calculateSleepAwareness();
 //            if(now-lastBackendUpdate >= (1000*60*60*24)) {
-                sendV0(username);
+                sendV0(email);
                 lastBackendUpdate = now;
                 editor.putLong("lastBackendUpdate", now);
                 editor.apply();
@@ -574,7 +574,7 @@ public class MainActivity extends AppCompatActivity {
                 calculateAwareness();
                 calculateSleepAwareness();
                 if(now-lastBackendUpdate >= (1000*60*60*12)) {
-                    sendV0(username);
+                    sendV0(email);
                     lastBackendUpdate = now;
                     editor.putLong("lastBackendUpdate", now);
                     editor.apply();
@@ -1063,7 +1063,7 @@ public class MainActivity extends AppCompatActivity {
         return false;
     }
 
-    protected void sendV0(String username) {
+    protected void sendV0(String userEmail) {
 
         OkHttpClient client = new OkHttpClient.Builder()
                 .connectTimeout(20, TimeUnit.SECONDS)
@@ -1100,7 +1100,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         //DataModal modal = new DataModal(username, tempSleep, tempV0);
-        DataModal modal = new DataModal(username, tempSleep);
+        DataModal modal = new DataModal(userEmail, tempSleep);
         Call<DataModal> call = retrofitAPI.createPost(modal);
         call.enqueue(new Callback<DataModal>() {
             @Override
@@ -1127,7 +1127,7 @@ public class MainActivity extends AppCompatActivity {
 
                     // on below line we are getting our data from modal class and adding it to our string.
                     String responseString = "Response Code : " + response.code() + "\nName : " + "\n";
-                    Log.v("RESPONSE2", responseString);
+                    Log.v("RESPONSE for sending data", responseString);
                 }
             }
 
