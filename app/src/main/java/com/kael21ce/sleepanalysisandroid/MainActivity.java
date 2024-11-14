@@ -673,16 +673,6 @@ public class MainActivity extends AppCompatActivity {
 
         //Clean entries
         List<V0> deleteV0 = new ArrayList<>();
-        if (sleeps.size() > 1) {
-            for (int i = 1; i < sleeps.size(); i++) {
-                if (sleeps.get(sleeps.size() - i).sleepStart <= sleeps.get(sleeps.size() - i - 1).sleepEnd) {
-                    // Fix later
-                    if (v0s.size() >= sleeps.size()) {
-                        deleteV0.add(v0s.get(i));
-                    }
-                }
-            }
-        }
 
         //get init V0
         for(V0 v0: v0s){
@@ -743,7 +733,7 @@ public class MainActivity extends AppCompatActivity {
             v0.y_val = res[1];
             v0.n_val = res[2];
             v0.H_val = res[3];
-            v0.time = startProcess + (Long) (i + Math.max(0, (int) endProcess-startProcess/fiveMinutesToMil + 1))*fiveMinutesToMil;
+            v0.time = startProcess + (i*fiveMinutesToMil);
             Log.v("VO TIME", i*5 + " " + getAwarenessValue(res[3], res[2], res[1], res[0]));
             newV0.add(v0);
             v0s.add(v0);
@@ -760,6 +750,7 @@ public class MainActivity extends AppCompatActivity {
                 //Normalization
                 barEntries.add(new BarEntry((float) barIdx, value*100f/3f));
                 barIdx += addBarIdx;
+                Log.v("Each bar", "x: " + barIdx + " / y: " + value*100f/3.0f);
             }
         }
         v0Dao.insertAll(newV0);
@@ -817,6 +808,7 @@ public class MainActivity extends AppCompatActivity {
             float fAwarenessVal = (float) awarenessVal;
             barEntries.add(new BarEntry(barIdx, fAwarenessVal*100f/3.0f));
             barIdx += addBarIdx;
+            Log.v("Each bar", "x: " + barIdx + " / y: " + fAwarenessVal*100f/3.0f);
         }
 
         Log.v("BAR ENTRIES SIZE", String.valueOf(barEntries.size()));
