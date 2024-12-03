@@ -18,7 +18,7 @@ public interface RetrofitAPI {
 
     Call<DataSurvey> createSurvey(@Body DataSurvey dataSurvey);
 
-    @POST("survey/sleep_quality/")
+    @POST("daily_survey/")
 
     Call<DataMood> createMood(@Body DataMood dataMood);
 }

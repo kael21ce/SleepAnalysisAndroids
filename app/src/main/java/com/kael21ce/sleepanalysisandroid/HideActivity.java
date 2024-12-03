@@ -14,7 +14,7 @@ import android.widget.Toast;
 
 public class HideActivity extends AppCompatActivity {
 
-    private static final String password = "7890";
+    private static final String password = "9743";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

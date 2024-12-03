@@ -1064,7 +1064,7 @@ public class MainActivity extends AppCompatActivity {
                 .build();
 
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("https://www.sleep-math.com/sleepapp/android/")
+                .baseUrl("https://www.sleep-math.com/sleepapp/")
                 // as we are sending data in json format so
                 // we have to add Gson converter factory
                 .addConverterFactory(GsonConverterFactory.create())

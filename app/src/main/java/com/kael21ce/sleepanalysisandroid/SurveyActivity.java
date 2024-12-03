@@ -212,7 +212,7 @@ public class SurveyActivity extends AppCompatActivity {
 
     private void sendSurvey(){
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("https://sleep-math.com/sleepapp/")
+                .baseUrl("https://www.sleep-math.com/sleepapp/")
                 // as we are sending data in json format so
                 // we have to add Gson converter factory
                 .addConverterFactory(GsonConverterFactory.create())
@@ -272,7 +272,7 @@ public class SurveyActivity extends AppCompatActivity {
                 .readTimeout(20, TimeUnit.SECONDS)
                 .build();
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("https://www.sleep-math.com/sleepapp/daily_survey/")
+                .baseUrl("https://www.sleep-math.com/sleepapp/")
                 // as we are sending data in json format so
                 // we have to add Gson converter factory
                 .addConverterFactory(GsonConverterFactory.create())
@@ -287,7 +287,7 @@ public class SurveyActivity extends AppCompatActivity {
         Locale currentLocale = Locale.getDefault();
         String language = currentLocale.getLanguage();
 
-        DataMood mood = new DataMood(userEmail,getLevel2(), sleep_quality, mood_high, mood_low, mood_anx, mood_irr, time, latency);
+        DataMood mood = new DataMood(userEmail, latency, getLevel2(), sleep_quality, mood_high, mood_low, mood_anx, mood_irr, time);
         Call<DataMood> call = retrofitAPI.createMood(mood);
         call.enqueue(new Callback<DataMood>() {
             @Override
