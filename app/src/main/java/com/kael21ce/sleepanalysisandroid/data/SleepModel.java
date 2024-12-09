@@ -125,7 +125,7 @@ public class SleepModel {
     //type1: sleep is enough
     //type2: sleep is early
     //-> 0: false, 1: true
-    public static int[] Sleep_pattern_suggestion(double[] V0, int sleep_onset, int work_onset, int work_offset, double step) {
+    public static int[] Sleep_pattern_suggestion(double[] V0, int sleep_onset, int work_onset, int work_offset, double step, boolean is_night) {
         int buffer = (int) Math.round(1 / step); // Time between nap offset and work onset
         int unit = (int) Math.round(0.5 / step);
         int len0 = work_onset - sleep_onset; // length between work onset and work onset
@@ -194,7 +194,7 @@ public class SleepModel {
         }
 
         if (sleep_start + sleep_amount >= (len0 - buffer)) {
-            if (len0 - sleep_start - sleep_onset >= 2 * buffer) {
+            if (is_night) {
                 result[0] = sleep_onset + sleep_start;
                 result[1] = work_onset - buffer;
                 result[4] = 0;

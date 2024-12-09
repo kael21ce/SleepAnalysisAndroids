@@ -32,6 +32,7 @@ public class SplashActivity extends AppCompatActivity {
     private int dotCount = 0;
     private final int MAX_DOTS = 3;
     private TextView loadingText;
+    private long sleepOnset, sleepOnsetShow, workOnset, workOffset;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,6 +73,23 @@ public class SplashActivity extends AppCompatActivity {
 //        }
         healthConnectManager.setIsSleepDone(false);
         healthConnectManager.setAddSleepDone(false);
+
+
+        long currentTime = System.currentTimeMillis();
+        sleepOnset = sharedPref.getLong("sleepOnset", currentTime);
+        workOnset = sharedPref.getLong("workOnset", currentTime);
+        workOffset = sharedPref.getLong("workOffset", currentTime);
+        sleepOnsetShow = sharedPref.getLong("sleepOnsetShow", currentTime);
+
+        Long[] updatedDates = updateOnsetDate(currentTime, sleepOnset, sleepOnsetShow, workOnset, workOffset);
+        sleepOnsetShow = updatedDates[1];
+        SharedPreferences.Editor editor = sharedPref.edit();
+
+        editor.putLong("sleepOnset", updatedDates[0]);
+        editor.putLong("sleepOnsetShow", updatedDates[1]);
+        editor.putLong("workOnset", updatedDates[2]);
+        editor.putLong("workOffset", updatedDates[3]);
+        editor.apply();
 
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
@@ -119,5 +137,56 @@ public class SplashActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         dotHandler.removeCallbacksAndMessages(null);
+    }
+
+    public static Long[] updateOnsetDate(long currentTime, long sleepOnset, long sleepOnsetShow, long workOnset, long workOffset) {
+        long oneDayToMils = 1000*60*60*24;
+        long tenMinToMils = 1000*60*10;
+        long oneHourToMils = 1000*60*60;
+
+        // Keep sleepOnsetShow before workOnset minus 1 day
+        while (sleepOnsetShow < workOnset - oneDayToMils) {
+            sleepOnsetShow = sleepOnsetShow + oneDayToMils;
+            sleepOnset = sleepOnsetShow;
+        }
+
+        // Ensure workOnset is after sleepOnset
+        while (workOnset < sleepOnset) {
+            workOnset = workOffset + oneDayToMils;
+        }
+
+        // Ensure workOffset is after workOnset
+        while (workOffset < workOnset) {
+            workOffset = workOffset + oneDayToMils;
+        }
+
+        // Adjust sleepOnset if currentTime is within sleepOnset and workOnset
+        if (sleepOnset < currentTime && currentTime < workOnset) {
+            while (sleepOnset < currentTime) {
+                sleepOnset = currentTime + tenMinToMils;
+            }
+        }
+
+        // Ensure sleepOnsetShow is not before currentTime
+        if (workOnset - oneHourToMils <= sleepOnset) {
+            while (sleepOnsetShow < currentTime) {
+                sleepOnsetShow = sleepOnsetShow + oneDayToMils;
+            }
+            sleepOnset = sleepOnsetShow;
+        }
+
+        // Repeat the adjustments for sleepOnsetShow, workOnset, and workOffset
+        while (sleepOnsetShow < workOnset - oneDayToMils) {
+            sleepOnsetShow = sleepOnsetShow + oneDayToMils;
+            sleepOnset = sleepOnsetShow;
+        }
+        while (workOnset < sleepOnset) {
+            workOnset = workOnset + oneDayToMils;
+        }
+        while (workOffset < workOnset) {
+            workOffset = workOffset + oneDayToMils;
+        }
+
+        return new Long[]{sleepOnset, sleepOnsetShow, workOnset, workOffset};
     }
 }

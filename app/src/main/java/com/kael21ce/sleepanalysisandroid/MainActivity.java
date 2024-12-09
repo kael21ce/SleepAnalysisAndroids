@@ -98,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
     //for fragment too
     private long mainSleepStart, mainSleepEnd, napSleepStart, napSleepEnd;
     private boolean isearlysleep, isenoughsleep;
-    private long sleepOnset, workOnset, workOffset;
+    private long sleepOnset, workOnset, workOffset, sleepOnsetShow;
     private long lastSleepUpdate, lastDataUpdate, lastBackendUpdate;
 
     AppDatabase db;
@@ -202,8 +202,17 @@ public class MainActivity extends AppCompatActivity {
         sleepOnset = sharedPref.getLong("sleepOnset", now);
         workOnset = sharedPref.getLong("workOnset", now);
         workOffset = sharedPref.getLong("workOffset", now);
+        sleepOnsetShow = sharedPref.getLong("sleepOnsetShow", now);
 
         barEntries = new ArrayList<BarEntry>();
+
+        Long[] updatedDates = updateOnsetDate(now, sleepOnset, sleepOnsetShow, workOnset, workOffset);
+        sleepOnsetShow = updatedDates[1];
+        setSleepOnset(updatedDates[0]);
+        setWorkOnset(updatedDates[2]);
+        setWorkOffset(updatedDates[3]);
+        editor.putLong("sleepOnsetShow", sleepOnsetShow);
+        editor.apply();
 
         if (now > sleepOnset && now < workOnset) {
             if (workOnset - now < oneHour) {
@@ -504,6 +513,14 @@ public class MainActivity extends AppCompatActivity {
             barEntries = new ArrayList<BarEntry>();
             now = System.currentTimeMillis();
 
+            Long[] updatedDates = updateOnsetDate(now, sleepOnset, sleepOnsetShow, workOnset, workOffset);
+            sleepOnsetShow = updatedDates[1];
+            setSleepOnset(updatedDates[0]);
+            setWorkOnset(updatedDates[2]);
+            setWorkOffset(updatedDates[3]);
+            editor.putLong("sleepOnsetShow", sleepOnsetShow);
+            editor.apply();
+
             if (now > sleepOnset && now < workOnset) {
                 if (workOnset - now < oneHour) {
                     Log.v("NOW", "NOW IS CLOSE TO WORK ONSET AND ONSET");
@@ -756,12 +773,16 @@ public class MainActivity extends AppCompatActivity {
         v0Dao.insertAll(newV0);
         Log.v("V0 DONE", "V0 DONE");
         Log.v("SLEEP ONSET", String.valueOf((int)(sleepOnset-now)/(1000*60*5)));
+        Log.v("SLEEP OFFSET SHOW", String.valueOf((int)(sleepOnsetShow-now)/(1000*60*5)));
         Log.v("WORK ONSET", String.valueOf((int)(workOnset-now)/(1000*60*5)));
         Log.v("WORK OFFSET", String.valueOf((int)(workOffset-now)/(1000*60*5)));
         Log.v("INIT V0", initV0[0] + " " + initV0[1] + " " + initV0[2] + " " + initV0[3]);
 
         //process sleep prediction
-        int[] sleepSuggestion = sleepModel.Sleep_pattern_suggestion(initV0, (int)(sleepOnset-now)/(1000*60*5), (int)(workOnset-now)/(1000*60*5), (int)(workOffset-now)/(1000*60*5), 5/60.0);
+        boolean isNight = sleepOnset == sleepOnsetShow;
+        int[] sleepSuggestion = sleepModel.Sleep_pattern_suggestion(initV0, (int)(sleepOnset-now)/(1000*60*5),
+                (int)(workOnset-now)/(1000*60*5), (int)(workOffset-now)/(1000*60*5), 5/60.0, isNight);
+        Log.v("SLEEP SUGGESTION", "is night? : " + isNight);
         Log.v("SLEEP SUGGESTION", String.valueOf(sleepSuggestion[0]));
         Log.v("MAIN SLEEP START", sdfDateTime.format(new Date(sleepSuggestion[0]*(1000*60*5)+now)));
         Log.v("MAIN SLEEP END", sdfDateTime.format(new Date(sleepSuggestion[1]*(1000*60*5)+now)));
@@ -820,6 +841,57 @@ public class MainActivity extends AppCompatActivity {
                 barEntries.set(i, new BarEntry(barEntries.get(i).getX() + thePlus, barEntries.get(i).getY()));
             }
         }
+    }
+
+    public static Long[] updateOnsetDate(long currentTime, long sleepOnset, long sleepOnsetShow, long workOnset, long workOffset) {
+        long oneDayToMils = 1000*60*60*24;
+        long tenMinToMils = 1000*60*10;
+        long oneHourToMils = 1000*60*60;
+
+        // Keep sleepOnsetShow before workOnset minus 1 day
+        while (sleepOnsetShow < workOnset - oneDayToMils) {
+            sleepOnsetShow = sleepOnsetShow + oneDayToMils;
+            sleepOnset = sleepOnsetShow;
+        }
+
+        // Ensure workOnset is after sleepOnset
+        while (workOnset < sleepOnset) {
+            workOnset = workOffset + oneDayToMils;
+        }
+
+        // Ensure workOffset is after workOnset
+        while (workOffset < workOnset) {
+            workOffset = workOffset + oneDayToMils;
+        }
+
+        // Adjust sleepOnset if currentTime is within sleepOnset and workOnset
+        if (sleepOnset < currentTime && currentTime < workOnset) {
+            while (sleepOnset < currentTime) {
+                sleepOnset = currentTime + tenMinToMils;
+            }
+        }
+
+        // Ensure sleepOnsetShow is not before currentTime
+        if (workOnset - oneHourToMils <= sleepOnset) {
+            while (sleepOnsetShow < currentTime) {
+                sleepOnsetShow = sleepOnsetShow + oneDayToMils;
+            }
+            sleepOnset = sleepOnsetShow;
+        }
+
+        // Repeat the adjustments for sleepOnsetShow, workOnset, and workOffset
+        while (sleepOnsetShow < workOnset - oneDayToMils) {
+            sleepOnsetShow = sleepOnsetShow + oneDayToMils;
+            sleepOnset = sleepOnsetShow;
+        }
+        while (workOnset < sleepOnset) {
+            workOnset = workOnset + oneDayToMils;
+        }
+        while (workOffset < workOnset) {
+            workOffset = workOffset + oneDayToMils;
+        }
+
+        return new Long[]{sleepOnset, sleepOnsetShow, workOnset, workOffset};
     }
 
     public ArrayList<BarEntry> getBarEntries(){
