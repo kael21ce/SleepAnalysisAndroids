@@ -468,15 +468,15 @@ public class WhenWorkFragment extends Fragment {
                 String language = currentLocale.getLanguage();
                 if(response.code() <= 300) {
                     if (language.equals("ko")) {
-                        Toast.makeText(getActivity(), "데이터가 전송되었습니다", Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(getActivity(), "데이터가 전송되었습니다", Toast.LENGTH_SHORT).show();
                     } else {
-                        Toast.makeText(getActivity(), "Data added to API", Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(getActivity(), "Data added to API", Toast.LENGTH_SHORT).show();
                     }
                 }else {
                     if (language.equals("ko")) {
-                        Toast.makeText(getActivity(), "데이터 전송에 실패했습니다", Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(getActivity(), "데이터 전송에 실패했습니다", Toast.LENGTH_SHORT).show();
                     } else {
-                        Toast.makeText(getActivity(), "Data sending failed", Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(getActivity(), "Data sending failed", Toast.LENGTH_SHORT).show();
                     }
                     // we are getting response from our body
                     // and passing it to our modal class.

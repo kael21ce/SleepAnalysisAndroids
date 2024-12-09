@@ -115,15 +115,21 @@ public class RecommendFragment extends Fragment {
             editor.putBoolean("isHidden", true).apply();
         }
         boolean isHidden = false;
-
+        long K1 = sharedPref2.getLong("workOnset",now);
+        long K2 = sharedPref2.getLong("workOffset",now);
         if (sharedPref2.contains("sleepOnset") && sharedPref2.contains("workOnset") && sharedPref2.contains("workOffset")) {
-            noDataLayout.setVisibility(View.GONE);
-            if (!isHidden) {
-                InfoView.setVisibility(View.VISIBLE);
-                RecommendClockView.setVisibility(View.VISIBLE);
+            if (K1 == K2) {
+                noDataLayout.setVisibility(View.VISIBLE);
+                InfoView.setVisibility(View.GONE);
             } else {
-                InfoView.setVisibility(View.VISIBLE);
-                RecommendClockView.setVisibility(View.GONE);
+                noDataLayout.setVisibility(View.GONE);
+                if (!isHidden) {
+                    InfoView.setVisibility(View.VISIBLE);
+                    RecommendClockView.setVisibility(View.VISIBLE);
+                } else {
+                    InfoView.setVisibility(View.VISIBLE);
+                    RecommendClockView.setVisibility(View.GONE);
+                }
             }
         } else {
             InfoView.setVisibility(View.GONE);

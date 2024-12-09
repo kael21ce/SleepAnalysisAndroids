@@ -156,34 +156,44 @@ public class HomeFragment extends Fragment {
         boolean isHidden = false;
 
         if (sharedPref.contains("sleepOnset") && sharedPref.contains("workOnset") && sharedPref.contains("workOffset")) {
-            if (sleeps != null && sleeps.size() > 0) {
-                if (!isHidden) {
-                    homeNoDataView.setVisibility(View.GONE);
-                    SurveyUpperView.setVisibility(View.VISIBLE);
-                    alertnessNoDataView.setVisibility(View.GONE);
-                    RecommendHomeView.setVisibility(View.VISIBLE);
-                    AlertnessHomeView.setVisibility(View.VISIBLE);
-                    ChartHomeView.setVisibility(View.VISIBLE);
-                    SleepChartHomeView.setVisibility(View.VISIBLE);
-                } else {
-                    homeNoDataView.setVisibility(View.GONE);
-                    SurveyUpperView.setVisibility(View.VISIBLE);
-                    alertnessNoDataView.setVisibility(View.GONE);
-                    RecommendHomeView.setVisibility(View.GONE);
-                    AlertnessHomeView.setVisibility(View.GONE);
-                    ChartHomeView.setVisibility(View.GONE);
-                    SleepChartHomeView.setVisibility(View.GONE);
-                }
-            } else {
+            if (sharedPref.getLong("workOnset",now) == sharedPref.getLong("workOffset",now)) {
                 homeNoDataView.setVisibility(View.VISIBLE);
-                alertnessNoDataView.setVisibility(View.VISIBLE);
+                SurveyUpperView.setVisibility(View.VISIBLE);
+                alertnessNoDataView.setVisibility(View.GONE);
                 RecommendHomeView.setVisibility(View.GONE);
                 AlertnessHomeView.setVisibility(View.GONE);
                 ChartHomeView.setVisibility(View.GONE);
                 SleepChartHomeView.setVisibility(View.GONE);
+            } else {
+                if (sleeps != null && sleeps.size() > 0) {
+                    if (!isHidden) {
+                        homeNoDataView.setVisibility(View.GONE);
+                        SurveyUpperView.setVisibility(View.VISIBLE);
+                        alertnessNoDataView.setVisibility(View.GONE);
+                        RecommendHomeView.setVisibility(View.VISIBLE);
+                        AlertnessHomeView.setVisibility(View.VISIBLE);
+                        ChartHomeView.setVisibility(View.VISIBLE);
+                        SleepChartHomeView.setVisibility(View.VISIBLE);
+                    } else {
+                        homeNoDataView.setVisibility(View.GONE);
+                        SurveyUpperView.setVisibility(View.VISIBLE);
+                        alertnessNoDataView.setVisibility(View.GONE);
+                        RecommendHomeView.setVisibility(View.GONE);
+                        AlertnessHomeView.setVisibility(View.GONE);
+                        ChartHomeView.setVisibility(View.GONE);
+                        SleepChartHomeView.setVisibility(View.GONE);
+                    }
+                } else {
+                    homeNoDataView.setVisibility(View.VISIBLE);
+                    alertnessNoDataView.setVisibility(View.VISIBLE);
+                    RecommendHomeView.setVisibility(View.GONE);
+                    AlertnessHomeView.setVisibility(View.GONE);
+                    ChartHomeView.setVisibility(View.GONE);
+                    SleepChartHomeView.setVisibility(View.GONE);
 
-                //Change text in homeNoDataView
-                homeNoDataDescription.setText("수면 기록을 추가해보세요");
+                    //Change text in homeNoDataView
+                    homeNoDataDescription.setText("수면 기록을 추가해보세요");
+                }
             }
         } else {
             homeNoDataView.setVisibility(View.VISIBLE);
