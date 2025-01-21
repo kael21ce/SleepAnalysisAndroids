@@ -272,6 +272,42 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/workTypeCaption"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/workTypeText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:fontFamily="@font/pretendardbold"
+                android:gravity="center_horizontal"
+                android:text="근무 종류"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                android:layout_marginTop="32dp"
+                android:layout_marginBottom="8dp"/>
+
+            <com.google.android.material.tabs.TabLayout
+                android:id="@+id/workTypeTab"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="32dp"
+                android:background="@drawable/corner_8_gray"
+                app:tabGravity="fill"
+                app:tabMode="fixed"
+                app:tabTextColor="@color/black"
+                app:tabBackground="@drawable/tab_background"
+                app:tabSelectedTextColor="@color/blue_1"
+                app:tabIndicatorColor="@android:color/transparent"
+                app:tabIndicatorHeight="0dp"
+                app:tabRippleColor="@android:color/transparent"
+                tools:ignore="SpeakableTextPresentCheck" />
+        </LinearLayout>
+
+        <LinearLayout
             android:id="@+id/workButtonCaption"
             android:layout_width="match_parent"
             android:layout_height="match_parent"

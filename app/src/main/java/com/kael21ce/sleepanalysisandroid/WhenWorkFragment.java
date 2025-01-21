@@ -21,6 +21,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.material.tabs.TabLayout;
 import com.kael21ce.sleepanalysisandroid.data.DataSurvey;
 import com.kael21ce.sleepanalysisandroid.data.RetrofitAPI;
 
@@ -312,6 +313,46 @@ public class WhenWorkFragment extends Fragment {
             }
         });
 
+        // Work Type Picker
+        final int[] selectedType = new int[1];
+        selectedType[0] = 0;
+        TabLayout workTypeTab = v.findViewById(R.id.workTypeTab);
+        workTypeTab.addTab(workTypeTab.newTab().setText("휴무"));
+        workTypeTab.addTab(workTypeTab.newTab().setText("아침"));
+        workTypeTab.addTab(workTypeTab.newTab().setText("저녁"));
+        workTypeTab.addTab(workTypeTab.newTab().setText("야간"));
+
+        workTypeTab.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                int position = tab.getPosition();
+                switch (position) {
+                    case 0:
+                        selectedType[0] = 0;
+                        Log.v("WhenWorkFragment", "Selected Work type: " + selectedType[0]);
+                        break;
+                    case 1:
+                        selectedType[0] = -1;
+                        Log.v("WhenWorkFragment", "Selected Work type: " + selectedType[0]);
+                        break;
+                    case 2:
+                        selectedType[0] = -2;
+                        Log.v("WhenWorkFragment", "Selected Work type: " + selectedType[0]);
+                        break;
+                    case 3:
+                        selectedType[0] = -3;
+                        Log.v("WhenWorkFragment", "Selected Work type: " + selectedType[0]);
+                        break;
+                }
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {}
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {}
+        });
+
         Bundle sleepBundle = getArguments();
         if (sleepBundle != null) {
             sleepOnsetTime = sleepBundle.getString("SleepOnset");
@@ -403,8 +444,9 @@ public class WhenWorkFragment extends Fragment {
                     mainActivity.setSleepOnset(sleepOnset.getTime());
                     mainActivity.setWorkOnset(workOnset.getTime());
                     mainActivity.setWorkOffset(workOffset.getTime());
+                    sharedPref.edit().putInt("workType", selectedType[0]).apply();
 
-                    sendSurvey(sleepOnset.getTime(), workOnset.getTime(), workOffset.getTime());
+                    sendSurvey(sleepOnset.getTime(), workOnset.getTime(), workOffset.getTime(), selectedType[0]);
 
                     mainActivity.finish();
                     startActivity(new Intent(mainActivity, SplashActivity.class));
@@ -445,7 +487,7 @@ public class WhenWorkFragment extends Fragment {
         return dayOfWeek == Calendar.SATURDAY || dayOfWeek == Calendar.SUNDAY;
     }
 
-    private void sendSurvey(long sleep_onset, long work_onset, long work_offset){
+    private void sendSurvey(long sleep_onset, long work_onset, long work_offset, int work_type){
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("https://sleep-math.com/sleepapp/")
                 // as we are sending data in json format so
@@ -458,7 +500,7 @@ public class WhenWorkFragment extends Fragment {
         String userEmail = sharedPref.getString("User_Email", "tester33");
         long time = System.currentTimeMillis();
 
-        DataSurvey survey = new DataSurvey(userEmail, sleep_onset, work_onset, work_offset, -1, time);
+        DataSurvey survey = new DataSurvey(userEmail, sleep_onset, work_onset, work_offset, work_type, time);
         Call<DataSurvey> call = retrofitAPI.createSurvey(survey);
         call.enqueue(new Callback<DataSurvey>() {
             @Override

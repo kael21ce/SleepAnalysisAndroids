@@ -215,6 +215,34 @@
 
                 </LinearLayout>
 
+                <TextView
+                    android:id="@+id/typeSmallText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:layout_gravity="top"
+                    android:layout_marginLeft="16dp"
+                    android:fontFamily="@font/pretendardbold"
+                    android:text="근무 종류"
+                    android:textColor="@color/black"
+                    android:textSize="16sp" />
+
+                <com.google.android.material.tabs.TabLayout
+                    android:id="@+id/workTypeTabSetting"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="16dp"
+                    android:background="@drawable/corner_8_gray"
+                    app:tabGravity="fill"
+                    app:tabMode="fixed"
+                    app:tabTextColor="@color/black"
+                    app:tabBackground="@drawable/tab_background"
+                    app:tabSelectedTextColor="@color/blue_1"
+                    app:tabIndicatorColor="@android:color/transparent"
+                    app:tabIndicatorHeight="0dp"
+                    app:tabRippleColor="@android:color/transparent"
+                    tools:ignore="SpeakableTextPresentCheck" />
+
             </LinearLayout>
 
             <Button

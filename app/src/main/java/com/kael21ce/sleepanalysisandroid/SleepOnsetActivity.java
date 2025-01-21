@@ -16,6 +16,7 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
+import com.google.android.material.tabs.TabLayout;
 import com.kael21ce.sleepanalysisandroid.data.DataSurvey;
 import com.kael21ce.sleepanalysisandroid.data.RetrofitAPI;
 
@@ -23,6 +24,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Objects;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -32,16 +34,13 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class SleepOnsetActivity extends AppCompatActivity implements ButtonTextUpdater{
 
-    private Button sleepOnsetDateButton;
-    private Button sleepOnsetTimeButton;
-    private Button workOnsetDateButton;
-    private Button workOnsetTimeButton;
-    private Button workOffsetDateButton;
-    private Button workOffsetTimeButton;
-    private Button sleepSettingSubmitButton;
+    private Button sleepOnsetDateButton, sleepOnsetTimeButton, workOnsetDateButton, workOnsetTimeButton,
+     workOffsetDateButton, workOffsetTimeButton, sleepSettingSubmitButton;
     public DatePickerDialog datePickerDialog;
     public TimePickerDialog timePickerDialog;
+    private TabLayout workTypeTabSetting;
     long sleepOnset, workOnset, workOffset;
+    int workType;
     SimpleDateFormat sdf;
     SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy.MM.dd");
     SimpleDateFormat sdfTime;
@@ -73,6 +72,7 @@ public class SleepOnsetActivity extends AppCompatActivity implements ButtonTextU
         workOnsetTimeButton = findViewById(R.id.workOnsetTimeButton);
         workOffsetDateButton = findViewById(R.id.workOffsetDateButton);
         workOffsetTimeButton = findViewById(R.id.workOffsetTimeButton);
+        workTypeTabSetting = findViewById(R.id.workTypeTabSetting);
         sleepSettingSubmitButton = findViewById(R.id.sleepSettingSubmitButton);
 
         nineHours = (1000*60*60*9);
@@ -85,6 +85,7 @@ public class SleepOnsetActivity extends AppCompatActivity implements ButtonTextU
         sleepOnset = sharedPref.getLong("sleepOnset", now);
         workOnset = sharedPref.getLong("workOnset", now);
         workOffset = sharedPref.getLong("workOffset", now);
+        workType = sharedPref.getInt("workType", 0);
 
 //        String sleepOnsetString = sdf.format(new Date(sleepOnset));
 //        String workOnsetString = sdf.format(new Date(workOnset));
@@ -143,6 +144,45 @@ public class SleepOnsetActivity extends AppCompatActivity implements ButtonTextU
             timePickerDialog.show();
         });
 
+        final int[] selectedType = new int[1];
+        selectedType[0] = workType;
+        workTypeTabSetting.addTab(workTypeTabSetting.newTab().setText("휴무"));
+        workTypeTabSetting.addTab(workTypeTabSetting.newTab().setText("아침"));
+        workTypeTabSetting.addTab(workTypeTabSetting.newTab().setText("저녁"));
+        workTypeTabSetting.addTab(workTypeTabSetting.newTab().setText("야간"));
+        int initialTab = Math.abs(workType);
+        Objects.requireNonNull(workTypeTabSetting.getTabAt(initialTab)).select();
+        workTypeTabSetting.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                int position = tab.getPosition();
+                switch (position) {
+                    case 0:
+                        selectedType[0] = 0;
+                        Log.v("SleepOnsetActivity", "Selected Work type: " + selectedType[0]);
+                        break;
+                    case 1:
+                        selectedType[0] = -1;
+                        Log.v("SleepOnsetActivity", "Selected Work type: " + selectedType[0]);
+                        break;
+                    case 2:
+                        selectedType[0] = -2;
+                        Log.v("SleepOnsetActivity", "Selected Work type: " + selectedType[0]);
+                        break;
+                    case 3:
+                        selectedType[0] = -3;
+                        Log.v("SleepOnsetActivity", "Selected Work type: " + selectedType[0]);
+                        break;
+                }
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {}
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {}
+        });
+
         sleepSettingSubmitButton.setOnClickListener(view -> {
             String sleepOnsetDate = (String) sleepOnsetDateButton.getText();
             String sleepOnsetTime = (String) sleepOnsetTimeButton.getText();
@@ -172,13 +212,36 @@ public class SleepOnsetActivity extends AppCompatActivity implements ButtonTextU
             assert workOffsetEdit != null;
 
             if(isValid(sleepOnsetEdit.getTime(), workOnsetEdit.getTime(), workOffsetEdit.getTime())) {
-                mainActivity.setSleepOnset(sleepOnsetEdit.getTime());
-                mainActivity.setWorkOnset(workOnsetEdit.getTime());
-                mainActivity.setWorkOffset(workOffsetEdit.getTime());
-                sendSurvey(sleepOnsetEdit.getTime(), workOnsetEdit.getTime(), workOffsetEdit.getTime());
+                if (Math.abs(selectedType[0]) < 4) {
+                    mainActivity.setSleepOnset(sleepOnsetEdit.getTime());
+                    mainActivity.setWorkOnset(workOnsetEdit.getTime());
+                    mainActivity.setWorkOffset(workOffsetEdit.getTime());
+                    editor.putInt("workType", selectedType[0]).apply();
+                    sendSurvey(sleepOnsetEdit.getTime(), workOnsetEdit.getTime(), workOffsetEdit.getTime(), selectedType[0]);
 
-                mainActivity.finish();
-                startActivity(new Intent(this, SplashActivity.class));
+                    mainActivity.finish();
+                    startActivity(new Intent(this, SplashActivity.class));
+                } else {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    builder.setCancelable(true);
+                    if (languageSetting.equals("ko")) {
+                        builder.setTitle("경고");
+                        builder.setMessage("근무 종류를 선택해주세요.");
+
+                        builder.setNegativeButton("OK", (dialogInterface, i) -> dialogInterface.cancel());
+                    } else {
+                        builder.setTitle("ERROR");
+                        builder.setMessage("Choose the work type");
+
+                        builder.setNegativeButton("OK", (dialogInterface, i) -> dialogInterface.cancel());
+                    }
+
+                    AlertDialog alert = builder.create();
+                    alert.setOnShowListener(arg0 -> {
+                        alert.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(getResources().getColor(R.color.black));
+                    });
+                    alert.show();
+                }
             }else{
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setCancelable(true);
@@ -269,7 +332,7 @@ public class SleepOnsetActivity extends AppCompatActivity implements ButtonTextU
     }
 
     //Send info to server about changing schedule
-    private void sendSurvey(long sleep_onset, long work_onset, long work_offset){
+    private void sendSurvey(long sleep_onset, long work_onset, long work_offset, int work_type){
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("https://sleep-math.com/sleepapp/")
                 // as we are sending data in json format so
@@ -282,7 +345,7 @@ public class SleepOnsetActivity extends AppCompatActivity implements ButtonTextU
         String userEmail = sharedPref.getString("User_Email", "tester33");
         long time = System.currentTimeMillis();
 
-        DataSurvey survey = new DataSurvey(userEmail, sleep_onset, work_onset, work_offset, -1, time);
+        DataSurvey survey = new DataSurvey(userEmail, sleep_onset, work_onset, work_offset, work_type, time);
         Call<DataSurvey> call = retrofitAPI.createSurvey(survey);
         call.enqueue(new Callback<DataSurvey>() {
             @Override
