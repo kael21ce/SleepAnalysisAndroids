@@ -380,7 +380,8 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
-                            android:fontFamily="@font/pretendardbold"
+                            android:fontFamily="@font/pretendardvariable"
+                            android:maxLines="1"
                             android:text="기상시간을 지켜주세요"
                             android:textColor="@color/gray_4" />
                     </LinearLayout>

@@ -209,7 +209,7 @@ public class HomeFragment extends Fragment {
         now = System.currentTimeMillis();
 
         //Survey description and button: move to SurveyActivity
-        surveyDescription.setText(user_name + "님의 현재 상태를 알려주세요");
+        surveyDescription.setText("지금 얼마나 개운하신가요?");
         SurveyUpperView.setOnClickListener(view -> {
             Intent surveyIntent = new Intent(v.getContext(), SurveyActivity.class);
             surveyIntent.putExtra("firstDone", 0);
@@ -257,6 +257,10 @@ public class HomeFragment extends Fragment {
         stateDescriptionText.setMovementMethod(new ScrollingMovementMethod());
         stateDescriptionText.setHorizontallyScrolling(true);
         stateDescriptionText.setSelected(true);
+
+        stateDescriptionSmallText.setMovementMethod(new ScrollingMovementMethod());
+        stateDescriptionSmallText.setHorizontallyScrolling(true);
+        stateDescriptionSmallText.setSelected(true);
 
         sleepButton.setOnClickListener(v1 -> sleepButtonClick(v1, mainActivity, startTime, endTime,
                 sleepButton, napButton, workButton, sleepTypeText, sleepImportanceText, stateDescriptionText,
@@ -849,7 +853,7 @@ public class HomeFragment extends Fragment {
             endTime.setText(sdfDateTimeRecomm.format(new Date(sleepEnd)));
             if (isenough) {
                 stateDescriptionText.setText("오늘의 추천 밤잠 일정이에요");
-                stateDescriptionSmallText.setText("추천보다 너무 늦지 않게 일어나주세요");
+                stateDescriptionSmallText.setText("추천 기상 시간 이후에 일어나야 일과중에 졸리지 않아요");
                 stateDescriptionImage.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.sleep, null));
             } else {
                 if (isearly) {
@@ -909,8 +913,8 @@ public class HomeFragment extends Fragment {
                 stateDescriptionSmallText.setText("맑은 정신을 위해선 낮잠이 필요해요");
                 stateDescriptionImage.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.sleep, null));
             } else {
-                stateDescriptionText.setText("근무 전까지 최대한 많이 자야해요");
-                stateDescriptionSmallText.setText("근무 중에 피곤할 수 있어요");
+                stateDescriptionText.setText("오늘의 추천 낮잠 일정이에요");
+                stateDescriptionSmallText.setText("다만 충분히 자도 근무 중에 피곤할 수 있어요");
                 stateDescriptionImage.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.puke, null));
             }
         }else{
