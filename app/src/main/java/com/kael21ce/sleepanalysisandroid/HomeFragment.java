@@ -33,11 +33,14 @@ import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.github.mikephil.charting.highlight.Highlight;
+import com.google.common.reflect.TypeToken;
+import com.google.gson.Gson;
 import com.kael21ce.sleepanalysisandroid.data.Awareness;
 import com.kael21ce.sleepanalysisandroid.data.Sleep;
 
 import org.w3c.dom.Text;
 
+import java.lang.reflect.Type;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -57,6 +60,7 @@ public class HomeFragment extends Fragment {
     long now, nineHours;
     String mainSleepStartString, mainSleepEndString, workOnsetString, workOffsetString, napSleepStartString, napSleepEndString, sleepOnsetString;
     private List<Awareness> awarenesses, sleepAwarenesses;
+    private static final String MoodArrayKey = "MoodArray";
 
     @SuppressLint("ResourceAsColor")
     @Override
@@ -803,6 +807,38 @@ public class HomeFragment extends Fragment {
             }
         });
 
+        // Daily survey summary
+        Gson gson = new Gson();
+        ArrayList<Records> baseArrayList = new ArrayList();
+        ArrayList<Records> dailyArrayList = new ArrayList<>();
+        String baseJson = gson.toJson(baseArrayList);
+
+        RecyclerView dailyRecyclerView = v.findViewById(R.id.DailySurveyRecyclerView);
+        RecordsAdapter dailyAdapter = new RecordsAdapter();
+        String dailyJson = sharedPref.getString(MoodArrayKey, baseJson);
+        Type type = new TypeToken<ArrayList<Records>>() {}.getType();
+        dailyArrayList = gson.fromJson(dailyJson, type);
+        int totalRecords = Math.min(14, dailyArrayList.size());
+        for (int k = 0; k < totalRecords; k++) {
+            Records r = dailyArrayList.get(totalRecords-k-1);
+            dailyAdapter.addItem(r);
+        }
+        dailyRecyclerView.setAdapter(dailyAdapter);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(v.getContext(),
+                LinearLayoutManager.VERTICAL, false);
+        dailyRecyclerView.setLayoutManager(layoutManager);
+
+        dailyRecyclerView.post(() -> {
+            if (dailyAdapter.getItemCount() > 0) {
+                View firstItemView = dailyRecyclerView.getChildAt(0);
+                if (firstItemView != null) {
+                    int itemHeight = firstItemView.getHeight();
+                    ViewGroup.LayoutParams params = dailyRecyclerView.getLayoutParams();
+                    params.height = itemHeight;
+                    dailyRecyclerView.setLayoutParams(params);
+                }
+            }
+        });
         return v;
     }
 

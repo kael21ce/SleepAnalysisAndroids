@@ -12,6 +12,18 @@ public class DataMood {
     private int mood_irr;
     private long time;
 
+    public int getSleep_quality() {
+        return sleep_quality;
+    }
+
+    public int getDaily_alertness() {
+        return daily_alertness;
+    }
+
+    public long getTime() {
+        return time;
+    }
+
     public DataMood(String user, int latency, int daily_alertness, int sleep_quality, int mood_high, int mood_low, int mood_anx, int mood_irr, long time){
         this.user = user;
         this.latency = latency;

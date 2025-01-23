@@ -14,13 +14,17 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.common.reflect.TypeToken;
+import com.google.gson.Gson;
 import com.kael21ce.sleepanalysisandroid.data.DataModal;
 import com.kael21ce.sleepanalysisandroid.data.DataMood;
 import com.kael21ce.sleepanalysisandroid.data.DataSurvey;
 import com.kael21ce.sleepanalysisandroid.data.RetrofitAPI;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
@@ -38,6 +42,11 @@ public class SurveyActivity extends AppCompatActivity {
     private int surveyLevel = 1;
     SharedPreferences sharedPref;
     SharedPreferences.Editor editor;
+    private static final String MoodArrayKey = "MoodArray";
+    private ArrayList<Records> recordsArrayList = new ArrayList<>();
+    private ArrayList<Records> baseArrayList = new ArrayList<>();
+    private Gson gson = new Gson();
+    private String baseJson, moodJson;
     private static final String survey_key = "SQMood";
 
     @Override
@@ -55,6 +64,18 @@ public class SurveyActivity extends AppCompatActivity {
 
         sharedPref = getSharedPreferences("SleepWake", Context.MODE_PRIVATE);
         editor = sharedPref.edit();
+
+        // Make mood survey list
+        baseJson = gson.toJson(baseArrayList);
+        if (!sharedPref.contains(MoodArrayKey)) {
+            sharedPref.edit().putString(MoodArrayKey, baseJson).apply();
+        } else {
+            Log.v("SurveyActivity", "Record list is loaded");
+            moodJson = sharedPref.getString(MoodArrayKey, baseJson);
+            Type type = new TypeToken<ArrayList<Records>>() {}.getType();
+            Gson loadGson = new Gson();
+            recordsArrayList = loadGson.fromJson(moodJson, type);
+        }
 
         //Text
         TextView surveyTitle = findViewById(R.id.SurveyTitle);
@@ -162,6 +183,19 @@ public class SurveyActivity extends AppCompatActivity {
                         moodData.getInt("mood_low"), moodData.getInt("mood_anx"),
                         moodData.getInt("mood_irr"), moodData.getInt("latency"));
                 editor.putInt(survey_key, day).apply();
+
+                //Save the daily survey dataset
+                String userEmail = sharedPref.getString("User_Email", "tester33");
+                long time = System.currentTimeMillis();
+
+                DataMood mood = new DataMood(userEmail, moodData.getInt("latency"),
+                        getLevel2(), moodData.getInt("sleep_quality"),
+                        moodData.getInt("mood_high"), moodData.getInt("mood_low"),
+                        moodData.getInt("mood_anx"), moodData.getInt("mood_irr"), time);
+                recordsArrayList = findDateGroup(recordsArrayList, mood);
+                Gson gson1 = new Gson();
+                moodJson = gson1.toJson(recordsArrayList);
+                editor.putString(MoodArrayKey, moodJson).apply();
                 //Need to add level to dataset
                 startActivity(endIntent);
                 for (int i = 0; i < mainActivity.surveyList().size(); i++) {
@@ -207,6 +241,91 @@ public class SurveyActivity extends AppCompatActivity {
             } else {
                 emoji.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.puke, null));
             }
+        }
+    }
+
+
+    public ArrayList<Records> findDateGroup(ArrayList<Records> recordsList, DataMood mood) {
+        // Extract date information from daily survey result
+        long baseTime = mood.getTime();
+        Calendar baseCalendar = Calendar.getInstance();
+        baseCalendar.setTimeInMillis(baseTime);
+        baseCalendar.set(Calendar.HOUR_OF_DAY, 0);
+        baseCalendar.set(Calendar.MINUTE, 0);
+        baseCalendar.set(Calendar.SECOND, 0);
+        baseCalendar.set(Calendar.MILLISECOND, 0);
+
+        Date baseDate = baseCalendar.getTime();
+        if (recordsList.size() == 0) {
+
+            ArrayList<DataMood> moodList = new ArrayList<>();
+            moodList.add(mood);
+
+            ArrayList<DataSurvey> alertList = new ArrayList<>();
+
+            Records records = new Records(baseDate, false, alertList, moodList);
+            recordsList.add(records);
+
+            Log.v("SurveyActivity", "Record list is created");
+
+            return recordsList;
+        } else {
+            int n = recordsList.size();
+            boolean isUpdateNeeded = true;
+            for (int i = 0; i < Math.min(n, 14); i++) {
+                Records records = recordsList.get(n-i-1);
+                Date date = records.getRecordDate();
+                boolean isAlertness = records.isAlertness();
+                ArrayList<DataSurvey> dataSurveys = records.getDataSurvey();
+                ArrayList<DataMood> dataMoods = records.getDataMood();
+
+                Calendar calendaR = Calendar.getInstance();
+                calendaR.setTime(date);
+                if (calendaR.get(Calendar.YEAR) == baseCalendar.get(Calendar.YEAR)
+                        && calendaR.get(Calendar.MONTH) == baseCalendar.get(Calendar.MONTH)
+                        && calendaR.get(Calendar.DAY_OF_MONTH) == baseCalendar.get(Calendar.DAY_OF_MONTH)) {
+                    dataMoods.add(mood);
+                    Records r = new Records(date, isAlertness, dataSurveys, dataMoods);
+                    recordsList.set(n-i-1, r);
+                    isUpdateNeeded = false;
+                    Log.v("SurveyActivity", "Record list is added");
+                }
+            }
+            if (isUpdateNeeded) {
+                Log.v("SurveyActivity", "Record list is added newly");
+                ArrayList<DataMood> moodList = new ArrayList<>();
+                moodList.add(mood);
+
+                ArrayList<DataSurvey> alertList = new ArrayList<>();
+
+                Records r = new Records(baseDate, false, alertList, moodList);
+                recordsList.add(r);
+//                for (int j = 0; j < n; j++) {
+//                    Records compareRecords1 = recordsList.get(j);
+//                    Date compareDate1 = compareRecords1.getRecordDate();
+//
+//                    if (j == 0) {
+//                        if (compareDate1.compareTo(baseDate) > 0) {
+//                            recordsList.add(j, r);
+//                            Log.v("SurveyActivity", "Version 1");
+//                        }
+//                    } else if (j < n - 1) {
+//                        Records compareRecords2 = recordsList.get(j+1);
+//                        Date compareDate2 = compareRecords2.getRecordDate();
+//                        if (compareDate1.compareTo(baseDate) < 0 && compareDate2.compareTo(baseDate) > 0) {
+//                            recordsList.add(j+1, r);
+//                            Log.v("SurveyActivity", "Version 2");
+//                        }
+//                    } else if (j == n - 1) {
+//                        if (compareDate1.compareTo(baseDate) < 0) {
+//                            recordsList.add(r);
+//                            Log.v("SurveyActivity", "Version 3");
+//                        }
+//                    }
+//                }
+            }
+            Log.v("SurveyActivity", "Record list size: " + recordsList.size());
+            return recordsList;
         }
     }
 
