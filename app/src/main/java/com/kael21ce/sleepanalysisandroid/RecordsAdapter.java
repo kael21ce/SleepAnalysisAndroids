@@ -2,6 +2,7 @@ package com.kael21ce.sleepanalysisandroid;
 
 import android.content.res.Resources;
 import android.graphics.Color;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +15,7 @@ import androidx.core.content.res.ResourcesCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.kael21ce.sleepanalysisandroid.data.DataMood;
+import com.kael21ce.sleepanalysisandroid.data.DataSurvey;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -49,7 +51,7 @@ public class RecordsAdapter extends RecyclerView.Adapter<RecordsAdapter.ViewHold
 
         TextView recordsDate, progressText, recordsText1, recordsDate1, recordsText2, recordsDate2, recordsText3, recordsDate3;
         ProgressBar progressBar;
-        ImageView bullet3;
+        ImageView bullet2, bullet3;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -62,6 +64,7 @@ public class RecordsAdapter extends RecyclerView.Adapter<RecordsAdapter.ViewHold
             recordsText3 = itemView.findViewById(R.id.recordsText3);
             recordsDate3 = itemView.findViewById(R.id.recordsDate3);
             progressBar = itemView.findViewById(R.id.progressBar);
+            bullet2 = itemView.findViewById(R.id.bullet2);
             bullet3 = itemView.findViewById(R.id.bullet3);
         }
         public void setItem(Records item) {
@@ -69,7 +72,62 @@ public class RecordsAdapter extends RecyclerView.Adapter<RecordsAdapter.ViewHold
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy. M. d.", Locale.KOREA);
             SimpleDateFormat timeFormat = new SimpleDateFormat("a h:mm", Locale.KOREA);
             if (type) {
-
+                // Text: recent 3 alertness survey
+                if (item.dataSurvey.size() == 0) {
+                    Date latestDate = item.getRecordDate();
+                    recordsDate.setText(dateFormat.format(latestDate));
+                    progressText.setText("일일 목표 달성률: 0/3");
+                    recordsText1.setText("각성도: -");
+                    recordsDate1.setVisibility(View.INVISIBLE);
+                    recordsText2.setText("각성도: -");
+                    recordsDate2.setVisibility(View.INVISIBLE);
+                    recordsText3.setText("각성도: -");
+                    recordsDate3.setVisibility(View.INVISIBLE);
+                    progressBar.setProgress(0);
+                } else {
+                    ArrayList<DataSurvey> latestAlerts = getLatestAlerts(item.getDataSurvey());
+                    ArrayList<DataSurvey> alertsShow = new ArrayList<>();
+                    Date latestDate1, latestDate2, latestDate3;
+                    for (int l = 0; l < latestAlerts.size(); l++) {
+                        if (latestAlerts.get(l).getTime() > 0) {
+                            alertsShow.add(latestAlerts.get(l));
+                        }
+                    }
+                    Date latestDate = new Date(alertsShow.get(0).getTime());
+                    recordsDate.setText(dateFormat.format(latestDate));
+                    progressText.setText("일일 목표 달성률: " + alertsShow.size() + "/3");
+                    progressBar.setProgress(100*alertsShow.size()/3);
+                    recordsText1.setText("각성도: " + alertsShow.get(0).getSurvey_result());
+                    if (alertsShow.size() == 3) {
+                        latestDate1 = new Date(alertsShow.get(0).getTime());
+                        recordsDate1.setText(timeFormat.format(latestDate1));
+                        recordsText2.setText("각성도: " + alertsShow.get(1).getSurvey_result());
+                        latestDate2 = new Date(alertsShow.get(1).getTime());
+                        recordsDate2.setText(timeFormat.format(latestDate2));
+                        recordsText3.setText("각성도: " + alertsShow.get(2).getSurvey_result());
+                        latestDate3 = new Date(alertsShow.get(2).getTime());
+                        recordsDate3.setText(timeFormat.format(latestDate3));
+                    } else if (alertsShow.size() == 2) {
+                        latestDate1 = new Date(alertsShow.get(0).getTime());
+                        recordsDate1.setText(timeFormat.format(latestDate1));
+                        recordsText2.setText("각성도: " + alertsShow.get(1).getSurvey_result());
+                        latestDate2 = new Date(alertsShow.get(1).getTime());
+                        recordsDate2.setText(timeFormat.format(latestDate2));
+                        recordsText3.setVisibility(View.INVISIBLE);
+                        bullet3.setVisibility(View.INVISIBLE);
+                        recordsDate3.setVisibility(View.INVISIBLE);
+                    } else {
+                        latestDate1 = new Date(alertsShow.get(0).getTime());
+                        recordsDate1.setText(timeFormat.format(latestDate1));
+                        recordsText2.setVisibility(View.INVISIBLE);
+                        recordsText2.setVisibility(View.INVISIBLE);
+                        bullet2.setVisibility(View.INVISIBLE);
+                        recordsDate2.setVisibility(View.INVISIBLE);
+                        recordsText3.setVisibility(View.INVISIBLE);
+                        bullet3.setVisibility(View.INVISIBLE);
+                        recordsDate3.setVisibility(View.INVISIBLE);
+                    }
+                }
             } else {
                 // Text: daily alertness, daily sleep quality
                 if (item.dataMood.size() == 0) {
@@ -112,6 +170,41 @@ public class RecordsAdapter extends RecyclerView.Adapter<RecordsAdapter.ViewHold
             } else {
                 return null;
             }
+        }
+
+        public ArrayList<DataSurvey> getLatestAlerts(ArrayList<DataSurvey> surveyList) {
+            DataSurvey dummySurvey;
+            ArrayList<DataSurvey> results = new ArrayList<>(3);
+            ArrayList<Long> times = new ArrayList<>(3);
+            for (int k = 0; k < 3; k++) {
+                dummySurvey = new DataSurvey("tester",0,0,0,0,0);
+                results.add(dummySurvey);
+                times.add(0L);
+            }
+            for (int i = 0; i < surveyList.size(); i++) {
+                DataSurvey alert = surveyList.get(i);
+                long alertTime = alert.getTime();
+                if (alertTime >= times.get(2)) {
+                    results.set(0, results.get(1));
+                    results.set(1, results.get(2));
+                    results.set(2, alert);
+
+                    times.set(0, times.get(1));
+                    times.set(1, times.get(2));
+                    times.set(2, alertTime);
+                } else if (alertTime >= times.get(1)) {
+                    results.set(0, results.get(1));
+                    results.set(1, alert);
+
+                    times.set(0, times.get(1));
+                    times.set(1, alertTime);
+                } else if (alertTime >= times.get(0)) {
+                    results.set(0, alert);
+                    times.set(0, alertTime);
+                }
+            }
+            Log.v("RecordsAdapter", "TIMES: " + times.get(0) + " / " + times.get(1) + " / " + times.get(2));
+            return results;
         }
 
 

@@ -61,6 +61,7 @@ public class HomeFragment extends Fragment {
     String mainSleepStartString, mainSleepEndString, workOnsetString, workOffsetString, napSleepStartString, napSleepEndString, sleepOnsetString;
     private List<Awareness> awarenesses, sleepAwarenesses;
     private static final String MoodArrayKey = "MoodArray";
+    private static final String AlertnessArrayKey = "AlertnessArray";
 
     @SuppressLint("ResourceAsColor")
     @Override
@@ -807,16 +808,46 @@ public class HomeFragment extends Fragment {
             }
         });
 
+        // Daily alertness summary
+        Gson alertGson = new Gson();
+        ArrayList<Records> baseArrayList = new ArrayList();
+        ArrayList<Records> alertArrayList = new ArrayList<>();
+        String baseJson = alertGson.toJson(baseArrayList);
+
+        RecyclerView alertRecyclerView = v.findViewById(R.id.AlertnessSurveyRecyclerView);
+        RecordsAdapter alertAdapter = new RecordsAdapter();
+        String alertJson = sharedPref.getString(AlertnessArrayKey, baseJson);
+        Type type = new TypeToken<ArrayList<Records>>() {}.getType();
+        alertArrayList = alertGson.fromJson(alertJson, type);
+        int alertTotalRecords = Math.min(14, alertArrayList.size());
+        for (int k = 0; k < alertTotalRecords; k++) {
+            Records r = alertArrayList.get(alertTotalRecords-k-1);
+            alertAdapter.addItem(r);
+        }
+        alertRecyclerView.setAdapter(alertAdapter);
+        LinearLayoutManager alertLayoutManager = new LinearLayoutManager(v.getContext(),
+                LinearLayoutManager.VERTICAL, false);
+        alertRecyclerView.setLayoutManager(alertLayoutManager);
+
+        alertRecyclerView.post(() -> {
+            if (alertAdapter.getItemCount() > 0) {
+                View firstItemView = alertRecyclerView.getChildAt(0);
+                if (firstItemView != null) {
+                    int itemHeight = firstItemView.getHeight();
+                    ViewGroup.LayoutParams params = alertRecyclerView.getLayoutParams();
+                    params.height = itemHeight;
+                    alertRecyclerView.setLayoutParams(params);
+                }
+            }
+        });
+
         // Daily survey summary
         Gson gson = new Gson();
-        ArrayList<Records> baseArrayList = new ArrayList();
         ArrayList<Records> dailyArrayList = new ArrayList<>();
-        String baseJson = gson.toJson(baseArrayList);
 
         RecyclerView dailyRecyclerView = v.findViewById(R.id.DailySurveyRecyclerView);
         RecordsAdapter dailyAdapter = new RecordsAdapter();
         String dailyJson = sharedPref.getString(MoodArrayKey, baseJson);
-        Type type = new TypeToken<ArrayList<Records>>() {}.getType();
         dailyArrayList = gson.fromJson(dailyJson, type);
         int totalRecords = Math.min(14, dailyArrayList.size());
         for (int k = 0; k < totalRecords; k++) {

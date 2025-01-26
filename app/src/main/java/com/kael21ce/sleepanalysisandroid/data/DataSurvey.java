@@ -9,6 +9,14 @@ public class DataSurvey {
     private long survey_result;
     private long time;
 
+    public long getTime() {
+        return time;
+    }
+
+    public long getSurvey_result() {
+        return survey_result;
+    }
+
     public DataSurvey(String user, long sleep_onset, long work_onset, long work_offset, long survey_result, long time){
         this.user = user;
         this.sleep_onset = sleep_onset;
