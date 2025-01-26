@@ -190,6 +190,8 @@ public class SurveyActivity extends AppCompatActivity {
                 moodJson = gson1.toJson(recordsArrayList);
                 editor.putString(AlertnessArrayKey, moodJson).apply();
 
+                editor.putLong("LastSurveyTime", System.currentTimeMillis()).apply();
+
                 startActivity(nextIntent);
                 for (int i = 0; i < mainActivity.surveyList().size(); i++) {
                     mainActivity.surveyList().get(i).finish();

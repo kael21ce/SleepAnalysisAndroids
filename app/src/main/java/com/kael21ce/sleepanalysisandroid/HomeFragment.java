@@ -16,6 +16,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
@@ -57,7 +58,7 @@ public class HomeFragment extends Fragment {
     SimpleDateFormat sdfDateTimeRecomm = new SimpleDateFormat("a hh:mm", Locale.KOREA);
     SimpleDateFormat sdfDate = new SimpleDateFormat("MM/dd", Locale.KOREA);
     SimpleDateFormat sdfTime = new SimpleDateFormat("HH:mm", Locale.KOREA);
-    long now, nineHours;
+    long now = System.currentTimeMillis(), nineHours = (1000*60*60*9);
     String mainSleepStartString, mainSleepEndString, workOnsetString, workOffsetString, napSleepStartString, napSleepEndString, sleepOnsetString;
     private List<Awareness> awarenesses, sleepAwarenesses;
     private static final String MoodArrayKey = "MoodArray";
@@ -210,20 +211,29 @@ public class HomeFragment extends Fragment {
             SleepChartHomeView.setVisibility(View.GONE);
         }
 
-        nineHours = (1000*60*60*9);
-        now = System.currentTimeMillis();
-
         //Survey description and button: move to SurveyActivity
         surveyDescription.setText("지금 얼마나 개운하신가요?");
         SurveyUpperView.setOnClickListener(view -> {
-            Intent surveyIntent = new Intent(v.getContext(), SurveyActivity.class);
-            surveyIntent.putExtra("firstDone", 0);
-            startActivity(surveyIntent);
+            long lastSurvey = sharedPref.getLong("LastSurveyTime", 0);
+            if (Math.abs(lastSurvey - now) < 30*60*1000) {
+                Toast.makeText(getActivity().getApplicationContext(), "적어도 30분 뒤 설문을 진행해주세요.",
+                        Toast.LENGTH_SHORT).show();
+            } else {
+                Intent surveyIntent = new Intent(v.getContext(), SurveyActivity.class);
+                surveyIntent.putExtra("firstDone", 0);
+                startActivity(surveyIntent);
+            }
         });
         surveyUpperButton.setOnClickListener(view -> {
-            Intent surveyIntent = new Intent(v.getContext(), SurveyActivity.class);
-            surveyIntent.putExtra("firstDone", 0);
-            startActivity(surveyIntent);
+            long lastSurvey = sharedPref.getLong("LastSurveyTime", 0);
+            if (Math.abs(lastSurvey - now) < 30*60*1000) {
+                Toast.makeText(getActivity().getApplicationContext(), "적어도 30분 뒤 설문을 진행해주세요.",
+                        Toast.LENGTH_SHORT).show();
+            } else {
+                Intent surveyIntent = new Intent(v.getContext(), SurveyActivity.class);
+                surveyIntent.putExtra("firstDone", 0);
+                startActivity(surveyIntent);
+            }
         });
 
         //Move to SleepOnsetActivity
