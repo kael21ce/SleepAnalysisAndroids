@@ -445,6 +445,7 @@ public class WhenWorkFragment extends Fragment {
                     mainActivity.setWorkOnset(workOnset.getTime());
                     mainActivity.setWorkOffset(workOffset.getTime());
                     sharedPref.edit().putInt("workType", selectedType[0]).apply();
+                    sharedPref.edit().putLong("sleepOnsetShow", sleepOnset.getTime());
 
                     sendSurvey(sleepOnset.getTime(), workOnset.getTime(), workOffset.getTime(), selectedType[0]);
 

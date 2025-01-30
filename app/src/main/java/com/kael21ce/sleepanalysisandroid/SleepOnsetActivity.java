@@ -39,7 +39,8 @@ public class SleepOnsetActivity extends AppCompatActivity implements ButtonTextU
     public DatePickerDialog datePickerDialog;
     public TimePickerDialog timePickerDialog;
     private TabLayout workTypeTabSetting;
-    long sleepOnset, workOnset, workOffset;
+    long sleepOnset, workOnset, workOffset, sleepOnsetShow;
+    long sleepOnsetEditTime, sleepOnsetShowEditTime, workOnsetEditTime, workOffsetEditTime;
     int workType;
     SimpleDateFormat sdf;
     SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy.MM.dd");
@@ -83,6 +84,7 @@ public class SleepOnsetActivity extends AppCompatActivity implements ButtonTextU
         SharedPreferences sharedPref = getSharedPreferences("SleepWake", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
         sleepOnset = sharedPref.getLong("sleepOnset", now);
+        sleepOnsetShow = sharedPref.getLong("sleepOnsetShow", now);
         workOnset = sharedPref.getLong("workOnset", now);
         workOffset = sharedPref.getLong("workOffset", now);
         workType = sharedPref.getInt("workType", 0);
@@ -99,8 +101,8 @@ public class SleepOnsetActivity extends AppCompatActivity implements ButtonTextU
             sdfTime = new SimpleDateFormat("hh:mm a");
         }
 
-        sleepOnsetDateButton.setText(sdfDate.format(new Date(sleepOnset)));
-        sleepOnsetTimeButton.setText(sdfTime.format(new Date(sleepOnset)));
+        sleepOnsetDateButton.setText(sdfDate.format(new Date(sleepOnsetShow)));
+        sleepOnsetTimeButton.setText(sdfTime.format(new Date(sleepOnsetShow)));
         workOnsetDateButton.setText(sdfDate.format(new Date(workOnset)));
         workOnsetTimeButton.setText(sdfTime.format(new Date(workOnset)));
         workOffsetDateButton.setText(sdfDate.format(new Date(workOffset)));
@@ -211,13 +213,21 @@ public class SleepOnsetActivity extends AppCompatActivity implements ButtonTextU
             assert workOnsetEdit != null;
             assert workOffsetEdit != null;
 
-            if(isValid(sleepOnsetEdit.getTime(), workOnsetEdit.getTime(), workOffsetEdit.getTime())) {
+            Long[] updateDates = updateOnsetDate(now, sleepOnsetEdit.getTime(), sleepOnsetEdit.getTime(),
+                    workOnsetEdit.getTime(), workOffsetEdit.getTime());
+            sleepOnsetEditTime = updateDates[0];
+            sleepOnsetShowEditTime = updateDates[1];
+            workOnsetEditTime = updateDates[2];
+            workOffsetEditTime = updateDates[3];
+
+            if(isValid(sleepOnsetEditTime, workOnsetEditTime, workOffsetEditTime)) {
                 if (Math.abs(selectedType[0]) < 4) {
-                    mainActivity.setSleepOnset(sleepOnsetEdit.getTime());
-                    mainActivity.setWorkOnset(workOnsetEdit.getTime());
-                    mainActivity.setWorkOffset(workOffsetEdit.getTime());
+                    mainActivity.setSleepOnset(sleepOnsetEditTime);
+                    editor.putLong("sleepOnsetShow", sleepOnsetShowEditTime);
+                    mainActivity.setWorkOnset(workOnsetEditTime);
+                    mainActivity.setWorkOffset(workOffsetEditTime);
                     editor.putInt("workType", selectedType[0]).apply();
-                    sendSurvey(sleepOnsetEdit.getTime(), workOnsetEdit.getTime(), workOffsetEdit.getTime(), selectedType[0]);
+                    sendSurvey(sleepOnsetEditTime, workOnsetEditTime, workOffsetEditTime, selectedType[0]);
 
                     mainActivity.finish();
                     startActivity(new Intent(this, SplashActivity.class));
@@ -382,5 +392,56 @@ public class SleepOnsetActivity extends AppCompatActivity implements ButtonTextU
                 Log.v("ERROR", "Error found is : " + t.getMessage());
             }
         });
+    }
+
+    public static Long[] updateOnsetDate(long currentTime, long sleepOnset, long sleepOnsetShow, long workOnset, long workOffset) {
+        long oneDayToMils = 1000*60*60*24;
+        long tenMinToMils = 1000*60*10;
+        long oneHourToMils = 1000*60*60;
+
+        // Keep sleepOnsetShow before workOnset minus 1 day
+        while (sleepOnsetShow < workOnset - oneDayToMils) {
+            sleepOnsetShow = sleepOnsetShow + oneDayToMils;
+            sleepOnset = sleepOnsetShow;
+        }
+
+        // Ensure workOnset is after sleepOnset
+        while (workOnset < sleepOnset) {
+            workOnset = workOnset + oneDayToMils;
+        }
+
+        // Ensure workOffset is after workOnset
+        while (workOffset < workOnset) {
+            workOffset = workOffset + oneDayToMils;
+        }
+
+        // Adjust sleepOnset if currentTime is within sleepOnset and workOnset
+        if (sleepOnset <= currentTime && currentTime <= workOnset) {
+            while (sleepOnset < currentTime) {
+                sleepOnset = currentTime + tenMinToMils;
+            }
+        }
+
+        // Ensure sleepOnsetShow is not before currentTime
+        if (workOnset - oneHourToMils <= sleepOnset) {
+            while (sleepOnsetShow < currentTime) {
+                sleepOnsetShow = sleepOnsetShow + oneDayToMils;
+            }
+            sleepOnset = sleepOnsetShow;
+        }
+
+        // Repeat the adjustments for sleepOnsetShow, workOnset, and workOffset
+        while (sleepOnsetShow < workOnset - oneDayToMils) {
+            sleepOnsetShow = sleepOnsetShow + oneDayToMils;
+            sleepOnset = sleepOnsetShow;
+        }
+        while (workOnset < sleepOnset) {
+            workOnset = workOnset + oneDayToMils;
+        }
+        while (workOffset < workOnset) {
+            workOffset = workOffset + oneDayToMils;
+        }
+
+        return new Long[]{sleepOnset, sleepOnsetShow, workOnset, workOffset};
     }
 }
