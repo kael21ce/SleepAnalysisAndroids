@@ -223,7 +223,7 @@ public class SleepOnsetActivity extends AppCompatActivity implements ButtonTextU
             if(isValid(sleepOnsetEditTime, workOnsetEditTime, workOffsetEditTime)) {
                 if (Math.abs(selectedType[0]) < 4) {
                     mainActivity.setSleepOnset(sleepOnsetEditTime);
-                    editor.putLong("sleepOnsetShow", sleepOnsetShowEditTime);
+                    editor.putLong("sleepOnsetShow", sleepOnsetShowEditTime).apply();
                     mainActivity.setWorkOnset(workOnsetEditTime);
                     mainActivity.setWorkOffset(workOffsetEditTime);
                     editor.putInt("workType", selectedType[0]).apply();

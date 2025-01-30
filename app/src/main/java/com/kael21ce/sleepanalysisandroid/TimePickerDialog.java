@@ -92,7 +92,7 @@ public class TimePickerDialog extends Dialog {
         DateTimeFormatter df;
         String languageSetting = Locale.getDefault().getLanguage();
         if (languageSetting.equals("ko")) {
-            df = DateTimeFormatter.ofPattern( "a hh:mm", Locale.KOREA);
+            df = DateTimeFormatter.ofPattern( "a h:mm", Locale.KOREA);
         } else {
             df = DateTimeFormatter.ofPattern( "hh:mm a");
         }

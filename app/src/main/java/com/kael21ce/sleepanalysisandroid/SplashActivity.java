@@ -152,7 +152,7 @@ public class SplashActivity extends AppCompatActivity {
 
         // Ensure workOnset is after sleepOnset
         while (workOnset < sleepOnset) {
-            workOnset = workOffset + oneDayToMils;
+            workOnset = workOnset + oneDayToMils;
         }
 
         // Ensure workOffset is after workOnset

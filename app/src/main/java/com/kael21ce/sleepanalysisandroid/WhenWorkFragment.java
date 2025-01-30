@@ -48,6 +48,8 @@ public class WhenWorkFragment extends Fragment {
     SimpleDateFormat inputSdfTime = new SimpleDateFormat("HH:mm");
     long now = System.currentTimeMillis();
     long oneDay = (1000*60*60*24);
+    long sleepOnsetResult, sleepOnsetShowResult, workOnsetResult, workOffsetResult;
+    long sleepOnsetType, workOnsetType, workOffsetType;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -367,87 +369,73 @@ public class WhenWorkFragment extends Fragment {
             if (sleepOnsetTime.equals(workOnsetTime)) {
                 Toast.makeText(v.getContext(), "취침 시간과 집중 시작 시간은 일치하면 안됩니다!",Toast.LENGTH_SHORT).show();
             } else {
-                int index = sleepOnsetTime.indexOf(":");
-                String currentHr = inputSdfTime.format(now);
-                String sleepHr = sleepOnsetTime.substring(0, index);
-                String sleepMin = sleepOnsetTime.substring(index + 1);
-                //Move to RecommendFragment
-                //If sleep time is tomorrow
-                if (Integer.parseInt(currentHr.substring(0, currentHr.indexOf(":"))) > Integer.parseInt(sleepHr)) {
-                    sleepOnsetDate = sdfDate.format(now + oneDay);
-                } else if (Integer.parseInt(currentHr.substring(0, currentHr.indexOf(":"))) == Integer.parseInt(sleepHr)) {
-                    if (Integer.parseInt(currentHr.substring(currentHr.indexOf(":") + 1)) >= Integer.parseInt(sleepMin)) {
-                        sleepOnsetDate = sdfDate.format(now + oneDay);
-                    } else {
-                        sleepOnsetDate = sdfDate.format(now);
-                    }
-                } else {
-                    sleepOnsetDate = sdfDate.format(now);
-                }
-                //Set the work onset and work offset date
-                if (sleepOnsetDate.equals(sdfDate.format(now))) {
-                    if (Integer.parseInt(sleepOnsetTime.substring(0, index)) > Integer.parseInt(onHour1 + onHour2)) {
-                        workOnsetDate = sdfDate.format(now + oneDay);
-                        workOffsetDate = workOnsetDate;
-                    } else if (Integer.parseInt(onHour1 + onHour2) > Integer.parseInt(offHour1 + offHour2)) {
-                        workOnsetDate = sdfDate.format(now);
-                        workOffsetDate = sdfDate.format(now + oneDay);
-                    } else {
-                        workOnsetDate = sleepOnsetDate;
-                        workOffsetDate = sleepOnsetDate;
-                    }
-                } else {
-                    if (Integer.parseInt(sleepOnsetTime.substring(0, index)) > Integer.parseInt(offHour1 + offHour2)) {
-                        if (Integer.parseInt(offHour1 + offHour2) < Integer.parseInt(onHour1 + onHour2)) {
-                            workOnsetDate = sleepOnsetDate;
-                            workOffsetDate = sdfDate.format(now + oneDay*2);
-                        } else {
-                            workOnsetDate = sdfDate.format(now + oneDay*2);
-                            workOffsetDate = sdfDate.format(now + oneDay*2);
-                        }
-                    } else {
-                        workOnsetDate = sleepOnsetDate;
-                        workOffsetDate = sleepOnsetDate;
-                    }
-                }
-                //Set sleepOnset Time
+                Date sleepOnsetInput, workOnsetInput, workOffsetInput;
+                Calendar sleepOnsetCal, workOnsetCal, workOffsetCal;
                 try {
-                    Date sleepOnsetInput = inputSdfTime.parse(sleepOnsetTime);
-                    sleepOnsetOutput = sdfTime.format(sleepOnsetInput);
-                    Date workOnsetInput = inputSdfTime.parse(workOnsetTime);
-                    workOnsetOutput = sdfTime.format(workOnsetInput);
-                    Date workOffsetInput = inputSdfTime.parse(workOffsetTime);
-                    workOffsetOutput = sdfTime.format(workOffsetInput);
+                    sleepOnsetInput = inputSdfTime.parse(sleepOnsetTime);
+
+
+                    workOnsetInput = inputSdfTime.parse(workOnsetTime);
+
+
+                    workOffsetInput = inputSdfTime.parse(workOffsetTime);
                 } catch (ParseException e) {
-                    e.printStackTrace();
+                    sleepOnsetInput = new Date();
+                    workOnsetInput = new Date();
+                    workOffsetInput = new Date();
+                }
+                sleepOnsetCal = Calendar.getInstance();
+                Calendar timeCal = Calendar.getInstance();
+                timeCal.setTime(sleepOnsetInput);
+                sleepOnsetCal.set(Calendar.HOUR_OF_DAY, timeCal.get(Calendar.HOUR_OF_DAY));
+                sleepOnsetCal.set(Calendar.MINUTE, timeCal.get(Calendar.MINUTE));
+                sleepOnsetCal.set(Calendar.SECOND, 0);
+                sleepOnsetCal.set(Calendar.MILLISECOND, 0);
+                sleepOnsetType = sleepOnsetCal.getTimeInMillis();
+
+                workOnsetCal = Calendar.getInstance();
+                timeCal = Calendar.getInstance();
+                timeCal.setTime(workOnsetInput);
+                workOnsetCal.set(Calendar.HOUR_OF_DAY, timeCal.get(Calendar.HOUR_OF_DAY));
+                workOnsetCal.set(Calendar.MINUTE, timeCal.get(Calendar.MINUTE));
+                workOnsetCal.set(Calendar.SECOND, 0);
+                workOnsetCal.set(Calendar.MILLISECOND, 0);
+                workOnsetType = workOnsetCal.getTimeInMillis();
+
+                timeCal = Calendar.getInstance();
+                timeCal.setTime(workOffsetInput);
+                workOffsetCal = Calendar.getInstance();
+                workOffsetCal.set(Calendar.HOUR_OF_DAY, timeCal.get(Calendar.HOUR_OF_DAY));
+                workOffsetCal.set(Calendar.MINUTE, timeCal.get(Calendar.MINUTE));
+                workOffsetCal.set(Calendar.SECOND, 0);
+                workOffsetCal.set(Calendar.MILLISECOND, 0);
+                workOffsetType = workOffsetCal.getTimeInMillis();
+
+                if (sleepOnsetType <= now) {
+                    sleepOnsetType = sleepOnsetType + oneDay;
+                }
+                if (workOnsetType <= now) {
+                    workOnsetType = workOnsetType + oneDay;
+                }
+                if (workOffsetType <= now) {
+                    workOffsetType = workOffsetType + oneDay;
                 }
 
-                String sleepOnsetSDF = sleepOnsetDate + ' ' + sleepOnsetOutput;
-                String workOnsetSDF = workOnsetDate + ' ' + workOnsetOutput;
-                String workOffsetSDF = workOffsetDate + ' ' + workOffsetOutput;
+                Long[] updateDates = updateOnsetDate(now, sleepOnsetType, sleepOnsetType,
+                        workOnsetType, workOffsetType);
+                sleepOnsetResult = updateDates[0];
+                sleepOnsetShowResult = updateDates[1];
+                workOnsetResult = updateDates[2];
+                workOffsetResult = updateDates[3];
 
-                Date sleepOnset = null;
-                Date workOnset = null;
-                Date workOffset = null;
-                try {
-                    sleepOnset = sdf.parse(sleepOnsetSDF);
-                    workOnset = sdf.parse(workOnsetSDF);
-                    workOffset = sdf.parse(workOffsetSDF);
-                } catch (ParseException e) {
-                    throw new RuntimeException(e);
-                }
-                assert sleepOnset != null;
-                assert workOnset != null;
-                assert workOffset != null;
-
-                if(isValid(sleepOnset.getTime(), workOnset.getTime(), workOffset.getTime())) {
-                    mainActivity.setSleepOnset(sleepOnset.getTime());
-                    mainActivity.setWorkOnset(workOnset.getTime());
-                    mainActivity.setWorkOffset(workOffset.getTime());
+                if(isValid(sleepOnsetResult, workOnsetResult, workOffsetResult)) {
+                    mainActivity.setSleepOnset(sleepOnsetResult);
+                    mainActivity.setWorkOnset(workOnsetResult);
+                    mainActivity.setWorkOffset(workOffsetResult);
                     sharedPref.edit().putInt("workType", selectedType[0]).apply();
-                    sharedPref.edit().putLong("sleepOnsetShow", sleepOnset.getTime());
+                    sharedPref.edit().putLong("sleepOnsetShow", sleepOnsetShowResult).apply();
 
-                    sendSurvey(sleepOnset.getTime(), workOnset.getTime(), workOffset.getTime(), selectedType[0]);
+                    sendSurvey(sleepOnsetResult, workOnsetResult, workOffsetResult, selectedType[0]);
 
                     mainActivity.finish();
                     startActivity(new Intent(mainActivity, SplashActivity.class));
@@ -538,5 +526,56 @@ public class WhenWorkFragment extends Fragment {
                 Log.v("ERROR", "Error found is : " + t.getMessage());
             }
         });
+    }
+
+    public static Long[] updateOnsetDate(long currentTime, long sleepOnset, long sleepOnsetShow, long workOnset, long workOffset) {
+        long oneDayToMils = 1000*60*60*24;
+        long tenMinToMils = 1000*60*10;
+        long oneHourToMils = 1000*60*60;
+
+        // Keep sleepOnsetShow before workOnset minus 1 day
+        while (sleepOnsetShow < workOnset - oneDayToMils) {
+            sleepOnsetShow = sleepOnsetShow + oneDayToMils;
+            sleepOnset = sleepOnsetShow;
+        }
+
+        // Ensure workOnset is after sleepOnset
+        while (workOnset < sleepOnset) {
+            workOnset = workOnset + oneDayToMils;
+        }
+
+        // Ensure workOffset is after workOnset
+        while (workOffset < workOnset) {
+            workOffset = workOffset + oneDayToMils;
+        }
+
+        // Adjust sleepOnset if currentTime is within sleepOnset and workOnset
+        if (sleepOnset <= currentTime && currentTime <= workOnset) {
+            while (sleepOnset < currentTime) {
+                sleepOnset = currentTime + tenMinToMils;
+            }
+        }
+
+        // Ensure sleepOnsetShow is not before currentTime
+        if (workOnset - oneHourToMils <= sleepOnset) {
+            while (sleepOnsetShow < currentTime) {
+                sleepOnsetShow = sleepOnsetShow + oneDayToMils;
+            }
+            sleepOnset = sleepOnsetShow;
+        }
+
+        // Repeat the adjustments for sleepOnsetShow, workOnset, and workOffset
+        while (sleepOnsetShow < workOnset - oneDayToMils) {
+            sleepOnsetShow = sleepOnsetShow + oneDayToMils;
+            sleepOnset = sleepOnsetShow;
+        }
+        while (workOnset < sleepOnset) {
+            workOnset = workOnset + oneDayToMils;
+        }
+        while (workOffset < workOnset) {
+            workOffset = workOffset + oneDayToMils;
+        }
+
+        return new Long[]{sleepOnset, sleepOnsetShow, workOnset, workOffset};
     }
 }
