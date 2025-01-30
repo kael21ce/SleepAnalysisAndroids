@@ -58,7 +58,7 @@ import java.util.Locale;
 public class HomeFragment extends Fragment {
     SimpleDateFormat sdfDateTime = new SimpleDateFormat( "hh:mm a", Locale.KOREA);
     SimpleDateFormat sdfDateTime2 = new SimpleDateFormat( "dd/MM/yyyy hh:mm a", Locale.KOREA);
-    SimpleDateFormat sdfDateTimeRecomm = new SimpleDateFormat("a hh:mm", Locale.KOREA);
+    SimpleDateFormat sdfDateTimeRecomm = new SimpleDateFormat("H:mm", Locale.KOREA);
     SimpleDateFormat sdfDate = new SimpleDateFormat("MM/dd", Locale.KOREA);
     SimpleDateFormat sdfTime = new SimpleDateFormat("HH:mm", Locale.KOREA);
     long now = System.currentTimeMillis(), nineHours = (1000*60*60*9);

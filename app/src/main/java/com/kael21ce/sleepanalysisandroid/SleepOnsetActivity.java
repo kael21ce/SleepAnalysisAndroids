@@ -94,8 +94,8 @@ public class SleepOnsetActivity extends AppCompatActivity implements ButtonTextU
 //        String workOffsetString = sdf.format(new Date(workOffset));
 
         if (languageSetting.equals("ko")) {
-            sdf = new SimpleDateFormat("yyyy.MM.dd a hh:mm", Locale.KOREA);
-            sdfTime = new SimpleDateFormat("a hh:mm", Locale.KOREA);
+            sdf = new SimpleDateFormat("yyyy.MM.dd a h:mm", Locale.KOREA);
+            sdfTime = new SimpleDateFormat("a h:mm", Locale.KOREA);
         } else {
             sdf = new SimpleDateFormat("yyyy.MM.dd hh:mm a");
             sdfTime = new SimpleDateFormat("hh:mm a");

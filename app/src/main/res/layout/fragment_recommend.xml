@@ -39,9 +39,9 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/pretendardbold"
+                        android:text="수면 추천을 위한 일정"
                         android:textColor="@color/black"
-                        android:textSize="20sp"
-                        android:text="수면 추천 받기" />
+                        android:textSize="20sp" />
 
                     <TextView
                         android:id="@+id/noDataDescription"
@@ -68,9 +68,9 @@
                     android:layout_margin="24dp"
                     android:backgroundTint="@color/blue_1"
                     android:fontFamily="@font/pretendardvariable"
-                    android:text="시작하기"
-                    android:textSize="16sp"
                     android:padding="10dp"
+                    android:text="추천 받기"
+                    android:textSize="16sp"
                     app:cornerRadius="28dp" />
 
             </LinearLayout>
@@ -210,7 +210,7 @@
                             android:layout_margin="16dp"
                             android:fontFamily="@font/pretendardvariable"
                             android:gravity="end"
-                            android:text="오전 0시 00분"
+                            android:text="1 : 00"
                             android:textColor="@color/black"
                             android:textSize="16sp" />
                     </LinearLayout>
@@ -313,7 +313,7 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:fontFamily="@font/pretendardvariable"
-                                    android:text="오전 1시 00분"
+                                    android:text="9 : 00 - 18 : 00"
                                     android:textColor="@color/black"
                                     android:textSize="16sp" />
                             </LinearLayout>

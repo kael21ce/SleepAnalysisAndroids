@@ -45,7 +45,7 @@ public class RecommendFragment extends Fragment {
     private LinearLayout InfoView, RecommendClockView;
     SimpleDateFormat sdfDateTime = new SimpleDateFormat("dd/MM/yyyy"+ "HH:mm", Locale.KOREA);
     SimpleDateFormat sdfDateTimeRecomm = new SimpleDateFormat("a hh:mm", Locale.KOREA);
-    SimpleDateFormat sdfDateTimeRecomm2 = new SimpleDateFormat("a h시 mm분", Locale.KOREA);
+    SimpleDateFormat sdfDateTimeRecomm2 = new SimpleDateFormat("H : mm", Locale.KOREA);
     SimpleDateFormat sdfTime = new SimpleDateFormat("HH:mm", Locale.KOREA);
     String mainSleepStartString,sleepOnsetString, mainSleepEndString, workOnsetString, workOffsetString, napSleepStartString, napSleepEndString;
     String sleepOnsetDisplaying, workOnsetDisplaying, workOffsetDisplaying;
@@ -108,7 +108,7 @@ public class RecommendFragment extends Fragment {
         InfoView = v.findViewById(R.id.InfoView);
         RecommendClockView = v.findViewById(R.id.RecommendClockView);
         TextView noDataDescription = v.findViewById(R.id.noDataDescription);
-        noDataDescription.setText(user_name + "님에게 딱 맞는 \n수면 패턴을 추천해 드릴게요");
+        noDataDescription.setText(user_name + "님에게 딱 맞는 수면 패턴을 추천해 드릴게요");
 
         //Check whether recommendation is hidden
         if (!sharedPref2.contains("isHidden")) {
@@ -163,11 +163,11 @@ public class RecommendFragment extends Fragment {
         ImageButton infoButton = v.findViewById(R.id.infoButton);
 
         hopeTimeText.setText(sleepOnsetDisplaying);
-        workTimeStart.setText(workOnsetDisplaying);
-        workTimeEnd.setText(workOffsetDisplaying);
+        workTimeStart.setVisibility(View.INVISIBLE);
+        workTimeEnd.setText(workOnsetDisplaying + " - " + workOffsetDisplaying);
 
         //User name setting
-        infoText.setText(user_name + "님의 일정");
+        infoText.setText("일정");
         clockTitleRecommend.setText(user_name + "님을 위한 추천 수면");
 
         //Recommendation information
