@@ -387,7 +387,7 @@ public class SurveyActivity extends AppCompatActivity {
 
                 ArrayList<DataMood> moodList = new ArrayList<>();
 
-                Records r = new Records(baseDate, false, alertList, moodList);
+                Records r = new Records(baseDate, true, alertList, moodList);
                 recordsList.add(r);
             }
             Log.v("SurveyActivity", "Record list size: " + recordsList.size());

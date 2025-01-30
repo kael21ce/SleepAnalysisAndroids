@@ -73,15 +73,18 @@ public class RecordsAdapter extends RecyclerView.Adapter<RecordsAdapter.ViewHold
             SimpleDateFormat timeFormat = new SimpleDateFormat("a h:mm", Locale.KOREA);
             if (type) {
                 // Text: recent 3 alertness survey
+                Log.v("RecordsAdapter", "Size: " + item.dataSurvey.size());
                 if (item.dataSurvey.size() == 0) {
                     Date latestDate = item.getRecordDate();
                     recordsDate.setText(dateFormat.format(latestDate));
                     progressText.setText("일일 목표 달성률: 0/3");
-                    recordsText1.setText("각성도: -");
+                    recordsText1.setText("일일 각성도 설문을 진행해주세요");
                     recordsDate1.setVisibility(View.INVISIBLE);
-                    recordsText2.setText("각성도: -");
+                    bullet2.setVisibility(View.INVISIBLE);
+                    recordsText2.setVisibility(View.INVISIBLE);
                     recordsDate2.setVisibility(View.INVISIBLE);
-                    recordsText3.setText("각성도: -");
+                    bullet3.setVisibility(View.INVISIBLE);
+                    recordsText3.setVisibility(View.INVISIBLE);
                     recordsDate3.setVisibility(View.INVISIBLE);
                     progressBar.setProgress(0);
                 } else {
@@ -134,9 +137,10 @@ public class RecordsAdapter extends RecyclerView.Adapter<RecordsAdapter.ViewHold
                     Date latestDate = item.getRecordDate();
                     recordsDate.setText(dateFormat.format(latestDate));
                     progressText.setText("일일 목표 달성률: 0/1");
-                    recordsText1.setText("일별 각성도: -");
+                    recordsText1.setText("오후 12시 이후 일일 설문을 진행해주세요");
                     recordsDate1.setVisibility(View.INVISIBLE);
-                    recordsText2.setText("일별 수면의 질: -");
+                    bullet2.setVisibility(View.INVISIBLE);
+                    recordsText2.setVisibility(View.INVISIBLE);
                     progressBar.setProgress(0);
                 } else {
                     DataMood latestMood = getLatestMood(item.getDataMood());
@@ -203,7 +207,6 @@ public class RecordsAdapter extends RecyclerView.Adapter<RecordsAdapter.ViewHold
                     times.set(0, alertTime);
                 }
             }
-            Log.v("RecordsAdapter", "TIMES: " + times.get(0) + " / " + times.get(1) + " / " + times.get(2));
             return results;
         }
 

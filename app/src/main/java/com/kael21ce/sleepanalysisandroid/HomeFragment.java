@@ -37,6 +37,8 @@ import com.github.mikephil.charting.highlight.Highlight;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.kael21ce.sleepanalysisandroid.data.Awareness;
+import com.kael21ce.sleepanalysisandroid.data.DataMood;
+import com.kael21ce.sleepanalysisandroid.data.DataSurvey;
 import com.kael21ce.sleepanalysisandroid.data.Sleep;
 
 import org.w3c.dom.Text;
@@ -47,6 +49,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -829,9 +832,42 @@ public class HomeFragment extends Fragment {
         RecyclerView alertRecyclerView = v.findViewById(R.id.AlertnessSurveyRecyclerView);
         RecordsAdapter alertAdapter = new RecordsAdapter();
         String alertJson = sharedPref.getString(AlertnessArrayKey, baseJson);
+        Log.v("HomeFragment", "Alert Json " + alertJson);
         Type type = new TypeToken<ArrayList<Records>>() {}.getType();
         alertArrayList = alertGson.fromJson(alertJson, type);
+        Log.v("HomeFragment", "Alert list size: " + alertArrayList.size());
         int alertTotalRecords = Math.min(14, alertArrayList.size());
+
+        // Add empty records if there is no records in current day
+        long baseTime = System.currentTimeMillis();
+        Calendar baseCalendar = Calendar.getInstance();
+        baseCalendar.setTimeInMillis(baseTime);
+        baseCalendar.set(Calendar.HOUR_OF_DAY, 0);
+        baseCalendar.set(Calendar.MINUTE, 0);
+        baseCalendar.set(Calendar.SECOND, 0);
+        baseCalendar.set(Calendar.MILLISECOND, 0);
+        boolean isEmptyAlertNeeded = true;
+        for (int l = 0; l < alertTotalRecords; l++) {
+            Records r = alertArrayList.get(alertTotalRecords-l-1);
+            Date rDate = r.getRecordDate();
+            Calendar calendaR = Calendar.getInstance();
+            calendaR.setTime(rDate);
+            if (calendaR.get(Calendar.YEAR) == baseCalendar.get(Calendar.YEAR)
+                    && calendaR.get(Calendar.MONTH) == baseCalendar.get(Calendar.MONTH)
+                    && calendaR.get(Calendar.DAY_OF_MONTH) == baseCalendar.get(Calendar.DAY_OF_MONTH)) {
+                isEmptyAlertNeeded = false;
+                break;
+            }
+        }
+        if (isEmptyAlertNeeded || alertTotalRecords == 0) {
+            ArrayList<DataSurvey> emptyAlerts = new ArrayList<>();
+            ArrayList<DataMood> emptyMoods = new ArrayList<>();
+            Records emptyRecords = new Records(baseCalendar.getTime(), true, emptyAlerts, emptyMoods);
+            alertArrayList.add(emptyRecords);
+        }
+        Log.v("HomeFragment", "Alert list size 2: " + alertArrayList.size());
+        alertTotalRecords = Math.min(14, alertArrayList.size());
+
         for (int k = 0; k < alertTotalRecords; k++) {
             Records r = alertArrayList.get(alertTotalRecords-k-1);
             alertAdapter.addItem(r);
@@ -862,6 +898,29 @@ public class HomeFragment extends Fragment {
         String dailyJson = sharedPref.getString(MoodArrayKey, baseJson);
         dailyArrayList = gson.fromJson(dailyJson, type);
         int totalRecords = Math.min(14, dailyArrayList.size());
+
+        // Add empty records if there is no records in current day
+        boolean isEmptyNeeded = true;
+        for (int l = 0; l < totalRecords; l++) {
+            Records r = dailyArrayList.get(totalRecords-l-1);
+            Date rDate = r.getRecordDate();
+            Calendar calendaR = Calendar.getInstance();
+            calendaR.setTime(rDate);
+            if (calendaR.get(Calendar.YEAR) == baseCalendar.get(Calendar.YEAR)
+                    && calendaR.get(Calendar.MONTH) == baseCalendar.get(Calendar.MONTH)
+                    && calendaR.get(Calendar.DAY_OF_MONTH) == baseCalendar.get(Calendar.DAY_OF_MONTH)) {
+                isEmptyNeeded = false;
+                break;
+            }
+        }
+        if (isEmptyNeeded || totalRecords == 0) {
+            ArrayList<DataSurvey> emptyAlerts = new ArrayList<>();
+            ArrayList<DataMood> emptyMoods = new ArrayList<>();
+            Records emptyRecords = new Records(baseCalendar.getTime(), false, emptyAlerts, emptyMoods);
+            dailyArrayList.add(emptyRecords);
+        }
+        totalRecords = Math.min(14, dailyArrayList.size());
+
         for (int k = 0; k < totalRecords; k++) {
             Records r = dailyArrayList.get(totalRecords-k-1);
             dailyAdapter.addItem(r);
