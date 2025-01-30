@@ -156,10 +156,12 @@ public class HomeFragment extends Fragment {
         });
 
         //Check whether recommendation is hidden
+        boolean isHidden = true;
         if (!sharedPref.contains("isHidden")) {
             editor.putBoolean("isHidden", true).apply();
+        } else {
+            isHidden = sharedPref.getBoolean("isHidden", true);
         }
-        boolean isHidden = false;
 
         if (sharedPref.contains("sleepOnset") && sharedPref.contains("workOnset") && sharedPref.contains("workOffset")) {
             if (sharedPref.getLong("workOnset",now) == sharedPref.getLong("workOffset",now)) {

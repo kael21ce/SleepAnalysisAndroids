@@ -105,7 +105,7 @@
                 android:layout_height="wrap_content"
                 android:background="@drawable/setting_stroke"
                 android:orientation="horizontal"
-                android:visibility="gone">
+                android:visibility="visible">
 
                 <LinearLayout
                     android:id="@+id/HideTextView"

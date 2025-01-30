@@ -61,13 +61,16 @@ public class IntervalFragment extends Fragment {
         }
 
         //Show or hide the good and bad duration
+        boolean isHidden = false;
         if (sharedPref.contains("isHidden")) {
-            boolean isHidden = false;
-            if (isHidden) {
-                alertnessLayout.setVisibility(View.GONE);
-            } else {
-                alertnessLayout.setVisibility(View.VISIBLE);
-            }
+            isHidden = sharedPref.getBoolean("isHidden", true);
+        } else {
+            editor.putBoolean("isHidden", true).apply();
+        }
+        if (isHidden) {
+            alertnessLayout.setVisibility(View.GONE);
+        } else {
+            alertnessLayout.setVisibility(View.VISIBLE);
         }
 
         //Schedule information
