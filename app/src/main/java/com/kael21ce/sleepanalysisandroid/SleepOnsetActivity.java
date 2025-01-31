@@ -229,6 +229,9 @@ public class SleepOnsetActivity extends AppCompatActivity implements ButtonTextU
                     editor.putInt("workType", selectedType[0]).apply();
                     sendSurvey(sleepOnsetEditTime, workOnsetEditTime, workOffsetEditTime, selectedType[0]);
 
+                    Log.v("SleepOnsetActivity", "Onset: " + sleepOnsetEditTime + " / Onset Show: " + sleepOnsetShowEditTime +
+                            " / Work onset: " + workOnsetEditTime + " / Work offset: " + workOffsetEditTime);
+
                     mainActivity.finish();
                     startActivity(new Intent(this, SplashActivity.class));
                 } else {
@@ -398,6 +401,12 @@ public class SleepOnsetActivity extends AppCompatActivity implements ButtonTextU
         long oneDayToMils = 1000*60*60*24;
         long tenMinToMils = 1000*60*10;
         long oneHourToMils = 1000*60*60;
+
+        // Update work if it is ended
+        while (currentTime > workOffset) {
+            workOnset = workOnset + oneDayToMils;
+            workOffset = workOffset + oneDayToMils;
+        }
 
         // Keep sleepOnsetShow before workOnset minus 1 day
         while (sleepOnsetShow < workOnset - oneDayToMils) {

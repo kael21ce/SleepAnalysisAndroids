@@ -55,6 +55,15 @@ public class ScheduleFragment extends Fragment {
         SharedPreferences sharedPref = getActivity().getSharedPreferences("SleepWake", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
 
+
+        // Update
+        Long [] updatedDates = updateOnsetDate(now, sharedPref.getLong("sleepOnset", now), sharedPref.getLong("sleepOnsetShow", now),
+                sharedPref.getLong("workOnset", now), sharedPref.getLong("workOffset", now));
+        mainActivity.setSleepOnset(updatedDates[0]);
+        editor.putLong("sleepOnsetShow", updatedDates[1]).apply();
+        mainActivity.setWorkOnset(updatedDates[2]);
+        mainActivity.setWorkOffset(updatedDates[3]);
+
         //get sleep data and calculate map values
         List<Sleep> sleeps = mainActivity.getSleeps();
         long oneDayToMils = 1000*60*60*24;
@@ -303,5 +312,62 @@ public class ScheduleFragment extends Fragment {
 
 
         return v;
+    }
+
+    public static Long[] updateOnsetDate(long currentTime, long sleepOnset, long sleepOnsetShow, long workOnset, long workOffset) {
+        long oneDayToMils = 1000*60*60*24;
+        long tenMinToMils = 1000*60*10;
+        long oneHourToMils = 1000*60*60;
+
+        // Update work if it is ended
+        while (currentTime > workOffset) {
+            workOnset = workOnset + oneDayToMils;
+            workOffset = workOffset + oneDayToMils;
+        }
+
+        // Keep sleepOnsetShow before workOnset minus 1 day
+        while (sleepOnsetShow < workOnset - oneDayToMils) {
+            sleepOnsetShow = sleepOnsetShow + oneDayToMils;
+            sleepOnset = sleepOnsetShow;
+        }
+
+        // Ensure workOnset is after sleepOnset
+        while (workOnset < sleepOnset) {
+            workOnset = workOnset + oneDayToMils;
+        }
+
+        // Ensure workOffset is after workOnset
+        while (workOffset < workOnset) {
+            workOffset = workOffset + oneDayToMils;
+        }
+
+        // Adjust sleepOnset if currentTime is within sleepOnset and workOnset
+        if (sleepOnset <= currentTime && currentTime <= workOnset) {
+            while (sleepOnset < currentTime) {
+                sleepOnset = currentTime + tenMinToMils;
+            }
+        }
+
+        // Ensure sleepOnsetShow is not before currentTime
+        if (workOnset - oneHourToMils <= sleepOnset) {
+            while (sleepOnsetShow < currentTime) {
+                sleepOnsetShow = sleepOnsetShow + oneDayToMils;
+            }
+            sleepOnset = sleepOnsetShow;
+        }
+
+        // Repeat the adjustments for sleepOnsetShow, workOnset, and workOffset
+        while (sleepOnsetShow < workOnset - oneDayToMils) {
+            sleepOnsetShow = sleepOnsetShow + oneDayToMils;
+            sleepOnset = sleepOnsetShow;
+        }
+        while (workOnset < sleepOnset) {
+            workOnset = workOnset + oneDayToMils;
+        }
+        while (workOffset < workOnset) {
+            workOffset = workOffset + oneDayToMils;
+        }
+
+        return new Long[]{sleepOnset, sleepOnsetShow, workOnset, workOffset};
     }
 }

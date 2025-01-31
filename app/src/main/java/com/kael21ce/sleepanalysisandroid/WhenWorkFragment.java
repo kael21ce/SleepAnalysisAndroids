@@ -414,12 +414,6 @@ public class WhenWorkFragment extends Fragment {
                 if (sleepOnsetType <= now) {
                     sleepOnsetType = sleepOnsetType + oneDay;
                 }
-                if (workOnsetType <= now) {
-                    workOnsetType = workOnsetType + oneDay;
-                }
-                if (workOffsetType <= now) {
-                    workOffsetType = workOffsetType + oneDay;
-                }
 
                 Long[] updateDates = updateOnsetDate(now, sleepOnsetType, sleepOnsetType,
                         workOnsetType, workOffsetType);
@@ -434,6 +428,9 @@ public class WhenWorkFragment extends Fragment {
                     mainActivity.setWorkOffset(workOffsetResult);
                     sharedPref.edit().putInt("workType", selectedType[0]).apply();
                     sharedPref.edit().putLong("sleepOnsetShow", sleepOnsetShowResult).apply();
+
+                    Log.v("SplashActivity", "Onset: " + sleepOnsetResult + " / Onset Show: " + sleepOnsetShowResult +
+                            " / Work onset: " + workOnsetResult + " / Work offset: " + workOffsetResult);
 
                     sendSurvey(sleepOnsetResult, workOnsetResult, workOffsetResult, selectedType[0]);
 
@@ -532,6 +529,12 @@ public class WhenWorkFragment extends Fragment {
         long oneDayToMils = 1000*60*60*24;
         long tenMinToMils = 1000*60*10;
         long oneHourToMils = 1000*60*60;
+
+        // Update work if it is ended
+        while (currentTime > workOffset) {
+            workOnset = workOnset + oneDayToMils;
+            workOffset = workOffset + oneDayToMils;
+        }
 
         // Keep sleepOnsetShow before workOnset minus 1 day
         while (sleepOnsetShow < workOnset - oneDayToMils) {

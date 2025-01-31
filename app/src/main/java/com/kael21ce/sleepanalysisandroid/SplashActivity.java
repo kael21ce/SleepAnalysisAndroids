@@ -90,6 +90,8 @@ public class SplashActivity extends AppCompatActivity {
         editor.putLong("workOnset", updatedDates[2]);
         editor.putLong("workOffset", updatedDates[3]);
         editor.apply();
+        Log.v("SplashActivity", "Onset: " + updatedDates[0] + " / Onset Show: " + updatedDates[1] +
+                " / Work onset: " + updatedDates[2] + " / Work offset: " + updatedDates[3]);
 
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
@@ -143,6 +145,12 @@ public class SplashActivity extends AppCompatActivity {
         long oneDayToMils = 1000*60*60*24;
         long tenMinToMils = 1000*60*10;
         long oneHourToMils = 1000*60*60;
+
+        // Update work if it is ended
+        while (currentTime > workOffset) {
+            workOnset = workOnset + oneDayToMils;
+            workOffset = workOffset + oneDayToMils;
+        }
 
         // Keep sleepOnsetShow before workOnset minus 1 day
         while (sleepOnsetShow < workOnset - oneDayToMils) {
