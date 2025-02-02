@@ -88,15 +88,17 @@
                 <LinearLayout
                     android:id="@+id/InfoTextButtonCaption"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:layout_marginHorizontal="16dp"
                     android:layout_marginTop="16dp"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:weightSum="10">
 
                     <LinearLayout
                         android:id="@+id/InfoTextCaption"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="match_parent"
+                        android:layout_weight="2"
                         android:orientation="vertical">
 
                         <LinearLayout
@@ -109,7 +111,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/pretendardbold"
-                                android:text="\(userName)님의 일정"
+                                android:text="일정"
                                 android:textColor="@color/black"
                                 android:textSize="20sp" />
 
@@ -127,7 +129,7 @@
                         <TextView
                             android:id="@+id/InfoDescriptionText"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
+                            android:layout_height="match_parent"
                             android:fontFamily="@font/pretendardvariable"
                             android:text="오늘 밤 수면과 내일 근무 일정에 맞춰 설정해주세요"
                             android:textColor="@color/gray_4"
@@ -139,6 +141,7 @@
                         android:id="@+id/InfoButtonCaption"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
+                        android:layout_weight="8"
                         android:gravity="right"
                         android:orientation="horizontal">
 
