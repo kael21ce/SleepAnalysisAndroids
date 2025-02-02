@@ -38,8 +38,11 @@
             <TextView
                 android:id="@+id/sleepOnsetTitle"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
+                android:autoSizeMaxTextSize="24sp"
+                android:autoSizeMinTextSize="12sp"
                 android:gravity="center_horizontal"
+                android:maxLines="1"
                 android:text="수면 및 근무 일정"
                 android:textSize="24sp" />
 
@@ -52,11 +55,14 @@
 
                 <TextView
                     android:id="@+id/sleepSmallText"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
                     android:layout_gravity="top"
                     android:layout_marginLeft="16dp"
+                    android:autoSizeMaxTextSize="16sp"
+                    android:autoSizeMinTextSize="8sp"
                     android:fontFamily="@font/pretendardbold"
+                    android:maxLines="1"
                     android:text="수면 일정"
                     android:textColor="@color/black"
                     android:textSize="16sp" />
@@ -64,9 +70,12 @@
                 <TextView
                     android:id="@+id/sleepSmallDescription"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:layout_marginLeft="16dp"
+                    android:autoSizeMaxTextSize="12sp"
+                    android:autoSizeMinTextSize="6sp"
                     android:fontFamily="@font/pretendardvariable"
+                    android:maxLines="1"
                     android:text="오늘 밤 잠자리에 들 수 있는 가장 이른 시각을 알려주세요"
                     android:textColor="@color/gray_4"
                     android:textSize="12sp" />
@@ -114,11 +123,14 @@
 
                 <TextView
                     android:id="@+id/workSmallText"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
                     android:layout_gravity="top"
                     android:layout_marginLeft="16dp"
+                    android:autoSizeMaxTextSize="16sp"
+                    android:autoSizeMinTextSize="8sp"
                     android:fontFamily="@font/pretendardbold"
+                    android:maxLines="1"
                     android:text="근무 일정"
                     android:textColor="@color/black"
                     android:textSize="16sp" />
@@ -126,9 +138,12 @@
                 <TextView
                     android:id="@+id/workSmallDescription"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:layout_marginLeft="16dp"
+                    android:autoSizeMaxTextSize="12sp"
+                    android:autoSizeMinTextSize="6sp"
                     android:fontFamily="@font/pretendardvariable"
+                    android:maxLines="1"
                     android:text="내일 근무 혹은 활동 시간을 알려주세요"
                     android:textColor="@color/gray_4"
                     android:textSize="12sp" />
@@ -147,6 +162,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/pretendardvariable"
+                        android:maxLines="1"
                         android:text="시작"
                         android:textColor="@color/black"
                         android:textSize="16sp" />
@@ -217,12 +233,13 @@
 
                 <TextView
                     android:id="@+id/typeSmallText"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
                     android:layout_gravity="top"
                     android:layout_marginLeft="16dp"
+                    android:layout_marginBottom="8dp"
                     android:fontFamily="@font/pretendardbold"
+                    android:maxLines="1"
                     android:text="근무 종류"
                     android:textColor="@color/black"
                     android:textSize="16sp" />
@@ -248,12 +265,18 @@
             <Button
                 android:id="@+id/sleepSettingSubmitButton"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_marginHorizontal="16dp"
+                android:autoSizeMaxTextSize="14sp"
+                android:autoSizeMinTextSize="6sp"
+                android:autoSizeStepGranularity="2sp"
+                android:autoSizeTextType="uniform"
                 android:backgroundTint="@color/blue_1"
                 android:fontFamily="@font/pretendardvariable"
+                android:maxLines="1"
                 android:text="업데이트"
                 android:textColor="@color/white"
+                android:textSize="14sp"
                 android:visibility="visible"
                 app:cornerRadius="28dp"
                 tools:visibility="visible" />

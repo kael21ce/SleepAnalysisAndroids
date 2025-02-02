@@ -39,33 +39,48 @@
                 <TextView
                     android:id="@+id/whenWorkTitle"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:fontFamily="@font/pretendardbold"
+                    android:maxLines="1"
                     android:text="근무 시간이 언제인가요?"
                     android:textColor="@color/black"
-                    android:textSize="24sp" />
+                    android:textSize="24sp"
+                    android:autoSizeMaxTextSize="24sp"
+                    android:autoSizeMinTextSize="12sp"
+                    android:autoSizeStepGranularity="2sp"
+                    android:autoSizeTextType="uniform"/>
 
                 <TextView
                     android:id="@+id/whenWorkDescription"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:layout_marginTop="8dp"
                     android:fontFamily="@font/pretendardvariable"
+                    android:maxLines="1"
                     android:text="휴무일이라면 활동하는 시간을 알려주세요"
                     android:textColor="@color/black"
-                    android:textSize="14sp" />
+                    android:textSize="14sp"
+                    android:autoSizeMaxTextSize="14sp"
+                    android:autoSizeMinTextSize="6sp"
+                    android:autoSizeStepGranularity="2sp"
+                    android:autoSizeTextType="uniform"/>
             </LinearLayout>
         </LinearLayout>
 
         <TextView
             android:id="@+id/workOnsetDescription"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="20dp"
             android:layout_marginTop="64dp"
             android:layout_marginBottom="8dp"
             android:gravity="center_horizontal"
+            android:maxLines="1"
             android:text="시작 시간"
-            android:textSize="16sp" />
+            android:textSize="16sp"
+            android:autoSizeMaxTextSize="16sp"
+            android:autoSizeMinTextSize="8sp"
+            android:autoSizeStepGranularity="2sp"
+            android:autoSizeTextType="uniform"/>
 
         <LinearLayout
             android:id="@+id/whenWorkCaption"
@@ -167,12 +182,17 @@
         <TextView
             android:id="@+id/workOffsetDescription"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="20dp"
             android:layout_marginTop="32dp"
             android:layout_marginBottom="8dp"
             android:gravity="center_horizontal"
+            android:maxLines="1"
             android:text="종료 시간"
-            android:textSize="16sp" />
+            android:textSize="16sp"
+            android:autoSizeMaxTextSize="16sp"
+            android:autoSizeMinTextSize="8sp"
+            android:autoSizeStepGranularity="2sp"
+            android:autoSizeTextType="uniform"/>
 
         <LinearLayout
             android:id="@+id/whenWorkOffCaption"
@@ -280,15 +300,20 @@
             <TextView
                 android:id="@+id/workTypeText"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_gravity="center_horizontal"
+                android:layout_marginTop="32dp"
+                android:layout_marginBottom="8dp"
                 android:fontFamily="@font/pretendardbold"
                 android:gravity="center_horizontal"
+                android:maxLines="1"
                 android:text="근무 종류"
                 android:textColor="@color/black"
                 android:textSize="16sp"
-                android:layout_marginTop="32dp"
-                android:layout_marginBottom="8dp"/>
+                android:autoSizeMaxTextSize="16sp"
+                android:autoSizeMinTextSize="8sp"
+                android:autoSizeStepGranularity="2sp"
+                android:autoSizeTextType="uniform"/>
 
             <com.google.android.material.tabs.TabLayout
                 android:id="@+id/workTypeTab"
@@ -320,6 +345,7 @@
                 android:layout_height="wrap_content"
                 android:backgroundTint="@color/blue_1"
                 android:fontFamily="@font/pretendardvariable"
+                android:maxLines="1"
                 android:paddingHorizontal="10dp"
                 android:paddingVertical="16dp"
                 android:text="다음"
