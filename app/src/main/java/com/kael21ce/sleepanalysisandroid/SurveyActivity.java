@@ -312,7 +312,7 @@ public class SurveyActivity extends AppCompatActivity {
                         && calendaR.get(Calendar.MONTH) == baseCalendar.get(Calendar.MONTH)
                         && calendaR.get(Calendar.DAY_OF_MONTH) == baseCalendar.get(Calendar.DAY_OF_MONTH)) {
                     dataMoods.add(mood);
-                    Records r = new Records(date, isAlertness, dataSurveys, dataMoods);
+                    Records r = new Records(date, false, dataSurveys, dataMoods);
                     recordsList.set(n-i-1, r);
                     isUpdateNeeded = false;
                     Log.v("SurveyActivity", "Record list is added");
@@ -374,7 +374,7 @@ public class SurveyActivity extends AppCompatActivity {
                         && calendaR.get(Calendar.DAY_OF_MONTH) == baseCalendar.get(Calendar.DAY_OF_MONTH)) {
                     dataSurveys.add(alert);
 
-                    Records r = new Records(date, isAlertness, dataSurveys, dataMoods);
+                    Records r = new Records(date, true, dataSurveys, dataMoods);
                     recordsList.set(n-i-1, r);
                     isUpdateNeeded = false;
                     Log.v("SurveyActivity", "Record list is added");
