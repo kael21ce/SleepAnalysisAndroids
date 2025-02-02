@@ -870,7 +870,10 @@ public class HomeFragment extends Fragment {
 
         for (int k = 0; k < alertTotalRecords; k++) {
             Records r = alertArrayList.get(alertTotalRecords-k-1);
-            alertAdapter.addItem(r);
+            Log.v("HomeFragment", "isAlertness in Alertness: " + r.isAlertness());
+            if (r.isAlertness()) {
+                alertAdapter.addItem(r);
+            }
         }
         alertRecyclerView.setAdapter(alertAdapter);
         LinearLayoutManager alertLayoutManager = new LinearLayoutManager(v.getContext(),
@@ -923,7 +926,10 @@ public class HomeFragment extends Fragment {
 
         for (int k = 0; k < totalRecords; k++) {
             Records r = dailyArrayList.get(totalRecords-k-1);
-            dailyAdapter.addItem(r);
+            Log.v("HomeFragment", "isAlertness in Daily: " + r.isAlertness());
+            if (!r.isAlertness()) {
+                dailyAdapter.addItem(r);
+            }
         }
         dailyRecyclerView.setAdapter(dailyAdapter);
         LinearLayoutManager layoutManager = new LinearLayoutManager(v.getContext(),
