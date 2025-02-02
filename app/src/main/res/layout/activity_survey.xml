@@ -42,8 +42,13 @@
         <TextView
             android:id="@+id/SurveyTitle"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
+            android:autoSizeMaxTextSize="24sp"
+            android:autoSizeMinTextSize="12sp"
+            android:autoSizeStepGranularity="2sp"
+            android:autoSizeTextType="uniform"
             android:fontFamily="@font/pretendardbold"
+            android:maxLines="1"
             android:text="지금 얼마나 개운하신가요?"
             android:textColor="@color/black"
             android:textSize="24dp" />
@@ -51,11 +56,17 @@
         <TextView
             android:id="@+id/SurveyDescription"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_marginTop="8dp"
+            android:autoSizeMaxTextSize="14sp"
+            android:autoSizeMinTextSize="6sp"
+            android:autoSizeStepGranularity="2sp"
+            android:autoSizeTextType="uniform"
             android:fontFamily="@font/pretendardvariable"
+            android:maxLines="1"
             android:text="지금의 각성도를 잘 메모해둘게요 :)"
-            android:textColor="@color/gray_4" />
+            android:textColor="@color/gray_4"
+            android:textSize="14sp" />
 
     </LinearLayout>
 
@@ -77,10 +88,15 @@
         <TextView
             android:id="@+id/EmojiDescription"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_marginTop="24dp"
+            android:autoSizeMaxTextSize="20sp"
+            android:autoSizeMinTextSize="10sp"
+            android:autoSizeStepGranularity="2sp"
+            android:autoSizeTextType="uniform"
             android:fontFamily="@font/pretendardbold"
             android:gravity="center"
+            android:maxLines="1"
             android:text="개운한 정도: 1 / 10"
             android:textColor="@color/black"
             android:textSize="20sp" />

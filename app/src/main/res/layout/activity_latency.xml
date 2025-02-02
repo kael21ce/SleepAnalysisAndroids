@@ -17,7 +17,7 @@
         <TextView
             android:id="@+id/latencyTitle"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:fontFamily="@font/pretendardbold"
             android:text="어제 잠자리에 든 이후부터 잠에 들기까지 얼마나 걸렸나요?"
             android:textSize="24sp" />
@@ -25,12 +25,17 @@
         <TextView
             android:id="@+id/latencyDescription"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_marginTop="8dp"
             android:fontFamily="@font/pretendardvariable"
+            android:maxLines="1"
             android:text="대략적인 시간을 알려주세요"
+            android:textColor="@color/gray_4"
             android:textSize="16sp"
-            android:textColor="@color/gray_4" />
+            android:autoSizeMaxTextSize="16sp"
+            android:autoSizeMinTextSize="8sp"
+            android:autoSizeStepGranularity="2sp"
+            android:autoSizeTextType="uniform"/>
     </LinearLayout>
 
     <LinearLayout
@@ -64,13 +69,18 @@
 
         <TextView
             android:id="@+id/latencyMinuteText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:fontFamily="@font/pretendardvariable"
             android:gravity="center"
+            android:maxLines="1"
             android:text="분"
             android:textColor="@color/black"
-            android:textSize="16sp" />
+            android:textSize="16sp"
+            android:autoSizeMaxTextSize="16sp"
+            android:autoSizeMinTextSize="8sp"
+            android:autoSizeStepGranularity="2sp"
+            android:autoSizeTextType="uniform"/>
     </LinearLayout>
 
     <LinearLayout
@@ -88,8 +98,8 @@
             android:fontFamily="@font/pretendardvariable"
             android:paddingVertical="16dp"
             android:text="다음"
-            android:textSize="16sp"
             android:textColor="@color/white"
+            android:textSize="16sp"
             app:cornerRadius="28dp" />
     </LinearLayout>
 
