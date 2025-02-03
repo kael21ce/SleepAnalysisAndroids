@@ -51,6 +51,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -79,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
     SettingFragment settingFragment = new SettingFragment();
     private RelativeLayout loadingScreenLayout;
     boolean creation = false;
-    SimpleDateFormat sdfDateTime = new SimpleDateFormat("dd/MM/yyyy"+ "HH:mm");
+    SimpleDateFormat sdfDateTime = new SimpleDateFormat("dd/MM/yyyy" + " HH:mm");
     private static final String TAG = "MainActivity";
     private static final String CHECK_CHANNEL_ID = "check_recommend", SURVEY_CHANNEL_ID = "alertness_survey";
     HealthConnectManager healthConnectManager;
@@ -192,7 +193,12 @@ public class MainActivity extends AppCompatActivity {
         }
 
         //this is in GMT
-        nineHours = (1000*60*60*9);
+        // nineHours represent time difference between current timezone and UTC
+        ZoneId zone = ZoneId.systemDefault();
+        ZonedDateTime zoneNow = ZonedDateTime.now(zone);
+        ZoneOffset offset = zoneNow.getOffset();
+        nineHours = (1000L * offset.getTotalSeconds());
+
         now = System.currentTimeMillis();
         creation = true;
 

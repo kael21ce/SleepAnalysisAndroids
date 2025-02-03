@@ -22,6 +22,9 @@ import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -50,7 +53,11 @@ public class ScheduleFragment extends Fragment {
 
         Log.v("FRAGMENT", "SCHEDULE FRAGMENT");
 
-        nineHours = (1000*9*60*60);
+        ZoneId zone = ZoneId.systemDefault();
+        ZonedDateTime zoneNow = ZonedDateTime.now(zone);
+        ZoneOffset offset = zoneNow.getOffset();
+        nineHours = (1000L * offset.getTotalSeconds());
+
         now = System.currentTimeMillis();
         SharedPreferences sharedPref = getActivity().getSharedPreferences("SleepWake", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();

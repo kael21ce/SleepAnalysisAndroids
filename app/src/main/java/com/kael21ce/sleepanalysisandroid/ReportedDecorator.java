@@ -15,6 +15,9 @@ import com.prolificinteractive.materialcalendarview.DayViewFacade;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -48,6 +51,12 @@ public class ReportedDecorator implements DayViewDecorator {
                 throw new RuntimeException(e);
             }
             assert date != null;
+
+            ZoneId zone = ZoneId.systemDefault();
+            ZonedDateTime zoneNow = ZonedDateTime.now(zone);
+            ZoneOffset offset = zoneNow.getOffset();
+            nineHours = (1000L * offset.getTotalSeconds());
+
             long dayInMillis = date.getTime();
             long calendarDay = (dayInMillis + nineHours) / oneDayToMils;
             //Check
