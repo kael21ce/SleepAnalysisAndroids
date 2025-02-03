@@ -54,6 +54,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.TimeZone;
 
 public class HomeFragment extends Fragment {
     SimpleDateFormat sdfDateTime = new SimpleDateFormat( "hh:mm a", Locale.KOREA);
@@ -255,6 +256,13 @@ public class HomeFragment extends Fragment {
             infoIntent.putExtra("Location",0);
             startActivity(infoIntent);
         });
+
+        TimeZone timeZone = TimeZone.getDefault();
+        sdfDateTimeRecomm.setTimeZone(timeZone);
+        sdfTime.setTimeZone(timeZone);
+        sdfDateTime.setTimeZone(timeZone);
+        sdfDate.setTimeZone(timeZone);
+        sdfDateTime2.setTimeZone(timeZone);
 
         //Initial button color setting
         clockView.setTypeOfInterval(1);

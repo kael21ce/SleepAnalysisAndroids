@@ -30,6 +30,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.TimeZone;
 
 public class EditIntervalFragment extends Fragment implements ButtonTextUpdater {
 
@@ -64,13 +65,16 @@ public class EditIntervalFragment extends Fragment implements ButtonTextUpdater 
 
         MainActivity mainActivity = (MainActivity)getActivity();
 
+        TimeZone timeZone = TimeZone.getDefault();
+        sdfDateTime.setTimeZone(timeZone);
+        sdf24H.setTimeZone(timeZone);
+        sdfSimple.setTimeZone(timeZone);
+
         IntervalFragment intervalFragment = new IntervalFragment();
         //Back to intervalFragment if backButtonEdit is clicked
         Bundle bundle = this.getArguments();
         intervalFragment.setArguments(bundle.getBundle("bundle"));
         backButtonEdit.setOnClickListener(view -> getParentFragmentManager().beginTransaction().replace(R.id.IntervalFrame, intervalFragment).commit());
-
-
 
         //Set the time picker to each timeEditButton
         EditIntervalFragment editIntervalFragment = this;
@@ -108,6 +112,8 @@ public class EditIntervalFragment extends Fragment implements ButtonTextUpdater 
             sdf = new SimpleDateFormat("yyyy/MM/dd hh:mm aaa");
             sdfAMPM = new SimpleDateFormat("hh:mm a");
         }
+        sdf.setTimeZone(timeZone);
+        sdfAMPM.setTimeZone(timeZone);
 
         Log.v("AM PM FORMAT", sdfAMPM.format(startHourD));
         Log.v("AM PM FORMAT", sdfAMPM.format(endHourD));

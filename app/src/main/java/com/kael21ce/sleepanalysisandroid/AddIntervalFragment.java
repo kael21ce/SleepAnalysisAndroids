@@ -53,6 +53,8 @@ public class AddIntervalFragment extends Fragment implements ButtonTextUpdater {
         editor.putBoolean("isSchedule", true);
         editor.apply();
 
+        TimeZone timeZone = TimeZone.getDefault();
+
         startDateButton = v.findViewById(R.id.startDateButton);
         startTimeButton = v.findViewById(R.id.startTimeButton);
         endDateButton = v.findViewById(R.id.endDateButton);
@@ -75,6 +77,7 @@ public class AddIntervalFragment extends Fragment implements ButtonTextUpdater {
         } else {
             sdf = new SimpleDateFormat("yyyy.MM.dd hh:mm aaa");
         }
+        sdf.setTimeZone(timeZone);
 
 
         //Set the initial added time to current time
@@ -87,12 +90,18 @@ public class AddIntervalFragment extends Fragment implements ButtonTextUpdater {
             throw new RuntimeException(e);
         }
         String current_time;
+        SimpleDateFormat sdfCurrent, sdfDate;
         if (languageSetting.equals("ko")) {
-            current_time = new SimpleDateFormat("aaa hh:mm").format(new Date(1000*60*60*15));
+            sdfCurrent = new SimpleDateFormat("aaa hh:mm");
         } else {
-            current_time = new SimpleDateFormat("hh:mm aaa").format(new Date(1000*60*60*15));
+            sdfCurrent = new SimpleDateFormat("hh:mm aaa");
         }
-        String current_date = new SimpleDateFormat("yyyy.MM.dd").format(ref.curDate);
+        sdfCurrent.setTimeZone(timeZone);
+        current_time = sdfCurrent.format(getMidnight());
+
+        sdfDate = new SimpleDateFormat("yyyy.MM.dd");
+        sdfDate.setTimeZone(timeZone);
+        String current_date = sdfDate.format(ref.curDate);
 
         startDateButton.setText(current_date);
         endDateButton.setText(current_date);
@@ -162,6 +171,10 @@ public class AddIntervalFragment extends Fragment implements ButtonTextUpdater {
             assert sleepEndDate != null;
             add_sleep.sleepStart = sleepStartDate.getTime();
             add_sleep.sleepEnd = sleepEndDate.getTime();
+            boolean bool1 = sleepStartDate.getTime() <= sleepEndDate.getTime();
+            boolean bool2 = !mainActivity.isOverlap(mainActivity.getSleeps(), add_sleep, -1);
+            Log.v("AddIntervalFragment", "Bool 1: " + bool1);
+            Log.v("AddIntervalFragment", "Bool 2: " + bool2);
             if(sleepStartDate.getTime() <= sleepEndDate.getTime() && !mainActivity.isOverlap(mainActivity.getSleeps(), add_sleep, -1)) {
                 if (Math.abs(sleepStartDate.getTime()-sleepEndDate.getTime()) > 24*60*60*1000) {
                     AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
@@ -181,7 +194,26 @@ public class AddIntervalFragment extends Fragment implements ButtonTextUpdater {
                         alert.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(getResources().getColor(R.color.black));
                     });
                     alert.show();
+                } else if (sleepStartDate.getTime()-sleepEndDate.getTime() == 0) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                    builder.setCancelable(true);
+                    if (languageSetting.equals("ko")) {
+                        builder.setTitle("경고");
+                        builder.setMessage("수면 시작과 종료는 달라야 합니다.");
+                        builder.setNegativeButton("확인", (dialogInterface, i) -> dialogInterface.cancel());
+                    } else {
+                        builder.setTitle("ERROR");
+                        builder.setMessage("Sleep onset and offset should be different");
+                        builder.setNegativeButton("OK", (dialogInterface, i) -> dialogInterface.cancel());
+                    }
+
+                    AlertDialog alert = builder.create();
+                    alert.setOnShowListener(arg0 -> {
+                        alert.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(getResources().getColor(R.color.black));
+                    });
+                    alert.show();
                 } else {
+
                     mainActivity.addSleep(add_sleep);
 
                     mainActivity.finish();
@@ -266,5 +298,16 @@ public class AddIntervalFragment extends Fragment implements ButtonTextUpdater {
                 return nullString;
             }
         }
+    }
+
+    public Date getMidnight() {
+        Calendar calendar = Calendar.getInstance();
+
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+
+        return calendar.getTime();
     }
 }

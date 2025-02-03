@@ -20,11 +20,13 @@ import com.google.android.material.tabs.TabLayout;
 import com.kael21ce.sleepanalysisandroid.data.DataSurvey;
 import com.kael21ce.sleepanalysisandroid.data.RetrofitAPI;
 
+import java.sql.Time;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.TimeZone;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -100,6 +102,11 @@ public class SleepOnsetActivity extends AppCompatActivity implements ButtonTextU
             sdf = new SimpleDateFormat("yyyy.MM.dd hh:mm a");
             sdfTime = new SimpleDateFormat("hh:mm a");
         }
+
+        TimeZone timeZone = TimeZone.getDefault();
+        sdf.setTimeZone(timeZone);
+        sdfTime.setTimeZone(timeZone);
+        sdfDate.setTimeZone(timeZone);
 
         sleepOnsetDateButton.setText(sdfDate.format(new Date(sleepOnsetShow)));
         sleepOnsetTimeButton.setText(sdfTime.format(new Date(sleepOnsetShow)));

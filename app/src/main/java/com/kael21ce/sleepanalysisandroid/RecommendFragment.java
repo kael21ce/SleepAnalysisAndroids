@@ -29,6 +29,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.TimeZone;
 
 public class RecommendFragment extends Fragment {
 
@@ -45,7 +46,7 @@ public class RecommendFragment extends Fragment {
     private LinearLayout InfoView, RecommendClockView;
     SimpleDateFormat sdfDateTime = new SimpleDateFormat("dd/MM/yyyy"+ "HH:mm", Locale.KOREA);
     SimpleDateFormat sdfDateTimeRecomm = new SimpleDateFormat("a hh:mm", Locale.KOREA);
-    SimpleDateFormat sdfDateTimeRecomm2 = new SimpleDateFormat("H : mm", Locale.KOREA);
+    SimpleDateFormat sdfDateTimeRecomm2 = new SimpleDateFormat("H : mm");
     SimpleDateFormat sdfTime = new SimpleDateFormat("HH:mm", Locale.KOREA);
     String mainSleepStartString,sleepOnsetString, mainSleepEndString, workOnsetString, workOffsetString, napSleepStartString, napSleepEndString;
     String sleepOnsetDisplaying, workOnsetDisplaying, workOffsetDisplaying;
@@ -92,6 +93,11 @@ public class RecommendFragment extends Fragment {
         editor.putLong("sleepOnsetShow", updatedDates[1]).apply();
         mainActivity.setWorkOnset(updatedDates[2]);
         mainActivity.setWorkOffset(updatedDates[3]);
+
+        TimeZone timeZone = TimeZone.getDefault();
+        sdfDateTime.setTimeZone(timeZone);
+        sdfDateTimeRecomm.setTimeZone(timeZone);
+        sdfDateTimeRecomm2.setTimeZone(timeZone);
 
         mainSleepStartString = sdfTime.format(new Date(mainActivity.getMainSleepStart()));
         mainSleepEndString = sdfTime.format(new Date(mainActivity.getMainSleepEnd()));

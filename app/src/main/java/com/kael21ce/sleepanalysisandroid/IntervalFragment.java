@@ -20,6 +20,7 @@ import android.widget.TextView;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.TimeZone;
 
 
 public class IntervalFragment extends Fragment {
@@ -46,6 +47,9 @@ public class IntervalFragment extends Fragment {
         intervalPlusButton = v.findViewById(R.id.intervalPlusButton);
         intervalRecyclerView = v.findViewById(R.id.IntervalRecyclerView);
         alertnessLayout = v.findViewById(R.id.AlertnessLayout);
+
+        TimeZone timeZone = TimeZone.getDefault();
+        sdf.setTimeZone(timeZone);
 
 
         //Set layoutManager to recyclerView

@@ -60,6 +60,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.OkHttpClient;
@@ -78,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
     SettingFragment settingFragment = new SettingFragment();
     private RelativeLayout loadingScreenLayout;
     boolean creation = false;
-    SimpleDateFormat sdfDateTime = new SimpleDateFormat("dd/MM/yyyy"+ "HH:mm", Locale.KOREA);
+    SimpleDateFormat sdfDateTime = new SimpleDateFormat("dd/MM/yyyy"+ "HH:mm");
     private static final String TAG = "MainActivity";
     private static final String CHECK_CHANNEL_ID = "check_recommend", SURVEY_CHANNEL_ID = "alertness_survey";
     HealthConnectManager healthConnectManager;
@@ -142,6 +143,10 @@ public class MainActivity extends AppCompatActivity {
         //get the shared preferences variable
         sharedPref = getSharedPreferences("SleepWake", Context.MODE_PRIVATE);
         editor = sharedPref.edit();
+
+        // Set timezone
+        TimeZone timeZone = TimeZone.getDefault();
+        sdfDateTime.setTimeZone(timeZone);
 
         //Set the initial notification time
         if (!sharedPref.contains(NotifyKey)) {
