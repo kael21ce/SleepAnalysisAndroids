@@ -326,12 +326,6 @@ public class ScheduleFragment extends Fragment {
         long tenMinToMils = 1000*60*10;
         long oneHourToMils = 1000*60*60;
 
-        // Update work if it is ended
-        while (currentTime > workOffset) {
-            workOnset = workOnset + oneDayToMils;
-            workOffset = workOffset + oneDayToMils;
-        }
-
         // Keep sleepOnsetShow before workOnset minus 1 day
         while (sleepOnsetShow < workOnset - oneDayToMils) {
             sleepOnsetShow = sleepOnsetShow + oneDayToMils;
@@ -372,6 +366,12 @@ public class ScheduleFragment extends Fragment {
             workOnset = workOnset + oneDayToMils;
         }
         while (workOffset < workOnset) {
+            workOffset = workOffset + oneDayToMils;
+        }
+
+        // Update work if it is ended
+        while (currentTime > workOffset) {
+            workOnset = workOnset + oneDayToMils;
             workOffset = workOffset + oneDayToMils;
         }
 
