@@ -44,6 +44,7 @@ import java.time.Instant
 import java.time.ZonedDateTime
 import java.util.Date
 import java.util.Locale
+import java.util.TimeZone
 import java.util.concurrent.CompletableFuture
 import kotlin.random.Random
 
@@ -152,6 +153,9 @@ class HealthConnectManager(private val context: Context) {
                 timeRangeFilter = TimeRangeFilter.between(start, end)
         )
 
+        val timeZone = TimeZone.getDefault();
+        val nineHours = timeZone.getOffset(System.currentTimeMillis());
+
         val response = healthConnectClient.readRecords(request)
         val db = Room.databaseBuilder(context, AppDatabase::class.java, "sleep_wake").build()
         val userDao = db.sleepDao()
@@ -162,15 +166,15 @@ class HealthConnectManager(private val context: Context) {
             Log.v("THE RECORD START", sdfDateTime.format(Date.from(sleepRecord.startTime)))
             Log.v("THE RECORD END", sdfDateTime.format(Date.from(sleepRecord.endTime)))
             //check whether we need to divide the sleep to two
-            val sleepStartDay = ((sleepStart + (1000*60*60*9)) / (1000 * 60 * 60 * 24))
-            val sleepEndDay = ((sleepEnd + (1000*60*60*9))/ (1000 * 60 * 60 * 24))
+            val sleepStartDay = ((sleepStart + nineHours) / (1000 * 60 * 60 * 24))
+            val sleepEndDay = ((sleepEnd + nineHours)/ (1000 * 60 * 60 * 24))
             if (sleepStartDay != sleepEndDay) {
                 val midnight = sleepEndDay * (1000 * 60 * 60 * 24)
                 val additionalSleep = Sleep()
                 additionalSleep.sleepStart = sleepStart
-                additionalSleep.sleepEnd = midnight - (1000*60*60*9)
+                additionalSleep.sleepEnd = midnight - nineHours
                 sleepList.add(additionalSleep)
-                sleepStart = midnight - (1000*60*60*9)
+                sleepStart = midnight - nineHours
             }
             //save everything in the database
             val sleep = Sleep()
