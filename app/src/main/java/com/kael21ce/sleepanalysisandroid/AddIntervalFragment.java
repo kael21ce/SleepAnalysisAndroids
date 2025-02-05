@@ -175,7 +175,7 @@ public class AddIntervalFragment extends Fragment implements ButtonTextUpdater {
             boolean bool2 = !mainActivity.isOverlap(mainActivity.getSleeps(), add_sleep, -1);
             Log.v("AddIntervalFragment", "Bool 1: " + bool1);
             Log.v("AddIntervalFragment", "Bool 2: " + bool2);
-            if(sleepStartDate.getTime() <= sleepEndDate.getTime() && !mainActivity.isOverlap(mainActivity.getSleeps(), add_sleep, -1)) {
+            if(sleepStartDate.getTime() < sleepEndDate.getTime() && !mainActivity.isOverlap(mainActivity.getSleeps(), add_sleep, -1)) {
                 if (Math.abs(sleepStartDate.getTime()-sleepEndDate.getTime()) > 24*60*60*1000) {
                     AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
                     builder.setCancelable(true);
@@ -186,24 +186,6 @@ public class AddIntervalFragment extends Fragment implements ButtonTextUpdater {
                     } else {
                         builder.setTitle("ERROR");
                         builder.setMessage("Please enter sleep time of less than 24 hours");
-                        builder.setNegativeButton("OK", (dialogInterface, i) -> dialogInterface.cancel());
-                    }
-
-                    AlertDialog alert = builder.create();
-                    alert.setOnShowListener(arg0 -> {
-                        alert.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(getResources().getColor(R.color.black));
-                    });
-                    alert.show();
-                } else if (sleepStartDate.getTime()-sleepEndDate.getTime() == 0) {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                    builder.setCancelable(true);
-                    if (languageSetting.equals("ko")) {
-                        builder.setTitle("경고");
-                        builder.setMessage("수면 시작과 종료는 달라야 합니다.");
-                        builder.setNegativeButton("확인", (dialogInterface, i) -> dialogInterface.cancel());
-                    } else {
-                        builder.setTitle("ERROR");
-                        builder.setMessage("Sleep onset and offset should be different");
                         builder.setNegativeButton("OK", (dialogInterface, i) -> dialogInterface.cancel());
                     }
 
@@ -243,7 +225,7 @@ public class AddIntervalFragment extends Fragment implements ButtonTextUpdater {
                     builder.setNegativeButton("확인", (dialogInterface, i) -> dialogInterface.cancel());
                 } else {
                     builder.setTitle("ERROR");
-                    builder.setMessage("INVALID SLEEP VALUE");
+                    builder.setMessage("Invalid sleep value");
                     builder.setNegativeButton("OK", (dialogInterface, i) -> dialogInterface.cancel());
                 }
 
