@@ -46,32 +46,22 @@ public class TimePickerDialog extends Dialog {
                 minuteStr = String.valueOf(minute);
             }
             if (hour >= 12) {
-                if (hour - 12 < 10) {
-                    if(languageSetting == "en") {
-                        format = "0" + (hour - 12) + ":" + minuteStr + " PM";
-                    }else{
-                        format = "오후 0" + (hour - 12) + ":" + minuteStr;
-                    }
-                } else {
-                    if(languageSetting == "en") {
-                        format = (hour - 12) + ":" + minuteStr + " PM";
-                    }else{
-                        format = "오후 " + (hour - 12) + ":" + minuteStr;
-                    }
+                if (hour == 12) {
+                    hour = hour + 12;
+                }
+                if(languageSetting == "en") {
+                    format = (hour - 12) + ":" + minuteStr + " PM";
+                }else {
+                    format = "오후 " + (hour - 12) + ":" + minuteStr;
                 }
             } else {
-                if (hour < 10) {
-                    if(languageSetting == "en") {
-                        format = "0" + hour + ":" + minuteStr + " AM";
-                    }else{
-                        format = "오전 0" + hour + ":" + minuteStr;
-                    }
-                } else {
-                    if(languageSetting == "en") {
-                        format = hour + ":" + minuteStr + " AM";
-                    }else{
-                        format = "오전 " + hour + ":" + minuteStr;
-                    }
+                if (hour == 0) {
+                    hour = hour + 12;
+                }
+                if(languageSetting == "en") {
+                    format = hour + ":" + minuteStr + " AM";
+                }else{
+                    format = "오전 " + hour + ":" + minuteStr;
                 }
             }
             checkTimeButton.setOnClickListener(view -> {
@@ -94,7 +84,7 @@ public class TimePickerDialog extends Dialog {
         if (languageSetting.equals("ko")) {
             df = DateTimeFormatter.ofPattern( "a h:mm", Locale.KOREA);
         } else {
-            df = DateTimeFormatter.ofPattern( "hh:mm a");
+            df = DateTimeFormatter.ofPattern( "h:mm a");
         }
         LocalTime time = LocalTime.parse(current_time, df);
 //        int hour = Integer.parseInt(current_time.substring(0, 2));

@@ -407,7 +407,7 @@ public class MainActivity extends AppCompatActivity {
 
     //Change "HH:mm" to milliseconds
     public long timeToSeconds(String value) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("H:mm");
         LocalTime time = LocalTime.parse(value, formatter);
         LocalDate currentDate = LocalDate.now();
         ZonedDateTime dateTime = ZonedDateTime.of(currentDate, time, ZoneId.systemDefault());

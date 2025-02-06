@@ -41,10 +41,10 @@ public class SettingFragment extends Fragment implements ButtonTextUpdater {
     Boolean isFolded = true;
     private static final String NotifyKey = "Notify_At";
     Button notifyButton;
-    SimpleDateFormat sdfComplexTime = new SimpleDateFormat( "a hh:mm", Locale.KOREA);
-    SimpleDateFormat sdfComplexTime_En = new SimpleDateFormat( "hh:mm a");
-    SimpleDateFormat sdfSimpleTime = new SimpleDateFormat("HH:mm", Locale.KOREA);
-    SimpleDateFormat sdfSimpleTime_En = new SimpleDateFormat("HH:mm");
+    SimpleDateFormat sdfComplexTime = new SimpleDateFormat( "a h:mm", Locale.KOREA);
+    SimpleDateFormat sdfComplexTime_En = new SimpleDateFormat( "h:mm a");
+    SimpleDateFormat sdfSimpleTime = new SimpleDateFormat("H:mm", Locale.KOREA);
+    SimpleDateFormat sdfSimpleTime_En = new SimpleDateFormat("H:mm");
     String notifyAt, notifyAt_complex;
     SharedPreferences sharedPref;
     SharedPreferences.Editor editor;

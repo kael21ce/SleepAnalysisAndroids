@@ -32,7 +32,7 @@ public class IntervalFragment extends Fragment {
     public TextView AlertnessLowTimeText;
     private LinearLayout alertnessLayout;
 
-    SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", Locale.KOREA);
+    SimpleDateFormat sdf = new SimpleDateFormat("H:mm", Locale.KOREA);
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,

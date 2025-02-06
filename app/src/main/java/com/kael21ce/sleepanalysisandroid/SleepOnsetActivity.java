@@ -23,6 +23,7 @@ import com.kael21ce.sleepanalysisandroid.data.RetrofitAPI;
 import java.sql.Time;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Objects;
@@ -49,6 +50,7 @@ public class SleepOnsetActivity extends AppCompatActivity implements ButtonTextU
     SimpleDateFormat sdfTime;
     long now, nineHours;
     private String languageSetting = Locale.getDefault().getLanguage();
+    String sleepOnsetTimeText, workOnsetTimeText, workOffsetTimeText;
 
     @Override
     protected void onCreate(Bundle saveInstanceState) {
@@ -99,8 +101,8 @@ public class SleepOnsetActivity extends AppCompatActivity implements ButtonTextU
             sdf = new SimpleDateFormat("yyyy.MM.dd a h:mm", Locale.KOREA);
             sdfTime = new SimpleDateFormat("a h:mm", Locale.KOREA);
         } else {
-            sdf = new SimpleDateFormat("yyyy.MM.dd hh:mm a");
-            sdfTime = new SimpleDateFormat("hh:mm a");
+            sdf = new SimpleDateFormat("yyyy.MM.dd h:mm a");
+            sdfTime = new SimpleDateFormat("h:mm a");
         }
 
         TimeZone timeZone = TimeZone.getDefault();

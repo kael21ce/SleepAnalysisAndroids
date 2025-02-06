@@ -40,11 +40,11 @@ public class EditIntervalFragment extends Fragment implements ButtonTextUpdater 
     private String buttonEndText;
     private TextView intervalTextView;
 
-    SimpleDateFormat sdfDateTime = new SimpleDateFormat( "yyyy/MM/dd HH:mm", Locale.KOREA);
+    SimpleDateFormat sdfDateTime = new SimpleDateFormat( "yyyy/MM/dd H:mm", Locale.KOREA);
     SimpleDateFormat sdf;
     SimpleDateFormat sdfSimple = new SimpleDateFormat("yyyy/MM/dd");
 
-    SimpleDateFormat sdf24H = new SimpleDateFormat("HH:mm");
+    SimpleDateFormat sdf24H = new SimpleDateFormat("H:mm");
     SimpleDateFormat sdfAMPM;
 
     private static final String TAG = "EditIntervalFragment";
@@ -106,11 +106,11 @@ public class EditIntervalFragment extends Fragment implements ButtonTextUpdater 
         }
 
         if (languageSetting.equals("ko")) {
-            sdf = new SimpleDateFormat("yyyy/MM/dd a hh:mm");
-            sdfAMPM = new SimpleDateFormat("a hh:mm", Locale.KOREA);
+            sdf = new SimpleDateFormat("yyyy/MM/dd a h:mm");
+            sdfAMPM = new SimpleDateFormat("a h:mm", Locale.KOREA);
         } else {
-            sdf = new SimpleDateFormat("yyyy/MM/dd hh:mm aaa");
-            sdfAMPM = new SimpleDateFormat("hh:mm a");
+            sdf = new SimpleDateFormat("yyyy/MM/dd h:mm a");
+            sdfAMPM = new SimpleDateFormat("h:mm a");
         }
         sdf.setTimeZone(timeZone);
         sdfAMPM.setTimeZone(timeZone);
@@ -338,9 +338,9 @@ public class EditIntervalFragment extends Fragment implements ButtonTextUpdater 
         String languageSetting = Locale.getDefault().getLanguage();
         DateTimeFormatter formatter;
         if (languageSetting.equals("ko")) {
-            formatter = DateTimeFormatter.ofPattern("a hh:mm", Locale.KOREA);
+            formatter = DateTimeFormatter.ofPattern("a h:mm", Locale.KOREA);
         } else {
-            formatter = DateTimeFormatter.ofPattern("hh:mm a");
+            formatter = DateTimeFormatter.ofPattern("h:mm a");
         }
 
         LocalTime startTime = LocalTime.parse(start, formatter);

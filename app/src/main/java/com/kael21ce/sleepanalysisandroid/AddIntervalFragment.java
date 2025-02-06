@@ -73,9 +73,9 @@ public class AddIntervalFragment extends Fragment implements ButtonTextUpdater {
         backButton.setOnClickListener(view -> getParentFragmentManager().beginTransaction().replace(R.id.IntervalFrame, intervalFragment).commit());
         
         if (languageSetting.equals("ko")) {
-            sdf = new SimpleDateFormat("yyyy.MM.dd aaa hh:mm");
+            sdf = new SimpleDateFormat("yyyy.MM.dd a h:mm");
         } else {
-            sdf = new SimpleDateFormat("yyyy.MM.dd hh:mm aaa");
+            sdf = new SimpleDateFormat("yyyy.MM.dd h:mm a");
         }
         sdf.setTimeZone(timeZone);
 
@@ -92,9 +92,9 @@ public class AddIntervalFragment extends Fragment implements ButtonTextUpdater {
         String current_time;
         SimpleDateFormat sdfCurrent, sdfDate;
         if (languageSetting.equals("ko")) {
-            sdfCurrent = new SimpleDateFormat("aaa hh:mm");
+            sdfCurrent = new SimpleDateFormat("a h:mm");
         } else {
-            sdfCurrent = new SimpleDateFormat("hh:mm aaa");
+            sdfCurrent = new SimpleDateFormat("h:mm a");
         }
         sdfCurrent.setTimeZone(timeZone);
         current_time = sdfCurrent.format(getMidnight());
@@ -126,9 +126,9 @@ public class AddIntervalFragment extends Fragment implements ButtonTextUpdater {
             timePickerDialog = new TimePickerDialog(v.getContext(), addIntervalFragment);
             timePickerDialog.setData(1);
             if (languageSetting.equals("ko")) {
-                timePickerDialog.setTimePicker("오전 00:00");
+                timePickerDialog.setTimePicker("오전 12:00");
             } else {
-                timePickerDialog.setTimePicker("00:00 AM");
+                timePickerDialog.setTimePicker("12:00 AM");
             }
             timePickerDialog.show();
         });
@@ -136,9 +136,9 @@ public class AddIntervalFragment extends Fragment implements ButtonTextUpdater {
             timePickerDialog = new TimePickerDialog(v.getContext(), addIntervalFragment);
             timePickerDialog.setData(0);
             if (languageSetting.equals("ko")) {
-                timePickerDialog.setTimePicker("오전 00:00");
+                timePickerDialog.setTimePicker("오전 12:00");
             } else {
-                timePickerDialog.setTimePicker("00:00 AM");
+                timePickerDialog.setTimePicker("12:00 AM");
             }
             timePickerDialog.show();
         });
@@ -157,6 +157,32 @@ public class AddIntervalFragment extends Fragment implements ButtonTextUpdater {
             try {
                 sleepStartDate = sdf.parse(startSDF);
                 sleepEndDate = sdf.parse(endSDF);
+
+                Calendar startCalendar = Calendar.getInstance();
+                startCalendar.setTime(sleepStartDate);
+                Calendar endCalendar = Calendar.getInstance();
+                endCalendar.setTime(sleepEndDate);
+
+                if (languageSetting.equals("ko")) {
+                    if (startTime.startsWith("오전") && startTime.contains("12:")) {
+                        startCalendar.set(Calendar.HOUR_OF_DAY, 0);
+                        Log.v("AddIntervalFragment", "1");
+                    }
+                    if (endTime.startsWith("오전") && endTime.contains("12:")) {
+                        endCalendar.set(Calendar.HOUR_OF_DAY, 0);
+                        Log.v("AddIntervalFragment", "2");
+                    }
+                } else {
+                    if (startTime.endsWith("AM") && startTime.contains("12:")) {
+                        startCalendar.set(Calendar.HOUR_OF_DAY, 0);
+                        Log.v("AddIntervalFragment", "3");
+                    }
+                    if (endTime.endsWith("AM") && endTime.contains("12:")) {
+                        endCalendar.set(Calendar.HOUR_OF_DAY, 0);
+                        Log.v("AddIntervalFragment", "4");
+                    }
+                }
+
                 //translate to local date time
                 LocalDateTime ldt1 = LocalDateTime.ofInstant(sleepStartDate.toInstant(), ZoneId.systemDefault());
                 LocalDateTime ldt2 = LocalDateTime.ofInstant(sleepEndDate.toInstant(), ZoneId.systemDefault());
