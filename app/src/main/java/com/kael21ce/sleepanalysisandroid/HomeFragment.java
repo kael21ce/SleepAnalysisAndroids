@@ -578,6 +578,23 @@ public class HomeFragment extends Fragment {
         AlertnessText.setMovementMethod(new ScrollingMovementMethod());
         AlertnessText.setHorizontallyScrolling(true);
         AlertnessText.setSelected(true);
+
+        //Change the description depending on current alertness
+        float currentAlertness = 0f;
+        if (barEntries.size() > 0) {
+            currentAlertness = barEntries.get((int) barEntries.size()/2).getY();
+            if (currentAlertness >= 0) {
+                alertnessTitle.setText("집중하기 좋은 상태에요");
+                alertnessDescription.setText(user_name + "님의 각성도가 높아요");
+            } else {
+                alertnessTitle.setText("잠시 낮잠을 자는 건 어때요?");
+                alertnessDescription.setText(user_name + "님의 각성도가 낮아요");
+            }
+        } else {
+            alertnessTitle.setText("잠시 바람 쐬는 건 어때요?");
+            alertnessDescription.setText(user_name + "님의 각성도가 낮아요");
+        }
+
         if (alertnessPhaseChange != 49f) {
             Highlight[] highlights = new Highlight[] {
                     new Highlight(24f, 0, -1),
@@ -589,7 +606,7 @@ public class HomeFragment extends Fragment {
             };
             alertnessChart.highlightValues(highlights);
             String originString = floatToTime(alertnessPhaseChange);
-            if (Math.abs(alertnessPhaseChange - 24f) < 6f/60f) {
+            if (Math.abs(alertnessPhaseChange - 24f) < 6f/60f || currentAlertness < 0f) {
                 AlertnessText.setText("지금도 충분히 잠에 들 수 있어요");
             } else {
                 AlertnessText.setText(originString + " 이전에는 잠에 들기 어려울 수 있어요");
@@ -603,23 +620,7 @@ public class HomeFragment extends Fragment {
                     new Highlight(nMidF, 0, -1)
             };
             alertnessChart.highlightValues(highlights);
-            //Set the time of alertnessText
-            String originString = sdfDateTimeRecomm.format(new Date(mainActivity.getMainSleepStart()));
             AlertnessText.setText("지금도 충분히 잠에 들 수 있어요");
-        }
-        //Change the description depending on current alertness
-        if (barEntries.size() > 0) {
-            float currentAlertness = barEntries.get((int) barEntries.size()/2).getY();
-            if (currentAlertness >= 0) {
-                alertnessTitle.setText("집중하기 좋은 상태에요");
-                alertnessDescription.setText(user_name + "님의 각성도가 높아요");
-            } else {
-                alertnessTitle.setText("잠시 낮잠을 자는 건 어때요?");
-                alertnessDescription.setText(user_name + "님의 각성도가 낮아요");
-            }
-        } else {
-            alertnessTitle.setText("잠시 바람 쐬는 건 어때요?");
-            alertnessDescription.setText(user_name + "님의 각성도가 낮아요");
         }
 
         alertnessChart.invalidate();
