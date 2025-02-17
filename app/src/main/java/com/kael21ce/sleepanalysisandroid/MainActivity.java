@@ -79,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
     RecommendFragment recommendFragment = new RecommendFragment();
     SettingFragment settingFragment = new SettingFragment();
     private RelativeLayout loadingScreenLayout;
-    boolean creation = false;
+    private boolean creation = true;
     SimpleDateFormat sdfDateTime = new SimpleDateFormat("dd/MM/yyyy" + " HH:mm");
     private static final String TAG = "MainActivity";
     private static final String CHECK_CHANNEL_ID = "check_recommend", SURVEY_CHANNEL_ID = "alertness_survey";
@@ -200,7 +200,6 @@ public class MainActivity extends AppCompatActivity {
         nineHours = (1000L * offset.getTotalSeconds());
 
         now = System.currentTimeMillis();
-        creation = true;
 
         //update variables
         lastSleepUpdate = sharedPref.getLong("lastSleepUpdate", now - twoWeeks);
@@ -468,7 +467,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        if(creation == false) {
+        Log.v("MainActivity", "onStart is called");
+        if (creation) {
+            creation = false;
+        } else {
             Log.v("RESUMING", "RESUMING");
             barEntries = new ArrayList<BarEntry>();
             now = System.currentTimeMillis();

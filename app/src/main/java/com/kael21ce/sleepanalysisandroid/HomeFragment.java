@@ -60,7 +60,8 @@ public class HomeFragment extends Fragment {
     SimpleDateFormat sdfDateTimeRecomm = new SimpleDateFormat("H:mm", Locale.KOREA);
     SimpleDateFormat sdfDate = new SimpleDateFormat("MM/dd", Locale.KOREA);
     SimpleDateFormat sdfTime = new SimpleDateFormat("HH:mm", Locale.KOREA);
-    long now = System.currentTimeMillis(), nineHours = (1000*60*60*9);
+    long now;
+    private boolean creation = true;
     String mainSleepStartString, mainSleepEndString, workOnsetString, workOffsetString, napSleepStartString, napSleepEndString, sleepOnsetString;
     private List<Awareness> awarenesses, sleepAwarenesses;
     private static final String MoodArrayKey = "MoodArray";
@@ -165,6 +166,9 @@ public class HomeFragment extends Fragment {
             isHidden = sharedPref.getBoolean("isHidden", true);
         }
 
+        // System time
+        now = System.currentTimeMillis();
+
         if (sharedPref.contains("sleepOnset") && sharedPref.contains("workOnset") && sharedPref.contains("workOffset")) {
             if (sharedPref.getLong("workOnset",now) == sharedPref.getLong("workOffset",now)) {
                 homeNoDataView.setVisibility(View.VISIBLE);
@@ -218,8 +222,9 @@ public class HomeFragment extends Fragment {
         //Survey description and button: move to SurveyActivity
         surveyDescription.setText("지금 얼마나 개운하신가요?");
         SurveyUpperView.setOnClickListener(view -> {
+            Log.v("HomeFragment", "Var now: " + now + " / System: " + System.currentTimeMillis());
             long lastSurvey = sharedPref.getLong("LastSurveyTime", 0);
-            if (Math.abs(lastSurvey - now) < 30*60*1000) {
+            if (Math.abs(lastSurvey - System.currentTimeMillis()) < 30*60*1000) {
                 Toast.makeText(getActivity().getApplicationContext(), "적어도 30분 뒤 설문을 진행해주세요.",
                         Toast.LENGTH_SHORT).show();
             } else {
@@ -229,8 +234,9 @@ public class HomeFragment extends Fragment {
             }
         });
         surveyUpperButton.setOnClickListener(view -> {
+            Log.v("HomeFragment", "Var now: " + now + " / System: " + System.currentTimeMillis());
             long lastSurvey = sharedPref.getLong("LastSurveyTime", 0);
-            if (Math.abs(lastSurvey - now) < 30*60*1000) {
+            if (Math.abs(lastSurvey - System.currentTimeMillis()) < 30*60*1000) {
                 Toast.makeText(getActivity().getApplicationContext(), "적어도 30분 뒤 설문을 진행해주세요.",
                         Toast.LENGTH_SHORT).show();
             } else {
@@ -959,6 +965,18 @@ public class HomeFragment extends Fragment {
             }
         });
         return v;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        Log.v("HomeFragment", "onStart is called");
+        if (creation) {
+            creation = false;
+        } else {
+            Log.v("HomeFragment", "Resume");
+            now = System.currentTimeMillis();
+        }
     }
 
     public void sleepButtonClick(View v, MainActivity mainActivity, TextView startTime, TextView endTime,
