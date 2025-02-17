@@ -40,6 +40,8 @@
         <activity
             android:name=".HideActivity"
             android:exported="false" />
+        <activity android:name=".NotifyActivity"
+            android:exported="false" />
         <activity
             android:name=".SurveyActivity"
             android:exported="false" />

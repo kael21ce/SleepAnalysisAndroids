@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/NotifyCaption"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <ImageButton
+            android:id="@+id/NotifyBackButton"
+            style="@style/NoClickEffect"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/white"
+            android:padding="8dp"
+            android:src="@drawable/chevron_left"
+            tools:ignore="SpeakableTextPresentCheck" />
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:id="@+id/NotifyLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/notifyTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:autoSizeMaxTextSize="24sp"
+                    android:autoSizeMinTextSize="12sp"
+                    android:gravity="center_horizontal"
+                    android:maxLines="1"
+                    android:text="알림 시간 설정"
+                    android:textSize="24sp" />
+
+                <LinearLayout
+                    android:id="@+id/recommendNotifyLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginVertical="24dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/recommendNotifySmallText"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="top"
+                        android:layout_marginLeft="16dp"
+                        android:autoSizeMaxTextSize="16sp"
+                        android:autoSizeMinTextSize="8sp"
+                        android:fontFamily="@font/pretendardbold"
+                        android:maxLines="1"
+                        android:text="추천 수면 확인"
+                        android:textColor="@color/black"
+                        android:textSize="16sp" />
+
+                    <LinearLayout
+                        android:id="@+id/recommendNotifySettingView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="bottom"
+                        android:orientation="vertical">
+
+                        <LinearLayout
+                            android:id="@+id/notifySettingView"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="16dp"
+                            android:gravity="right"
+                            android:orientation="horizontal"
+                            android:paddingRight="16dp">
+
+                            <Button
+                                android:id="@+id/recommendNotifyButton"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:backgroundTint="@color/gray_1"
+                                android:fontFamily="@font/pretendardvariable"
+                                android:text="오후 6:30"
+                                android:textColor="@color/black"
+                                android:textSize="14sp" />
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/alertSmallText"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="top"
+                        android:layout_marginLeft="16dp"
+                        android:autoSizeMaxTextSize="16sp"
+                        android:autoSizeMinTextSize="8sp"
+                        android:fontFamily="@font/pretendardbold"
+                        android:maxLines="1"
+                        android:text="각성도 일일 설문"
+                        android:textColor="@color/black"
+                        android:textSize="16sp" />
+
+                    <LinearLayout
+                        android:id="@+id/alert1SettingView"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginBottom="16dp"
+                        android:gravity="right"
+                        android:orientation="horizontal"
+                        android:paddingRight="16dp">
+
+                        <Button
+                            android:id="@+id/alert1TimeButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:backgroundTint="@color/gray_1"
+                            android:fontFamily="@font/pretendardvariable"
+                            android:text="오후 6:30"
+                            android:textColor="@color/black"
+                            android:textSize="14sp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/alert2SettingView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="16dp"
+                        android:gravity="right"
+                        android:orientation="horizontal"
+                        android:paddingRight="16dp">
+
+                        <Button
+                            android:id="@+id/alert2TimeButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:backgroundTint="@color/gray_1"
+                            android:fontFamily="@font/pretendardvariable"
+                            android:text="오후 9:45"
+                            android:textColor="@color/black"
+                            android:textSize="14sp" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/alert3SettingView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="right"
+                        android:orientation="horizontal"
+                        android:paddingRight="16dp">
+
+                        <Button
+                            android:id="@+id/alert3TimeButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:backgroundTint="@color/gray_1"
+                            android:fontFamily="@font/pretendardvariable"
+                            android:text="오후 9:45"
+                            android:textColor="@color/black"
+                            android:textSize="14sp" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <Button
+                    android:id="@+id/notifySubmitButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginHorizontal="16dp"
+                    android:autoSizeMaxTextSize="14sp"
+                    android:autoSizeMinTextSize="6sp"
+                    android:autoSizeStepGranularity="2sp"
+                    android:autoSizeTextType="uniform"
+                    android:backgroundTint="@color/blue_1"
+                    android:fontFamily="@font/pretendardvariable"
+                    android:maxLines="1"
+                    android:text="업데이트"
+                    android:textColor="@color/white"
+                    android:textSize="14sp"
+                    android:visibility="visible"
+                    app:cornerRadius="28dp"
+                    tools:visibility="visible" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>

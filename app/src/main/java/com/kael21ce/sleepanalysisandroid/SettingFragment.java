@@ -31,16 +31,11 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
-public class SettingFragment extends Fragment implements ButtonTextUpdater {
+public class SettingFragment extends Fragment {
 
     Boolean isFolded = true;
     private static final String NotifyKey = "Notify_At";
     Button notifyButton;
-    SimpleDateFormat sdfComplexTime = new SimpleDateFormat( "a h:mm", Locale.KOREA);
-    SimpleDateFormat sdfComplexTime_En = new SimpleDateFormat( "h:mm a");
-    SimpleDateFormat sdfSimpleTime = new SimpleDateFormat("H:mm", Locale.KOREA);
-    SimpleDateFormat sdfSimpleTime_En = new SimpleDateFormat("H:mm");
-    String notifyAt, notifyAt_complex;
     SharedPreferences sharedPref;
     SharedPreferences.Editor editor;
     OneTimeWorkRequest requested;
@@ -66,8 +61,6 @@ public class SettingFragment extends Fragment implements ButtonTextUpdater {
         if (!sharedPref.contains(NotifyKey)) {
             editor.putString(NotifyKey, "21:00").apply();
         }
-        notifyAt = sharedPref.getString(NotifyKey, "21:00");
-        notifyAt_complex = changeTimeFormatComplex(notifyAt);
 
 
         notifyButton = v.findViewById(R.id.notifyButton);
@@ -77,7 +70,7 @@ public class SettingFragment extends Fragment implements ButtonTextUpdater {
             editor.putBoolean("isNotifyOn", true).apply();
         }
 
-        notifyButton.setText(notifyAt_complex);
+        notifyButton.setText("설정");
         TextView notifyDescription = v.findViewById(R.id.NotifyDescription);
         TextView noNotifyDescription = v.findViewById(R.id.NoNotifyDescription);
         LinearLayout notifyView = v.findViewById(R.id.NotifyView);
@@ -124,10 +117,12 @@ public class SettingFragment extends Fragment implements ButtonTextUpdater {
 
 
         notifyButton.setOnClickListener(view -> {
-            TimePickerDialog timePickerDialog = new TimePickerDialog(v.getContext(), settingFragment);
-            timePickerDialog.setData(1);
-            timePickerDialog.setTimePicker(notifyAt_complex);
-            timePickerDialog.show();
+//            TimePickerDialog timePickerDialog = new TimePickerDialog(v.getContext(), settingFragment);
+//            timePickerDialog.setData(1);
+//            timePickerDialog.setTimePicker(notifyAt_complex);
+//            timePickerDialog.show();
+            Intent notifyIntent = new Intent(v.getContext(), NotifyActivity.class);
+            startActivity(notifyIntent);
         });
 
         //Move to HideActivity
@@ -182,91 +177,4 @@ public class SettingFragment extends Fragment implements ButtonTextUpdater {
 
         return v;
     }
-
-    //Change "HH:mm" to milliseconds
-    public long timeToSeconds(String value) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
-        LocalTime time = LocalTime.parse(value, formatter);
-        LocalDate currentDate = LocalDate.now();
-        ZonedDateTime dateTime = ZonedDateTime.of(currentDate, time, ZoneId.systemDefault());
-
-        return dateTime.toInstant().toEpochMilli();
-    }
-
-    //Change "HH:mm" to "hh:mm a"
-    public String changeTimeFormatComplex(String value) {
-        //Change time format of notifyAt
-        String languageSetting = Locale.getDefault().getLanguage();
-        Date date;
-        try {
-            if (languageSetting == "en") {
-                date = sdfSimpleTime_En.parse(value);
-                return sdfComplexTime_En.format(date);
-            } else {
-                date = sdfSimpleTime.parse(value);
-                return sdfComplexTime.format(date);
-            }
-        } catch (ParseException e) {
-            e.printStackTrace();
-            return "";
-        }
-    }
-
-    //Change "hh:mm a" to "HH:mm"
-    public String changeTimeFormatSimple(String value) {
-        //Change time format of notifyAt
-        String languageSetting = Locale.getDefault().getLanguage();
-        Date date;
-        try {
-            if (languageSetting == "en") {
-                date = sdfComplexTime_En.parse(value);
-                return sdfSimpleTime_En.format(date);
-            } else {
-                date = sdfComplexTime.parse(value);
-                return sdfSimpleTime.format(date);
-            }
-        } catch (ParseException e) {
-            e.printStackTrace();
-            return "";
-        }
-    }
-
-    @Override
-    public void setDateButtonText(String text, int isStartButton) {
-    }
-
-    @Override
-    public void setTimeButtonText(String text, int isStartButton) {
-        if (notifyButton != null) {
-            notifyButton.setText(text);
-            if (sharedPref != null && sharedPref.contains(NotifyKey)) {
-                String buttonText = (String) notifyButton.getText();
-                String shared_buttonText = changeTimeFormatSimple(buttonText);
-                if (!shared_buttonText.equals("")) {
-                    editor.putString(NotifyKey, shared_buttonText).apply();
-                    Log.v("SettingFragment", "Notification time is set: "
-                            + shared_buttonText);
-
-                    //Request pushWorker newly
-                    if (this.requested != null && context != null) {
-                        long now = System.currentTimeMillis();
-                        WorkManager.getInstance(context).cancelWorkById(requested.getId());
-                        long targetTime = timeToSeconds(shared_buttonText);
-                        long delay = targetTime - now;
-                        if (delay < 0) {
-                            delay += oneDay;
-                        }
-                        Log.v("SettingFragment", "Delay of the notification: " + delay);
-                        OneTimeWorkRequest pushRequest = new OneTimeWorkRequest.Builder(PushWorker.class)
-                                .setInitialDelay(delay, TimeUnit.MILLISECONDS)
-                                .build();
-                        WorkManager.getInstance(context).enqueueUniqueWork(RecommendName,
-                                ExistingWorkPolicy.REPLACE, pushRequest);
-                    }
-                }
-            }
-        }
-    }
-
-    public String getDateButtonText(int isStartButton) {return "";}
 }

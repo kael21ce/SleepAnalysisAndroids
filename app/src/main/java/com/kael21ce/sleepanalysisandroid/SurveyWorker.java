@@ -64,7 +64,7 @@ public class SurveyWorker extends Worker {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, SURVEY_CHANNEL_ID)
                 .setSmallIcon(R.drawable.moon)
                 .setContentTitle("SleepWake")
-                .setContentText("현재 상태를 알려주세요")
+                .setContentText("현재 얼마나 개운한지 알려주세요")
                 .setContentIntent(pendingIntent)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE)

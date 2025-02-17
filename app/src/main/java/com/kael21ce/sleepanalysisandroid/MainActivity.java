@@ -81,6 +81,7 @@ public class MainActivity extends AppCompatActivity {
     private RelativeLayout loadingScreenLayout;
     private boolean creation = true;
     SimpleDateFormat sdfDateTime = new SimpleDateFormat("dd/MM/yyyy" + " HH:mm");
+    SimpleDateFormat sdfSimple = new SimpleDateFormat("H:mm");
     private static final String TAG = "MainActivity";
     private static final String CHECK_CHANNEL_ID = "check_recommend", SURVEY_CHANNEL_ID = "alertness_survey";
     HealthConnectManager healthConnectManager;
@@ -156,6 +157,7 @@ public class MainActivity extends AppCompatActivity {
 
         //Create channel
         createNotificationChannel(this);
+        createSurveyChannel(this);
 
 
         //Request the permission of notification in context if API >= 33
@@ -343,7 +345,8 @@ public class MainActivity extends AppCompatActivity {
                     sendNotification(sharedPref);
                     Log.v(TAG, "SharedPreference listener is called 2");
                 }
-                if (key.equals("sleepOnset") || key.equals("workOnset") || key.equals("workOffset")) {
+                if (key.equals("workOnset") || key.equals("workOffset") || key.equals("alertTime1")
+                        || key.equals("alertTime2") || key.equals("alertTime3")) {
                     sendNotification(sharedPref);
                     Log.v(TAG, "SharedPreference listener is called 3");
                 }
@@ -384,6 +387,18 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+
+    //Create channel for notification for survey
+    public void createSurveyChannel(Context context) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(SURVEY_CHANNEL_ID,
+                    "Alertness Survey", NotificationManager.IMPORTANCE_HIGH);
+            NotificationManager notificationManager = context.getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
+    }
+
+
     public void sendNotification(SharedPreferences sharedPref) {
         long now = System.currentTimeMillis();
 
@@ -402,6 +417,96 @@ public class MainActivity extends AppCompatActivity {
                 .build();
         WorkManager.getInstance(this).enqueueUniquePeriodicWork(RecommendName,
                 ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE, pushRequest);
+
+        //Send notification for survey in four time
+        long surveyTime, surveyDelay1, surveyDelay2, surveyDelay3;
+        //1. work onset
+        if (sharedPref.contains("alertTime1")) {
+            surveyTime = timeToSeconds(sharedPref.getString("alertTime1", "9:00"));
+            surveyDelay1 = surveyTime - now;
+        } else if (sharedPref.contains("workOnset")) {
+            surveyTime = getWorkOnset();
+            surveyDelay1 = surveyTime - now - oneDay;
+
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTimeInMillis(surveyTime);
+            Date surveyDate = calendar.getTime();
+            editor.putString("alertTime1", sdfSimple.format(surveyDate)).apply();
+        } else {
+            surveyTime = timeToSeconds("9:00");
+            surveyDelay1 = surveyTime - now;
+
+            editor.putString("alertTime1", "9:00").apply();
+        }
+        if (surveyDelay1 < 0) {
+            surveyDelay1 += oneDay;
+        }
+        PeriodicWorkRequest surveyRequest1 = new PeriodicWorkRequest.Builder(SurveyWorker.class,
+                24, TimeUnit.HOURS)
+                .setInitialDelay(surveyDelay1, TimeUnit.MILLISECONDS)
+                .build();
+        WorkManager.getInstance(this).enqueueUniquePeriodicWork(SurveyName1,
+                ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE, surveyRequest1);
+        Log.v(TAG, "Survey delay 1: " + surveyDelay1);
+
+        //2. middle of work onset and offset
+        if (sharedPref.contains("alertTime2")) {
+            surveyTime = timeToSeconds(sharedPref.getString("alertTime2", "13:00"));
+            surveyDelay2 = surveyTime - now;
+        }
+        else if (sharedPref.contains("workOnset") && sharedPref.contains("workOffset")) {
+            surveyTime = (getWorkOnset() + getWorkOffset()) / 2;
+            surveyDelay2 = surveyTime - now - oneDay;
+
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTimeInMillis(surveyTime);
+            Date surveyDate = calendar.getTime();
+            editor.putString("alertTime2", sdfSimple.format(surveyDate)).apply();
+        } else {
+            surveyTime = timeToSeconds("13:00");
+            surveyDelay2 = surveyTime - now;
+            editor.putString("alertTime2", "13:00").apply();
+        }
+        if (surveyDelay2 < 0) {
+            surveyDelay2 += oneDay;
+        }
+        PeriodicWorkRequest surveyRequest2 = new PeriodicWorkRequest.Builder(SurveyWorker.class,
+                24, TimeUnit.HOURS)
+                .setInitialDelay(surveyDelay2, TimeUnit.MILLISECONDS)
+                .build();
+        WorkManager.getInstance(this).enqueueUniquePeriodicWork(SurveyName2,
+                ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE, surveyRequest2);
+        Log.v(TAG, "Survey delay 2: " + surveyDelay2);
+
+        //3. work offset
+        if (sharedPref.contains("alertTime3")) {
+            surveyTime = timeToSeconds(sharedPref.getString("alertTime3", "18:00"));
+            surveyDelay3 = surveyTime - now;
+        }
+        else if(sharedPref.contains("workOffset")) {
+            surveyTime = getWorkOffset();
+            surveyDelay3 = surveyTime - now - oneDay;
+
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTimeInMillis(surveyTime);
+            Date surveyDate = calendar.getTime();
+            editor.putString("alertTime3", sdfSimple.format(surveyDate)).apply();
+        } else {
+            surveyTime = timeToSeconds("18:00");
+            surveyDelay3 = surveyTime - now;
+            editor.putString("alertTime3", "18:00").apply();
+        }
+        if (surveyDelay3 < 0) {
+            surveyDelay3 += oneDay;
+        }
+        PeriodicWorkRequest surveyRequest3 = new PeriodicWorkRequest.Builder(SurveyWorker.class,
+                24, TimeUnit.HOURS)
+                .setInitialDelay(surveyDelay3, TimeUnit.MILLISECONDS)
+                .build();
+        WorkManager.getInstance(this).enqueueUniquePeriodicWork(SurveyName3,
+                ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE, surveyRequest3);
+        Log.v(TAG, "Survey delay 3: " + surveyDelay3);
+
     }
 
     //Change "HH:mm" to milliseconds
@@ -472,6 +577,10 @@ public class MainActivity extends AppCompatActivity {
             creation = false;
         } else {
             Log.v("RESUMING", "RESUMING");
+            //get the shared preferences variable
+            sharedPref = getSharedPreferences("SleepWake", Context.MODE_PRIVATE);
+            editor = sharedPref.edit();
+
             barEntries = new ArrayList<BarEntry>();
             now = System.currentTimeMillis();
 
