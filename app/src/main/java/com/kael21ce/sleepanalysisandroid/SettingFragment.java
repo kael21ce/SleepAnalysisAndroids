@@ -1,6 +1,5 @@
 package com.kael21ce.sleepanalysisandroid;
 
-import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -11,12 +10,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import androidx.appcompat.content.res.AppCompatResources;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.work.ExistingWorkPolicy;
@@ -33,7 +29,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 public class SettingFragment extends Fragment implements ButtonTextUpdater {
@@ -77,7 +72,7 @@ public class SettingFragment extends Fragment implements ButtonTextUpdater {
 
         notifyButton = v.findViewById(R.id.notifyButton);
 
-        //initifal setting of notifySetting
+        //initial setting of notifySetting
         if (!sharedPref.contains("isNotifyOn")) {
             editor.putBoolean("isNotifyOn", true).apply();
         }

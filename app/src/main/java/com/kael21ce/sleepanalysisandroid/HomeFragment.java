@@ -41,8 +41,6 @@ import com.kael21ce.sleepanalysisandroid.data.DataMood;
 import com.kael21ce.sleepanalysisandroid.data.DataSurvey;
 import com.kael21ce.sleepanalysisandroid.data.Sleep;
 
-import org.w3c.dom.Text;
-
 import java.lang.reflect.Type;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -835,7 +833,7 @@ public class HomeFragment extends Fragment {
         // Daily alertness summary
         Gson alertGson = new Gson();
         ArrayList<Records> baseArrayList = new ArrayList();
-        ArrayList<Records> alertArrayList = new ArrayList<>();
+        ArrayList<Records> alertArrayList;
         String baseJson = alertGson.toJson(baseArrayList);
 
         RecyclerView alertRecyclerView = v.findViewById(R.id.AlertnessSurveyRecyclerView);
@@ -844,8 +842,9 @@ public class HomeFragment extends Fragment {
         Log.v("HomeFragment", "Alert Json " + alertJson);
         Type type = new TypeToken<ArrayList<Records>>() {}.getType();
         alertArrayList = alertGson.fromJson(alertJson, type);
-        Log.v("HomeFragment", "Alert list size: " + alertArrayList.size());
-        int alertTotalRecords = Math.min(14, alertArrayList.size());
+        int alertRecordsSize = alertArrayList.size();
+        Log.v("HomeFragment", "Alert list size: " + alertRecordsSize);
+        int alertTotalRecords = Math.min(14, alertRecordsSize);
 
         // Add empty records if there is no records in current day
         long baseTime = System.currentTimeMillis();
@@ -857,7 +856,7 @@ public class HomeFragment extends Fragment {
         baseCalendar.set(Calendar.MILLISECOND, 0);
         boolean isEmptyAlertNeeded = true;
         for (int l = 0; l < alertTotalRecords; l++) {
-            Records r = alertArrayList.get(alertTotalRecords-l-1);
+            Records r = alertArrayList.get(alertRecordsSize-l-1);
             Date rDate = r.getRecordDate();
             Calendar calendaR = Calendar.getInstance();
             calendaR.setTime(rDate);
@@ -874,11 +873,12 @@ public class HomeFragment extends Fragment {
             Records emptyRecords = new Records(baseCalendar.getTime(), true, emptyAlerts, emptyMoods);
             alertArrayList.add(emptyRecords);
         }
-        Log.v("HomeFragment", "Alert list size 2: " + alertArrayList.size());
+        alertRecordsSize = alertArrayList.size();
+        Log.v("HomeFragment", "Alert list size 2: " + alertRecordsSize);
         alertTotalRecords = Math.min(14, alertArrayList.size());
 
         for (int k = 0; k < alertTotalRecords; k++) {
-            Records r = alertArrayList.get(alertTotalRecords-k-1);
+            Records r = alertArrayList.get(alertRecordsSize-k-1);
             Log.v("HomeFragment", "isAlertness in Alertness: " + r.isAlertness());
             if (r.isAlertness()) {
                 alertAdapter.addItem(r);
@@ -909,12 +909,13 @@ public class HomeFragment extends Fragment {
         RecordsAdapter dailyAdapter = new RecordsAdapter();
         String dailyJson = sharedPref.getString(MoodArrayKey, baseJson);
         dailyArrayList = gson.fromJson(dailyJson, type);
-        int totalRecords = Math.min(14, dailyArrayList.size());
+        int recordsSize = dailyArrayList.size();
+        int totalRecords = Math.min(14, recordsSize);
 
         // Add empty records if there is no records in current day
         boolean isEmptyNeeded = true;
         for (int l = 0; l < totalRecords; l++) {
-            Records r = dailyArrayList.get(totalRecords-l-1);
+            Records r = dailyArrayList.get(recordsSize-l-1);
             Date rDate = r.getRecordDate();
             Calendar calendaR = Calendar.getInstance();
             calendaR.setTime(rDate);
@@ -931,10 +932,11 @@ public class HomeFragment extends Fragment {
             Records emptyRecords = new Records(baseCalendar.getTime(), false, emptyAlerts, emptyMoods);
             dailyArrayList.add(emptyRecords);
         }
-        totalRecords = Math.min(14, dailyArrayList.size());
+        recordsSize = dailyArrayList.size();
+        totalRecords = Math.min(14, recordsSize);
 
         for (int k = 0; k < totalRecords; k++) {
-            Records r = dailyArrayList.get(totalRecords-k-1);
+            Records r = dailyArrayList.get(recordsSize-k-1);
             Log.v("HomeFragment", "isAlertness in Daily: " + r.isAlertness());
             if (!r.isAlertness()) {
                 dailyAdapter.addItem(r);

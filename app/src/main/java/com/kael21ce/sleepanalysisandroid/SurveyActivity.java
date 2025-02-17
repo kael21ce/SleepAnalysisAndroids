@@ -187,8 +187,8 @@ public class SurveyActivity extends AppCompatActivity {
                 DataSurvey dataSurvey = new DataSurvey(userEmail, sleep_onset, work_onset, work_offset, getLevel(), time);
                 recordsArrayList = findAlertGroup(recordsArrayList, dataSurvey);
                 Gson gson1 = new Gson();
-                moodJson = gson1.toJson(recordsArrayList);
-                editor.putString(AlertnessArrayKey, moodJson).apply();
+                alertJson = gson1.toJson(recordsArrayList);
+                editor.putString(AlertnessArrayKey, alertJson).apply();
 
                 editor.putLong("LastSurveyTime", System.currentTimeMillis()).apply();
 
@@ -302,7 +302,6 @@ public class SurveyActivity extends AppCompatActivity {
             for (int i = 0; i < Math.min(n, 14); i++) {
                 Records records = recordsList.get(n-i-1);
                 Date date = records.getRecordDate();
-                boolean isAlertness = records.isAlertness();
                 ArrayList<DataSurvey> dataSurveys = records.getDataSurvey();
                 ArrayList<DataMood> dataMoods = records.getDataMood();
 
@@ -363,7 +362,6 @@ public class SurveyActivity extends AppCompatActivity {
             for (int i = 0; i < Math.min(n, 14); i++) {
                 Records records = recordsList.get(n-i-1);
                 Date date = records.getRecordDate();
-                boolean isAlertness = records.isAlertness();
                 ArrayList<DataSurvey> dataSurveys = records.getDataSurvey();
                 ArrayList<DataMood> dataMoods = records.getDataMood();
 
