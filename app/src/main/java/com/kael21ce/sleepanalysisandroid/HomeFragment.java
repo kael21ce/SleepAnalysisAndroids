@@ -39,6 +39,7 @@ import com.google.gson.Gson;
 import com.kael21ce.sleepanalysisandroid.data.Awareness;
 import com.kael21ce.sleepanalysisandroid.data.DataMood;
 import com.kael21ce.sleepanalysisandroid.data.DataSurvey;
+import com.kael21ce.sleepanalysisandroid.data.RetrofitAPI;
 import com.kael21ce.sleepanalysisandroid.data.Sleep;
 
 import java.lang.reflect.Type;
@@ -49,10 +50,19 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
+
+import okhttp3.OkHttpClient;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class HomeFragment extends Fragment {
     SimpleDateFormat sdfDateTime = new SimpleDateFormat( "hh:mm a", Locale.KOREA);
@@ -914,8 +924,31 @@ public class HomeFragment extends Fragment {
         RecyclerView dailyRecyclerView = v.findViewById(R.id.DailySurveyRecyclerView);
         RecordsAdapter dailyAdapter = new RecordsAdapter();
         String dailyJson = sharedPref.getString(MoodArrayKey, baseJson);
+        Log.v("HomeFragment", "Daily Json " + dailyJson);
         dailyArrayList = gson.fromJson(dailyJson, type);
         int recordsSize = dailyArrayList.size();
+
+        // Delete the wrong data in dailyArrayList
+        int space = 0;
+        boolean isNeedToRecover = false;
+        for (int l = 0; l < recordsSize; l++) {
+            Records r = dailyArrayList.get(l-space);
+            if (r.isAlertness) {
+                dailyArrayList.remove(l-space);
+                space = space + 1;
+                isNeedToRecover = true;
+            }
+        }
+
+        // Recover the survey data from the server
+        int recoverSpace = 0;
+        if (isNeedToRecover) {
+            // Recover the deleted daily mood surveys
+        }
+
+        dailyJson = gson.toJson(dailyArrayList);
+        editor.putString(MoodArrayKey, dailyJson).apply();
+        recordsSize = recordsSize - space + recoverSpace;
         int totalRecords = Math.min(14, recordsSize);
 
         // Add empty records if there is no records in current day
@@ -1248,6 +1281,120 @@ public class HomeFragment extends Fragment {
             }
         }
     }
+
+//    private ArrayList<DataMood> getMood(SharedPreferences sharedPref) {
+//        OkHttpClient client = new OkHttpClient.Builder()
+//                .connectTimeout(20, TimeUnit.SECONDS)
+//                .writeTimeout(20, TimeUnit.SECONDS)
+//                .readTimeout(20, TimeUnit.SECONDS)
+//                .build();
+//        Retrofit retrofit = new Retrofit.Builder()
+//                .baseUrl("https://www.sleep-math.com/sleepapp/")
+//                // as we are sending data in json format so
+//                // we have to add Gson converter factory
+//                .addConverterFactory(GsonConverterFactory.create())
+//                .client(client)
+//                // at last we are building our retrofit builder.
+//                .build();
+//        RetrofitAPI retrofitAPI = retrofit.create(RetrofitAPI.class);
+//        String userEmail = sharedPref.getString("User_Email", "tester33");
+//
+//        ArrayList<DataMood> resultArray = new ArrayList<>();
+//        Call<List<DataMood>> call = retrofitAPI.getData();
+//        call.enqueue(new Callback<List<DataMood>>() {
+//            @Override
+//            public void onResponse(Call<List<DataMood>> call, Response<List<DataMood>> response) {
+//                Log.v("HomeFragment", "is successful: " + response.isSuccessful());
+//                if (response.isSuccessful() && response.body() != null) {
+//                    for (DataMood item : response.body()) {
+//                        String itemID = item.getUser();
+//                        if (itemID.equals(userEmail)) {
+//                            Log.v("HomeFragment", "Successfully recovered");
+//                            resultArray.add(item);
+//                        }
+//                    }
+//                }
+//            }
+//
+//            @Override
+//            public void onFailure(Call<List<DataMood>> call, Throwable t) {
+//                Log.e("HomeFragment", t.getMessage());
+//            }
+//        });
+//        return resultArray;
+//    }
+
+    private ArrayList<Records> sortRecordsList(ArrayList<Records> original) {
+        // Reorder the dailyArrayList
+        ArrayList<Long> timeList = new ArrayList<>();
+        ArrayList<Pair> pairList = new ArrayList<>();
+        for (int o = 0; o < original.size(); o++) {
+            Records itemO = original.get(o);
+            Date dateO = itemO.getRecordDate();
+            long timeO = dateO.getTime();
+            timeList.add(timeO);
+            pairList.add(new Pair(timeO, itemO));
+        }
+        pairList.sort(Comparator.comparingLong(pair -> pair.time));
+
+        ArrayList<Records> orderedArrayList = new ArrayList<>();
+        for (Pair pair : pairList) {
+            orderedArrayList.add(pair.records);
+        }
+        return orderedArrayList;
+    }
+
+    private ArrayList<Records> recoverDailyArrayList(SharedPreferences sharedPref, ArrayList<Records> original) {
+//        ArrayList<DataMood> recoverMoodList = getMood(sharedPref);
+        ArrayList<DataMood> recoverMoodList = new ArrayList<>();
+        ArrayList<DataMood> restArray = new ArrayList<>();
+        boolean isNeedToBeAdded = true;
+        for (int m = 0; m < recoverMoodList.size(); m++) {
+            DataMood mMood = recoverMoodList.get(m);
+            Calendar mCal = Calendar.getInstance();
+            mCal.setTimeInMillis(mMood.getTime());
+            for (int n = 0; n < original.size(); n++) {
+                Records nRecords = original.get(n);
+                Calendar nCal = Calendar.getInstance();
+                nCal.setTime(nRecords.getRecordDate());
+                ArrayList<DataMood> nMoodArray = nRecords.getDataMood();
+                ArrayList<DataSurvey> nAlertArray = nRecords.getDataSurvey();
+
+                if (mCal.get(Calendar.YEAR) == nCal.get(Calendar.YEAR)
+                        && mCal.get(Calendar.MONTH) == nCal.get(Calendar.MONTH)
+                        && mCal.get(Calendar.DAY_OF_MONTH) == nCal.get(Calendar.DAY_OF_MONTH)) {
+                    nMoodArray.add(mMood);
+
+                    Records r = new Records(nRecords.getRecordDate(), false, nAlertArray, nMoodArray);
+                    original.set(n, r);
+                    isNeedToBeAdded = false;
+                }
+            }
+            if (isNeedToBeAdded) {
+                restArray.add(mMood);
+                isNeedToBeAdded = false;
+            }
+        }
+        for (int l = 0; l < restArray.size(); l++) {
+            DataMood lItem = restArray.get(l);
+            Calendar lCal = Calendar.getInstance();
+            lCal.setTimeInMillis(lItem.getTime());
+            lCal.set(Calendar.HOUR_OF_DAY, 0);
+            lCal.set(Calendar.MINUTE, 0);
+            lCal.set(Calendar.SECOND, 0);
+            lCal.set(Calendar.MILLISECOND, 0);
+
+            ArrayList<DataSurvey> dummyArray = new ArrayList<>();
+            ArrayList<DataMood> lMoodArray = new ArrayList<>();
+            lMoodArray.add(lItem);
+
+            Date lDate = lCal.getTime();
+            Records r = new Records(lDate, false, dummyArray, lMoodArray);
+            original.add(r);
+        }
+        ArrayList<Records> orderedArrayList = sortRecordsList(original);
+        return orderedArrayList;
+    }
 }
 
 //Axis value formatter for x-axis in alertnessChart
@@ -1314,5 +1461,15 @@ class XAxisValueFormatter extends ValueFormatter {
         } else {
             return "";
         }
+    }
+}
+
+class Pair {
+    long time;
+    Records records;
+
+    Pair(long time, Records records) {
+        this.time = time;
+        this.records = records;
     }
 }

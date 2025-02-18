@@ -24,6 +24,30 @@ public class DataMood {
         return time;
     }
 
+    public String getUser() {
+        return user;
+    }
+
+    public int getLatency() {
+        return latency;
+    }
+
+    public int getMood_high() {
+        return mood_high;
+    }
+
+    public int getMood_low() {
+        return mood_low;
+    }
+
+    public int getMood_anx() {
+        return mood_anx;
+    }
+
+    public int getMood_irr() {
+        return mood_irr;
+    }
+
     public DataMood(String user, int latency, int daily_alertness, int sleep_quality, int mood_high, int mood_low, int mood_anx, int mood_irr, long time){
         this.user = user;
         this.latency = latency;

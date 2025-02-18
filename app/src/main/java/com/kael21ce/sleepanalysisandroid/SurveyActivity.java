@@ -66,30 +66,6 @@ public class SurveyActivity extends AppCompatActivity {
         sharedPref = getSharedPreferences("SleepWake", Context.MODE_PRIVATE);
         editor = sharedPref.edit();
 
-        // Make mood survey list
-        baseJson = gson.toJson(baseArrayList);
-        if (surveyLevel == 1) {
-            if (!sharedPref.contains(AlertnessArrayKey)) {
-                sharedPref.edit().putString(AlertnessArrayKey, baseJson).apply();
-            } else {
-                Log.v("SurveyActivity", "Alertness list is loaded");
-                alertJson = sharedPref.getString(AlertnessArrayKey, baseJson);
-                Type type = new TypeToken<ArrayList<Records>>() {}.getType();
-                Gson loadGson = new Gson();
-                recordsArrayList = loadGson.fromJson(alertJson, type);
-            }
-        } else {
-            if (!sharedPref.contains(MoodArrayKey)) {
-                sharedPref.edit().putString(MoodArrayKey, baseJson).apply();
-            } else {
-                Log.v("SurveyActivity", "Record list is loaded");
-                moodJson = sharedPref.getString(MoodArrayKey, baseJson);
-                Type type = new TypeToken<ArrayList<Records>>() {}.getType();
-                Gson loadGson = new Gson();
-                recordsArrayList = loadGson.fromJson(moodJson, type);
-            }
-        }
-
         //Text
         TextView surveyTitle = findViewById(R.id.SurveyTitle);
         TextView surveyDescription = findViewById(R.id.SurveyDescription);
@@ -173,6 +149,31 @@ public class SurveyActivity extends AppCompatActivity {
             surveyDescription.setText("어제의 전반적인 개운한 정도를 평가해주세요");
         }
         Log.v("SURVEY LEVEL", String.valueOf(surveyLevel));
+
+        // Make mood survey list
+        baseJson = gson.toJson(baseArrayList);
+        if (surveyLevel == 1) {
+            if (!sharedPref.contains(AlertnessArrayKey)) {
+                sharedPref.edit().putString(AlertnessArrayKey, baseJson).apply();
+            } else {
+                Log.v("SurveyActivity", "Alertness list is loaded");
+                alertJson = sharedPref.getString(AlertnessArrayKey, baseJson);
+                Type type = new TypeToken<ArrayList<Records>>() {}.getType();
+                Gson loadGson = new Gson();
+                recordsArrayList = loadGson.fromJson(alertJson, type);
+            }
+        } else {
+            if (!sharedPref.contains(MoodArrayKey)) {
+                sharedPref.edit().putString(MoodArrayKey, baseJson).apply();
+            } else {
+                Log.v("SurveyActivity", "Daily list is loaded");
+                moodJson = sharedPref.getString(MoodArrayKey, baseJson);
+                Type type = new TypeToken<ArrayList<Records>>() {}.getType();
+                Gson loadGson = new Gson();
+                recordsArrayList = loadGson.fromJson(moodJson, type);
+            }
+        }
+
         if(surveyLevel == 1) {
             endSurveyButton.setOnClickListener(view -> {
                 Intent nextIntent = new Intent(this, SplashActivity.class);
