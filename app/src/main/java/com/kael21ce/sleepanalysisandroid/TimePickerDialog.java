@@ -10,6 +10,7 @@ import android.widget.TimePicker;
 import java.text.SimpleDateFormat;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Calendar;
 import java.util.Locale;
 
 import io.reactivex.annotations.NonNull;
@@ -39,31 +40,16 @@ public class TimePickerDialog extends Dialog {
         timePicker.setOnTimeChangedListener((timePicker, hour, minute) -> {
             //Get time in format
             String format;
-            String minuteStr;
-            if (minute < 10) {
-                minuteStr = "0" + minute;
+            String input = hour + ":" + minute;
+            DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("H:m", Locale.getDefault());
+            DateTimeFormatter outputFormatter;
+            if (languageSetting.equals("ko")) {
+                outputFormatter = DateTimeFormatter.ofPattern("a h:mm", Locale.getDefault());
             } else {
-                minuteStr = String.valueOf(minute);
+                outputFormatter = DateTimeFormatter.ofPattern("h:mm a", Locale.getDefault());
             }
-            if (hour >= 12) {
-                if (hour == 12) {
-                    hour = hour + 12;
-                }
-                if(languageSetting == "en") {
-                    format = (hour - 12) + ":" + minuteStr + " PM";
-                }else {
-                    format = "오후 " + (hour - 12) + ":" + minuteStr;
-                }
-            } else {
-                if (hour == 0) {
-                    hour = hour + 12;
-                }
-                if(languageSetting == "en") {
-                    format = hour + ":" + minuteStr + " AM";
-                }else{
-                    format = "오전 " + hour + ":" + minuteStr;
-                }
-            }
+            LocalTime time = LocalTime.parse(input, inputFormatter);
+            format = time.format(outputFormatter);
             checkTimeButton.setOnClickListener(view -> {
                 //Send time format to AddIntervalFragment
                 buttonTextUpdater.setTimeButtonText(format, isStartButton);
@@ -82,16 +68,11 @@ public class TimePickerDialog extends Dialog {
         DateTimeFormatter df;
         String languageSetting = Locale.getDefault().getLanguage();
         if (languageSetting.equals("ko")) {
-            df = DateTimeFormatter.ofPattern( "a h:mm", Locale.KOREA);
+            df = DateTimeFormatter.ofPattern("a h:mm", Locale.KOREA);
         } else {
-            df = DateTimeFormatter.ofPattern( "h:mm a");
+            df = DateTimeFormatter.ofPattern("h:mm a", Locale.getDefault());
         }
         LocalTime time = LocalTime.parse(current_time, df);
-//        int hour = Integer.parseInt(current_time.substring(0, 2));
-//        int minutes = Integer.parseInt(current_time.substring(3,5));
-//        if(current_time.substring(6, 8).equals("PM") || current_time.substring(0, 2).equals("오후")){
-//            hour += 12;
-//        }
         int hour = time.getHour();
         int minutes = time.getMinute();
         timePicker.setHour(hour);

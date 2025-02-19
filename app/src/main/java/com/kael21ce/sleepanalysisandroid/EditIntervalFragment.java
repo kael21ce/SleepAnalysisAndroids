@@ -2,13 +2,9 @@ package com.kael21ce.sleepanalysisandroid;
 
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,18 +13,17 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import androidx.fragment.app.Fragment;
+
 import com.kael21ce.sleepanalysisandroid.data.Sleep;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
@@ -36,20 +31,17 @@ public class EditIntervalFragment extends Fragment implements ButtonTextUpdater 
 
     public Button startTimeEditButton;
     public Button endTimeEditButton;
-    private String buttonStartText;
-    private String buttonEndText;
     private TextView intervalTextView;
-
     SimpleDateFormat sdfDateTime = new SimpleDateFormat( "yyyy/MM/dd H:mm", Locale.KOREA);
     SimpleDateFormat sdf;
-    SimpleDateFormat sdfSimple = new SimpleDateFormat("yyyy/MM/dd");
+    SimpleDateFormat sdfSimple = new SimpleDateFormat("yyyy/MM/dd", Locale.getDefault());
 
-    SimpleDateFormat sdf24H = new SimpleDateFormat("H:mm");
+    SimpleDateFormat sdf24H = new SimpleDateFormat("H:mm", Locale.getDefault());
     SimpleDateFormat sdfAMPM;
 
     private static final String TAG = "EditIntervalFragment";
-    private static long oneDay = 1000*60*60*24;
-    private String languageSetting = Locale.getDefault().getLanguage();
+    private static final long oneDay = 1000*60*60*24;
+    private final String languageSetting = Locale.getDefault().getLanguage();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -73,6 +65,7 @@ public class EditIntervalFragment extends Fragment implements ButtonTextUpdater 
         IntervalFragment intervalFragment = new IntervalFragment();
         //Back to intervalFragment if backButtonEdit is clicked
         Bundle bundle = this.getArguments();
+        assert bundle != null;
         intervalFragment.setArguments(bundle.getBundle("bundle"));
         backButtonEdit.setOnClickListener(view -> getParentFragmentManager().beginTransaction().replace(R.id.IntervalFrame, intervalFragment).commit());
 
@@ -86,9 +79,6 @@ public class EditIntervalFragment extends Fragment implements ButtonTextUpdater 
         editor.apply();
 
         //get the bundle
-        if(bundle == null){
-            Log.v("bundle", "bundle failed to be fetched");
-        }
         String date = bundle.getString("date");
         String startHour = bundle.getString("startHour");
         String endHour = bundle.getString("endHour");
@@ -102,15 +92,32 @@ public class EditIntervalFragment extends Fragment implements ButtonTextUpdater 
             startHourD = sdf24H.parse(startHour);
             endHourD = sdf24H.parse(endHour);
         } catch (ParseException e) {
-            throw new RuntimeException(e);
+            Log.e("EditIntervalFragment", e.toString());
+
+            // Display alert message
+            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+            builder.setCancelable(true);
+            if (languageSetting.equals("ko")) {
+                builder.setTitle("시스템 에러");
+                builder.setMessage("앱을 잠시 후 다시 시작해주세요. 문제가 계속되면 개발자에게 연락바랍니다.");
+                builder.setNegativeButton("확인", (dialogInterface, i) -> dialogInterface.cancel());
+            } else {
+                builder.setTitle("System Error");
+                builder.setMessage("Please restart the app after a moment. If the problem persists, please contact the developer.");
+                builder.setNegativeButton("OK", (dialogInterface, i) -> dialogInterface.cancel());
+            }
+
+            AlertDialog alert = builder.create();
+            alert.setOnShowListener(arg0 -> alert.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(getResources().getColor(R.color.black, null)));
+            alert.show();
         }
 
         if (languageSetting.equals("ko")) {
-            sdf = new SimpleDateFormat("yyyy/MM/dd a h:mm");
+            sdf = new SimpleDateFormat("yyyy/MM/dd a h:mm", Locale.KOREA);
             sdfAMPM = new SimpleDateFormat("a h:mm", Locale.KOREA);
         } else {
-            sdf = new SimpleDateFormat("yyyy/MM/dd h:mm a");
-            sdfAMPM = new SimpleDateFormat("h:mm a");
+            sdf = new SimpleDateFormat("yyyy/MM/dd h:mm a", Locale.getDefault());
+            sdfAMPM = new SimpleDateFormat("h:mm a", Locale.getDefault());
         }
         sdf.setTimeZone(timeZone);
         sdfAMPM.setTimeZone(timeZone);
@@ -125,10 +132,26 @@ public class EditIntervalFragment extends Fragment implements ButtonTextUpdater 
             intervalTextView.setText("수면 시간: "
                    + getInterval(sdfAMPM.format(startHourD), sdfAMPM.format(endHourD)));
         } catch (ParseException e) {
-            throw new RuntimeException(e);
+            Log.e("EditIntervalFragment", e.toString());
+
+            // Display alert message
+            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+            builder.setCancelable(true);
+            if (languageSetting.equals("ko")) {
+                builder.setTitle("시스템 에러");
+                builder.setMessage("앱을 잠시 후 다시 시작해주세요. 문제가 계속되면 개발자에게 연락바랍니다.");
+                builder.setNegativeButton("확인", (dialogInterface, i) -> dialogInterface.cancel());
+            } else {
+                builder.setTitle("System Error");
+                builder.setMessage("Please restart the app after a moment. If the problem persists, please contact the developer.");
+                builder.setNegativeButton("OK", (dialogInterface, i) -> dialogInterface.cancel());
+            }
+
+            AlertDialog alert = builder.create();
+            alert.setOnShowListener(arg0 -> alert.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(getResources().getColor(R.color.black, null)));
+            alert.show();
         }
 
-        Date finalStartHourD = startHourD;
         startTimeEditButton.setOnClickListener(view -> {
             TimePickerDialog timePickerDialog = new TimePickerDialog(v.getContext(), editIntervalFragment);
             timePickerDialog.setData(1);
@@ -191,24 +214,51 @@ public class EditIntervalFragment extends Fragment implements ButtonTextUpdater 
             try {
                 sleepStartDate = sdf.parse(startSDF);
                 sleepEndDate = sdf.parse(endSDF);
-                //translate to local date time
-//                LocalDateTime ldt1 = LocalDateTime.ofInstant(sleepStartDate.toInstant(), ZoneId.systemDefault());
-//                LocalDateTime ldt2 = LocalDateTime.ofInstant(sleepEndDate.toInstant(), ZoneId.systemDefault());
-//                sleepStartDate = Date.from(ldt1.atZone(ZoneId.systemDefault()).toInstant());
-//                sleepEndDate = Date.from(ldt2.atZone(ZoneId.systemDefault()).toInstant());
             } catch (ParseException e) {
-                throw new RuntimeException(e);
+                Log.e("EditIntervalFragment", e.toString());
+
+                // Display alert message
+                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                builder.setCancelable(true);
+                if (languageSetting.equals("ko")) {
+                    builder.setTitle("시스템 에러");
+                    builder.setMessage("앱을 잠시 후 다시 시작해주세요. 문제가 계속되면 개발자에게 연락바랍니다.");
+                    builder.setNegativeButton("확인", (dialogInterface, i) -> dialogInterface.cancel());
+                } else {
+                    builder.setTitle("System Error");
+                    builder.setMessage("Please restart the app after a moment. If the problem persists, please contact the developer.");
+                    builder.setNegativeButton("OK", (dialogInterface, i) -> dialogInterface.cancel());
+                }
+
+                AlertDialog alert = builder.create();
+                alert.setOnShowListener(arg0 -> alert.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(getResources().getColor(R.color.black, null)));
+                alert.show();
             }
             Log.v("START DATE", sleepStartDate.toString());
             Log.v("END DATE", sleepEndDate.toString());
-            assert sleepStartDate != null;
-            assert sleepEndDate != null;
 
-            Date curDate = null;
+            Date curDate = new Date();
             try {
                 curDate = sdfSimple.parse(date);
             } catch (ParseException e) {
-                throw new RuntimeException(e);
+                Log.e("EditIntervalFragment", e.toString());
+
+                // Display alert message
+                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                builder.setCancelable(true);
+                if (languageSetting.equals("ko")) {
+                    builder.setTitle("시스템 에러");
+                    builder.setMessage("앱을 잠시 후 다시 시작해주세요. 문제가 계속되면 개발자에게 연락바랍니다.");
+                    builder.setNegativeButton("확인", (dialogInterface, i) -> dialogInterface.cancel());
+                } else {
+                    builder.setTitle("System Error");
+                    builder.setMessage("Please restart the app after a moment. If the problem persists, please contact the developer.");
+                    builder.setNegativeButton("OK", (dialogInterface, i) -> dialogInterface.cancel());
+                }
+
+                AlertDialog alert = builder.create();
+                alert.setOnShowListener(arg0 -> alert.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(getResources().getColor(R.color.black, null)));
+                alert.show();
             }
 
             long sleepStartMillis = sleepStartDate.getTime();
@@ -258,15 +308,19 @@ public class EditIntervalFragment extends Fragment implements ButtonTextUpdater 
             }else{
                 AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
                 builder.setCancelable(true);
-                builder.setTitle("ERROR");
-                builder.setMessage("Start of the sleep has to be before the end of the sleep");
+                if (languageSetting.equals("ko")) {
+                    builder.setTitle("오류");
+                    builder.setMessage("수면 시작 시각이 종료 시각보다 일러야 합니다.");
 
-                builder.setNegativeButton("OK", (dialogInterface, i) -> dialogInterface.cancel());
+                    builder.setNegativeButton("확인", (dialogInterface, i) -> dialogInterface.cancel());
+                } else {
+                    builder.setTitle("ERROR");
+                    builder.setMessage("Start of the sleep has to be before the end of the sleep");
 
+                    builder.setNegativeButton("OK", (dialogInterface, i) -> dialogInterface.cancel());
+                }
                 AlertDialog alert = builder.create();
-                alert.setOnShowListener(arg0 -> {
-                    alert.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(getResources().getColor(R.color.black));
-                });
+                alert.setOnShowListener(arg0 -> alert.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(getResources().getColor(R.color.black, null)));
                 alert.show();
             }
         });
@@ -289,7 +343,24 @@ public class EditIntervalFragment extends Fragment implements ButtonTextUpdater 
                     startHourD = sdfAMPM.parse(text);
                     endHourD = sdfAMPM.parse(endTimeEditButton.getText().toString());
                 } catch (ParseException e) {
-                    throw new RuntimeException(e);
+                    Log.e("EditIntervalFragment", e.toString());
+
+                    // Display alert message
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                    builder.setCancelable(true);
+                    if (languageSetting.equals("ko")) {
+                        builder.setTitle("시스템 에러");
+                        builder.setMessage("앱을 잠시 후 다시 시작해주세요. 문제가 계속되면 개발자에게 연락바랍니다.");
+                        builder.setNegativeButton("확인", (dialogInterface, i) -> dialogInterface.cancel());
+                    } else {
+                        builder.setTitle("System Error");
+                        builder.setMessage("Please restart the app after a moment. If the problem persists, please contact the developer.");
+                        builder.setNegativeButton("OK", (dialogInterface, i) -> dialogInterface.cancel());
+                    }
+
+                    AlertDialog alert = builder.create();
+                    alert.setOnShowListener(arg0 -> alert.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(getResources().getColor(R.color.black, null)));
+                    alert.show();
                 }
 
                 try {
@@ -297,7 +368,24 @@ public class EditIntervalFragment extends Fragment implements ButtonTextUpdater 
                             + getInterval(sdfAMPM.format(startHourD),
                             sdfAMPM.format(endHourD)));
                 } catch (ParseException e) {
-                    throw new RuntimeException(e);
+                    Log.e("EditIntervalFragment", e.toString());
+
+                    // Display alert message
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                    builder.setCancelable(true);
+                    if (languageSetting.equals("ko")) {
+                        builder.setTitle("시스템 에러");
+                        builder.setMessage("앱을 잠시 후 다시 시작해주세요. 문제가 계속되면 개발자에게 연락바랍니다.");
+                        builder.setNegativeButton("확인", (dialogInterface, i) -> dialogInterface.cancel());
+                    } else {
+                        builder.setTitle("System Error");
+                        builder.setMessage("Please restart the app after a moment. If the problem persists, please contact the developer.");
+                        builder.setNegativeButton("OK", (dialogInterface, i) -> dialogInterface.cancel());
+                    }
+
+                    AlertDialog alert = builder.create();
+                    alert.setOnShowListener(arg0 -> alert.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(getResources().getColor(R.color.black, null)));
+                    alert.show();
                 }
             }
         } else {
@@ -311,7 +399,24 @@ public class EditIntervalFragment extends Fragment implements ButtonTextUpdater 
                     startHourD = sdfAMPM.parse(startTimeEditButton.getText().toString());
                     endHourD = sdfAMPM.parse(text);
                 } catch (ParseException e) {
-                    throw new RuntimeException(e);
+                    Log.e("EditIntervalFragment", e.toString());
+
+                    // Display alert message
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                    builder.setCancelable(true);
+                    if (languageSetting.equals("ko")) {
+                        builder.setTitle("시스템 에러");
+                        builder.setMessage("앱을 잠시 후 다시 시작해주세요. 문제가 계속되면 개발자에게 연락바랍니다.");
+                        builder.setNegativeButton("확인", (dialogInterface, i) -> dialogInterface.cancel());
+                    } else {
+                        builder.setTitle("System Error");
+                        builder.setMessage("Please restart the app after a moment. If the problem persists, please contact the developer.");
+                        builder.setNegativeButton("OK", (dialogInterface, i) -> dialogInterface.cancel());
+                    }
+
+                    AlertDialog alert = builder.create();
+                    alert.setOnShowListener(arg0 -> alert.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(getResources().getColor(R.color.black, null)));
+                    alert.show();
                 }
 
                 try {
@@ -319,7 +424,24 @@ public class EditIntervalFragment extends Fragment implements ButtonTextUpdater 
                             + getInterval(sdfAMPM.format(startHourD),
                             sdfAMPM.format(endHourD)));
                 } catch (ParseException e) {
-                    throw new RuntimeException(e);
+                    Log.e("EditIntervalFragment", e.toString());
+
+                    // Display alert message
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                    builder.setCancelable(true);
+                    if (languageSetting.equals("ko")) {
+                        builder.setTitle("시스템 에러");
+                        builder.setMessage("앱을 잠시 후 다시 시작해주세요. 문제가 계속되면 개발자에게 연락바랍니다.");
+                        builder.setNegativeButton("확인", (dialogInterface, i) -> dialogInterface.cancel());
+                    } else {
+                        builder.setTitle("System Error");
+                        builder.setMessage("Please restart the app after a moment. If the problem persists, please contact the developer.");
+                        builder.setNegativeButton("OK", (dialogInterface, i) -> dialogInterface.cancel());
+                    }
+
+                    AlertDialog alert = builder.create();
+                    alert.setOnShowListener(arg0 -> alert.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(getResources().getColor(R.color.black, null)));
+                    alert.show();
                 }
             }
         }

@@ -10,8 +10,9 @@ import android.widget.ImageButton;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -24,14 +25,18 @@ public class NotifyActivity extends AppCompatActivity implements ButtonTextUpdat
     private static final String AlertKey3 = "alertTime3";
     private static final String WorkOnsetKey = "workOnset";
     private static final String WorkOffsetKey = "workOffset";
-    private Button recommendButton, alert1TimeButton, alert2TimeButton, alert3TimeButton, notifySubmitButton;
+    private Button recommendButton;
+    private Button alert1TimeButton;
+    private Button alert2TimeButton;
+    private Button alert3TimeButton;
     private TimePickerDialog timePickerDialog;
     SharedPreferences sharedPref;
     SharedPreferences.Editor editor;
-    SimpleDateFormat sdfComplexTime = new SimpleDateFormat( "a h:mm", Locale.KOREA);
-    SimpleDateFormat sdfComplexTime_En = new SimpleDateFormat( "h:mm a");
-    SimpleDateFormat sdfSimpleTime = new SimpleDateFormat("H:mm", Locale.KOREA);
-    SimpleDateFormat sdfSimpleTime_En = new SimpleDateFormat("H:mm");
+    DateTimeFormatter dfComplexTime = DateTimeFormatter.ofPattern("a h:mm", Locale.KOREA);
+    DateTimeFormatter dfComplexTime_En = DateTimeFormatter.ofPattern("h:mm a");
+    DateTimeFormatter dfSimpleTime = DateTimeFormatter.ofPattern("H:mm", Locale.KOREA);
+    DateTimeFormatter dfSimpleTime_En = DateTimeFormatter.ofPattern("H:mm");
+    SimpleDateFormat sdfSimpleTime = new SimpleDateFormat("H:mm", Locale.getDefault());
     String notifyResult, alert1Result, alert2Result, alert3Result;
 
     @Override
@@ -50,9 +55,7 @@ public class NotifyActivity extends AppCompatActivity implements ButtonTextUpdat
 
         ImageButton notifyBackButton = findViewById(R.id.NotifyBackButton);
         //Click back button
-        notifyBackButton.setOnClickListener(view -> {
-            finish();
-        });
+        notifyBackButton.setOnClickListener(view -> finish());
 
         // Recommendation notification
         if (!sharedPref.contains(NotifyKey)) {
@@ -149,7 +152,7 @@ public class NotifyActivity extends AppCompatActivity implements ButtonTextUpdat
         });
 
         // Update the notification time
-        notifySubmitButton = findViewById(R.id.notifySubmitButton);
+        Button notifySubmitButton = findViewById(R.id.notifySubmitButton);
         notifySubmitButton.setOnClickListener(submitV -> {
             notifyResult = changeTimeFormatSimple(recommendButton.getText().toString());
             alert1Result = changeTimeFormatSimple(alert1TimeButton.getText().toString());
@@ -175,9 +178,7 @@ public class NotifyActivity extends AppCompatActivity implements ButtonTextUpdat
                 builder.setNegativeButton("OK", (dialogInterface, i) -> dialogInterface.cancel());
             }
             AlertDialog alert = builder.create();
-            alert.setOnShowListener(arg0 -> {
-                alert.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(getResources().getColor(R.color.black));
-            });
+            alert.setOnShowListener(arg0 -> alert.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(getResources().getColor(R.color.black, null)));
             alert.show();
         });
     }
@@ -185,36 +186,26 @@ public class NotifyActivity extends AppCompatActivity implements ButtonTextUpdat
     public String changeTimeFormatComplex(String value) {
         //Change time format of notifyAt
         String languageSetting = Locale.getDefault().getLanguage();
-        Date date;
-        try {
-            if (languageSetting == "en") {
-                date = sdfSimpleTime_En.parse(value);
-                return sdfComplexTime_En.format(date);
-            } else {
-                date = sdfSimpleTime.parse(value);
-                return sdfComplexTime.format(date);
-            }
-        } catch (ParseException e) {
-            e.printStackTrace();
-            return "";
+        LocalTime time;
+        if (languageSetting.equals("ko")) {
+            time = LocalTime.parse(value, dfSimpleTime);
+            return time.format(dfComplexTime);
+        } else {
+            time = LocalTime.parse(value, dfSimpleTime_En);
+            return time.format(dfComplexTime_En);
         }
     }
 
     public String changeTimeFormatSimple(String value) {
         //Change time format of notifyAt
         String languageSetting = Locale.getDefault().getLanguage();
-        Date date;
-        try {
-            if (languageSetting == "en") {
-                date = sdfComplexTime_En.parse(value);
-                return sdfSimpleTime_En.format(date);
-            } else {
-                date = sdfComplexTime.parse(value);
-                return sdfSimpleTime.format(date);
-            }
-        } catch (ParseException e) {
-            e.printStackTrace();
-            return "";
+        LocalTime time;
+        if (languageSetting.equals("ko")) {
+            time = LocalTime.parse(value, dfComplexTime);
+            return time.format(dfSimpleTime);
+        } else {
+            time = LocalTime.parse(value, dfComplexTime_En);
+            return time.format(dfSimpleTime_En);
         }
     }
 

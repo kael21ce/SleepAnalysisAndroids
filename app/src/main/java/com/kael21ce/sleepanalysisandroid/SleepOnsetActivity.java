@@ -260,7 +260,7 @@ public class SleepOnsetActivity extends AppCompatActivity implements ButtonTextU
 
                     AlertDialog alert = builder.create();
                     alert.setOnShowListener(arg0 -> {
-                        alert.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(getResources().getColor(R.color.black));
+                        alert.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(getResources().getColor(R.color.black, null));
                     });
                     alert.show();
                 }
@@ -281,7 +281,7 @@ public class SleepOnsetActivity extends AppCompatActivity implements ButtonTextU
 
                 AlertDialog alert = builder.create();
                 alert.setOnShowListener(arg0 -> {
-                    alert.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(getResources().getColor(R.color.black));
+                    alert.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(getResources().getColor(R.color.black, null));
                 });
                 alert.show();
             }

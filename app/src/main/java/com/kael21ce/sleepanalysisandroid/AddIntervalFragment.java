@@ -22,7 +22,9 @@ import com.kael21ce.sleepanalysisandroid.data.Sleep;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -108,6 +110,19 @@ public class AddIntervalFragment extends Fragment implements ButtonTextUpdater {
         startTimeButton.setText(current_time);
         endTimeButton.setText(current_time);
 
+        // String of noon time
+        String noonInput = "0:0";
+        DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("H:m", Locale.getDefault());
+        DateTimeFormatter outputFormatter;
+        if (languageSetting.equals("ko")) {
+            outputFormatter = DateTimeFormatter.ofPattern("a h:mm", Locale.getDefault());
+        } else {
+            outputFormatter = DateTimeFormatter.ofPattern("h:mm a", Locale.getDefault());
+        }
+        LocalTime noonTime = LocalTime.parse(noonInput, inputFormatter);
+        String noonOutput = noonTime.format(outputFormatter);
+        Log.v("AddIntervalFragment", "Locale: " + Locale.getDefault());
+
         //Open Picker when buttons about date are clicked
         AddIntervalFragment addIntervalFragment = this;
         startDateButton.setOnClickListener(view -> {
@@ -125,21 +140,13 @@ public class AddIntervalFragment extends Fragment implements ButtonTextUpdater {
         startTimeButton.setOnClickListener(view -> {
             timePickerDialog = new TimePickerDialog(v.getContext(), addIntervalFragment);
             timePickerDialog.setData(1);
-            if (languageSetting.equals("ko")) {
-                timePickerDialog.setTimePicker("오전 12:00");
-            } else {
-                timePickerDialog.setTimePicker("12:00 AM");
-            }
+            timePickerDialog.setTimePicker(noonOutput);
             timePickerDialog.show();
         });
         endTimeButton.setOnClickListener(view -> {
             timePickerDialog = new TimePickerDialog(v.getContext(), addIntervalFragment);
             timePickerDialog.setData(0);
-            if (languageSetting.equals("ko")) {
-                timePickerDialog.setTimePicker("오전 12:00");
-            } else {
-                timePickerDialog.setTimePicker("12:00 AM");
-            }
+            timePickerDialog.setTimePicker(noonOutput);
             timePickerDialog.show();
         });
         addButton.setOnClickListener(view -> {
@@ -217,7 +224,7 @@ public class AddIntervalFragment extends Fragment implements ButtonTextUpdater {
 
                     AlertDialog alert = builder.create();
                     alert.setOnShowListener(arg0 -> {
-                        alert.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(getResources().getColor(R.color.black));
+                        alert.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(getResources().getColor(R.color.black, null));
                     });
                     alert.show();
                 } else {
@@ -257,7 +264,7 @@ public class AddIntervalFragment extends Fragment implements ButtonTextUpdater {
 
                 AlertDialog alert = builder.create();
                 alert.setOnShowListener(arg0 -> {
-                    alert.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(getResources().getColor(R.color.black));
+                    alert.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(getResources().getColor(R.color.black, null));
                 });
                 alert.show();
             }
