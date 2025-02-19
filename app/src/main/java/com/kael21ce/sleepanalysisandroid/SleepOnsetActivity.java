@@ -46,7 +46,7 @@ public class SleepOnsetActivity extends AppCompatActivity implements ButtonTextU
     long sleepOnsetEditTime, sleepOnsetShowEditTime, workOnsetEditTime, workOffsetEditTime;
     int workType;
     SimpleDateFormat sdf;
-    SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy.MM.dd");
+    SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy.MM.dd", Locale.getDefault());
     SimpleDateFormat sdfTime;
     long now, nineHours;
     private String languageSetting = Locale.getDefault().getLanguage();
@@ -101,8 +101,8 @@ public class SleepOnsetActivity extends AppCompatActivity implements ButtonTextU
             sdf = new SimpleDateFormat("yyyy.MM.dd a h:mm", Locale.KOREA);
             sdfTime = new SimpleDateFormat("a h:mm", Locale.KOREA);
         } else {
-            sdf = new SimpleDateFormat("yyyy.MM.dd h:mm a");
-            sdfTime = new SimpleDateFormat("h:mm a");
+            sdf = new SimpleDateFormat("yyyy.MM.dd h:mm a", Locale.getDefault());
+            sdfTime = new SimpleDateFormat("h:mm a", Locale.getDefault());
         }
 
         TimeZone timeZone = TimeZone.getDefault();

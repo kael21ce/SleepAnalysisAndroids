@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import io.reactivex.annotations.NonNull;
@@ -36,7 +37,7 @@ public class DatePickerDialog extends Dialog {
         backPopButton.setOnClickListener(view -> dismiss());
 
         //Send selected date to AddIntervalFragment when checkDateButton is clicked
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd", Locale.getDefault());
         String initialDateStr = buttonTextUpdater.getDateButtonText(isStartButton);
         Log.d("DatePickerDialog", initialDateStr);
         List<Integer> initialList = str2Date(initialDateStr);
@@ -84,7 +85,7 @@ public class DatePickerDialog extends Dialog {
     //Convert string into year, month, and day
     public List<Integer> str2Date(String theDate) {
         List<Integer> dateList = new ArrayList<>();
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd", Locale.getDefault());
         int year = 0;
         int month = 1;
         int day = 0;

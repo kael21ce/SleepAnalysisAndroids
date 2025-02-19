@@ -42,10 +42,10 @@ public class WhenWorkFragment extends Fragment {
     String onHour1, onHour2, onMinute1, onMinute2, offHour1, offHour2, offMinute1, offMinute2;
     String sleepOnsetTime, workOnsetTime, workOffsetTime, sleepOnsetDate, workOnsetDate, workOffsetDate;
     String sleepOnsetOutput, workOnsetOutput, workOffsetOutput;
-    SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd hh:mm aaa");
-    SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy.MM.dd");
-    SimpleDateFormat sdfTime = new SimpleDateFormat("hh:mm aaa");
-    SimpleDateFormat inputSdfTime = new SimpleDateFormat("HH:mm");
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd hh:mm aaa", Locale.getDefault());
+    SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy.MM.dd", Locale.getDefault());
+    SimpleDateFormat sdfTime = new SimpleDateFormat("hh:mm aaa", Locale.getDefault());
+    SimpleDateFormat inputSdfTime = new SimpleDateFormat("HH:mm", Locale.getDefault());
     long now = System.currentTimeMillis();
     long oneDay = (1000*60*60*24);
     long sleepOnsetResult, sleepOnsetShowResult, workOnsetResult, workOffsetResult;

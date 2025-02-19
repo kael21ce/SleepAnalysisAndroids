@@ -75,9 +75,9 @@ public class AddIntervalFragment extends Fragment implements ButtonTextUpdater {
         backButton.setOnClickListener(view -> getParentFragmentManager().beginTransaction().replace(R.id.IntervalFrame, intervalFragment).commit());
         
         if (languageSetting.equals("ko")) {
-            sdf = new SimpleDateFormat("yyyy.MM.dd a h:mm");
+            sdf = new SimpleDateFormat("yyyy.MM.dd a h:mm", Locale.KOREA);
         } else {
-            sdf = new SimpleDateFormat("yyyy.MM.dd h:mm a");
+            sdf = new SimpleDateFormat("yyyy.MM.dd h:mm a", Locale.getDefault());
         }
         sdf.setTimeZone(timeZone);
 
@@ -94,14 +94,14 @@ public class AddIntervalFragment extends Fragment implements ButtonTextUpdater {
         String current_time;
         SimpleDateFormat sdfCurrent, sdfDate;
         if (languageSetting.equals("ko")) {
-            sdfCurrent = new SimpleDateFormat("a h:mm");
+            sdfCurrent = new SimpleDateFormat("a h:mm", Locale.KOREA);
         } else {
-            sdfCurrent = new SimpleDateFormat("h:mm a");
+            sdfCurrent = new SimpleDateFormat("h:mm a", Locale.getDefault());
         }
         sdfCurrent.setTimeZone(timeZone);
         current_time = sdfCurrent.format(getMidnight());
 
-        sdfDate = new SimpleDateFormat("yyyy.MM.dd");
+        sdfDate = new SimpleDateFormat("yyyy.MM.dd", Locale.getDefault());
         sdfDate.setTimeZone(timeZone);
         String current_date = sdfDate.format(ref.curDate);
 

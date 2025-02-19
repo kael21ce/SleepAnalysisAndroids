@@ -145,7 +145,7 @@ class HealthConnectManager(private val context: Context) {
      * TODO: Reads in existing [WeightRecord]s.
      */
     suspend fun readSleepInputs(start: Instant, end: Instant){
-        val sdfDateTime = SimpleDateFormat("yyyy/MM/dd HH:mm")
+        val sdfDateTime = SimpleDateFormat("yyyy/MM/dd HH:mm", Locale.getDefault())
         Log.v("start", start.toString())
         Log.v("end", end.toString())
         val request = ReadRecordsRequest(

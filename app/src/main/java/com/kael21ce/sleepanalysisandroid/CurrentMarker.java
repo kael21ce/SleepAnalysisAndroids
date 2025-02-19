@@ -21,6 +21,7 @@ import com.github.mikephil.charting.utils.MPPointF;
 
 import java.util.Date;
 import java.text.SimpleDateFormat;
+import java.util.Locale;
 
 public class CurrentMarker extends MarkerView {
     private Context context;
@@ -259,7 +260,7 @@ public class CurrentMarker extends MarkerView {
     public float pastTimeToX(String time) {
         long now = System.currentTimeMillis();
         Date date = new Date(now);
-        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
+        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", Locale.getDefault());
         String currentTime = sdf.format(date);
         int currentHour = Integer.parseInt(currentTime.substring(0, currentTime.indexOf(":")));
         int currentMinute = Integer.parseInt(currentTime.substring(currentTime.indexOf(":") + 1));

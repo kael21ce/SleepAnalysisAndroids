@@ -80,8 +80,8 @@ public class MainActivity extends AppCompatActivity {
     SettingFragment settingFragment = new SettingFragment();
     private RelativeLayout loadingScreenLayout;
     private boolean creation = true;
-    SimpleDateFormat sdfDateTime = new SimpleDateFormat("dd/MM/yyyy" + " HH:mm");
-    SimpleDateFormat sdfSimple = new SimpleDateFormat("H:mm");
+    SimpleDateFormat sdfDateTime = new SimpleDateFormat("dd/MM/yyyy" + " HH:mm", Locale.getDefault());
+    SimpleDateFormat sdfSimple = new SimpleDateFormat("H:mm", Locale.getDefault());
     private static final String TAG = "MainActivity";
     private static final String CHECK_CHANNEL_ID = "check_recommend", SURVEY_CHANNEL_ID = "alertness_survey";
     HealthConnectManager healthConnectManager;
