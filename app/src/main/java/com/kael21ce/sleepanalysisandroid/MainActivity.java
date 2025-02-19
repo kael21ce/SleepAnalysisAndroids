@@ -686,12 +686,15 @@ public class MainActivity extends AppCompatActivity {
         v0Dao = db.v0Dao();
         v0s = Collections.synchronizedList(v0Dao.getAll());
 
-        for (V0 v0 : v0s) {
-            Log.v("V0s", String.valueOf(v0));
-        }
-
-        if (lastDataUpdate < now - twoWeeks) {
-            lastDataUpdate = now - twoWeeks;
+        Boolean deleteException = sharedPref.getBoolean("deleteException", false);
+        if (!deleteException) {
+            Log.v("MainActivity", "Conventional");
+            if (lastDataUpdate < now - twoWeeks) {
+                lastDataUpdate = now - twoWeeks;
+            }
+        } else {
+            Log.v("MainActivity", "Exceptional");
+            editor.putBoolean("deleteException", false).apply();
         }
 
         //do pcr simulation
@@ -1315,6 +1318,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public boolean deleteSleep(Sleep sleepDel){
+        now = System.currentTimeMillis();
         long sleepDelStart = sleepDel.sleepStart/60000;
         long sleepDelEnd = sleepDel.sleepEnd/60000;
         Log.v("SLEEP DELETE START", String.valueOf(sleepDel.sleepStart));
@@ -1332,6 +1336,9 @@ public class MainActivity extends AppCompatActivity {
             if(sSleepStart == sleepDelStart && sSleepEnd == sleepDelEnd){
                 Log.v("deleted broooo", "broooo");
                 lastDataUpdate = sleep.sleepStart - (1000*60*60*24);
+                if (lastDataUpdate < now - twoWeeks) {
+                    editor.putBoolean("deleteException", true).apply();
+                }
                 editor.putLong("lastDataUpdate", lastDataUpdate);
                 editor.apply();
                 sleepDao.delete(sleep);
