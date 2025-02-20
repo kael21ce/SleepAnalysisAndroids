@@ -183,19 +183,11 @@ public class NotifyActivity extends AppCompatActivity implements ButtonTextUpdat
             editor.apply();
 
             String languageSetting = Locale.getDefault().getLanguage();
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setCancelable(true);
             if (languageSetting.equals("ko")) {
                 showAlertDialog(dimBackground, actionBar,"알림 시간이 업데이트되었습니다.", "확인");
             } else {
                 showAlertDialog(dimBackground, actionBar,"Notification time is updated", "OK");
             }
-            AlertDialog alert = builder.create();
-            alert.setOnShowListener(arg0 -> alert.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(getResources().getColor(R.color.black, null)));
-            alert.show();
-            WindowManager.LayoutParams lp = alert.getWindow().getAttributes();
-            lp.dimAmount=0.8f;
-            alert.getWindow().setAttributes(lp);
         });
     }
 

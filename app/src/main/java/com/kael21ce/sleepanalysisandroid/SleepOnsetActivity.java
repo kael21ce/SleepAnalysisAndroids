@@ -4,16 +4,21 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.tabs.TabLayout;
@@ -155,6 +160,10 @@ public class SleepOnsetActivity extends AppCompatActivity implements ButtonTextU
             timePickerDialog.show();
         });
 
+        // Setup for alert dialog
+        View dimBackground = findViewById(R.id.dimBackgroundSLO);
+        ActionBar actionBar = getSupportActionBar();
+
         final int[] selectedType = new int[1];
         selectedType[0] = workType;
         workTypeTabSetting.addTab(workTypeTabSetting.newTab().setText("휴무"));
@@ -282,46 +291,18 @@ public class SleepOnsetActivity extends AppCompatActivity implements ButtonTextU
                     mainActivity.finish();
                     startActivity(new Intent(this, SplashActivity.class));
                 } else {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                    builder.setCancelable(true);
                     if (languageSetting.equals("ko")) {
-                        builder.setTitle("경고");
-                        builder.setMessage("근무 종류를 선택해주세요.");
-
-                        builder.setNegativeButton("확인", (dialogInterface, i) -> dialogInterface.cancel());
+                        showAlertDialog(dimBackground, actionBar,"경고", "근무 종류를 선택해주세요.", "확인");
                     } else {
-                        builder.setTitle("ERROR");
-                        builder.setMessage("Choose the work type");
-
-                        builder.setNegativeButton("OK", (dialogInterface, i) -> dialogInterface.cancel());
+                        showAlertDialog(dimBackground, actionBar,"ERROR", "Choose your work type", "OK");
                     }
-
-                    AlertDialog alert = builder.create();
-                    alert.setOnShowListener(arg0 -> {
-                        alert.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(getResources().getColor(R.color.black, null));
-                    });
-                    alert.show();
                 }
             }else{
-                AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setCancelable(true);
                 if (languageSetting.equals("ko")) {
-                    builder.setTitle("경고");
-                    builder.setMessage("잘못된 입력값입니다.");
-
-                    builder.setNegativeButton("OK", (dialogInterface, i) -> dialogInterface.cancel());
+                    showAlertDialog(dimBackground, actionBar,"경고", "잘못된 입력값입니다.", "확인");
                 } else {
-                    builder.setTitle("ERROR");
-                    builder.setMessage("INVALID INPUT");
-
-                    builder.setNegativeButton("OK", (dialogInterface, i) -> dialogInterface.cancel());
+                    showAlertDialog(dimBackground, actionBar,"ERROR", "Invalid input", "OK");
                 }
-
-                AlertDialog alert = builder.create();
-                alert.setOnShowListener(arg0 -> {
-                    alert.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(getResources().getColor(R.color.black, null));
-                });
-                alert.show();
             }
         });
     }
@@ -499,5 +480,55 @@ public class SleepOnsetActivity extends AppCompatActivity implements ButtonTextU
         }
 
         return new Long[]{sleepOnset, sleepOnsetShow, workOnset, workOffset};
+    }
+
+    private void showAlertDialog(View dimBackground, ActionBar actionBar,
+                                 String title, String message, String buttonText) {
+        // Save the original color
+        // Change this part if someone tries to change the primary color
+        int originalActionBarColor = getResources().getColor(R.color.white, null);
+        Window window = getWindow();
+
+        // Dim effect
+        dimBackground.setVisibility(View.VISIBLE);
+        if (actionBar != null) {
+            actionBar.setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.dim, null)));
+        }
+        Intent dimOnIntent = new Intent("DIM_EFFECT");
+        dimOnIntent.putExtra("COLOR", "#80000000");
+        sendBroadcast(dimOnIntent);
+        window.setStatusBarColor(getResources().getColor(R.color.dim, null));
+
+        View viewDialog = LayoutInflater.from(this).inflate(R.layout.layout_custom_dialog,
+                (LinearLayout) findViewById(R.id.DialogLayout));
+        TextView dialogTitle = (TextView) viewDialog.findViewById(R.id.dialogTitle);
+        TextView dialogMessage = (TextView) viewDialog.findViewById(R.id.dialogMessage);
+        Button dialogButton = (Button) viewDialog.findViewById(R.id.dialogButton);
+        dialogTitle.setText(title);
+        dialogMessage.setText(message);
+        dialogButton.setText(buttonText);
+
+        AlertDialog dialog = new AlertDialog.Builder(this, R.style.CustomAlertDialog)
+                .setView(viewDialog)
+                .create();
+
+        dialogButton.setOnClickListener(dialogV -> {
+            dialog.dismiss();
+            dimBackground.setVisibility(View.GONE);
+            if (actionBar != null) {
+                actionBar.setBackgroundDrawable(new ColorDrawable(originalActionBarColor));
+            }
+            Intent dimOffIntent = new Intent("DIM_EFFECT");
+            dimOffIntent.putExtra("COLOR", "#FFFFFF");
+            sendBroadcast(dimOffIntent);
+
+            window.setStatusBarColor(getResources().getColor(R.color.white, null));
+        });
+        dialog.setCancelable(true);
+        dialog.show();
+
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
+        }
     }
 }

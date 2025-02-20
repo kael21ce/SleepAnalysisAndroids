@@ -4,8 +4,11 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
@@ -15,12 +18,15 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.tabs.TabLayout;
 import com.kael21ce.sleepanalysisandroid.data.DataSurvey;
 import com.kael21ce.sleepanalysisandroid.data.RetrofitAPI;
@@ -462,6 +468,11 @@ public class WhenWorkFragment extends Fragment {
                 workOnsetResult = updateDates[2];
                 workOffsetResult = updateDates[3];
 
+                // Setup for alert dialog
+                View dimBackground = v.findViewById(R.id.dimBackgroundWhenWk);
+                ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
+                BottomNavigationView bottomNavigationView = getActivity().findViewById(R.id.bottomNavigationView);
+
                 if(isValid(sleepOnsetResult, workOnsetResult, workOffsetResult)) {
                     mainActivity.setSleepOnset(sleepOnsetResult);
                     mainActivity.setWorkOnset(workOnsetResult);
@@ -477,18 +488,12 @@ public class WhenWorkFragment extends Fragment {
                     mainActivity.finish();
                     startActivity(new Intent(mainActivity, SplashActivity.class));
                 }else{
-                    AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                    builder.setCancelable(true);
-                    builder.setTitle("ERROR");
-                    builder.setMessage("INVALID INPUT");
-
-                    builder.setNegativeButton("OK", (dialogInterface, i) -> dialogInterface.cancel());
-
-                    AlertDialog alert = builder.create();
-                    alert.setOnShowListener(arg0 -> {
-                        alert.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(getResources().getColor(R.color.black));
-                    });
-                    alert.show();
+                    String languageSetting = Locale.getDefault().getLanguage();
+                    if (languageSetting.equals("ko")) {
+                        showAlertDialog(dimBackground, actionBar, bottomNavigationView, "경고", "잘못된 입력값입니다.", "확인");
+                    } else {
+                        showAlertDialog(dimBackground, actionBar, bottomNavigationView, "Error", "Invalid input", "OK");
+                    }
                 }
             }
 
@@ -620,5 +625,55 @@ public class WhenWorkFragment extends Fragment {
         }
 
         return new Long[]{sleepOnset, sleepOnsetShow, workOnset, workOffset};
+    }
+
+    private void showAlertDialog(View dimBackground, ActionBar actionBar,
+                                 BottomNavigationView bottomNavigationView, String title,
+                                 String message, String buttonText) {
+        // Save the original color
+        // Change this part if someone tries to change the primary color
+        int originalActionBarColor = getResources().getColor(R.color.white, null);
+        Window window = getActivity().getWindow();
+
+        // Dim effect
+        dimBackground.setVisibility(View.VISIBLE);
+        if (actionBar != null) {
+            actionBar.setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.dim, null)));
+        }
+        if (bottomNavigationView != null) {
+            bottomNavigationView.setItemBackground(new ColorDrawable(Color.parseColor("#80000000")));
+        }
+        window.setStatusBarColor(getResources().getColor(R.color.dim, null));
+
+        View viewDialog = LayoutInflater.from(getActivity()).inflate(R.layout.layout_custom_dialog,
+                (LinearLayout) getActivity().findViewById(R.id.DialogLayout));
+        TextView dialogTitle = (TextView) viewDialog.findViewById(R.id.dialogTitle);
+        TextView dialogMessage = (TextView) viewDialog.findViewById(R.id.dialogMessage);
+        Button dialogButton = (Button) viewDialog.findViewById(R.id.dialogButton);
+        dialogTitle.setText(title);
+        dialogMessage.setText(message);
+        dialogButton.setText(buttonText);
+
+        AlertDialog dialog = new AlertDialog.Builder(getActivity(), R.style.CustomAlertDialog)
+                .setView(viewDialog)
+                .create();
+
+        dialogButton.setOnClickListener(dialogV -> {
+            dialog.dismiss();
+            dimBackground.setVisibility(View.GONE);
+            if (actionBar != null) {
+                actionBar.setBackgroundDrawable(new ColorDrawable(originalActionBarColor));
+            }
+            if (bottomNavigationView != null) {
+                bottomNavigationView.setItemBackground(new ColorDrawable(Color.parseColor("#FFFFFF")));
+            }
+            window.setStatusBarColor(getResources().getColor(R.color.white, null));
+        });
+        dialog.setCancelable(true);
+        dialog.show();
+
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
+        }
     }
 }
