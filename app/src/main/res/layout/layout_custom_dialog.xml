@@ -37,7 +37,7 @@
             android:maxLines="2"
             android:text="Message"
             android:textColor="@color/black"
-            android:textSize="14sp" />
+            android:textSize="16sp" />
 
         <LinearLayout
             android:id="@+id/LineLayout"

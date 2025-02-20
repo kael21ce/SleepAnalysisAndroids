@@ -4,9 +4,13 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
 
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
@@ -14,9 +18,13 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.kael21ce.sleepanalysisandroid.data.Sleep;
 
 import java.text.ParseException;
@@ -204,29 +212,20 @@ public class AddIntervalFragment extends Fragment implements ButtonTextUpdater {
             assert sleepEndDate != null;
             add_sleep.sleepStart = sleepStartDate.getTime();
             add_sleep.sleepEnd = sleepEndDate.getTime();
-            boolean bool1 = sleepStartDate.getTime() <= sleepEndDate.getTime();
-            boolean bool2 = !mainActivity.isOverlap(mainActivity.getSleeps(), add_sleep, -1);
-            Log.v("AddIntervalFragment", "Bool 1: " + bool1);
-            Log.v("AddIntervalFragment", "Bool 2: " + bool2);
+
+            View dimBackground = getParentFragment() != null ? getParentFragment().getView().findViewById(R.id.dimBackgroundSched) : v.findViewById(R.id.dimBackgroundAddIntv);
+            ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
+            BottomNavigationView bottomNavigationView = getActivity().findViewById(R.id.bottomNavigationView);
+
             if(sleepStartDate.getTime() < sleepEndDate.getTime() && !mainActivity.isOverlap(mainActivity.getSleeps(), add_sleep, -1)) {
                 if (Math.abs(sleepStartDate.getTime()-sleepEndDate.getTime()) > 24*60*60*1000) {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                    builder.setCancelable(true);
                     if (languageSetting.equals("ko")) {
-                        builder.setTitle("경고");
-                        builder.setMessage("24시간 미만으로 수면을 입력해주세요");
-                        builder.setNegativeButton("확인", (dialogInterface, i) -> dialogInterface.cancel());
+                        showAlertDialog(dimBackground, actionBar, bottomNavigationView,
+                                "경고", "24시간 미만으로 수면을 입력해주세요", "확인");
                     } else {
-                        builder.setTitle("ERROR");
-                        builder.setMessage("Please enter sleep time of less than 24 hours");
-                        builder.setNegativeButton("OK", (dialogInterface, i) -> dialogInterface.cancel());
+                        showAlertDialog(dimBackground, actionBar, bottomNavigationView,
+                                "ERROR", "Please enter sleep time of less than 24 hours", "OK");
                     }
-
-                    AlertDialog alert = builder.create();
-                    alert.setOnShowListener(arg0 -> {
-                        alert.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(getResources().getColor(R.color.black, null));
-                    });
-                    alert.show();
                 } else {
 
                     mainActivity.addSleep(add_sleep);
@@ -250,23 +249,13 @@ public class AddIntervalFragment extends Fragment implements ButtonTextUpdater {
                     startActivity(scheduleIntent);
                 }
             }else{
-                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                builder.setCancelable(true);
                 if (languageSetting.equals("ko")) {
-                    builder.setTitle("경고");
-                    builder.setMessage("잘못된 수면 입력값입니다");
-                    builder.setNegativeButton("확인", (dialogInterface, i) -> dialogInterface.cancel());
+                    showAlertDialog(dimBackground, actionBar, bottomNavigationView,
+                            "경고", "잘못된 수면 입력값입니다", "확인");
                 } else {
-                    builder.setTitle("ERROR");
-                    builder.setMessage("Invalid sleep value");
-                    builder.setNegativeButton("OK", (dialogInterface, i) -> dialogInterface.cancel());
+                    showAlertDialog(dimBackground, actionBar, bottomNavigationView,
+                            "ERROR", "Invalid sleep value", "OK");
                 }
-
-                AlertDialog alert = builder.create();
-                alert.setOnShowListener(arg0 -> {
-                    alert.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(getResources().getColor(R.color.black, null));
-                });
-                alert.show();
             }
         });
 
@@ -324,5 +313,55 @@ public class AddIntervalFragment extends Fragment implements ButtonTextUpdater {
         calendar.set(Calendar.MILLISECOND, 0);
 
         return calendar.getTime();
+    }
+
+    private void showAlertDialog(View dimBackground, ActionBar actionBar,
+                                 BottomNavigationView bottomNavigationView, String title,
+                                 String message, String buttonText) {
+        // Save the original color
+        // Change this part if someone tries to change the primary color
+        int originalActionBarColor = getResources().getColor(R.color.white, null);
+        Window window = getActivity().getWindow();
+
+        // Dim effect
+        dimBackground.setVisibility(View.VISIBLE);
+        if (actionBar != null) {
+            actionBar.setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.dim, null)));
+        }
+        if (bottomNavigationView != null) {
+            bottomNavigationView.setItemBackground(new ColorDrawable(Color.parseColor("#80000000")));
+        }
+        window.setStatusBarColor(getResources().getColor(R.color.dim, null));
+
+        View viewDialog = LayoutInflater.from(getActivity()).inflate(R.layout.layout_custom_dialog,
+                (LinearLayout) getActivity().findViewById(R.id.DialogLayout));
+        TextView dialogTitle = (TextView) viewDialog.findViewById(R.id.dialogTitle);
+        TextView dialogMessage = (TextView) viewDialog.findViewById(R.id.dialogMessage);
+        Button dialogButton = (Button) viewDialog.findViewById(R.id.dialogButton);
+        dialogTitle.setText(title);
+        dialogMessage.setText(message);
+        dialogButton.setText(buttonText);
+
+        AlertDialog dialog = new AlertDialog.Builder(getActivity(), R.style.CustomAlertDialog)
+                .setView(viewDialog)
+                .create();
+
+        dialogButton.setOnClickListener(dialogV -> {
+            dialog.dismiss();
+            dimBackground.setVisibility(View.GONE);
+            if (actionBar != null) {
+                actionBar.setBackgroundDrawable(new ColorDrawable(originalActionBarColor));
+            }
+            if (bottomNavigationView != null) {
+                bottomNavigationView.setItemBackground(new ColorDrawable(Color.parseColor("#FFFFFF")));
+            }
+            window.setStatusBarColor(getResources().getColor(R.color.white, null));
+        });
+        dialog.setCancelable(true);
+        dialog.show();
+
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
+        }
     }
 }

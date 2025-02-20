@@ -232,4 +232,10 @@
             app:cornerRadius="28dp" />
 
     </LinearLayout>
+    <View
+        android:id="@+id/dimBackgroundAddIntv"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/dim"
+        android:visibility="gone" />
 </FrameLayout>

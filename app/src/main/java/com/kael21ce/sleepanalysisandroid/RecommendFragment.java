@@ -327,62 +327,17 @@ public class RecommendFragment extends Fragment {
 
         Button workTypeSubmitButton = v.findViewById(R.id.workTypeSubmitButton);
         workTypeSubmitButton.setOnClickListener(typeV -> {
-            // Save the original color
-            // Change this part if someone tries to change the primary color
-            int originalActionBarColor = getResources().getColor(R.color.white, null);
-            Window window = getActivity().getWindow();
-
-            // Dim effect
-            dimBackground.setVisibility(View.VISIBLE);
-            if (actionBar != null) {
-                actionBar.setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.dim, null)));
-            }
-            if (bottomNavigationView != null) {
-                bottomNavigationView.setItemBackground(new ColorDrawable(Color.parseColor("#80000000")));
-            }
-            window.setStatusBarColor(getResources().getColor(R.color.dim, null));
-
+            // Update work type
             editor.putInt("workType", selectedType[0]).apply();
             Log.v("RecommendFragment", "Submit work type: " + selectedType[0]);
+
             String languageSetting = Locale.getDefault().getLanguage();
-            View view = LayoutInflater.from(getActivity()).inflate(R.layout.layout_custom_dialog,
-                    (LinearLayout) getActivity().findViewById(R.id.DialogLayout));
-            TextView dialogTitle = (TextView) view.findViewById(R.id.dialogTitle);
-            TextView dialogMessage = (TextView) view.findViewById(R.id.dialogMessage);
-            Button dialogButton = (Button) view.findViewById(R.id.dialogButton);
-
-            String title, buttonText;
-            dialogMessage.setVisibility(View.GONE);
             if (languageSetting.equals("ko")) {
-                title = "내일 근무 종류가 변경되었습니다.";
-                buttonText = "확인";
+                showAlertDialog(dimBackground, actionBar, bottomNavigationView,
+                        "내일 근무 종류가 변경되었습니다.", "확인");
             } else {
-                title = "Your work type for tomorrow has been updated.";
-                buttonText = "OK";
-            }
-            dialogTitle.setText(title);
-            dialogButton.setText(buttonText);
-
-            AlertDialog dialog = new AlertDialog.Builder(getActivity(), R.style.CustomAlertDialog)
-                    .setView(view)
-                    .create();
-
-            dialogButton.setOnClickListener(dialogV -> {
-                dialog.dismiss();
-                dimBackground.setVisibility(View.GONE);
-                if (actionBar != null) {
-                    actionBar.setBackgroundDrawable(new ColorDrawable(originalActionBarColor));
-                }
-                if (bottomNavigationView != null) {
-                    bottomNavigationView.setItemBackground(new ColorDrawable(Color.parseColor("#FFFFFF")));
-                }
-                window.setStatusBarColor(getResources().getColor(R.color.white, null));
-            });
-            dialog.setCancelable(true);
-            dialog.show();
-
-            if (dialog.getWindow() != null) {
-                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
+                showAlertDialog(dimBackground, actionBar, bottomNavigationView,
+                        "Your work type for tomorrow has been updated.", "OK");
             }
         });
 
@@ -601,5 +556,56 @@ public class RecommendFragment extends Fragment {
         }
 
         return new Long[]{sleepOnset, sleepOnsetShow, workOnset, workOffset};
+    }
+
+
+    private void showAlertDialog(View dimBackground, ActionBar actionBar,
+                                 BottomNavigationView bottomNavigationView, String title,
+                                 String buttonText) {
+        // Save the original color
+        // Change this part if someone tries to change the primary color
+        int originalActionBarColor = getResources().getColor(R.color.white, null);
+        Window window = getActivity().getWindow();
+
+        // Dim effect
+        dimBackground.setVisibility(View.VISIBLE);
+        if (actionBar != null) {
+            actionBar.setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.dim, null)));
+        }
+        if (bottomNavigationView != null) {
+            bottomNavigationView.setItemBackground(new ColorDrawable(Color.parseColor("#80000000")));
+        }
+        window.setStatusBarColor(getResources().getColor(R.color.dim, null));
+
+        View viewDialog = LayoutInflater.from(getActivity()).inflate(R.layout.layout_custom_dialog,
+                (LinearLayout) getActivity().findViewById(R.id.DialogLayout));
+        TextView dialogTitle = (TextView) viewDialog.findViewById(R.id.dialogTitle);
+        TextView dialogMessage = (TextView) viewDialog.findViewById(R.id.dialogMessage);
+        Button dialogButton = (Button) viewDialog.findViewById(R.id.dialogButton);
+        dialogTitle.setText(title);
+        dialogMessage.setVisibility(View.GONE);
+        dialogButton.setText(buttonText);
+
+        AlertDialog dialog = new AlertDialog.Builder(getActivity(), R.style.CustomAlertDialog)
+                .setView(viewDialog)
+                .create();
+
+        dialogButton.setOnClickListener(dialogV -> {
+            dialog.dismiss();
+            dimBackground.setVisibility(View.GONE);
+            if (actionBar != null) {
+                actionBar.setBackgroundDrawable(new ColorDrawable(originalActionBarColor));
+            }
+            if (bottomNavigationView != null) {
+                bottomNavigationView.setItemBackground(new ColorDrawable(Color.parseColor("#FFFFFF")));
+            }
+            window.setStatusBarColor(getResources().getColor(R.color.white, null));
+        });
+        dialog.setCancelable(true);
+        dialog.show();
+
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
+        }
     }
 }
