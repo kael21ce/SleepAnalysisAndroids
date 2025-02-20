@@ -250,7 +250,7 @@ public class SleepOnsetActivity extends AppCompatActivity implements ButtonTextU
                         builder.setTitle("경고");
                         builder.setMessage("근무 종류를 선택해주세요.");
 
-                        builder.setNegativeButton("OK", (dialogInterface, i) -> dialogInterface.cancel());
+                        builder.setNegativeButton("확인", (dialogInterface, i) -> dialogInterface.cancel());
                     } else {
                         builder.setTitle("ERROR");
                         builder.setMessage("Choose the work type");

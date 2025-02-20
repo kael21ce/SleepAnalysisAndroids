@@ -1,5 +1,6 @@
 package com.kael21ce.sleepanalysisandroid;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -21,6 +22,7 @@ import androidx.fragment.app.Fragment;
 import androidx.room.Room;
 
 import com.bumptech.glide.Glide;
+import com.google.android.material.tabs.TabLayout;
 import com.kael21ce.sleepanalysisandroid.data.AppDatabase;
 import com.kael21ce.sleepanalysisandroid.data.Sleep;
 import com.kael21ce.sleepanalysisandroid.data.SleepDao;
@@ -29,6 +31,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.TimeZone;
 
 public class RecommendFragment extends Fragment {
@@ -43,7 +46,7 @@ public class RecommendFragment extends Fragment {
     private TextView stateDescriptionText;
     private TextView stateDescriptionSmallText;
     private ImageView stateDescriptionImage;
-    private LinearLayout InfoView, RecommendClockView;
+    private LinearLayout InfoView, RecommendClockView, WorkTypeView;
     SimpleDateFormat sdfDateTime = new SimpleDateFormat("dd/MM/yyyy"+ "HH:mm", Locale.KOREA);
     SimpleDateFormat sdfDateTimeRecomm = new SimpleDateFormat("a hh:mm", Locale.KOREA);
     SimpleDateFormat sdfDateTimeRecomm2 = new SimpleDateFormat("H : mm", Locale.getDefault());
@@ -124,6 +127,9 @@ public class RecommendFragment extends Fragment {
         TextView noDataDescription = v.findViewById(R.id.noDataDescription);
         noDataDescription.setText(user_name + "님에게 딱 맞는 수면 패턴을 추천해 드릴게요");
 
+        // Work Type View
+        WorkTypeView = v.findViewById(R.id.WorkTypeView);
+
         //Check whether recommendation is hidden
         if (!sharedPref2.contains("isHidden")) {
             editor.putBoolean("isHidden", true).apply();
@@ -135,19 +141,23 @@ public class RecommendFragment extends Fragment {
             if (K1 == K2) {
                 noDataLayout.setVisibility(View.VISIBLE);
                 InfoView.setVisibility(View.GONE);
+                WorkTypeView.setVisibility(View.GONE);
             } else {
                 noDataLayout.setVisibility(View.GONE);
                 if (!isHidden) {
                     InfoView.setVisibility(View.VISIBLE);
                     RecommendClockView.setVisibility(View.VISIBLE);
+                    WorkTypeView.setVisibility(View.VISIBLE);
                 } else {
                     InfoView.setVisibility(View.VISIBLE);
                     RecommendClockView.setVisibility(View.GONE);
+                    WorkTypeView.setVisibility(View.VISIBLE);
                 }
             }
         } else {
             InfoView.setVisibility(View.GONE);
             RecommendClockView.setVisibility(View.GONE);
+            WorkTypeView.setVisibility(View.GONE);
         }
         RecommendClockView.setVisibility(View.GONE);
 
@@ -223,6 +233,69 @@ public class RecommendFragment extends Fragment {
             startTime.setText(sdfDateTimeRecomm.format(new Date(mainActivity.getMainSleepStart())));
             endTime.setText(sdfDateTimeRecomm.format(new Date(mainActivity.getMainSleepEnd())));
         }
+
+        // Work Type Selection
+        final int[] selectedType = {0};
+        TabLayout workTypeTabView = v.findViewById(R.id.workTypeTabView);
+        int workType = sharedPref2.getInt("workType", 0);
+        workTypeTabView.addTab(workTypeTabView.newTab().setText("휴무"));
+        workTypeTabView.addTab(workTypeTabView.newTab().setText("아침"));
+        workTypeTabView.addTab(workTypeTabView.newTab().setText("저녁"));
+        workTypeTabView.addTab(workTypeTabView.newTab().setText("야간"));
+        int initialTab = Math.abs(workType);
+        Objects.requireNonNull(workTypeTabView.getTabAt(initialTab)).select();
+        workTypeTabView.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                int position = tab.getPosition();
+                switch (position) {
+                    case 0 -> {
+                        selectedType[0] = 0;
+                        Log.v("RecommendFragment", "Selected Work type: " + selectedType[0]);
+                    }
+                    case 1 -> {
+                        selectedType[0] = -1;
+                        Log.v("RecommendFragment", "Selected Work type: " + selectedType[0]);
+                    }
+                    case 2 -> {
+                        selectedType[0] = -2;
+                        Log.v("RecommendFragment", "Selected Work type: " + selectedType[0]);
+                    }
+                    case 3 -> {
+                        selectedType[0] = -3;
+                        Log.v("RecommendFragment", "Selected Work type: " + selectedType[0]);
+                    }
+                }
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {}
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {}
+        });
+
+        Button workTypeSubmitButton = v.findViewById(R.id.workTypeSubmitButton);
+        workTypeSubmitButton.setOnClickListener(typeV -> {
+            editor.putInt("workType", selectedType[0]).apply();
+            Log.v("RecommendFragment", "Submit work type: " + selectedType[0]);
+            String languageSetting = Locale.getDefault().getLanguage();
+            AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
+            builder.setCancelable(true);
+            if (languageSetting.equals("ko")) {
+                builder.setMessage("내일 근무 종류가 변경되었습니다.");
+
+                builder.setNegativeButton("확인", (dialogInterface, i) -> dialogInterface.cancel());
+            } else {
+                builder.setMessage("Your work type for tomorrow has been updated.");
+
+                builder.setNegativeButton("OK", (dialogInterface, i) -> dialogInterface.cancel());
+            }
+
+            AlertDialog alert = builder.create();
+            alert.setOnShowListener(arg0 -> alert.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(getResources().getColor(R.color.black, null)));
+            alert.show();
+        });
 
         return v;
     }
