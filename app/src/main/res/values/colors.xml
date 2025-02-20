@@ -21,4 +21,5 @@
     <color name="white">#FFFFFFFF</color>
     <color name="orange_1">#FF9500</color>
     <color name="orange_2">#33FF9500</color>
+    <color name="dim">#80000000</color>
 </resources>

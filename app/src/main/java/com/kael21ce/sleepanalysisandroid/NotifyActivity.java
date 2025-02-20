@@ -4,6 +4,8 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageButton;
 
@@ -180,6 +182,9 @@ public class NotifyActivity extends AppCompatActivity implements ButtonTextUpdat
             AlertDialog alert = builder.create();
             alert.setOnShowListener(arg0 -> alert.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(getResources().getColor(R.color.black, null)));
             alert.show();
+            WindowManager.LayoutParams lp = alert.getWindow().getAttributes();
+            lp.dimAmount=0.8f;
+            alert.getWindow().setAttributes(lp);
         });
     }
 

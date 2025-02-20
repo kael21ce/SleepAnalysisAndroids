@@ -329,30 +329,70 @@ public class WhenWorkFragment extends Fragment {
             public void onTabSelected(TabLayout.Tab tab) {
                 int position = tab.getPosition();
                 switch (position) {
-                    case 0:
+                    case 0 -> {
                         selectedType[0] = 0;
                         Log.v("WhenWorkFragment", "Selected Work type: " + selectedType[0]);
-                        break;
-                    case 1:
+                    }
+                    case 1 -> {
                         selectedType[0] = -1;
                         Log.v("WhenWorkFragment", "Selected Work type: " + selectedType[0]);
-                        break;
-                    case 2:
+                    }
+                    case 2 -> {
                         selectedType[0] = -2;
                         Log.v("WhenWorkFragment", "Selected Work type: " + selectedType[0]);
-                        break;
-                    case 3:
+                    }
+                    case 3 -> {
                         selectedType[0] = -3;
                         Log.v("WhenWorkFragment", "Selected Work type: " + selectedType[0]);
-                        break;
+                    }
                 }
             }
 
             @Override
-            public void onTabUnselected(TabLayout.Tab tab) {}
+            public void onTabUnselected(TabLayout.Tab tab) {
+                int position = tab.getPosition();
+                switch (position) {
+                    case 0 -> {
+                        selectedType[0] = 0;
+                        Log.v("RecommendFragment", "Selected Work type: " + selectedType[0]);
+                    }
+                    case 1 -> {
+                        selectedType[0] = -1;
+                        Log.v("RecommendFragment", "Selected Work type: " + selectedType[0]);
+                    }
+                    case 2 -> {
+                        selectedType[0] = -2;
+                        Log.v("RecommendFragment", "Selected Work type: " + selectedType[0]);
+                    }
+                    case 3 -> {
+                        selectedType[0] = -3;
+                        Log.v("RecommendFragment", "Selected Work type: " + selectedType[0]);
+                    }
+                }
+            }
 
             @Override
-            public void onTabReselected(TabLayout.Tab tab) {}
+            public void onTabReselected(TabLayout.Tab tab) {
+                int position = tab.getPosition();
+                switch (position) {
+                    case 0 -> {
+                        selectedType[0] = 0;
+                        Log.v("RecommendFragment", "Selected Work type: " + selectedType[0]);
+                    }
+                    case 1 -> {
+                        selectedType[0] = -1;
+                        Log.v("RecommendFragment", "Selected Work type: " + selectedType[0]);
+                    }
+                    case 2 -> {
+                        selectedType[0] = -2;
+                        Log.v("RecommendFragment", "Selected Work type: " + selectedType[0]);
+                    }
+                    case 3 -> {
+                        selectedType[0] = -3;
+                        Log.v("RecommendFragment", "Selected Work type: " + selectedType[0]);
+                    }
+                }
+            }
         });
 
         Bundle sleepBundle = getArguments();

@@ -4,24 +4,31 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.media.Image;
+import android.content.res.Resources;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import androidx.compose.ui.text.font.FontVariation;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 import androidx.room.Room;
 
 import com.bumptech.glide.Glide;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.tabs.TabLayout;
 import com.kael21ce.sleepanalysisandroid.data.AppDatabase;
 import com.kael21ce.sleepanalysisandroid.data.Sleep;
@@ -46,7 +53,6 @@ public class RecommendFragment extends Fragment {
     private TextView stateDescriptionText;
     private TextView stateDescriptionSmallText;
     private ImageView stateDescriptionImage;
-    private LinearLayout InfoView, RecommendClockView, WorkTypeView;
     SimpleDateFormat sdfDateTime = new SimpleDateFormat("dd/MM/yyyy"+ "HH:mm", Locale.KOREA);
     SimpleDateFormat sdfDateTimeRecomm = new SimpleDateFormat("a hh:mm", Locale.KOREA);
     SimpleDateFormat sdfDateTimeRecomm2 = new SimpleDateFormat("H : mm", Locale.getDefault());
@@ -122,13 +128,13 @@ public class RecommendFragment extends Fragment {
         Button addDataButton = v.findViewById(R.id.addDataButton);
 
         //If no onset, offset data, show noDataLayout
-        InfoView = v.findViewById(R.id.InfoView);
-        RecommendClockView = v.findViewById(R.id.RecommendClockView);
+        LinearLayout infoView = v.findViewById(R.id.InfoView);
+        LinearLayout recommendClockView = v.findViewById(R.id.RecommendClockView);
         TextView noDataDescription = v.findViewById(R.id.noDataDescription);
         noDataDescription.setText(user_name + "님에게 딱 맞는 수면 패턴을 추천해 드릴게요");
 
         // Work Type View
-        WorkTypeView = v.findViewById(R.id.WorkTypeView);
+        LinearLayout workTypeView = v.findViewById(R.id.WorkTypeView);
 
         //Check whether recommendation is hidden
         if (!sharedPref2.contains("isHidden")) {
@@ -140,26 +146,26 @@ public class RecommendFragment extends Fragment {
         if (sharedPref2.contains("sleepOnset") && sharedPref2.contains("workOnset") && sharedPref2.contains("workOffset")) {
             if (K1 == K2) {
                 noDataLayout.setVisibility(View.VISIBLE);
-                InfoView.setVisibility(View.GONE);
-                WorkTypeView.setVisibility(View.GONE);
+                infoView.setVisibility(View.GONE);
+                workTypeView.setVisibility(View.GONE);
             } else {
                 noDataLayout.setVisibility(View.GONE);
                 if (!isHidden) {
-                    InfoView.setVisibility(View.VISIBLE);
-                    RecommendClockView.setVisibility(View.VISIBLE);
-                    WorkTypeView.setVisibility(View.VISIBLE);
+                    infoView.setVisibility(View.VISIBLE);
+                    recommendClockView.setVisibility(View.VISIBLE);
+                    workTypeView.setVisibility(View.VISIBLE);
                 } else {
-                    InfoView.setVisibility(View.VISIBLE);
-                    RecommendClockView.setVisibility(View.GONE);
-                    WorkTypeView.setVisibility(View.VISIBLE);
+                    infoView.setVisibility(View.VISIBLE);
+                    recommendClockView.setVisibility(View.GONE);
+                    workTypeView.setVisibility(View.VISIBLE);
                 }
             }
         } else {
-            InfoView.setVisibility(View.GONE);
-            RecommendClockView.setVisibility(View.GONE);
-            WorkTypeView.setVisibility(View.GONE);
+            infoView.setVisibility(View.GONE);
+            recommendClockView.setVisibility(View.GONE);
+            workTypeView.setVisibility(View.GONE);
         }
-        RecommendClockView.setVisibility(View.GONE);
+        recommendClockView.setVisibility(View.GONE);
 
         //Move to WhenSleepFragment
         addDataButton.setOnClickListener(view -> {
@@ -235,15 +241,19 @@ public class RecommendFragment extends Fragment {
         }
 
         // Work Type Selection
-        final int[] selectedType = {0};
         TabLayout workTypeTabView = v.findViewById(R.id.workTypeTabView);
+        View dimBackground = v.findViewById(R.id.dimBackground);
+        ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
+        BottomNavigationView bottomNavigationView = getActivity().findViewById(R.id.bottomNavigationView);
         int workType = sharedPref2.getInt("workType", 0);
+        Log.v("RecommendFragment", "Recorded work type: " + workType);
         workTypeTabView.addTab(workTypeTabView.newTab().setText("휴무"));
         workTypeTabView.addTab(workTypeTabView.newTab().setText("아침"));
         workTypeTabView.addTab(workTypeTabView.newTab().setText("저녁"));
         workTypeTabView.addTab(workTypeTabView.newTab().setText("야간"));
         int initialTab = Math.abs(workType);
         Objects.requireNonNull(workTypeTabView.getTabAt(initialTab)).select();
+        final int[] selectedType = {workType};
         workTypeTabView.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
@@ -269,32 +279,111 @@ public class RecommendFragment extends Fragment {
             }
 
             @Override
-            public void onTabUnselected(TabLayout.Tab tab) {}
+            public void onTabUnselected(TabLayout.Tab tab) {
+                int position = tab.getPosition();
+                switch (position) {
+                    case 0 -> {
+                        selectedType[0] = 0;
+                        Log.v("RecommendFragment", "Selected Work type: " + selectedType[0]);
+                    }
+                    case 1 -> {
+                        selectedType[0] = -1;
+                        Log.v("RecommendFragment", "Selected Work type: " + selectedType[0]);
+                    }
+                    case 2 -> {
+                        selectedType[0] = -2;
+                        Log.v("RecommendFragment", "Selected Work type: " + selectedType[0]);
+                    }
+                    case 3 -> {
+                        selectedType[0] = -3;
+                        Log.v("RecommendFragment", "Selected Work type: " + selectedType[0]);
+                    }
+                }
+            }
 
             @Override
-            public void onTabReselected(TabLayout.Tab tab) {}
+            public void onTabReselected(TabLayout.Tab tab) {
+                int position = tab.getPosition();
+                switch (position) {
+                    case 0 -> {
+                        selectedType[0] = 0;
+                        Log.v("RecommendFragment", "Selected Work type: " + selectedType[0]);
+                    }
+                    case 1 -> {
+                        selectedType[0] = -1;
+                        Log.v("RecommendFragment", "Selected Work type: " + selectedType[0]);
+                    }
+                    case 2 -> {
+                        selectedType[0] = -2;
+                        Log.v("RecommendFragment", "Selected Work type: " + selectedType[0]);
+                    }
+                    case 3 -> {
+                        selectedType[0] = -3;
+                        Log.v("RecommendFragment", "Selected Work type: " + selectedType[0]);
+                    }
+                }
+            }
         });
 
         Button workTypeSubmitButton = v.findViewById(R.id.workTypeSubmitButton);
         workTypeSubmitButton.setOnClickListener(typeV -> {
+            // Save the original color
+            // Change this part if someone tries to change the primary color
+            int originalActionBarColor = getResources().getColor(R.color.white, null);
+            Window window = getActivity().getWindow();
+
+            // Dim effect
+            dimBackground.setVisibility(View.VISIBLE);
+            if (actionBar != null) {
+                actionBar.setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.dim, null)));
+            }
+            if (bottomNavigationView != null) {
+                bottomNavigationView.setItemBackground(new ColorDrawable(Color.parseColor("#80000000")));
+            }
+            window.setStatusBarColor(getResources().getColor(R.color.dim, null));
+
             editor.putInt("workType", selectedType[0]).apply();
             Log.v("RecommendFragment", "Submit work type: " + selectedType[0]);
             String languageSetting = Locale.getDefault().getLanguage();
-            AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
-            builder.setCancelable(true);
+            View view = LayoutInflater.from(getActivity()).inflate(R.layout.layout_custom_dialog,
+                    (LinearLayout) getActivity().findViewById(R.id.DialogLayout));
+            TextView dialogTitle = (TextView) view.findViewById(R.id.dialogTitle);
+            TextView dialogMessage = (TextView) view.findViewById(R.id.dialogMessage);
+            Button dialogButton = (Button) view.findViewById(R.id.dialogButton);
+
+            String title, buttonText;
+            dialogMessage.setVisibility(View.GONE);
             if (languageSetting.equals("ko")) {
-                builder.setMessage("내일 근무 종류가 변경되었습니다.");
-
-                builder.setNegativeButton("확인", (dialogInterface, i) -> dialogInterface.cancel());
+                title = "내일 근무 종류가 변경되었습니다.";
+                buttonText = "확인";
             } else {
-                builder.setMessage("Your work type for tomorrow has been updated.");
-
-                builder.setNegativeButton("OK", (dialogInterface, i) -> dialogInterface.cancel());
+                title = "Your work type for tomorrow has been updated.";
+                buttonText = "OK";
             }
+            dialogTitle.setText(title);
+            dialogButton.setText(buttonText);
 
-            AlertDialog alert = builder.create();
-            alert.setOnShowListener(arg0 -> alert.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(getResources().getColor(R.color.black, null)));
-            alert.show();
+            AlertDialog dialog = new AlertDialog.Builder(getActivity(), R.style.CustomAlertDialog)
+                    .setView(view)
+                    .create();
+
+            dialogButton.setOnClickListener(dialogV -> {
+                dialog.dismiss();
+                dimBackground.setVisibility(View.GONE);
+                if (actionBar != null) {
+                    actionBar.setBackgroundDrawable(new ColorDrawable(originalActionBarColor));
+                }
+                if (bottomNavigationView != null) {
+                    bottomNavigationView.setItemBackground(new ColorDrawable(Color.parseColor("#FFFFFF")));
+                }
+                window.setStatusBarColor(getResources().getColor(R.color.white, null));
+            });
+            dialog.setCancelable(true);
+            dialog.show();
+
+            if (dialog.getWindow() != null) {
+                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
+            }
         });
 
         return v;

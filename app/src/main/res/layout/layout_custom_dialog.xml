@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/DialogLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="20dp"
+    android:orientation="vertical"
+    android:padding="20dp">
+
+    <LinearLayout
+        android:id="@+id/DialogBackground"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/corner_8_white"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/dialogTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/pretendardbold"
+            android:gravity="center_horizontal"
+            android:paddingHorizontal="16dp"
+            android:paddingTop="16dp"
+            android:text="Title"
+            android:textColor="@color/black"
+            android:textSize="20sp" />
+
+        <TextView
+            android:id="@+id/dialogMessage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="8dp"
+            android:layout_marginTop="16dp"
+            android:fontFamily="@font/pretendardvariable"
+            android:gravity="center_horizontal"
+            android:maxLines="2"
+            android:text="Message"
+            android:textColor="@color/black"
+            android:textSize="14sp" />
+
+        <LinearLayout
+            android:id="@+id/LineLayout"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="16dp"
+            android:background="@color/gray_3"
+            android:orientation="horizontal" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/dialogButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/white_gray_stroke"
+            android:fontFamily="@font/pretendardbold"
+            android:text="OK"
+            android:textColor="@color/blue_1"
+            android:textSize="20sp" />
+    </LinearLayout>
+</LinearLayout>
