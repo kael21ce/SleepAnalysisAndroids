@@ -6,10 +6,14 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -550,6 +554,29 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    //Broadcast receiver for the dim effect
+    private final BroadcastReceiver receiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String hex = intent.getStringExtra("COLOR");
+            BottomNavigationView view = findViewById(R.id.bottomNavigationView);
+            view.setItemBackground(new ColorDrawable(Color.parseColor(hex)));
+        }
+    };
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        IntentFilter filter = new IntentFilter("DIM_EFFECT");
+        registerReceiver(receiver, filter);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unregisterReceiver(receiver);
+    }
+
     //If back button is clicked twice, move out from application
     @Override
     public void onBackPressed() {
@@ -619,6 +646,8 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+
+
 
     @Override
     public void onDestroy(){
