@@ -175,6 +175,7 @@ public class HomeFragment extends Fragment {
         } else {
             isHidden = sharedPref.getBoolean("isHidden", true);
         }
+        isHidden = false;
 
         // System time
         now = System.currentTimeMillis();
@@ -255,6 +256,8 @@ public class HomeFragment extends Fragment {
                 startActivity(surveyIntent);
             }
         });
+
+        SurveyUpperView.setVisibility(View.GONE);
 
         //Move to SleepOnsetActivity
         ImageButton clockOnsetButton = v.findViewById(R.id.ClockOnsetButton);

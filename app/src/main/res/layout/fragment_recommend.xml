@@ -344,10 +344,10 @@
                     android:layout_height="match_parent"
                     android:layout_marginHorizontal="16dp"
                     android:layout_marginTop="16dp"
-                    android:text="근무 종류 설정"
-                    android:maxLines="1"
                     android:autoSizeMaxTextSize="20sp"
                     android:autoSizeMinTextSize="10sp"
+                    android:maxLines="1"
+                    android:text="근무 종류 설정"
                     android:textColor="@color/black"
                     android:textSize="20sp" />
 
@@ -355,12 +355,12 @@
                     android:id="@+id/WorkTypeDescriptionText"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:fontFamily="@font/pretendardvariable"
                     android:layout_marginHorizontal="16dp"
-                    android:text="내일의 근무 종류를 설정해주세요"
-                    android:maxLines="1"
                     android:autoSizeMaxTextSize="12sp"
                     android:autoSizeMinTextSize="6sp"
+                    android:fontFamily="@font/pretendardvariable"
+                    android:maxLines="1"
+                    android:text="내일의 근무 종류를 설정해주세요"
                     android:textColor="@color/gray_4"
                     android:textSize="12sp" />
 
@@ -401,7 +401,7 @@
                         android:background="@drawable/custom_ripple_effect"
                         android:fontFamily="@font/pretendardvariable"
                         android:text="확인"
-                        android:textColor="@color/white"/>
+                        android:textColor="@color/white" />
                 </LinearLayout>
 
             </LinearLayout>

@@ -359,6 +359,7 @@ public class MainActivity extends AppCompatActivity {
         sharedPref.registerOnSharedPreferenceChangeListener(prefListener);
 
         //Open the mood and sleep quality survey if the app is open after 12 p.m.
+        /*
         Calendar calendar = Calendar.getInstance();
         int hour = calendar.get(Calendar.HOUR_OF_DAY);
         int day = calendar.get(Calendar.DAY_OF_MONTH);
@@ -379,6 +380,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         }
+        */
     }
 
     //Create channel for notification of recommendation
@@ -422,6 +424,7 @@ public class MainActivity extends AppCompatActivity {
         WorkManager.getInstance(this).enqueueUniquePeriodicWork(RecommendName,
                 ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE, pushRequest);
 
+        /*
         //Send notification for survey in four time
         long surveyTime, surveyDelay1, surveyDelay2, surveyDelay3;
         //1. work onset
@@ -510,7 +513,7 @@ public class MainActivity extends AppCompatActivity {
         WorkManager.getInstance(this).enqueueUniquePeriodicWork(SurveyName3,
                 ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE, surveyRequest3);
         Log.v(TAG, "Survey delay 3: " + surveyDelay3);
-
+        */
     }
 
     //Change "HH:mm" to milliseconds

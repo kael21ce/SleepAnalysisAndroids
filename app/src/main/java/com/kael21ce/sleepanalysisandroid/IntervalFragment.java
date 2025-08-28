@@ -71,6 +71,7 @@ public class IntervalFragment extends Fragment {
         } else {
             editor.putBoolean("isHidden", true).apply();
         }
+        isHidden = false;
         if (isHidden) {
             alertnessLayout.setVisibility(View.GONE);
         } else {
