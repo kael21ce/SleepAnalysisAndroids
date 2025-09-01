@@ -24,8 +24,13 @@ public interface RetrofitAPI {
     @POST("daily_survey/")
 
     Call<DataMood> createMood(@Body DataMood dataMood);
-//
-//    @GET("daily_survey/")
-//
-//    Call<List<DataMood>> getData();
+
+    @POST("/sleepapp/signup/")
+    Call<Void> signup(@Body DataUser dataUser);
+
+    @POST("/sleepapp/token/")
+    Call<TokenPair> login(@Body DataUser dataUser);
+
+    @POST("/sleepapp/token/refresh/")
+    Call<AccessOnly> refresh(@Body RefreshPayload refreshPayload);
 }

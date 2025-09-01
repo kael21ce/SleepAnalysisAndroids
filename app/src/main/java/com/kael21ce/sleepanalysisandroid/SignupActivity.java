@@ -8,6 +8,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,9 +27,22 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.kael21ce.sleepanalysisandroid.data.DataUser;
+import com.kael21ce.sleepanalysisandroid.data.RetrofitAPI;
+import com.kael21ce.sleepanalysisandroid.data.RetrofitClient;
+import com.kael21ce.sleepanalysisandroid.data.TokenStorage;
+
+import java.io.IOException;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class SignupActivity extends AppCompatActivity {
     String user_email, user_password, user_name, password_check;
+    private static final String TAG = "AuthAPI";
+    private RetrofitAPI apiService;
+    private TokenStorage tokenStorage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -115,6 +129,9 @@ public class SignupActivity extends AppCompatActivity {
             if (user_password.equals(password_check)) {
                 user_email = emailText.getText().toString();
                 user_name = user_email.substring(0, user_email.indexOf("@"));
+                apiService = RetrofitClient.getClient().create(RetrofitAPI.class);
+                tokenStorage = TokenStorage.getInstance(this);
+                performSignup(user_email, user_password);
             } else {
                 // 경고 띄우기
                 View dimBackground = findViewById(R.id.dimBackgroundSignup);
@@ -187,28 +204,40 @@ public class SignupActivity extends AppCompatActivity {
         }
     }
 
-    private void showAlertDialogNoDim(String title, String message, String buttonText) {
-        LayoutInflater inflater = LayoutInflater.from(this);
-        View viewDialog = inflater.inflate(R.layout.layout_custom_dialog, null);
-        TextView dialogTitle = viewDialog.findViewById(R.id.dialogTitle);
-        TextView dialogMessage = viewDialog.findViewById(R.id.dialogMessage);
-        Button dialogButton = viewDialog.findViewById(R.id.dialogButton);
-        dialogTitle.setText(title);
-        dialogMessage.setText(message);
-        dialogButton.setText(buttonText);
+    // 회원가입 요청
+    private void performSignup(String email, String password) {
+        // 알림
+        View dimBackground = findViewById(R.id.dimBackgroundSignup);
+        ActionBar actionBar = getSupportActionBar();
 
-        android.app.AlertDialog dialog = new AlertDialog.Builder(this, R.style.CustomAlertDialog)
-                .setView(viewDialog)
-                .create();
+        // API 요청
+        DataUser dataUser = new DataUser(email, password);
+        apiService.signup(dataUser).enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                if (response.isSuccessful()) {
+                    Log.d(TAG, "Sign in accepted!");
 
-        dialogButton.setOnClickListener(dialogV -> {
-            dialog.dismiss();
+                    // 성공 알림 보여주기
+                    showAlertDialog(dimBackground, actionBar, "알림", "가입 완료! 이제 로그인하세요.", "확인");
+                } else {
+                    try {
+                        String errorBody = response.errorBody() != null ? response.errorBody().string() : "Unknown error";
+                        Log.e(TAG, "Sign in failed: " + errorBody);
+                        // 실패 알림 보여주기
+                        showAlertDialog(dimBackground, actionBar, "알림", "회원가입 실패: " + errorBody, "확인");
+                    } catch (IOException e) {
+                        Log.e(TAG, "Fail to parse error body", e);
+                        // 실패 알림 보여주기
+                        showAlertDialog(dimBackground, actionBar, "알림", "회원가입 실패", "확인");
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+                Log.e(TAG, "Network Error" + t.getMessage());
+            }
         });
-        dialog.setCancelable(true);
-        dialog.show();
-
-        if (dialog.getWindow() != null) {
-            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
-        }
     }
 }

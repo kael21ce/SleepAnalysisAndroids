@@ -10,7 +10,7 @@ plugins {
 
 android {
     namespace 'com.kael21ce.sleepanalysisandroid'
-    compileSdk 34
+    compileSdk 36
 
     defaultConfig {
         applicationId "com.kael21ce.sleepanalysisandroid"
@@ -47,6 +47,9 @@ android {
     kotlinOptions {
         jvmTarget = '17'
     }
+    kotlin {
+        jvmToolchain(17)
+    }
     buildFeatures {
         compose true
         viewBinding true
@@ -71,12 +74,14 @@ dependencies {
     implementation 'androidx.navigation:navigation-fragment:2.5.3'
     implementation 'androidx.navigation:navigation-ui:2.5.3'
 
-    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
-    implementation 'com.squareup.retrofit2:converter-gson:2.5.0'
+    implementation 'com.squareup.retrofit2:retrofit:2.7.1'
+    implementation 'com.squareup.retrofit2:converter-gson:2.7.1'
+    implementation 'com.squareup.okhttp3:logging-interceptor:4.11.0'
 
     implementation platform('com.google.firebase:firebase-bom:32.6.0')
     implementation 'com.google.firebase:firebase-analytics'
     implementation("com.google.firebase:firebase-crashlytics-ndk")
+    implementation 'androidx.activity:activity:1.10.1'
 
     def room_version = "2.5.2"
 
@@ -86,6 +91,9 @@ dependencies {
     // To use Kotlin annotation processing tool (kapt)
     // To use Kotlin Symbol Processing (KSP)
     ksp "androidx.room:room-compiler:$room_version"
+
+    // To use time range picker, which is not in Android as default
+    implementation 'nl.joery.timerangepicker:timerangepicker:1.0.0'
 
     // optional - RxJava2 support for Room
     implementation "androidx.room:room-rxjava2:$room_version"
