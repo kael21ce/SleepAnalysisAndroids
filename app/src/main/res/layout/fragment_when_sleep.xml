@@ -11,6 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
+
         <LinearLayout
             android:id="@+id/sleepBackButtonCaption"
             android:layout_width="match_parent"
@@ -40,9 +41,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/pretendardbold"
-                    android:text="언제부터 주무실 수 있나요?"
+                    android:text="오늘 언제 잠자리에 들어갈 예정이신가요?"
                     android:textColor="@color/black"
-                    android:textSize="24sp" />
+                    android:textSize="20sp" />
 
                 <TextView
                     android:id="@+id/whenSleepDescription"
@@ -50,20 +51,96 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:fontFamily="@font/pretendardvariable"
-                    android:text="userName님이 주무실 수 있는 가장 이른 시각을 알려주세요"
+                    android:text="가능한 가장 이른 예정 시각을 알려주세요"
                     android:textColor="@color/black"
                     android:textSize="14sp" />
+
+                <LinearLayout
+                    android:id="@+id/sleepExampleCaption"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="8dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/sleepExample1"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/pretendardvariable"
+                        android:text="예시 1) 오늘 밤 10시 이후 취침 예정 -> 22:00"
+                        android:textColor="@color/gray_4"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:id="@+id/sleepExample2"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:fontFamily="@font/pretendardvariable"
+                        android:text="예시 2) 야간 근무 후 아침 8시 이후에 취침 예정 -> 8:00 선택"
+                        android:textColor="@color/gray_4"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
             </LinearLayout>
         </LinearLayout>
+
+        <FrameLayout
+            android:id="@+id/WhenSleepClockCaption"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="64dp">
+
+            <nl.joery.timerangepicker.TimeRangePicker
+                android:id="@+id/WhenSleepPicker"
+                android:layout_width="300dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal|center_vertical"
+                app:trp_clockLabelSize="0sp"
+                app:trp_maxDurationMinutes="0"
+                app:trp_hourFormat="FORMAT_24"
+                app:trp_sliderColor="@color/blue_2"
+                app:trp_startTime="00:00"
+                app:trp_thumbColor="@color/blue_1" />
+
+            <LinearLayout
+                android:id="@+id/WhenSleepNoticeCaption"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center_horizontal|center_vertical"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/whenSleepText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:fontFamily="@font/pretendardbold"
+                    android:text="00:00"
+                    android:textSize="24sp" />
+
+                <TextView
+                    android:id="@+id/whenSleepGuidance"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:fontFamily="@font/pretendardvariable"
+                    android:text="드래그하여 설정"
+                    android:textColor="@color/gray_4"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+        </FrameLayout>
 
         <LinearLayout
             android:id="@+id/whenSleepCaption"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginHorizontal="32dp"
             android:layout_marginTop="64dp"
             android:layout_marginBottom="32dp"
-            android:layout_marginHorizontal="32dp"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            tools:visibility="gone">
 
             <EditText
                 android:id="@+id/whenSleepHour1"

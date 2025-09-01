@@ -11,6 +11,8 @@ import android.os.Bundle;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -82,7 +84,53 @@ public class WhenWorkFragment extends Fragment {
             getParentFragmentManager().beginTransaction().replace(R.id.mainFrame, whenSleepFragment).commit();
         });
 
-        //Get the work onset
+        //Work onset과 work type 선택
+        RecyclerView whenWorkTypeRecyclerView = v.findViewById(R.id.whenWorkTypeRecyclerView);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(v.getContext(),
+                LinearLayoutManager.VERTICAL, false);
+        whenWorkTypeRecyclerView.setLayoutManager(layoutManager);
+        WorkTypeAdapter whenWorkTypeAdapter = new WorkTypeAdapter();
+
+        // WorkType 아이템 설정
+        // 1. SharedPreference에 workType과 각 타입에 맞는 working time 설정
+        if (!sharedPref.contains("workType")) {
+            sharedPref.edit().putInt("workType", 0).apply(); // Default: 0 (휴무)
+        }
+        if (!sharedPref.contains("workOnset_1") || !sharedPref.contains("workOffset_1")) {
+            sharedPref.edit().putString("workOnset_1", "09:00").apply();
+            sharedPref.edit().putString("workOffset_1", "18:00").apply();
+        }
+        if (!sharedPref.contains("workOnset_2") || !sharedPref.contains("workOffset_2")) {
+            sharedPref.edit().putString("workOnset_2", "13:00").apply();
+            sharedPref.edit().putString("workOffset_2", "22:00").apply();
+        }
+        if (!sharedPref.contains("workOnset_3") || !sharedPref.contains("workOffset_3")) {
+            sharedPref.edit().putString("workOnset_3", "22:00").apply();
+            sharedPref.edit().putString("workOffset_3", "07:00").apply();
+        }
+        WorkType workTypeItem;
+        Boolean isChosen;
+        String workStart, workEnd;
+        for (int i = 0; i < 4; i++) {
+            if (sharedPref.getInt("workType", 0) == i) {
+                isChosen = true;
+            } else {
+                isChosen = false;
+            }
+            if (i == 0) {
+                workTypeItem = new WorkType(i, "-", "-", isChosen);
+            } else {
+                String key_onset_i = "workOnset_" + i;
+                String key_offset_i = "workOffset_" + i;
+                workStart = sharedPref.getString(key_onset_i, "00:00");
+                workEnd = sharedPref.getString(key_offset_i, "00:00");
+                workTypeItem = new WorkType(i, workStart, workEnd, isChosen);
+            }
+            whenWorkTypeAdapter.addItem(workTypeItem);
+        }
+
+        whenWorkTypeRecyclerView.setAdapter(whenWorkTypeAdapter);
+
         EditText whenWorkOnHour1 = v.findViewById(R.id.whenWorkOnHour1);
         EditText whenWorkOnHour2 = v.findViewById(R.id.whenWorkOnHour2);
         EditText whenWorkOnMinute1 = v.findViewById(R.id.whenWorkOnMinute1);

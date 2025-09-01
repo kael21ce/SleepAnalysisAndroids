@@ -57,7 +57,7 @@
                     android:layout_marginTop="8dp"
                     android:fontFamily="@font/pretendardvariable"
                     android:maxLines="1"
-                    android:text="휴무일이라면 활동하는 시간을 알려주세요"
+                    android:text="오늘의 근무 선택"
                     android:textColor="@color/black"
                     android:textSize="14sp"
                     android:autoSizeMaxTextSize="14sp"
@@ -65,7 +65,15 @@
                     android:autoSizeStepGranularity="2sp"
                     android:autoSizeTextType="uniform"/>
             </LinearLayout>
+
         </LinearLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/whenWorkTypeRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="64dp"
+            android:layout_marginHorizontal="32dp"/>
 
         <TextView
             android:id="@+id/workOnsetDescription"
@@ -73,14 +81,15 @@
             android:layout_height="20dp"
             android:layout_marginTop="64dp"
             android:layout_marginBottom="8dp"
+            android:autoSizeMaxTextSize="16sp"
+            android:autoSizeMinTextSize="8sp"
+            android:autoSizeStepGranularity="2sp"
+            android:autoSizeTextType="uniform"
             android:gravity="center_horizontal"
             android:maxLines="1"
             android:text="시작 시간"
             android:textSize="16sp"
-            android:autoSizeMaxTextSize="16sp"
-            android:autoSizeMinTextSize="8sp"
-            android:autoSizeStepGranularity="2sp"
-            android:autoSizeTextType="uniform"/>
+            android:visibility="gone" />
 
         <LinearLayout
             android:id="@+id/whenWorkCaption"
@@ -88,7 +97,8 @@
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="32dp"
             android:layout_marginBottom="32dp"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:visibility="gone">
 
             <EditText
                 android:id="@+id/whenWorkOnHour1"
@@ -185,14 +195,15 @@
             android:layout_height="20dp"
             android:layout_marginTop="32dp"
             android:layout_marginBottom="8dp"
+            android:autoSizeMaxTextSize="16sp"
+            android:autoSizeMinTextSize="8sp"
+            android:autoSizeStepGranularity="2sp"
+            android:autoSizeTextType="uniform"
             android:gravity="center_horizontal"
             android:maxLines="1"
             android:text="종료 시간"
             android:textSize="16sp"
-            android:autoSizeMaxTextSize="16sp"
-            android:autoSizeMinTextSize="8sp"
-            android:autoSizeStepGranularity="2sp"
-            android:autoSizeTextType="uniform"/>
+            android:visibility="gone" />
 
         <LinearLayout
             android:id="@+id/whenWorkOffCaption"
@@ -200,7 +211,8 @@
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="32dp"
             android:layout_marginBottom="32dp"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:visibility="gone">
 
             <EditText
                 android:id="@+id/whenWorkOffHour1"
@@ -295,7 +307,8 @@
             android:id="@+id/workTypeCaption"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:visibility="gone">
 
             <TextView
                 android:id="@+id/workTypeText"
@@ -304,16 +317,16 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="32dp"
                 android:layout_marginBottom="8dp"
+                android:autoSizeMaxTextSize="16sp"
+                android:autoSizeMinTextSize="8sp"
+                android:autoSizeStepGranularity="2sp"
+                android:autoSizeTextType="uniform"
                 android:fontFamily="@font/pretendardbold"
                 android:gravity="center_horizontal"
                 android:maxLines="1"
                 android:text="근무 종류"
                 android:textColor="@color/black"
-                android:textSize="16sp"
-                android:autoSizeMaxTextSize="16sp"
-                android:autoSizeMinTextSize="8sp"
-                android:autoSizeStepGranularity="2sp"
-                android:autoSizeTextType="uniform"/>
+                android:textSize="16sp" />
 
             <com.google.android.material.tabs.TabLayout
                 android:id="@+id/workTypeTab"
@@ -321,14 +334,14 @@
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="32dp"
                 android:background="@drawable/corner_8_gray"
-                app:tabGravity="fill"
-                app:tabMode="fixed"
-                app:tabTextColor="@color/black"
                 app:tabBackground="@drawable/tab_background"
-                app:tabSelectedTextColor="@color/blue_1"
+                app:tabGravity="fill"
                 app:tabIndicatorColor="@android:color/transparent"
                 app:tabIndicatorHeight="0dp"
+                app:tabMode="fixed"
                 app:tabRippleColor="@android:color/transparent"
+                app:tabSelectedTextColor="@color/blue_1"
+                app:tabTextColor="@color/black"
                 tools:ignore="SpeakableTextPresentCheck" />
         </LinearLayout>
 

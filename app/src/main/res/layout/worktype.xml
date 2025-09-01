@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/WorkTypeItemLayout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:background="@drawable/bottom_line"
+    android:layout_marginBottom="8dp">
+
+    <RadioButton
+        android:id="@+id/workTypeRadio"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_gravity="center"/>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:id="@+id/workTypeTitleText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/pretendardvariable"
+            android:text="아침"
+            android:textColor="@color/black"/>
+
+        <TextView
+            android:id="@+id/workTypeTimeText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="09:00 - 18:00"
+            android:fontFamily="@font/pretendardvariable"
+            android:textColor="@color/gray_4"/>
+
+    </LinearLayout>
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/workTypeEditButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="8dp"
+        android:background="@drawable/corner_8_gray"
+        android:fontFamily="@font/pretendardvariable"
+        android:minWidth="0dp"
+        android:minHeight="0dp"
+        android:text="편집"
+        android:textColor="@color/black"/>
+</LinearLayout>
