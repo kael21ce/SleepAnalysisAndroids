@@ -1,6 +1,7 @@
 package com.kael21ce.sleepanalysisandroid;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatButton;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -8,9 +9,9 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.util.Patterns;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.kael21ce.sleepanalysisandroid.data.DataUser;
@@ -41,9 +42,9 @@ public class CheckActivity extends AppCompatActivity {
         }
 
         //Turn on the checkButton whether email is valid or not
-        Button checkButton = findViewById(R.id.checkButton);
+        AppCompatButton checkButton = findViewById(R.id.checkButton);
         checkButton.setEnabled(false);
-        checkButton.setBackgroundColor(getResources().getColor(R.color.blue_2, null));
+        checkButton.setBackgroundResource(R.drawable.corner_16_black_alpha);
         EditText emailText = findViewById(R.id.emailText);
         EditText passwordText = findViewById(R.id.passwordText);
 
@@ -73,10 +74,10 @@ public class CheckActivity extends AppCompatActivity {
 
                 if (validEmail && !email.isEmpty() && !password.isEmpty()) {
                     checkButton.setEnabled(true);
-                    checkButton.setBackgroundColor(getResources().getColor(R.color.blue_1, null));
+                    checkButton.setBackgroundResource(R.drawable.corner_16_dim);
                 } else {
                     checkButton.setEnabled(false);
-                    checkButton.setBackgroundColor(getResources().getColor(R.color.blue_2, null));
+                    checkButton.setBackgroundResource(R.drawable.corner_16_black_alpha);
                 }
 
             }
@@ -102,6 +103,13 @@ public class CheckActivity extends AppCompatActivity {
             Intent backIntent = new Intent(CheckActivity.this, BeginRegisterActivity.class);
             backIntent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
             startActivity(backIntent);
+        });
+
+        // 회원가입 페이지로 이동
+        TextView go2RegisterText = findViewById(R.id.go2SignupText);
+        go2RegisterText.setOnClickListener(view -> {
+            Intent registerIntent = new Intent(CheckActivity.this, SignupActivity.class);
+            startActivity(registerIntent);
         });
     }
 

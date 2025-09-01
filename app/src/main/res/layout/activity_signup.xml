@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/SignupLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".SignupActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@+id/signupTextCaption"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/signupTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/pretendardbold"
+                android:gravity="center_horizontal"
+                android:text="회원가입"
+                android:textColor="@color/black"
+                android:textSize="24sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/SignupInputLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <EditText
+                android:id="@+id/signupEmailText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginBottom="8dp"
+                android:background="@drawable/corner_16_gray"
+                android:ems="10"
+                android:fontFamily="@font/pretendardvariable"
+                android:hint="이메일"
+                android:inputType="text"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="16dp"
+                android:textColor="@color/gray_4"
+                android:textColorHint="@color/gray_4"
+                android:textSize="16sp" />
+
+            <EditText
+                android:id="@+id/signupPasswordText"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginBottom="8dp"
+                android:background="@drawable/corner_16_gray"
+                android:ems="10"
+                android:fontFamily="@font/pretendardvariable"
+                android:hint="비밀번호 (6자 이상)"
+                android:inputType="textPassword"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="16dp"
+                android:textColor="@color/gray_4"
+                android:textColorHint="@color/gray_4"
+                android:textSize="16sp" />
+
+            <EditText
+                android:id="@+id/signupPasswordCheckText"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginBottom="8dp"
+                android:background="@drawable/corner_16_gray"
+                android:ems="10"
+                android:fontFamily="@font/pretendardvariable"
+                android:hint="비밀번호 확인"
+                android:inputType="textPassword"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="16dp"
+                android:textColor="@color/gray_4"
+                android:textColorHint="@color/gray_4"
+                android:textSize="16sp" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/signupButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginBottom="16dp"
+                android:background="@drawable/corner_16_dim"
+                android:fontFamily="@font/pretendardvariable"
+                android:padding="16dp"
+                android:text="가입하기"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                app:cornerRadius="28dp" />
+
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/Go2LoginLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/askYesAccountText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:fontFamily="@font/pretendardvariable"
+                android:gravity="right"
+                android:paddingRight="8dp"
+                android:text="이미 계정이 있나요?"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/go2LoginText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:fontFamily="@font/pretendardvariable"
+                android:gravity="left"
+                android:paddingLeft="8dp"
+                android:text="로그인"
+                android:textColor="@color/blue_1"
+                android:textSize="14sp" />
+
+        </LinearLayout>
+    </LinearLayout>
+
+    <View
+        android:id="@+id/dimBackgroundSignup"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/dim"
+        android:visibility="gone" />
+
+</FrameLayout>
