@@ -10,6 +10,7 @@ public class SleepModel {
     static double tau_c = 24.2, alpha_0 = 0.16, beta = 0.013, p = 0.6, i_0 = 9500.0, lambda1 = 60.0;
     static double G = 19.9, b = 0.4, gamma = 0.23, kappa = 12.0 / Math.PI, k = 0.55, f = 0.99669;
     static double coef_y = 0.8, coef_x = -0.16, v_vh = 1.01;
+    static double minsleepduration = 4.0;
 
     static double[] PCR_wake(double[] V) {
         double[] dVdt = new double[4];
@@ -145,9 +146,13 @@ public class SleepModel {
         double[] V_tmp0 = pcr_simulation_end(V0, sleep_pattern1, step);
         double[] V_tmp = V_tmp0;
         double[] V_tmp2 = V_tmp0;
+        double[] V_tmp_30 = V_tmp0;
         double H = V_tmp[3];// sleep pressure
         double D_up = (2.46 + 10.2 + (3.37 * 0.5) * (1.0 + coef_y * V_tmp[1] + coef_x * V_tmp[0])) / v_vh; // sleep threshold
+        double H_30 = H;
+        double D_up_30 = D_up;
         double H1 = 0.0, D_up1 = 0.0;
+
 
         int sleep_start = 0, sleep_amount = 0; // first point where the CSS sleep is possible
         int CSS_start = sleep_onset, CSS_end = sleep_onset;
@@ -174,21 +179,38 @@ public class SleepModel {
             } else {
                 sleep_start = i; // the earliest time that CSS sleep is possible
                 i = 0;
-                while (D_up < H) {
+
+                while (true) {
                     i = i + 1;
                     V_tmp = rk4_sleep(V_tmp, step);
                     H = V_tmp[3];
                     D_up = (2.46 + 10.2 + (3.37 * 0.5) * (1.0 + coef_y * V_tmp[1] + coef_x * V_tmp[0])) / v_vh;
+                    if (D_up > H) {
+                        V_tmp_30 = pcr_simulation_end(V_tmp, new double[6], step);
+                        H_30 = V_tmp_30[3];
+                        D_up_30 = (2.46 + 10.2 + (3.37*0.5)*(1.0 + coef_y*V_tmp_30[1] + coef_x*V_tmp_30[0]))/v_vh;
+                        if (D_up_30 > H_30) {
+                            break;
+                        }
+                    }
                 }
                 sleep_amount = i;
             }
         } else { // CSS sleep is possible at the sleep onset
             i = 0;
-            while (D_up < H) {
+            while (true) {
                 i = i + 1;
                 V_tmp = rk4_sleep(V_tmp, step);
                 H = V_tmp[3];
                 D_up = (2.46 + 10.2 + (3.37 * 0.5) * (1.0 + coef_y * V_tmp[1] + coef_x * V_tmp[0])) / v_vh;
+                if (D_up > H) {
+                    V_tmp_30 = pcr_simulation_end(V_tmp, new double[6], step);
+                    H_30 = V_tmp_30[3];
+                    D_up_30 = (2.46 + 10.2 + (3.37*0.5)*(1.0 + coef_y*V_tmp_30[1] + coef_x*V_tmp_30[0]))/v_vh;
+                    if (D_up_30 > H_30) {
+                        break;
+                    }
+                }
             }
             sleep_amount = i;
         }
@@ -228,7 +250,7 @@ public class SleepModel {
                 D_up1 += (2.46 + 10.2 + (3.37 * 0.5) * (1.0 + coef_y * y_temp.get(j - CSS_end)[1] + coef_x * y_temp.get(j - CSS_end)[0])) / v_vh;
             }
 
-            if (D_up1 - H1 > 0) { //AL condition is satisfied
+            if ((D_up1 - H1 > 0) && (sleep_amount > minsleepduration/step)) { //AL condition is satisfied
                 result[4] = 1;
                 result[5] = type2;
                 return result;
@@ -242,7 +264,7 @@ public class SleepModel {
             while (D_down < H) { // find the point where the CSS sleep is possible
                 V_tmp = rk4_sleep(V_tmp, step); // simulate awake
                 H = V_tmp[3];
-                D_up = (2.46 + 10.2 + (3.37 * 0.5) * (1.0 + coef_y * V_tmp[1] + coef_x * V_tmp[0])) / v_vh;
+                D_down = (1.45 + 10.2 + (3.37 * 0.5) * (1.0 + coef_y * V_tmp[1] + coef_x * V_tmp[0])) / v_vh;
                 i = i + 1;
             }
             sleep_amount += i;
@@ -391,6 +413,101 @@ public class SleepModel {
             }
         }
         result[4] = type1;
+        result[5] = type2;
+        return result;
+    }
+
+    public static int[] Sleep_pattern_suggestion_off(double[] V0, int sleep_onset, double step) {
+        int[] result = {0, 0, 0, 0, 0, 0}; //Output 1
+        int i; // iterator
+
+        if (sleep_onset <= 0) { // Wrong input
+            result[4] = 0;
+            result[5] = 0;
+            return result;
+        }
+
+        // Find CSS sleep
+        double[] sleep_pattern1 = new double[sleep_onset + 1];
+        double[] V_tmp0 = pcr_simulation_end(V0, sleep_pattern1, step);
+        double[] V_tmp = V_tmp0;
+        double[] V_tmp2 = V_tmp0;
+        double[] V_tmp_30 = V_tmp0;
+        double H = V_tmp[3];// sleep pressure
+        double D_up = (2.46 + 10.2 + (3.37 * 0.5) * (1.0 + coef_y * V_tmp[1] + coef_x * V_tmp[0])) / v_vh; // sleep threshold
+        double H_30 = H;
+        double D_up_30 = D_up;
+
+        int type2 = 0;
+
+        int sleep_start = 0, sleep_amount = 0; // first point where the CSS sleep is possible
+
+        if (D_up > H) { // CSS sleep is impossible at sleep onset -> Need more awake
+            type2 = 1;
+            i = 0;
+            while (true) { // find the point where the CSS sleep is possible
+                V_tmp = rk4_wake(V_tmp, step); // simulate awake
+                H = V_tmp[3];
+                D_up = (2.46 + 10.2 + (3.37 * 0.5) * (1.0 + coef_y * V_tmp[1] + coef_x * V_tmp[0])) / v_vh;
+                i = i + 1;
+                if (D_up < H) {
+                    break;
+                }
+            }
+            sleep_start = i; // the earliest time that CSS sleep is possible
+            i = 0;
+            while (true) {
+                i = i + 1;
+                V_tmp = rk4_sleep(V_tmp, step);
+                H = V_tmp[3];
+                D_up = (2.46 + 10.2 + (3.37 * 0.5) * (1.0 + coef_y * V_tmp[1] + coef_x * V_tmp[0])) / v_vh;
+                if (D_up > H) {
+                    V_tmp_30 = pcr_simulation_end(V_tmp, new double[6], step);
+                    H_30 = V_tmp_30[3];
+                    D_up_30 = (2.46 + 10.2 + (3.37 * 0.5) * (1.0 + coef_y * V_tmp_30[1] + coef_x * V_tmp_30[0])) / v_vh;
+                    if (D_up_30 > H_30) {
+                        break;
+                    }
+                }
+            }
+            sleep_amount = i;
+        } else { // CSS sleep is possible at the sleep onset
+            i = 0;
+            while (true) {
+                i = i + 1;
+                V_tmp = rk4_sleep(V_tmp, step);
+                H = V_tmp[3];
+                D_up = (2.46 + 10.2 + (3.37 * 0.5) * (1.0 + coef_y * V_tmp[1] + coef_x * V_tmp[0])) / v_vh;
+                if (D_up > H) {
+                    V_tmp_30 = pcr_simulation_end(V_tmp, new double[6], step);
+                    H_30 = V_tmp_30[3];
+                    D_up_30 = (2.46 + 10.2 + (3.37 * 0.5) * (1.0 + coef_y * V_tmp_30[1] + coef_x * V_tmp_30[0])) / v_vh;
+                    if (D_up_30 > H_30) {
+                        break;
+                    }
+                }
+            }
+            sleep_amount = i;
+        }
+
+        if (sleep_amount < minsleepduration / step) {
+            // Add sleep more (until wake thres)
+            double D_down = 0.0;
+            D_down += (1.45 + 10.2 + (3.37 * 0.5) * (1.0 + coef_y * V_tmp[1] + coef_x * V_tmp[0])) / v_vh;
+
+            i = 0;
+            while (D_down < H) { // find the point where the CSS sleep is possible
+                V_tmp = rk4_sleep(V_tmp, step); // simulate awake
+                H = V_tmp[3];
+                D_down = (1.45 + 10.2 + (3.37 * 0.5) * (1.0 + coef_y * V_tmp[1] + coef_x * V_tmp[0])) / v_vh;
+                i = i + 1;
+            }
+            sleep_amount += i;
+        }
+
+        result[0] = sleep_onset + sleep_start;
+        result[1] = result[1] + sleep_amount;
+        result[4] = 1;
         result[5] = type2;
         return result;
     }
