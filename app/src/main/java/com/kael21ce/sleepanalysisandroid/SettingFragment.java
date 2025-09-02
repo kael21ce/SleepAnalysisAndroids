@@ -8,12 +8,16 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -65,12 +69,23 @@ public class SettingFragment extends Fragment {
         sharedPref = getActivity().getSharedPreferences("SleepWake", Context.MODE_PRIVATE);
         editor = sharedPref.edit();
 
+        // 새로고침 버튼 클릭 시 계정 정보 업데이트
+        ImageButton accountRefreshButton = v.findViewById(R.id.accountRefreshButton);
+        accountRefreshButton.setOnClickListener(vRef -> {
+            // 회전 애니메이션
+            Animation rotateAnimation = AnimationUtils.loadAnimation(v.getContext(), R.anim.rotate_animation);
+            accountRefreshButton.startAnimation(rotateAnimation);
+            Handler handler = new Handler();
+            handler.postDelayed(() -> {
+                //refresh the information in SettingFragment
+
+            }, 400);
+        });
+
         //Setting the time of the periodic notification
         if (!sharedPref.contains(NotifyKey)) {
             editor.putString(NotifyKey, "21:00").apply();
         }
-
-
         notifyButton = v.findViewById(R.id.notifyButton);
 
         //initial setting of notifySetting
