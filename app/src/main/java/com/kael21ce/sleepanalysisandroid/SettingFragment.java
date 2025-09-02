@@ -1,23 +1,31 @@
 package com.kael21ce.sleepanalysisandroid;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.work.ExistingWorkPolicy;
 import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkManager;
+
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -169,13 +177,86 @@ public class SettingFragment extends Fragment {
         // Log out
         LinearLayout logOutView = v.findViewById(R.id.LogOutView);
         logOutView.setOnClickListener(v1 -> {
-            //Move to BeginRegisterActivity
-            Intent logOutIntent = new Intent(v.getContext(), BeginRegisterActivity.class);
-            logOutIntent.putExtra("LogOut", true);
-            startActivity(logOutIntent);
-            getActivity().finish();
+            View dimBackground = v.findViewById(R.id.dimBackgroundSetting);
+            ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
+            BottomNavigationView bottomNavigationView = getActivity().findViewById(R.id.bottomNavigationView);
+            showAlertDialog(dimBackground, actionBar, bottomNavigationView, "알림", "정말 로그아웃 하시겠습니까?", "확인", "취소");
+
         });
 
         return v;
+    }
+
+    private void showAlertDialog(View dimBackground, ActionBar actionBar,
+                                 BottomNavigationView bottomNavigationView, String title,
+                                 String message, String yesButtonText, String noButtonText) {
+        // Save the original color
+        // Change this part if someone tries to change the primary color
+        int originalActionBarColor = getResources().getColor(R.color.white, null);
+        Window window = getActivity().getWindow();
+
+        // Dim effect
+        dimBackground.setVisibility(View.VISIBLE);
+        if (actionBar != null) {
+            actionBar.setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.dim, null)));
+        }
+        if (bottomNavigationView != null) {
+            bottomNavigationView.setItemBackground(new ColorDrawable(Color.parseColor("#80000000")));
+        }
+        window.setStatusBarColor(getResources().getColor(R.color.dim, null));
+
+        View viewDialog = LayoutInflater.from(getActivity()).inflate(R.layout.layout_custom_binary_dialog,
+                getActivity().findViewById(R.id.BinaryDialogLayout));
+        TextView dialogTitle = viewDialog.findViewById(R.id.binaryDialogTitle);
+        TextView dialogMessage = viewDialog.findViewById(R.id.binaryDialogMessage);
+        Button dialogYesButton = viewDialog.findViewById(R.id.dialogYesButton);
+        Button dialogNoButton = viewDialog.findViewById(R.id.dialogNoButton);
+        dialogTitle.setText(title);
+        dialogMessage.setText(message);
+        dialogYesButton.setText(yesButtonText);
+        dialogNoButton.setText(noButtonText);
+
+        AlertDialog dialog = new AlertDialog.Builder(getActivity(), R.style.CustomAlertDialog)
+                .setView(viewDialog)
+                .create();
+
+        dialogYesButton.setOnClickListener(dialogV -> {
+            // logout 진행
+            //Move to BeginRegisterActivity
+            Intent logOutIntent = new Intent(viewDialog.getContext(), BeginRegisterActivity.class);
+            logOutIntent.putExtra("LogOut", true);
+            startActivity(logOutIntent);
+            getActivity().finish();
+
+            // Dialog 종료
+            dialog.dismiss();
+            dimBackground.setVisibility(View.GONE);
+            if (actionBar != null) {
+                actionBar.setBackgroundDrawable(new ColorDrawable(originalActionBarColor));
+            }
+            if (bottomNavigationView != null) {
+                bottomNavigationView.setItemBackground(new ColorDrawable(Color.parseColor("#FFFFFF")));
+            }
+            window.setStatusBarColor(getResources().getColor(R.color.white, null));
+        });
+
+        dialogNoButton.setOnClickListener(dialogV -> {
+            // Dialog 종료
+            dialog.dismiss();
+            dimBackground.setVisibility(View.GONE);
+            if (actionBar != null) {
+                actionBar.setBackgroundDrawable(new ColorDrawable(originalActionBarColor));
+            }
+            if (bottomNavigationView != null) {
+                bottomNavigationView.setItemBackground(new ColorDrawable(Color.parseColor("#FFFFFF")));
+            }
+            window.setStatusBarColor(getResources().getColor(R.color.white, null));
+        });
+        dialog.setCancelable(true);
+        dialog.show();
+
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
+        }
     }
 }

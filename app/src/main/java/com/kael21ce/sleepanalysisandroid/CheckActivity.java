@@ -110,7 +110,7 @@ public class CheckActivity extends AppCompatActivity {
             user_email = emailText.getText().toString();
             user_name = user_email.substring(0, user_email.indexOf("@"));
             user_password = passwordText.getText().toString();
-            apiService = RetrofitClient.getClient().create(RetrofitAPI.class);
+            apiService = RetrofitClient.getClient(this).create(RetrofitAPI.class);
             tokenStorage = TokenStorage.getInstance(this);
             performLogin(user_email, user_password);
         });

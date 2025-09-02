@@ -11,6 +11,8 @@ import android.util.Log;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.kael21ce.sleepanalysisandroid.data.TokenStorage;
+
 public class BeginRegisterActivity extends AppCompatActivity {
     private boolean doubleBackToExitPressedOnce = false;
 
@@ -33,6 +35,11 @@ public class BeginRegisterActivity extends AppCompatActivity {
             editor.clear();
             editor.apply();
             Log.v("BeginRegister", "Log out and all data were deleted");
+
+            // 앱 내에 저장된 토큰 모두 제거
+            TokenStorage tokenStorage = TokenStorage.getInstance(this);
+            tokenStorage.clearTokens();
+            Log.v("AuthAPI", "Log out and all tokens were deleted");
         }
 
         Button beginButton = findViewById(R.id.beginButton);
