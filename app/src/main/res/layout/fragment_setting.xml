@@ -148,7 +148,7 @@
                                     android:layout_height="wrap_content"
                                     android:layout_gravity="right"
                                     android:fontFamily="@font/pretendardvariable"
-                                    android:text="유효 - 2025.10.18. 10:04"
+                                    android:text="유효 - 1999-99-99 99:99"
                                     android:textColor="@color/green_1"
                                     android:textSize="14sp" />
                             </LinearLayout>

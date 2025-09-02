@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -25,19 +26,16 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
-import androidx.work.ExistingWorkPolicy;
 import androidx.work.OneTimeWorkRequest;
-import androidx.work.WorkManager;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.kael21ce.sleepanalysisandroid.data.TokenStorage;
 
-import java.text.ParseException;
+import org.json.JSONObject;
+
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
+import java.util.Base64;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -69,6 +67,18 @@ public class SettingFragment extends Fragment {
         sharedPref = getActivity().getSharedPreferences("SleepWake", Context.MODE_PRIVATE);
         editor = sharedPref.edit();
 
+        // 로그인 정보
+        // 이메일 가져오기
+        TextView accountEmailDescription = v.findViewById(R.id.accountEmailDescription);
+        String email = sharedPref.getString("User_Email", "로드 오류"); // 추후에 서버에서 불러오기
+        accountEmailDescription.setText(email);
+
+        // 토큰 만료 시간 가져오기
+        Date accessExp = decodeJWTExp(TokenStorage.getInstance(context).getAccessToken());
+        Date refreshExp = decodeJWTExp(TokenStorage.getInstance(context).getRefreshToken());
+        TextView accountSessionDescription = v.findViewById(R.id.accountSessionDescription);
+        getAuthStatus(accountSessionDescription, accessExp, refreshExp);
+
         // 새로고침 버튼 클릭 시 계정 정보 업데이트
         ImageButton accountRefreshButton = v.findViewById(R.id.accountRefreshButton);
         accountRefreshButton.setOnClickListener(vRef -> {
@@ -78,7 +88,9 @@ public class SettingFragment extends Fragment {
             Handler handler = new Handler();
             handler.postDelayed(() -> {
                 //refresh the information in SettingFragment
-
+                Date newAccessExp = decodeJWTExp(TokenStorage.getInstance(v.getContext()).getAccessToken());
+                Date newRefreshExp = decodeJWTExp(TokenStorage.getInstance(v.getContext()).getRefreshToken());
+                getAuthStatus(accountSessionDescription, newAccessExp, newRefreshExp);
             }, 400);
         });
 
@@ -272,6 +284,138 @@ public class SettingFragment extends Fragment {
 
         if (dialog.getWindow() != null) {
             dialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
+        }
+    }
+
+    public static Date decodeJWTExp(String token) {
+        if (token == null || token.isEmpty()) {
+            return null;
+        }
+
+        try {
+            // 1. JWT를 "." 기준으로 분리
+            String[] parts = token.split("\\.");
+            if (parts.length < 2) {
+                return null; // Payload 부분이 존재하지 않음
+            }
+
+            // 2. Payload 부분을 Base64URL 디코딩
+            String payloadJson = decodeBase64Url(parts[1]);
+            if (payloadJson == null) {
+                return null;
+            }
+
+            // 3. 디코딩된 문자열을 JSON 객체로 파싱
+            JSONObject jsonObject = new JSONObject(payloadJson);
+
+            // 4. exp 클레임 값을 가져오기 (Unix timestamp)
+            double exp = jsonObject.optDouble("exp");
+            if (Double.isNaN(exp)) {
+                return null;
+            }
+
+            // 5. 초를 밀리초로 변환하여 Date 객체 생성
+            long expMillis = (long) (exp * 1000);
+            return new Date(expMillis);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private static String decodeBase64Url(String input) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            byte[] decodedBytes = Base64.getUrlDecoder().decode(input);
+            return new String(decodedBytes, StandardCharsets.UTF_8);
+        } else {
+            byte[] decodedBytes = android.util.Base64.decode(input, android.util.Base64.URL_SAFE);
+            return new String(decodedBytes, StandardCharsets.UTF_8);
+        }
+
+    }
+
+    // Date 객체를 "yyyy-MM-dd HH:mm" 형식의 문자열로 변환
+    private String ymdhm(Date date) {
+        if (date == null) return "";
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
+        return sdf.format(date);
+    }
+
+    // Date 객체까지 남은 시간을 상대적인 문자열로 변환
+    private String relativeTimeString(Date date) {
+        if (date == null) {
+            return "";
+        }
+
+        long nowMillis = System.currentTimeMillis();
+        long dateMillis = date.getTime();
+
+        // 시간 차이를 밀리초(ms) 단위로 계산
+        long diff = Math.abs(nowMillis - dateMillis);
+
+        // 밀리초를 일, 시간, 분으로 변환
+        long days = TimeUnit.MILLISECONDS.toDays(diff);
+        diff -= TimeUnit.DAYS.toMillis(days);
+        long hours = TimeUnit.MILLISECONDS.toHours(diff);
+        diff -= TimeUnit.HOURS.toMillis(hours);
+        long minutes = TimeUnit.MILLISECONDS.toMinutes(diff);
+
+        // 문자열 조합
+        StringBuilder sb = new StringBuilder();
+        if (days > 0) {
+            sb.append(days).append("d ");
+        }
+        if (hours > 0) {
+            sb.append(hours).append("h ");
+        }
+        if (minutes > 0 || (days == 0 && hours == 0)) {
+            // 차이가 1분 미만이라도 "0m"을 표시하기 위한 조건
+            sb.append(minutes).append("m");
+        }
+
+        String timeString = sb.toString().trim();
+
+        // 미래 시점인지 과거 시점인지에 따라 접두사/접미사 추가
+        if (dateMillis >= nowMillis) {
+            return "in " + timeString;
+        } else {
+            return timeString + " ago";
+        }
+    }
+
+    // 토큰 기한에 따른 텍스트 변화
+    public void getAuthStatus(TextView textView, Date accessExp, Date refreshExp) {
+        String sessionText;
+        int sessionColor;
+
+        // 세션 상태 결정
+        if (refreshExp != null) {
+            if (refreshExp.after(new Date())) {
+                sessionText = "유효 — " + ymdhm(refreshExp);
+                sessionColor = R.color.green_1;
+            } else {
+                sessionText = "만료 — " + ymdhm(refreshExp);
+                sessionColor = R.color.red_1;
+            }
+        } else {
+            sessionText = "미로그인";
+            sessionColor = R.color.red_1;
+        }
+
+        // Access Token 상태 결정
+        String accessText;
+        if (accessExp == null) {
+            accessText = "없음";
+        } else {
+            accessText = accessExp.after(new Date()) ?
+                    "만료 " + relativeTimeString(accessExp) :
+                    "만료됨";
+        }
+
+        // TextView 속성 바꾸기
+        if (textView != null) {
+            textView.setText(sessionText);
+            textView.setTextColor(getResources().getColor(sessionColor, null));
         }
     }
 }
