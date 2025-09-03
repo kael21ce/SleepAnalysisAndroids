@@ -94,6 +94,13 @@ public class SettingFragment extends Fragment {
             }, 400);
         });
 
+        // 비밀번호 변경
+        LinearLayout resetPwdView = v.findViewById(R.id.ResetPwdView);
+        resetPwdView.setOnClickListener(vPwd -> {
+            Intent resetPwdIntent = new Intent(v.getContext(), ResetPwdActivity.class);
+            startActivity(resetPwdIntent);
+        });
+
         //Setting the time of the periodic notification
         if (!sharedPref.contains(NotifyKey)) {
             editor.putString(NotifyKey, "21:00").apply();
