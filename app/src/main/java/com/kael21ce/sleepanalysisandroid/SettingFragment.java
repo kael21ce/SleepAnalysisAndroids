@@ -70,7 +70,7 @@ public class SettingFragment extends Fragment {
         // 로그인 정보
         // 이메일 가져오기
         TextView accountEmailDescription = v.findViewById(R.id.accountEmailDescription);
-        String email = sharedPref.getString("User_Email", "로드 오류"); // 추후에 서버에서 불러오기
+        String email = sharedPref.getString("User_Email", "로드 오류"); // SharedPreference에 email이 저장되어 있다고 가정.
         accountEmailDescription.setText(email);
 
         // 토큰 만료 시간 가져오기

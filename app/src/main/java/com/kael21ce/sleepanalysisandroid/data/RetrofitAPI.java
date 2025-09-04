@@ -33,4 +33,7 @@ public interface RetrofitAPI {
 
     @POST("/sleepapp/token/refresh/")
     Call<AccessOnly> refresh(@Body RefreshPayload refreshPayload);
+
+    @POST("/sleepapp/user/reset_password/")
+    Call<Void> resetPassword(@Body ResetPasswordPayload payload);
 }
