@@ -175,7 +175,6 @@ public class HomeFragment extends Fragment {
         } else {
             isHidden = sharedPref.getBoolean("isHidden", true);
         }
-        isHidden = false;
 
         // System time
         now = System.currentTimeMillis();

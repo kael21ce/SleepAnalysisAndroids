@@ -6,19 +6,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Button;
-import android.widget.Toast;
-
-import com.kael21ce.sleepanalysisandroid.data.DataSurvey;
-import com.kael21ce.sleepanalysisandroid.data.DataUser;
-import com.kael21ce.sleepanalysisandroid.data.RetrofitAPI;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
+import android.widget.TextView;
 
 public class StartActivity extends AppCompatActivity {
     SharedPreferences sharedPref;
@@ -43,7 +32,13 @@ public class StartActivity extends AppCompatActivity {
 
         //Change the user name and user email in MainActivity
         String user_email = emailIntent.getStringExtra("User_Email");
+        assert user_email != null;
         String user_name = user_email.substring(0, user_email.indexOf("@"));
+
+        // Description에 user name 추가
+        TextView startDescription = findViewById(R.id.startDescription);
+        String user_based_text = user_name + startDescription.getText().toString();
+        startDescription.setText(user_based_text);
         startButton.setOnClickListener(view -> {
 
             //Add to sharedPreference
@@ -51,11 +46,10 @@ public class StartActivity extends AppCompatActivity {
             editor.putString("User_Name", user_name);
             editor.apply();
 
-            //Move to MainActivity
-
-            Intent mainIntent = new Intent(StartActivity.this, MainActivity.class);
-            mainIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(mainIntent);
+            //Move to WaitingActivity
+            Intent waitingIntent = new Intent(StartActivity.this, WaitingActivity.class);
+            waitingIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(waitingIntent);
             finish();
         });
     }

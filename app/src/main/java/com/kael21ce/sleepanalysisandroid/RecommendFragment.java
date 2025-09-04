@@ -140,7 +140,7 @@ public class RecommendFragment extends Fragment {
         if (!sharedPref2.contains("isHidden")) {
             editor.putBoolean("isHidden", true).apply();
         }
-        boolean isHidden = false;
+        boolean isHidden = sharedPref2.getBoolean("isHidden", true);
         long K1 = sharedPref2.getLong("workOnset",now);
         long K2 = sharedPref2.getLong("workOffset",now);
         if (sharedPref2.contains("sleepOnset") && sharedPref2.contains("workOnset") && sharedPref2.contains("workOffset")) {
