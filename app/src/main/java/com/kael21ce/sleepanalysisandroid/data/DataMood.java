@@ -1,15 +1,23 @@
 package com.kael21ce.sleepanalysisandroid.data;
 
-public class DataMood {
+import com.google.gson.annotations.SerializedName;
 
-    private String user;
+public class DataMood {
+    @SerializedName("latency")
     private int latency;
+    @SerializedName("daily_alertness")
     private int daily_alertness;
+    @SerializedName("sleep_quality")
     private int sleep_quality;
+    @SerializedName("mood_high")
     private int mood_high;
+    @SerializedName("mood_low")
     private int mood_low;
+    @SerializedName("mood_anx")
     private int mood_anx;
+    @SerializedName("mood_irr")
     private int mood_irr;
+    @SerializedName("time")
     private long time;
 
     public int getSleep_quality() {
@@ -22,10 +30,6 @@ public class DataMood {
 
     public long getTime() {
         return time;
-    }
-
-    public String getUser() {
-        return user;
     }
 
     public int getLatency() {
@@ -48,8 +52,7 @@ public class DataMood {
         return mood_irr;
     }
 
-    public DataMood(String user, int latency, int daily_alertness, int sleep_quality, int mood_high, int mood_low, int mood_anx, int mood_irr, long time){
-        this.user = user;
+    public DataMood(int latency, int daily_alertness, int sleep_quality, int mood_high, int mood_low, int mood_anx, int mood_irr, long time){
         this.latency = latency;
         this.daily_alertness = daily_alertness;
         this.sleep_quality = sleep_quality;

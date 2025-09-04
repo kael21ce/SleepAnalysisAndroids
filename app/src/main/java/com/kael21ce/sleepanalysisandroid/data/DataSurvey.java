@@ -1,12 +1,17 @@
 package com.kael21ce.sleepanalysisandroid.data;
 
-public class DataSurvey {
+import com.google.gson.annotations.SerializedName;
 
-    private String user;
+public class DataSurvey {
+    @SerializedName("sleep_onset")
     private long sleep_onset;
+    @SerializedName("work_onset")
     private long work_onset;
+    @SerializedName("work_offset")
     private long work_offset;
+    @SerializedName("survey_result")
     private long survey_result;
+    @SerializedName("time")
     private long time;
 
     public long getTime() {
@@ -17,8 +22,7 @@ public class DataSurvey {
         return survey_result;
     }
 
-    public DataSurvey(String user, long sleep_onset, long work_onset, long work_offset, long survey_result, long time){
-        this.user = user;
+    public DataSurvey(long sleep_onset, long work_onset, long work_offset, long survey_result, long time){
         this.sleep_onset = sleep_onset;
         this.work_onset = work_onset;
         this.work_offset = work_offset;

@@ -181,7 +181,7 @@ public class RecordsAdapter extends RecyclerView.Adapter<RecordsAdapter.ViewHold
             ArrayList<DataSurvey> results = new ArrayList<>(3);
             ArrayList<Long> times = new ArrayList<>(3);
             for (int k = 0; k < 3; k++) {
-                dummySurvey = new DataSurvey("tester",0,0,0,0,0);
+                dummySurvey = new DataSurvey(0,0,0,0,0);
                 results.add(dummySurvey);
                 times.add(0L);
             }
