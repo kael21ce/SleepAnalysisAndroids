@@ -78,7 +78,8 @@
                 android:layout_marginHorizontal="16dp"
                 android:layout_marginBottom="16dp"
                 android:theme="@style/CustomTextInputLayout"
-                app:passwordToggleEnabled="true">
+                app:passwordToggleEnabled="true"
+                app:hintEnabled="false">
 
                 <EditText
                     android:id="@+id/passwordText"
@@ -104,6 +105,7 @@
                 android:background="@drawable/corner_16_dim"
                 android:fontFamily="@font/pretendardvariable"
                 android:padding="16dp"
+                android:foreground="?attr/selectableItemBackground"
                 android:text="로그인"
                 android:textColor="@color/white"
                 android:textSize="16sp"

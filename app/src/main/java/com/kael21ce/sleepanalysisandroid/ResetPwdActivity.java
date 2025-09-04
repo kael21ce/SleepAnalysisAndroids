@@ -51,6 +51,11 @@ public class ResetPwdActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_reset_pwd);
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.ResetPwdLayout), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
+        });
 
         // Action bar 숨기기
         if (getSupportActionBar() != null) {
@@ -158,7 +163,7 @@ public class ResetPwdActivity extends AppCompatActivity {
     private void showAlertDialog(View dimBackground, String message, boolean isSuccess) {
         // Save the original color
         // Change this part if someone tries to change the primary color
-        int originalNavigationBarColor = getResources().getColor(R.color.white, null);
+        int originalNavigationBarColor = getResources().getColor(R.color.gray_1, null);
         Window window = getWindow();
 
         // Dim effect
@@ -185,7 +190,7 @@ public class ResetPwdActivity extends AppCompatActivity {
         dialogButton.setOnClickListener(dialogV -> {
             dialog.dismiss();
             dimBackground.setVisibility(View.GONE);
-            window.setStatusBarColor(getResources().getColor(R.color.white, null));
+            window.setStatusBarColor(getResources().getColor(R.color.gray_1, null));
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 window.setNavigationBarColor(originalNavigationBarColor);
             }
