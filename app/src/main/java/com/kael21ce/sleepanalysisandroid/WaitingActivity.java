@@ -8,7 +8,6 @@ import android.os.Handler;
 import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -31,6 +30,7 @@ import com.kael21ce.sleepanalysisandroid.data.BlockStatusResponse;
 import com.kael21ce.sleepanalysisandroid.data.DataMood;
 import com.kael21ce.sleepanalysisandroid.data.RetrofitAPI;
 import com.kael21ce.sleepanalysisandroid.data.RetrofitClient;
+import com.kael21ce.sleepanalysisandroid.data.Sleep;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -324,23 +324,11 @@ public class WaitingActivity extends AppCompatActivity {
     }
 }
 
-class SleepDTO {
-    @SerializedName("sleepStart")
-    private String sleepStart;
-
-    @SerializedName("sleepEnd")
-    private String sleepEnd;
-
-    // Getters
-    public String getSleepStart() { return sleepStart; }
-    public String getSleepEnd() { return sleepEnd; }
-}
-
 class PersonalResponse {
     @SerializedName("sleep")
-    private List<SleepDTO> sleep;
+    private List<Sleep> sleep;
 
-    public List<SleepDTO> getSleep() {
+    public List<Sleep> getSleep() {
         return sleep;
     }
 }
@@ -349,12 +337,12 @@ class SleepJSONSingle {
     @SerializedName("user")
     private String user;
     @SerializedName("sleep")
-    private List<SleepDTO> sleep;
+    private List<Sleep> sleep;
 
     // Getter
-    public List<SleepDTO> getSleep() { return sleep; }
+    public List<Sleep> getSleep() { return sleep; }
 
-    public static SleepJSONSingle fromSleepList(List<SleepDTO> sleepList) {
+    public static SleepJSONSingle fromSleepList(List<Sleep> sleepList) {
         SleepJSONSingle instance = new SleepJSONSingle();
         instance.sleep = sleepList;
 

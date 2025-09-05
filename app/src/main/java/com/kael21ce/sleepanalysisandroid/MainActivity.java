@@ -31,7 +31,6 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.room.Room;
 import androidx.work.ExistingPeriodicWorkPolicy;
 import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkManager;
@@ -40,18 +39,16 @@ import com.github.mikephil.charting.data.BarEntry;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.kael21ce.sleepanalysisandroid.data.AppDatabase;
 import com.kael21ce.sleepanalysisandroid.data.Awareness;
-import com.kael21ce.sleepanalysisandroid.data.AwarenessDao;
+import com.kael21ce.sleepanalysisandroid.data.CombineResult;
 import com.kael21ce.sleepanalysisandroid.data.DataModal;
 import com.kael21ce.sleepanalysisandroid.data.HealthConnectManager;
+import com.kael21ce.sleepanalysisandroid.data.ProcessingAPI;
 import com.kael21ce.sleepanalysisandroid.data.RetrofitAPI;
 import com.kael21ce.sleepanalysisandroid.data.Sleep;
 import com.kael21ce.sleepanalysisandroid.data.SleepDao;
-import com.kael21ce.sleepanalysisandroid.data.SleepModel;
 import com.kael21ce.sleepanalysisandroid.data.V0;
-import com.kael21ce.sleepanalysisandroid.data.V0Dao;
 
 import java.text.SimpleDateFormat;
-import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
@@ -59,7 +56,6 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
@@ -112,13 +108,12 @@ public class MainActivity extends AppCompatActivity {
     private List<Sleep> sleeps;
     private List<Awareness> awarenesses, sleepAwarenesses;
     private List<V0> v0s;
+    private CombineResult combineResult;
     String email, username;
     long now, nineHours;
     long twoWeeks = (1000*60*60*24*14), oneDay = 1000*60*60*24, oneHour = 1000*60*60;
     long fiveMinutesToMil = (1000*60*5);
-    Instant ILastSleepUpdate;
     SleepDao sleepDao;
-    V0Dao v0Dao;
 
     ArrayList<BarEntry> barEntries;
 
@@ -214,48 +209,21 @@ public class MainActivity extends AppCompatActivity {
         email = sharedPref.getString("User_Email", "tester33");
         username = sharedPref.getString("User_Name", "tester33");
 
+        combineResult = ProcessingAPI.run(this, sharedPref);
+        sleeps = combineResult.getSleeps();
+        v0s = combineResult.getV0s();
+        barEntries = combineResult.getBarEntries();
+        awarenesses = combineResult.getAwarenesses();
+        sleepAwarenesses = combineResult.getSleepAwarenesses();
+
         //user sleep variables
         sleepOnset = sharedPref.getLong("sleepOnset", now);
         workOnset = sharedPref.getLong("workOnset", now);
         workOffset = sharedPref.getLong("workOffset", now);
         sleepOnsetShow = sharedPref.getLong("sleepOnsetShow", now);
+        isenoughsleep = sharedPref.getBoolean("enoughSleep", false);
+        isearlysleep = sharedPref.getBoolean("earlySleep", false);
 
-        barEntries = new ArrayList<BarEntry>();
-
-        Long[] updatedDates = updateOnsetDate(now, sleepOnset, sleepOnsetShow, workOnset, workOffset);
-        sleepOnsetShow = updatedDates[1];
-        setSleepOnset(updatedDates[0]);
-        setWorkOnset(updatedDates[2]);
-        setWorkOffset(updatedDates[3]);
-        editor.putLong("sleepOnsetShow", sleepOnsetShow);
-        editor.apply();
-
-        //sleep result variables
-        mainSleepStart = sharedPref.getLong("mainSleepStart", now - twoWeeks);
-        mainSleepEnd = sharedPref.getLong("mainSleepEnd", now - twoWeeks);
-        napSleepStart = sharedPref.getLong("napSleepStart", now - twoWeeks);
-        napSleepEnd = sharedPref.getLong("napSleepEnd", now - twoWeeks);
-
-        ILastSleepUpdate = Instant.ofEpochMilli(lastSleepUpdate);
-
-        db = Room.databaseBuilder(getApplicationContext(),
-                AppDatabase.class, "sleep_wake").allowMainThreadQueries().build();
-
-        sleepDao = db.sleepDao();
-
-        getSleepData();
-        Log.v("SLEEP Sd", Integer.toString(sleeps.size()));
-        if(sleeps.size() > 0) {
-            do_simulation();
-            calculateAwareness();
-            calculateSleepAwareness();
-//            if(now-lastBackendUpdate >= (1000*60*60*24)) {
-                sendV0(email);
-                lastBackendUpdate = now;
-                editor.putLong("lastBackendUpdate", now);
-                editor.apply();
-//            }
-        }
         /*
         //Hide navigation bar
         View decorView = getWindow().getDecorView();
@@ -588,7 +556,7 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
         this.doubleBackToExitPressedOnce = true;
-        Toast.makeText(this, "\'뒤로\' 버튼을 한 번 더 누르시면 종료됩니다",
+        Toast.makeText(this, "'뒤로' 버튼을 한 번 더 누르시면 종료됩니다",
                 Toast.LENGTH_SHORT).show();
 
         new Handler().postDelayed(new Runnable() {
@@ -609,44 +577,7 @@ public class MainActivity extends AppCompatActivity {
             Log.v("RESUMING", "RESUMING");
             //get the shared preferences variable
             sharedPref = getSharedPreferences("SleepWake", Context.MODE_PRIVATE);
-            editor = sharedPref.edit();
-
-            barEntries = new ArrayList<BarEntry>();
-            now = System.currentTimeMillis();
-
-            Long[] updatedDates = updateOnsetDate(now, sleepOnset, sleepOnsetShow, workOnset, workOffset);
-            sleepOnsetShow = updatedDates[1];
-            setSleepOnset(updatedDates[0]);
-            setWorkOnset(updatedDates[2]);
-            setWorkOffset(updatedDates[3]);
-            editor.putLong("sleepOnsetShow", sleepOnsetShow);
-            editor.apply();
-
-            //sleep result variables
-            mainSleepStart = sharedPref.getLong("mainSleepStart", now - twoWeeks);
-            mainSleepEnd = sharedPref.getLong("mainSleepEnd", now - twoWeeks);
-            napSleepStart = sharedPref.getLong("napSleepStart", now - twoWeeks);
-            napSleepEnd = sharedPref.getLong("napSleepEnd", now - twoWeeks);
-
-            ILastSleepUpdate = Instant.ofEpochMilli(lastSleepUpdate);
-
-            db = Room.databaseBuilder(getApplicationContext(),
-                    AppDatabase.class, "sleep_wake").allowMainThreadQueries().build();
-
-            sleepDao = db.sleepDao();
-
-            getSleepData();
-            if (sleeps.size() > 0) {
-                do_simulation();
-                calculateAwareness();
-                calculateSleepAwareness();
-                if(now-lastBackendUpdate >= (1000*60*60*12)) {
-                    sendV0(email);
-                    lastBackendUpdate = now;
-                    editor.putLong("lastBackendUpdate", now);
-                    editor.apply();
-                }
-            }
+            combineResult = ProcessingAPI.run(getApplicationContext(), sharedPref);
         }
     }
 
@@ -666,514 +597,6 @@ public class MainActivity extends AppCompatActivity {
         double D_up = (2.46+10.2+C)/v_vh;
         double awareness = D_up - H;
         return awareness;
-    }
-
-    public void getSleepData(){
-        this.sleeps = Collections.synchronizedList(sleepDao.getAll());
-        boolean check = false;
-        long lastSleep1 = 0;
-        long befSleepStart = 0;
-        long befSleepEnd = 0;
-        ArrayList<Sleep> deleteTheSleeps = new ArrayList<>();
-        for(Sleep sleep: new ArrayList<Sleep>(this.sleeps)){
-            //synchronize the sleep
-            if(befSleepStart == sleep.sleepStart && befSleepEnd == sleep.sleepEnd) {
-                sleepDao.delete(sleep);
-                this.sleeps.remove(sleep);
-                Log.v("same data", "same data");
-                befSleepStart = sleep.sleepStart;
-                befSleepEnd = sleep.sleepEnd;
-                continue;
-            }
-            befSleepStart = sleep.sleepStart;
-            befSleepEnd = sleep.sleepEnd;
-            String sleepStart = sdfDateTime.format(new Date(sleep.sleepStart));
-            String sleepEnd = sdfDateTime.format(new Date(sleep.sleepEnd));
-            Date sleepEndD = new Date(sleep.sleepEnd);
-            lastSleep1 = sleepEndD.getTime();
-            Log.v("SLEEP REAL", sleepStart);
-            Log.v("SLEEP REAL", sleepEnd);
-            if(ILastSleepUpdate.isBefore(Instant.ofEpochMilli(sleep.sleepStart))){
-                if(check == false){
-                    lastDataUpdate = Long.min(lastDataUpdate, sleep.sleepStart - (1000*60*60*24));
-                    editor.putLong("lastDataUpdate", lastDataUpdate);
-                    editor.apply();
-                }
-                check = true;
-            }
-        }
-        Log.v("CHECK", String.valueOf(check));
-        Log.v("LAST SLEEP UPDATE", sdfDateTime.format(new Date(lastSleepUpdate)));
-        Log.v("LAST SLEEP DATA", sdfDateTime.format(new Date(lastSleep1)));
-        Log.v("SLEEP DATA", "GOT SLEEP DATA");
-        if(check){
-            //edit lastSleepUpdate to match current time
-            editor.putLong("lastSleepUpdate", lastSleep1);
-            editor.apply();
-        }
-    }
-
-    public void do_simulation(){
-        //get V0 data
-        v0Dao = db.v0Dao();
-        v0s = Collections.synchronizedList(v0Dao.getAll());
-
-        Boolean deleteException = sharedPref.getBoolean("deleteException", false);
-        if (!deleteException) {
-            Log.v("MainActivity", "Conventional");
-            if (lastDataUpdate < now - twoWeeks) {
-                lastDataUpdate = now - twoWeeks;
-            }
-        } else {
-            Log.v("MainActivity", "Exceptional");
-            editor.putBoolean("deleteException", false).apply();
-        }
-
-        //do pcr simulation
-        long yesterday = now - (1000*60*60*24);
-        Log.v("LAST DATA UPDATE", lastDataUpdate + " " + sdfDateTime.format(new Date(lastDataUpdate)));
-        long startProcess = Long.min(yesterday, lastDataUpdate);
-        if(sleeps.size() > 0) {
-            lastDataUpdate = now - (1000 * 60 * 5);
-            editor.putLong("lastDataUpdate", lastDataUpdate);
-            editor.apply();
-        }
-        long endProcess = now;
-        long processDuration = (endProcess - startProcess) / fiveMinutesToMil;
-        boolean gotInitV0 = false;
-        double[] initV0 = {-0.8990, -0.6153, 0.0961, 14.2460};
-
-        //Clean entries
-        List<V0> deleteV0 = new ArrayList<>();
-
-        //get init V0
-        for(V0 v0: v0s){
-//            Log.v("V0", "H: "+ v0.H_val + ", n: " + v0.n_val + ", y: "+v0.y_val + ", x: " + v0.x_val);
-            if(v0.time >= startProcess){
-                if(!gotInitV0 && v0.time <= startProcess + (1000*60*6)){
-                    initV0 = new double[]{v0.x_val, v0.y_val, v0.n_val, v0.H_val};
-                    gotInitV0 = true;
-                }
-                deleteV0.add(v0);
-            }
-        }
-        for(V0 v0: deleteV0){
-            v0s.remove(v0);
-        }
-        v0Dao.deleteRange(startProcess, endProcess);
-
-        //if we don't have the initV0, then something went wrong in the previous calculation
-        //or it is the first time we get sleep data, recalculate everything from the first sleep
-        if(!gotInitV0 && sleeps.size() > 0){
-            Sleep firstSleep = sleeps.get(0);
-            long firstSleepDayStart = (firstSleep.sleepStart + nineHours)/ (1000*60*60*24);
-            long firstSleepNoon = (firstSleepDayStart*(1000*60*60*24)) + (1000*60*60*12);
-            Log.v("FIRST SLEEP DAY START", String.valueOf(firstSleepNoon));
-            Log.v("FIRST SLEEP", String.valueOf(firstSleep.sleepStart));
-            if(firstSleep.sleepStart+nineHours >= firstSleepNoon){
-                startProcess = firstSleepNoon-nineHours;
-                initV0=new double[]{0.8958, 0.5219, 0.5792, 12.4225};
-            }else{
-                startProcess = (firstSleepDayStart * (1000*60*60*24))-nineHours;
-            }
-        }
-        Log.v("START PROCESS", sdfDateTime.format(new Date(startProcess)));
-        Log.v("END PROCESS", sdfDateTime.format(new Date(endProcess)));
-
-        Log.v("INIT V0", initV0[0] + " " + initV0[1] + " " + initV0[2] + " " + initV0[3]);
-        Log.v("AWARENESS OF V0", String.valueOf(getAwarenessValue(initV0[3], initV0[2], initV0[1], initV0[0])));
-
-        //get the sleep model & simulation result
-        SleepModel sleepModel = new SleepModel();
-        double[] sleepPattern = sleepToArray(startProcess, endProcess, sleeps);
-        Log.v("SLEEP SIZE", String.valueOf(sleepPattern.length));
-        for(int i = 0; i < sleepPattern.length; i ++){
-            Log.v("SLEEP PATTERN SUPER: ", String.valueOf(i) + " " + String.valueOf(sleepPattern[i]));
-        }
-        double step = 1/12.0;
-        ArrayList<double[]> simulationResult = sleepModel.pcr_simulation(initV0, sleepPattern, step);
-
-        //update V0 from the simulation
-        List<V0> newV0 = new ArrayList<>();
-        Log.v("SIZE", String.valueOf(simulationResult.size()));
-        float barIdx = 0f;
-        float addBarIdx = 0.0833333f;
-        for(int i = 0; i < simulationResult.size(); i ++){
-            double[] res = simulationResult.get(i);
-            V0 v0 = new V0();
-            v0.x_val = res[0];
-            v0.y_val = res[1];
-            v0.n_val = res[2];
-            v0.H_val = res[3];
-            v0.time = startProcess + (i*fiveMinutesToMil);
-            Log.v("VO TIME", i*5 + " " + getAwarenessValue(res[3], res[2], res[1], res[0]));
-            newV0.add(v0);
-            v0s.add(v0);
-
-            if(v0.time >= (now-(1000*60*6)) && (v0.time <= now)){
-                Log.v("UPDATED INIT V0", "UPDATED INIT V0");
-                initV0 = res;
-            }
-
-            if(simulationResult.size() - 288 <= i){
-                Log.v("BAR ENTRY", sdfDateTime.format(new Date(startProcess + (i*fiveMinutesToMil))));
-                Log.v("WTF", "WTF");
-                float value = (float) getAwarenessValue(res[3], res[2], res[1], res[0]);
-                //Normalization
-                barEntries.add(new BarEntry((float) barIdx, value*100f/3f));
-                barIdx += addBarIdx;
-                Log.v("Each bar", "x: " + barIdx + " / y: " + value*100f/3.0f);
-            }
-        }
-        v0Dao.insertAll(newV0);
-        Log.v("V0 DONE", "V0 DONE");
-        Log.v("SLEEP ONSET", String.valueOf((int)(sleepOnset-now)/(1000*60*5)));
-        Log.v("SLEEP OFFSET SHOW", String.valueOf((int)(sleepOnsetShow-now)/(1000*60*5)));
-        Log.v("WORK ONSET", String.valueOf((int)(workOnset-now)/(1000*60*5)));
-        Log.v("WORK OFFSET", String.valueOf((int)(workOffset-now)/(1000*60*5)));
-        Log.v("INIT V0", initV0[0] + " " + initV0[1] + " " + initV0[2] + " " + initV0[3]);
-
-        //process sleep prediction
-        boolean isNight = sleepOnset == sleepOnsetShow;
-        int[] sleepSuggestion = sleepModel.Sleep_pattern_suggestion(initV0, (int)(sleepOnset-now)/(1000*60*5),
-                (int)(workOnset-now)/(1000*60*5), (int)(workOffset-now)/(1000*60*5), 5/60.0, isNight);
-        Log.v("SLEEP SUGGESTION", "is night? : " + isNight);
-        Log.v("SLEEP SUGGESTION", String.valueOf(sleepSuggestion[0]));
-        Log.v("MAIN SLEEP START", sdfDateTime.format(new Date(sleepSuggestion[0]*(1000*60*5)+now)));
-        Log.v("MAIN SLEEP END", sdfDateTime.format(new Date(sleepSuggestion[1]*(1000*60*5)+now)));
-        Log.v("NAP SLEEP START", sdfDateTime.format(new Date(sleepSuggestion[2]*(1000*60*5)+now)));
-        Log.v("NAP SLEEP END", sdfDateTime.format(new Date(sleepSuggestion[3]*(1000*60*5)+now)));
-        //update shared preferences
-        mainSleepStart = sleepSuggestion[0]*(1000*60*5)+now;
-        mainSleepEnd = sleepSuggestion[1]*(1000*60*5)+now;
-        napSleepStart = sleepSuggestion[2]*(1000*60*5)+now;
-        napSleepEnd = sleepSuggestion[3]*(1000*60*5)+now;
-        int isenough = sleepSuggestion[4], isearly = sleepSuggestion[5];
-        //Get isearlysleep and isenoughsleep
-        isearlysleep = isearly != 0;
-        isenoughsleep = isenough != 0;
-        editor.putLong("mainSleepStart", mainSleepStart);
-        editor.putLong("mainSleepEnd", mainSleepEnd);
-        editor.putLong("napSleepStart", napSleepStart);
-        editor.putLong("napSleepEnd", napSleepEnd);
-        editor.putBoolean("isearlysleep", isearlysleep);
-        editor.putBoolean("isenoughsleep", isenoughsleep);
-        editor.apply();
-
-        //get the new graph V0
-        List<Sleep> newSleep = new ArrayList<>();
-        Sleep newMainSleep = new Sleep();
-        newMainSleep.sleepStart = mainSleepStart;
-        newMainSleep.sleepEnd = mainSleepEnd;
-        Sleep newNapSleep = new Sleep();
-        newNapSleep.sleepStart = napSleepStart;
-        newNapSleep.sleepEnd = napSleepEnd;
-        newSleep.add(newMainSleep);
-        newSleep.add(newNapSleep);
-
-        sleepPattern = sleepToArray(now, now+1000*60*60*24, newSleep);
-        for(int i = 0; i < sleepPattern.length; i ++){
-            Log.v("SLEEP PATTERN: ", String.valueOf(i) + " " + String.valueOf(sleepPattern[i]));
-        }
-        Log.v("SLEEP SIZE", String.valueOf(sleepPattern.length));
-        simulationResult = sleepModel.pcr_simulation(initV0, sleepPattern, 5/60.0);
-        for(int i = Integer.max(0, sleepPattern.length-288); i < sleepPattern.length; i ++){
-            double[] res = simulationResult.get(i);
-            double awarenessVal = getAwarenessValue(res[3], res[2], res[1], res[0]);
-            awarenessVal = Double.min(3.0, Double.max(-3.0, awarenessVal));
-            float fAwarenessVal = (float) awarenessVal;
-            barEntries.add(new BarEntry(barIdx, fAwarenessVal*100f/3.0f));
-            barIdx += addBarIdx;
-            Log.v("Each bar", "x: " + barIdx + " / y: " + fAwarenessVal*100f/3.0f);
-        }
-
-        Log.v("BAR ENTRIES SIZE", String.valueOf(barEntries.size()));
-
-        if(barEntries.size() < 576){
-            int need = 576 - barEntries.size();
-            float thePlus = need * addBarIdx;
-            for (int i = 0; i < barEntries.size(); i++) {
-                barEntries.set(i, new BarEntry(barEntries.get(i).getX() + thePlus, barEntries.get(i).getY()));
-            }
-        }
-    }
-
-    public static Long[] updateOnsetDate(long currentTime, long sleepOnset, long sleepOnsetShow, long workOnset, long workOffset) {
-        long oneDayToMils = 1000*60*60*24;
-        long tenMinToMils = 1000*60*10;
-        long oneHourToMils = 1000*60*60;
-
-        // Keep sleepOnsetShow before workOnset minus 1 day
-        while (sleepOnsetShow < workOnset - oneDayToMils) {
-            sleepOnsetShow = sleepOnsetShow + oneDayToMils;
-            sleepOnset = sleepOnsetShow;
-        }
-
-        // Ensure workOnset is after sleepOnset
-        while (workOnset < sleepOnset) {
-            workOnset = workOnset + oneDayToMils;
-        }
-
-        // Ensure workOffset is after workOnset
-        while (workOffset < workOnset) {
-            workOffset = workOffset + oneDayToMils;
-        }
-
-        // Adjust sleepOnset if currentTime is within sleepOnset and workOnset
-        if (sleepOnset <= currentTime && currentTime <= workOnset) {
-            while (sleepOnset < currentTime) {
-                sleepOnset = currentTime + tenMinToMils;
-            }
-        }
-
-        // Ensure sleepOnsetShow is not before currentTime
-        if (workOnset - oneHourToMils <= sleepOnset) {
-            while (sleepOnsetShow < currentTime) {
-                sleepOnsetShow = sleepOnsetShow + oneDayToMils;
-            }
-            sleepOnset = sleepOnsetShow;
-        }
-
-        // Repeat the adjustments for sleepOnsetShow, workOnset, and workOffset
-        while (sleepOnsetShow < workOnset - oneDayToMils) {
-            sleepOnsetShow = sleepOnsetShow + oneDayToMils;
-            sleepOnset = sleepOnsetShow;
-        }
-        while (workOnset < sleepOnset) {
-            workOnset = workOnset + oneDayToMils;
-        }
-        while (workOffset < workOnset) {
-            workOffset = workOffset + oneDayToMils;
-        }
-
-        // Update work if it is ended
-        while (currentTime > workOffset) {
-            workOnset = workOnset + oneDayToMils;
-            workOffset = workOffset + oneDayToMils;
-        }
-
-        return new Long[]{sleepOnset, sleepOnsetShow, workOnset, workOffset};
-    }
-
-    public ArrayList<BarEntry> getBarEntries(){
-        return barEntries;
-    }
-
-    public void calculateAwareness(){
-        //calculate the awareness
-        AwarenessDao awarenessDao = db.awarenessDao();
-        long oneDayToMils = 1000*60*60*24;
-        if(v0s.size() > 0){
-            long startDay = (v0s.get(0).time+nineHours)/oneDayToMils;
-            long goodDuration = 0;
-            long badDuration = 0;
-            for(V0 v0: v0s){
-                boolean isSleep = false;
-                for(Sleep sleep: sleeps){
-                    if(sleep.sleepStart <= v0.time && v0.time <= sleep.sleepEnd){
-                        isSleep = true;
-                        break;
-                    }
-                }
-                if(isSleep){
-                    continue;
-                }
-
-                long v0StartDay = (v0.time+nineHours)/oneDayToMils;
-                //check through the sleep in O(N) time. Fix it using hash map, but for now the complexity should be fine
-                double awareness = getAwarenessValue(v0.H_val, v0.n_val, v0.y_val, v0.x_val);
-                if(startDay != v0StartDay){
-                    //if it is not in database, add, if yes, update
-                    Awareness awarenessDb = awarenessDao.findByDay(startDay);
-                    Awareness addAwareness = new Awareness();
-                    addAwareness.awarenessDay = startDay;
-                    addAwareness.goodDuration = goodDuration;
-                    addAwareness.badDuration = badDuration;
-                    boolean isInAwareness = false;
-                    for(int i = 0; i < awarenesses.size(); i ++){
-                        if(awarenesses.get(i).awarenessDay == addAwareness.awarenessDay){
-                            awarenesses.set(i, addAwareness);
-                            isInAwareness = true;
-                            break;
-                        }
-                    }
-                    if(isInAwareness == false){
-                        awarenesses.add(addAwareness);
-                    }
-                    if(awarenessDb == null){
-                        //insert
-                        List<Awareness> awarenessList = new ArrayList<>();
-                        awarenessList.add(addAwareness);
-                        awarenessDao.insertAll(awarenessList);
-                    }else {
-                        //we can make it faster by using lazy loading, but this is okay for now
-                        awarenessDao.updateAwareness(startDay, goodDuration, badDuration);
-                    }
-                    Log.v("AWARENESS", String.valueOf(startDay)+' '+ goodDuration + ' ' + badDuration);
-
-                    goodDuration = 0;
-                    badDuration = 0;
-                    startDay = v0StartDay;
-                }
-                Log.v("AWARENESS CALCULATION", (sdfDateTime.format(new Date(v0.time)))+": " + String.valueOf(awareness));
-                if(awareness >= 0.0){
-                    goodDuration += 5;
-                }else{
-                    badDuration += 5;
-                }
-            }
-            if(goodDuration > 0 || badDuration > 0){
-                Awareness awarenessDb = awarenessDao.findByDay(startDay);
-                Awareness addAwareness = new Awareness();
-                addAwareness.awarenessDay = startDay;
-                addAwareness.goodDuration = goodDuration;
-                addAwareness.badDuration = badDuration;
-                boolean isInAwareness = false;
-                for(int i = 0; i < awarenesses.size(); i ++){
-                    if(awarenesses.get(i).awarenessDay == addAwareness.awarenessDay){
-                        awarenesses.set(i, addAwareness);
-                        isInAwareness = true;
-                        break;
-                    }
-                }
-                if(isInAwareness == false){
-                    awarenesses.add(addAwareness);
-                }
-                if(awarenessDb == null){
-                    //insert
-                    List<Awareness> awarenessList = new ArrayList<>();
-                    awarenessList.add(addAwareness);
-                    awarenessDao.insertAll(awarenessList);
-                }else {
-                    //we can make it faster by using lazy loading, but this is okay for now
-                    awarenessDao.updateAwareness(startDay, goodDuration, badDuration);
-                }
-            }
-        }
-    }
-
-    public void calculateSleepAwareness(){
-        //calculate the awareness in context of sleep
-        AwarenessDao awarenessDao = db.awarenessDao();
-        long oneDayToMils = 1000*60*60*24;
-        if(v0s.size() > 0){
-            long startDay = (v0s.get(0).time+nineHours)/oneDayToMils;
-            long goodDuration = 0;
-            long badDuration = 0;
-            for(V0 v0: v0s){
-                boolean isSleep = false;
-                for(Sleep sleep: sleeps){
-                    if(sleep.sleepStart <= v0.time && v0.time <= sleep.sleepEnd){
-                        isSleep = true;
-                        break;
-                    }
-                }
-                if(!isSleep){
-                    continue;
-                }
-
-                long v0StartDay = (v0.time+nineHours)/oneDayToMils;
-                //check through the sleep in O(N) time. Fix it using hash map, but for now the complexity should be fine
-                double awareness = getAwarenessValue(v0.H_val, v0.n_val, v0.y_val, v0.x_val);
-                if(startDay != v0StartDay){
-                    //if it is not in database, add, if yes, update
-                    Awareness awarenessDb = awarenessDao.findByDay(startDay);
-                    Awareness addAwareness = new Awareness();
-                    addAwareness.awarenessDay = startDay;
-                    addAwareness.goodDuration = goodDuration;
-                    addAwareness.badDuration = badDuration;
-                    boolean isInAwareness = false;
-                    for(int i = 0; i < sleepAwarenesses.size(); i ++){
-                        if(sleepAwarenesses.get(i).awarenessDay == addAwareness.awarenessDay){
-                            sleepAwarenesses.set(i, addAwareness);
-                            isInAwareness = true;
-                            break;
-                        }
-                    }
-                    if(isInAwareness == false){
-                        sleepAwarenesses.add(addAwareness);
-                    }
-                    if(awarenessDb == null){
-                        //insert
-                        List<Awareness> awarenessList = new ArrayList<>();
-                        awarenessList.add(addAwareness);
-                        awarenessDao.insertAll(awarenessList);
-                    }else {
-                        //we can make it faster by using lazy loading, but this is okay for now
-                        awarenessDao.updateAwareness(startDay, goodDuration, badDuration);
-                    }
-                    Log.v("AWARENESS", String.valueOf(startDay)+' '+ goodDuration + ' ' + badDuration);
-
-                    goodDuration = 0;
-                    badDuration = 0;
-                    startDay = v0StartDay;
-                }
-                Log.v("AWARENESS CALCULATION", (sdfDateTime.format(new Date(v0.time)))+": " + String.valueOf(awareness));
-                if(awareness <= 0.0){
-                    goodDuration += 5;
-                }else{
-                    badDuration += 5;
-                }
-            }
-            if(goodDuration > 0 || badDuration > 0){
-                Awareness awarenessDb = awarenessDao.findByDay(startDay);
-                Awareness addAwareness = new Awareness();
-                addAwareness.awarenessDay = startDay;
-                addAwareness.goodDuration = goodDuration;
-                addAwareness.badDuration = badDuration;
-                boolean isInAwareness = false;
-                for(int i = 0; i < sleepAwarenesses.size(); i ++){
-                    if(sleepAwarenesses.get(i).awarenessDay == addAwareness.awarenessDay){
-                        sleepAwarenesses.set(i, addAwareness);
-                        isInAwareness = true;
-                        break;
-                    }
-                }
-                if(isInAwareness == false){
-                    sleepAwarenesses.add(addAwareness);
-                }
-                if(awarenessDb == null){
-                    //insert
-                    List<Awareness> awarenessList = new ArrayList<>();
-                    awarenessList.add(addAwareness);
-                    awarenessDao.insertAll(awarenessList);
-                }else {
-                    //we can make it faster by using lazy loading, but this is okay for now
-                    awarenessDao.updateAwareness(startDay, goodDuration, badDuration);
-                }
-            }
-        }
-    }
-
-    public static Context getAppContext() {
-        return MainActivity.context;
-    }
-
-    //convert sleep from long value to integers array value
-    public static double[] sleepToArray(Long sleepStart, Long sleepEnd, List<Sleep> sleeps){
-        //for every 1000*60*5 we add a value to the array list
-        long fiveMinutesToMil = 1000*60*5;
-        int duration = (int)((sleepEnd - sleepStart)/fiveMinutesToMil);
-        double[] sleepPattern = new double[duration + 5];
-        Arrays.fill(sleepPattern, 0);
-        for(Sleep sleep: sleeps){
-            long tempSleepStart = Long.max( sleepStart/fiveMinutesToMil, sleep.sleepStart / fiveMinutesToMil);
-            long tempSleepEnd = Long.min(sleepEnd/fiveMinutesToMil, sleep.sleepEnd / fiveMinutesToMil);
-            if(sleepStart/fiveMinutesToMil <= tempSleepStart && tempSleepEnd <= sleepEnd/fiveMinutesToMil && tempSleepStart <= tempSleepEnd) {
-                Log.v("temp sleep start", String.valueOf(tempSleepStart));
-                Log.v("temp sleep end", String.valueOf(tempSleepEnd));
-                Log.v("sleep start", String.valueOf(sleepStart));
-                Log.v("sleep end", String.valueOf(sleepEnd));
-                int idx = (int) (tempSleepStart - (sleepStart / fiveMinutesToMil));
-                int offset = (int) (tempSleepEnd - (sleepStart / fiveMinutesToMil));
-                Log.v("index", String.valueOf(idx));
-                Log.v("offset", String.valueOf(offset));
-                for (int i = idx; i <= offset; i++) {
-                    sleepPattern[i] = 1.0;
-                }
-            }
-        }
-        return sleepPattern;
     }
 
     public boolean isOverlap(List<Sleep> sleeps, Sleep sleepX, int sleepEx){
@@ -1266,21 +689,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-//    public void sendV0(V0 v0){
-//        JSONObject postData = new JSONObject();
-//        try {
-//            postData.put("name", name.getText().toString());
-//            postData.put("address", address.getText().toString());
-//            postData.put("manufacturer", manufacturer.getText().toString());
-//            postData.put("location", location.getText().toString());
-//            postData.put("type", type.getText().toString());
-//            postData.put("deviceID", deviceID.getText().toString());
-//
-//            new SendDeviceDetails().execute("http://52.88.194.67:8080/IOTProjectServer/registerDevice", postData.toString());
-//        } catch (JSONException e) {
-//            e.printStackTrace();
-//        }
-//    }
+    public ArrayList<BarEntry> getBarEntries() { return this.barEntries; }
 
     public List<Awareness> getAwarenesses(){
         return awarenesses;
