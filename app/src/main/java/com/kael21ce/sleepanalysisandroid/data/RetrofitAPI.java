@@ -36,4 +36,7 @@ public interface RetrofitAPI {
 
     @POST("/sleepapp/user/reset_password/")
     Call<Void> resetPassword(@Body ResetPasswordPayload payload);
+
+    @GET("/sleepapp/user/blocked/")
+    Call<BlockStatusResponse> fetchBlockStatus();
 }

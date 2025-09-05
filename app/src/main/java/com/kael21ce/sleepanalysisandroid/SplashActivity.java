@@ -1,9 +1,6 @@
 package com.kael21ce.sleepanalysisandroid;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.compose.runtime.MutableState;
 
 import android.content.Context;
 import android.content.Intent;
@@ -14,25 +11,22 @@ import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
-import com.kael21ce.sleepanalysisandroid.data.HealthConnectAvailability;
+import com.kael21ce.sleepanalysisandroid.data.BlockStatusResponse;
 import com.kael21ce.sleepanalysisandroid.data.HealthConnectManager;
-import com.kael21ce.sleepanalysisandroid.data.HealthConnectManagerKt;
+import com.kael21ce.sleepanalysisandroid.data.RetrofitAPI;
+import com.kael21ce.sleepanalysisandroid.data.RetrofitClient;
 
 import java.time.Instant;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 
 public class SplashActivity extends AppCompatActivity {
 
     private static final String TAG = "SplashActivity";
-    private Handler dotHandler = new Handler();
+    private final Handler dotHandler = new Handler();
     private int dotCount = 0;
     private final int MAX_DOTS = 3;
     private TextView loadingText;
-    private long sleepOnset, sleepOnsetShow, workOnset, workOffset;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,10 +70,10 @@ public class SplashActivity extends AppCompatActivity {
 
 
         long currentTime = System.currentTimeMillis();
-        sleepOnset = sharedPref.getLong("sleepOnset", currentTime);
-        workOnset = sharedPref.getLong("workOnset", currentTime);
-        workOffset = sharedPref.getLong("workOffset", currentTime);
-        sleepOnsetShow = sharedPref.getLong("sleepOnsetShow", currentTime);
+        long sleepOnset = sharedPref.getLong("sleepOnset", currentTime);
+        long workOnset = sharedPref.getLong("workOnset", currentTime);
+        long workOffset = sharedPref.getLong("workOffset", currentTime);
+        long sleepOnsetShow = sharedPref.getLong("sleepOnsetShow", currentTime);
 
         Long[] updatedDates = updateOnsetDate(currentTime, sleepOnset, sleepOnsetShow, workOnset, workOffset);
         sleepOnsetShow = updatedDates[1];
@@ -94,30 +88,41 @@ public class SplashActivity extends AppCompatActivity {
                 " / Work onset: " + updatedDates[2] + " / Work offset: " + updatedDates[3]);
 
         Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if (getIntent() != null) {
-                    Date date = new Date();
-                    Calendar calendar = Calendar.getInstance();
+        handler.postDelayed(() -> {
+            if (getIntent() != null) {
+                Date date = new Date();
+                Calendar calendar = Calendar.getInstance();
 
-                    Intent scheduleIntent = getIntent();
-                    int year = scheduleIntent.getIntExtra("Year", calendar.get(Calendar.YEAR));
-                    int month = scheduleIntent.getIntExtra("Month", calendar.get(Calendar.MONTH));
-                    int day = scheduleIntent.getIntExtra("Day", calendar.get(Calendar.DAY_OF_MONTH));
+                Intent scheduleIntent = getIntent();
+                int year = scheduleIntent.getIntExtra("Year", calendar.get(Calendar.YEAR));
+                int month = scheduleIntent.getIntExtra("Month", calendar.get(Calendar.MONTH));
+                int day = scheduleIntent.getIntExtra("Day", calendar.get(Calendar.DAY_OF_MONTH));
 
-                    Log.v(TAG, "Selected: " + year + "-" + (month + 1) + "-" + day);
+                Log.v(TAG, "Selected: " + year + "-" + (month + 1) + "-" + day);
 
-                    Intent mainIntent = new Intent(SplashActivity.this, MainActivity.class);
-                    mainIntent.putExtra("Year", year);
-                    mainIntent.putExtra("Month", month);
-                    mainIntent.putExtra("Day", day);
-                    startActivity(mainIntent);
-                    finish();
-                } else {
-                    startActivity(new Intent(SplashActivity.this, MainActivity.class));
-                    finish();
-                }
+                Intent mainIntent = new Intent(SplashActivity.this, MainActivity.class);
+                mainIntent.putExtra("Year", year);
+                mainIntent.putExtra("Month", month);
+                mainIntent.putExtra("Day", day);
+
+                // is_blocked 불러온 후 MainActivity로 이동
+                RetrofitAPI apiService = RetrofitClient.getClient(SplashActivity.this).create(RetrofitAPI.class);
+                BlockStatusResponse.checkBlockStatus(apiService, SplashActivity.this, sharedPref, new BlockStatusResponse.BlockReadCallback() {
+                    @Override
+                    public void onBlockRead() {
+                        Log.d(TAG, "is_blocked 읽기 완료");
+                        startActivity(mainIntent);
+                        finish();
+                    }
+
+                    @Override
+                    public void onFailRead() {
+                        Log.d(TAG, "is_blocked 읽기 실패");
+                    }
+                });
+            } else {
+                startActivity(new Intent(SplashActivity.this, MainActivity.class));
+                finish();
             }
         }, 1000);
     }

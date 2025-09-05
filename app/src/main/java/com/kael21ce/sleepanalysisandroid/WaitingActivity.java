@@ -27,7 +27,10 @@ import com.google.gson.JsonParseException;
 import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
 import com.kael21ce.sleepanalysisandroid.data.AuthInterceptor;
+import com.kael21ce.sleepanalysisandroid.data.BlockStatusResponse;
 import com.kael21ce.sleepanalysisandroid.data.DataMood;
+import com.kael21ce.sleepanalysisandroid.data.RetrofitAPI;
+import com.kael21ce.sleepanalysisandroid.data.RetrofitClient;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -111,11 +114,20 @@ public class WaitingActivity extends AppCompatActivity {
         // 2) 설문 동기화
 
         // 3) is_blocked 불러오기
-        checkBlockStatus(() -> {
-            Log.d(TAG, "is_blocked 읽기 완료");
-            Intent finishIntent = new Intent(WaitingActivity.this, FinishActivity.class);
-            startActivity(finishIntent);
-            finish();
+        RetrofitAPI apiService = RetrofitClient.getClient(this).create(RetrofitAPI.class);
+        BlockStatusResponse.checkBlockStatus(apiService, this, sharedPref, new BlockStatusResponse.BlockReadCallback() {
+            @Override
+            public void onBlockRead() {
+                Log.d(TAG, "is_blocked 읽기 완료");
+                Intent finishIntent = new Intent(WaitingActivity.this, FinishActivity.class);
+                startActivity(finishIntent);
+                finish();
+            }
+
+            @Override
+            public void onFailRead() {
+                Log.d(TAG, "is_blocked 읽기 실패");
+            }
         });
     }
 
@@ -289,75 +301,6 @@ public class WaitingActivity extends AppCompatActivity {
         return surveyList[0];
     }
 
-    // is_blocked 서버로부터 확인
-    private void performFetchBlockStatus(BlockStatusCallback callback) {
-        Retrofit retrofit = WaitingClient.getWaitingClient(this, false);
-        WaitingService apiService = retrofit.create(WaitingService.class);
-        apiService.fetchBlockStatus().enqueue(new Callback<BlockStatusResponse>() {
-            @Override
-            public void onResponse(Call<BlockStatusResponse> call, Response<BlockStatusResponse> response) {
-                if (response.isSuccessful()) {
-                    callback.onSuccess(response.body().isBlocked());
-                } else {
-                    int statusCode = response.code();
-                    if (statusCode == 401 || statusCode == 403) {
-                        callback.onAuthFailure();
-                    } else {
-                        try {
-                            String errorBody = response.errorBody() != null ? response.errorBody().string() : "알 수 없는 에러";
-                            callback.onOtherFailure("HTTP " + statusCode + ": " + errorBody);
-                        } catch (IOException e) {
-                            callback.onOtherFailure("에러 메시지 파싱 실패");
-                        }
-                    }
-                }
-            }
-
-            @Override
-            public void onFailure(Call<BlockStatusResponse> call, Throwable t) {
-                NetworkLog(t.getMessage());
-                callback.onAuthFailure();
-            }
-        });
-    }
-
-    // Callback에 로그아웃 및 로깅 추가
-    private void checkBlockStatus(BlockReadCallback callback) {
-        SharedPreferences sharedPref = getSharedPreferences("SleepWake", Context.MODE_PRIVATE);
-        performFetchBlockStatus(new BlockStatusCallback() {
-            @Override
-            public void onSuccess(boolean isBlocked) {
-                Log.d(TAG, "is_blocked: " + isBlocked);
-                sharedPref.edit().putBoolean("isHidden", isBlocked).apply();
-
-                // 작업 완료 callback 보내기
-                callback.onBlockRead();
-            }
-
-            @Override
-            public void onAuthFailure() {
-                Log.d(TAG, "인증 실패. 로그인 화면으로 이동");
-                Toast.makeText(getApplicationContext(), "인증이 실패하여 로그인 화면으로 이동합니다.", Toast.LENGTH_SHORT).show();
-                Intent logOutIntent = new Intent(getApplicationContext(), BeginRegisterActivity.class);
-                logOutIntent.putExtra("LogOut", true);
-                startActivity(logOutIntent);
-                finish();
-            }
-
-            @Override
-            public void onOtherFailure(String errorMessage) {
-                Log.e(TAG, errorMessage);
-
-                // 작업 완료 callback 보내기
-                callback.onBlockRead();
-            }
-        });
-    }
-
-    // is_blocked를 읽어올 때까지 기다리는 Callback
-    private interface BlockReadCallback {
-        void onBlockRead();
-    }
 
     // 로깅 유틸
     private void NoContentLog(String type) {
@@ -504,27 +447,6 @@ class DailySurveyResponse {
     public List<DataMood> getResults() { return results; }
 }
 
-class BlockStatusResponse {
-    @SerializedName("is_blocked")
-    private boolean isBlocked;
-
-    public boolean isBlocked() {
-        return isBlocked;
-    }
-}
-
-// Block status의 callback 함수
-interface BlockStatusCallback {
-    // 성공 시 is_blocked 전달
-    void onSuccess(boolean isBlocked);
-
-    // 인증 실패 또는 네트워크 오류 시 호출
-    void onAuthFailure();
-
-    // 예외 처리
-    void onOtherFailure(String errorMessage);
-}
-
 // WaitingActivity 내에서 작동하는 API
 interface WaitingService {
     @GET("/sleepapp/android/")
@@ -535,7 +457,4 @@ interface WaitingService {
             @Query("from") String fromDate,
             @Query("to") String toDate
     );
-
-    @GET("/sleepapp/user/blocked/")
-    Call<BlockStatusResponse> fetchBlockStatus();
 }
