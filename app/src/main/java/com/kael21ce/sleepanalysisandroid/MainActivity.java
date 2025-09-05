@@ -31,6 +31,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.room.Room;
 import androidx.work.ExistingPeriodicWorkPolicy;
 import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkManager;
@@ -154,6 +155,10 @@ public class MainActivity extends AppCompatActivity {
             editor.putString(NotifyKey, "21:00").apply();
         }
 
+        // Load db
+        db = Room.databaseBuilder(context,
+                AppDatabase.class, "sleep_wake").allowMainThreadQueries().build();
+
         //Create channel
         createNotificationChannel(this);
         createSurveyChannel(this);
@@ -209,7 +214,7 @@ public class MainActivity extends AppCompatActivity {
         email = sharedPref.getString("User_Email", "tester33");
         username = sharedPref.getString("User_Name", "tester33");
 
-        combineResult = ProcessingAPI.run(this, sharedPref);
+        combineResult = ProcessingAPI.run(this, db, sharedPref);
         sleeps = combineResult.getSleeps();
         v0s = combineResult.getV0s();
         barEntries = combineResult.getBarEntries();
@@ -575,9 +580,11 @@ public class MainActivity extends AppCompatActivity {
             creation = false;
         } else {
             Log.v("RESUMING", "RESUMING");
+            db = Room.databaseBuilder(context,
+                    AppDatabase.class, "sleep_wake").allowMainThreadQueries().build();
             //get the shared preferences variable
             sharedPref = getSharedPreferences("SleepWake", Context.MODE_PRIVATE);
-            combineResult = ProcessingAPI.run(getApplicationContext(), sharedPref);
+            combineResult = ProcessingAPI.run(getApplicationContext(), db, sharedPref);
         }
     }
 
@@ -586,7 +593,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onDestroy(){
         super.onDestroy();
-        db.close();
+        if (db != null) {
+            db.close();
+        }
         sharedPref.unregisterOnSharedPreferenceChangeListener(prefListener);
         Log.v(TAG, "onDestroy() is called");
     }
@@ -610,85 +619,6 @@ public class MainActivity extends AppCompatActivity {
         }
         return false;
     }
-
-    protected void sendV0(String userEmail) {
-
-        OkHttpClient client = new OkHttpClient.Builder()
-                .connectTimeout(20, TimeUnit.SECONDS)
-                .writeTimeout(20, TimeUnit.SECONDS)
-                .readTimeout(20, TimeUnit.SECONDS)
-                .build();
-
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("https://www.sleep-math.com/sleepapp/")
-                // as we are sending data in json format so
-                // we have to add Gson converter factory
-                .addConverterFactory(GsonConverterFactory.create())
-                .client(client)
-                // at last we are building our retrofit builder.
-                .build();
-        RetrofitAPI retrofitAPI = retrofit.create(RetrofitAPI.class);
-
-        List<Sleep> tempSleep = new ArrayList<>();
-        List<V0> tempV0 = new ArrayList<>();
-        for(Sleep sleep: sleeps){
-            if(sleep.sleepStart >= (1000*60*60*24*14) && sleep.sleepStart <= now){
-                tempSleep.add(sleep);
-            }
-        }
-        if (v0s != null) {
-            for(V0 v0: v0s){
-                if(v0.time >= (1000*60*60*24*14) && v0.time <= now){
-                    tempV0.add(v0);
-                }
-            }
-        } else {
-            Toast.makeText(this, "전송할 수면 데이터가 존재하지 않습니다",
-                    Toast.LENGTH_SHORT).show();
-        }
-
-        //DataModal modal = new DataModal(username, tempSleep, tempV0);
-        DataModal modal = new DataModal(userEmail, tempSleep);
-        Call<DataModal> call = retrofitAPI.createPost(modal);
-        call.enqueue(new Callback<DataModal>() {
-            @Override
-            public void onResponse(Call<DataModal> call, Response<DataModal> response) {
-                // this method is called when we get response from our api.
-                Locale currentLocale = Locale.getDefault();
-                String language = currentLocale.getLanguage();
-                Log.v("MainActivity", "Response code: " + response.code());
-                if(response.code() <= 300) {
-                    if (language.equals("ko")) {
-                        Toast.makeText(MainActivity.this, "데이터가 전송되었습니다", Toast.LENGTH_SHORT).show();
-                    } else {
-                        Toast.makeText(MainActivity.this, "Data added to API", Toast.LENGTH_SHORT).show();
-                    }
-                }else {
-                    if (language.equals("ko")) {
-                        Toast.makeText(MainActivity.this, "데이터 전송에 실패했습니다", Toast.LENGTH_SHORT).show();
-                    } else {
-                        Toast.makeText(MainActivity.this, "Data sending failed", Toast.LENGTH_SHORT).show();
-                    }
-                    // we are getting response from our body
-                    // and passing it to our modal class.
-                    DataModal responseFromAPI = response.body();
-
-                    // on below line we are getting our data from modal class and adding it to our string.
-                    String responseString = "Response Code : " + response.code() + "\nName : " + "\n";
-                    Log.v("RESPONSE for sending data", responseString);
-                }
-            }
-
-            @Override
-            public void onFailure(Call<DataModal> call, Throwable t) {
-                // setting text to our text view when
-                // we get error response from API.
-               Log.v("ERROR", "Error found is : " + t.getMessage());
-            }
-        });
-
-    }
-
     public ArrayList<BarEntry> getBarEntries() { return this.barEntries; }
 
     public List<Awareness> getAwarenesses(){
@@ -723,7 +653,8 @@ public class MainActivity extends AppCompatActivity {
             listSleep.add(sleep);
         }
         Log.v("SLEEP DATA ADDED", String.valueOf(sleep.sleepStart));
-        this.sleepDao.insertAll(listSleep);
+        sleepDao = db.sleepDao();
+        sleepDao.insertAll(listSleep);
 //        }
         lastDataUpdate = sleep.sleepStart - (1000*60*60*24);
         editor.putLong("lastDataUpdate", lastDataUpdate);
@@ -733,6 +664,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public boolean editSleep(Sleep prevSleep, Sleep updatedSleep){
+        sleepDao = db.sleepDao();
+
         int count = 0;
         for(Sleep sleep: this.sleeps){
             if(sleep.sleepStart/60000 == prevSleep.sleepStart/60000 && sleep.sleepEnd/60000 == prevSleep.sleepEnd/60000){
@@ -759,6 +692,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public boolean deleteSleep(Sleep sleepDel){
+        sleepDao = db.sleepDao();
+
         now = System.currentTimeMillis();
         long sleepDelStart = sleepDel.sleepStart/60000;
         long sleepDelEnd = sleepDel.sleepEnd/60000;

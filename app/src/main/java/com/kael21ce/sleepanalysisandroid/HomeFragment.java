@@ -39,6 +39,7 @@ import com.google.gson.Gson;
 import com.kael21ce.sleepanalysisandroid.data.Awareness;
 import com.kael21ce.sleepanalysisandroid.data.DataMood;
 import com.kael21ce.sleepanalysisandroid.data.DataSurvey;
+import com.kael21ce.sleepanalysisandroid.data.ProcessingAPI;
 import com.kael21ce.sleepanalysisandroid.data.RetrofitAPI;
 import com.kael21ce.sleepanalysisandroid.data.Sleep;
 
@@ -333,7 +334,17 @@ public class HomeFragment extends Fragment {
         Button buttonSendData = v.findViewById(R.id.sendDataButton);
 
         buttonSendData.setOnClickListener(view -> {
-            mainActivity.sendV0(email);
+            ProcessingAPI.sendData(v.getContext(), mainActivity.getSleeps(), new ProcessingAPI.UploadCallback() {
+                @Override
+                public void onSuccess() {
+                    Toast.makeText(v.getContext(), "데이터가 전송되었습니다", Toast.LENGTH_SHORT).show();
+                }
+
+                @Override
+                public void onFailure(String errorMessage) {
+                    Toast.makeText(v.getContext(), errorMessage, Toast.LENGTH_SHORT).show();
+                }
+            });
         });
 
         //Graph showing alertness

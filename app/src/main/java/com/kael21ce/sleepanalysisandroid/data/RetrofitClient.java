@@ -3,6 +3,7 @@ package com.kael21ce.sleepanalysisandroid.data;
 import android.content.Context;
 
 import okhttp3.OkHttpClient;
+import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
@@ -11,10 +12,14 @@ public class RetrofitClient {
     private static final String BASE_URL = "https://www.sleep-math.com";
     private static Retrofit retrofit = null;
 
-    // OkHttp를 통해 401 에러를 받으면 자동으로 refresh
+    // AuthInterceptor를 통해 401 에러를 받으면 자동으로 refresh
     public static Retrofit getClient(Context context) {
         if (retrofit == null) {
+            HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
+            loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+
             OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                    .addInterceptor(loggingInterceptor)
                     .addInterceptor(new AuthInterceptor(context))
                     .build();
 
@@ -30,8 +35,16 @@ public class RetrofitClient {
     // 호환성을 위해 그대로 유지
     public static Retrofit getClient() {
         if (retrofit == null) {
+            HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
+            loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+
+            OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                    .addInterceptor(loggingInterceptor)
+                    .build();
+
             retrofit = new Retrofit.Builder()
                     .baseUrl(BASE_URL)
+                    .client(okHttpClient)
                     .addConverterFactory(GsonConverterFactory.create())
                     .build();
         }

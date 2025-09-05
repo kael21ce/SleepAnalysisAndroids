@@ -8,7 +8,9 @@ import android.widget.Toast;
 import androidx.room.Room;
 
 import com.github.mikephil.charting.data.BarEntry;
+import com.google.gson.annotations.SerializedName;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.ZoneId;
@@ -16,10 +18,12 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.OkHttpClient;
@@ -28,12 +32,15 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.http.Body;
+import retrofit2.http.POST;
 
 /**
  * MainActivity / Onboarding 공용 파이프라인
  * -> Sleep data 호출 및 정제, Alertness 계산
  */
 public class ProcessingAPI {
+    static final String TAG = "ProcessingAPI";
     static long now;
     static long nineHours;
     static long twoWeeks = (1000*60*60*24*14);
@@ -42,7 +49,7 @@ public class ProcessingAPI {
     static long fiveMinutesToMil = (1000*60*5);
     static SimpleDateFormat sdfDateTime = new SimpleDateFormat("dd/MM/yyyy" + " HH:mm", Locale.getDefault());
 
-    public static CombineResult run(Context context, SharedPreferences sharedPref) {
+    public static CombineResult run(Context context, AppDatabase db, SharedPreferences sharedPref) {
         //1) 기본 세팅
         SharedPreferences.Editor editor = sharedPref.edit();
         String email = sharedPref.getString("User_Email", "tester33");
@@ -64,8 +71,6 @@ public class ProcessingAPI {
         List<Awareness> awarenesses = Collections.synchronizedList(new ArrayList<>());
         List<Awareness> sleepAwarenesses = Collections.synchronizedList(new ArrayList<>());
 
-        AppDatabase db = Room.databaseBuilder(context,
-                AppDatabase.class, "sleep_wake").allowMainThreadQueries().build();
         SleepDao sleepDao = db.sleepDao();
 
         // 3) 수면 날짜 업데이트
@@ -91,7 +96,17 @@ public class ProcessingAPI {
             awarenesses = calculateAwareness(db, sleeps, v0s);
             sleepAwarenesses = calculateSleepAwareness(db, sleeps, v0s);
             if(now-lastBackendUpdate >= (1000*60*60*12)) {
-                sendV0(context, email, sleeps, v0s);
+                sendData(context, sleeps, new UploadCallback() {
+                    @Override
+                    public void onSuccess() {
+                        Toast.makeText(context, "데이터가 전송되었습니다", Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onFailure(String errorMessage) {
+                        Toast.makeText(context, errorMessage, Toast.LENGTH_SHORT).show();
+                    }
+                });
                 editor.putLong("lastBackendUpdate", now);
                 editor.apply();
             }
@@ -160,14 +175,18 @@ public class ProcessingAPI {
     public static List<Sleep> getSleepData(SharedPreferences sharedPref, SleepDao sleepDao, long lastDataUpdate,
                                     long lastSleepUpdate, Instant ILastSleepUpdate){
         SharedPreferences.Editor editor = sharedPref.edit();
+
+        // Access token으로 sleep data 가져오기
         List<Sleep> sleeps = Collections.synchronizedList(sleepDao.getAll());
+
+
         boolean check = false;
         long lastSleep1 = 0;
         long befSleepStart = 0;
         long befSleepEnd = 0;
         ArrayList<Sleep> deleteTheSleeps = new ArrayList<>();
         for(Sleep sleep: new ArrayList<Sleep>(sleeps)){
-            //synchronize the sleep
+            // 동일한 수면 데이터는 삭제
             if(befSleepStart == sleep.sleepStart && befSleepEnd == sleep.sleepEnd) {
                 sleepDao.delete(sleep);
                 sleeps.remove(sleep);
@@ -182,6 +201,8 @@ public class ProcessingAPI {
             String sleepEnd = sdfDateTime.format(new Date(sleep.sleepEnd));
             Date sleepEndD = new Date(sleep.sleepEnd);
             lastSleep1 = sleepEndD.getTime();
+
+            // 필터링된 데이터를 로깅
             Log.v("SLEEP REAL", sleepStart);
             Log.v("SLEEP REAL", sleepEnd);
             if(ILastSleepUpdate.isBefore(Instant.ofEpochMilli(sleep.sleepStart))){
@@ -596,82 +617,78 @@ public class ProcessingAPI {
         return sleepAwarenesses;
     }
 
-    protected static void sendV0(Context context, String userEmail, List<Sleep> sleeps, List<V0> v0s) {
+    public static void sendData(Context context, List<Sleep> sleeps, UploadCallback callback) {
+        // 1. API service 불러오기
+        SleepDataAPI apiService = RetrofitClient.getClient(context).create(SleepDataAPI.class);
 
-        OkHttpClient client = new OkHttpClient.Builder()
-                .connectTimeout(20, TimeUnit.SECONDS)
-                .writeTimeout(20, TimeUnit.SECONDS)
-                .readTimeout(20, TimeUnit.SECONDS)
-                .build();
+        // 2. 데이터 준비
+        List<Sleep_struct> sleepPayloadList = new ArrayList<>();
 
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("https://www.sleep-math.com/sleepapp/")
-                // as we are sending data in json format so
-                // we have to add Gson converter factory
-                .addConverterFactory(GsonConverterFactory.create())
-                .client(client)
-                // at last we are building our retrofit builder.
-                .build();
-        RetrofitAPI retrofitAPI = retrofit.create(RetrofitAPI.class);
+        // KST 기준 ISO 8601 형식 formatter
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX", Locale.KOREA);
+        formatter.setTimeZone(TimeZone.getTimeZone("Asia/Seoul"));
+        Calendar calendar = Calendar.getInstance();
+        Date now = calendar.getTime();
+        calendar.add(Calendar.DAY_OF_YEAR, -14);
+        Date twoWeeksAgo = calendar.getTime();
 
-        List<Sleep> tempSleep = new ArrayList<>();
-        List<V0> tempV0 = new ArrayList<>();
         for(Sleep sleep: sleeps){
-            if(sleep.sleepStart >= (1000*60*60*24*14) && sleep.sleepStart <= now){
-                tempSleep.add(sleep);
-            }
+            // 필터링: 시작 시간이 미래가 아니고, 종료 시간이 최근 2주 이내인 데이터만 전송
+            Date sleepStartDate = new Date(sleep.sleepStart);
+            Date sleepEndDate = new Date(sleep.sleepEnd);
+            if (sleepStartDate.after(now) || sleepEndDate.before(twoWeeksAgo)) continue;
+
+            String sleepStart = formatter.format(sleepStartDate);
+            String sleepEnd = formatter.format(sleepEndDate);
+            sleepPayloadList.add(new Sleep_struct(sleepStart, sleepEnd));
         }
-        if (v0s != null) {
-            for(V0 v0: v0s){
-                if(v0.time >= (1000*60*60*24*14) && v0.time <= now){
-                    tempV0.add(v0);
-                }
-            }
-        } else {
+        Log.d(TAG, "업로드할 수면 데이터 # - " + sleepPayloadList.size());
+
+        if (sleepPayloadList.isEmpty()) {
             Toast.makeText(context, "전송할 수면 데이터가 존재하지 않습니다",
                     Toast.LENGTH_SHORT).show();
         }
 
-        //DataModal modal = new DataModal(username, tempSleep, tempV0);
-        DataModal modal = new DataModal(userEmail, tempSleep);
-        Call<DataModal> call = retrofitAPI.createPost(modal);
-        call.enqueue(new Callback<DataModal>() {
-            @Override
-            public void onResponse(Call<DataModal> call, Response<DataModal> response) {
-                // this method is called when we get response from our api.
-                Locale currentLocale = Locale.getDefault();
-                String language = currentLocale.getLanguage();
-                Log.v("MainActivity", "Response code: " + response.code());
-                if(response.code() <= 300) {
-                    if (language.equals("ko")) {
-                        Toast.makeText(context, "데이터가 전송되었습니다", Toast.LENGTH_SHORT).show();
-                    } else {
-                        Toast.makeText(context, "Data added to API", Toast.LENGTH_SHORT).show();
-                    }
-                }else {
-                    if (language.equals("ko")) {
-                        Toast.makeText(context, "데이터 전송에 실패했습니다", Toast.LENGTH_SHORT).show();
-                    } else {
-                        Toast.makeText(context, "Data sending failed", Toast.LENGTH_SHORT).show();
-                    }
-                    // we are getting response from our body
-                    // and passing it to our modal class.
-                    DataModal responseFromAPI = response.body();
+        // 3. 요청 구성 및 네트워크 호출
+        SleepUploadPayload payload = new SleepUploadPayload(sleepPayloadList);
 
-                    // on below line we are getting our data from modal class and adding it to our string.
-                    String responseString = "Response Code : " + response.code() + "\nName : " + "\n";
-                    Log.v("RESPONSE for sending data", responseString);
+        apiService.uploadSleepData(payload).enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                if (response.isSuccessful()) {
+                    Log.d(TAG, "데이터 업로드 성공. Status: " + response.code());
+                    callback.onSuccess();
+                } else {
+                    try {
+                        String errorBody = response.errorBody() != null ? response.errorBody().string() : "알 수 없는 에러";
+                        String errorMessage = "서버 에러: " + response.code() + " - " + errorBody;
+                        Log.e(TAG, errorMessage);
+                        callback.onFailure("데이터 업로드 실패: 서버 에러");
+                    } catch (IOException e) {
+                        callback.onFailure("데이터 업로드 실패: 에러 메시지 파싱 실패");
+                    }
                 }
             }
 
             @Override
-            public void onFailure(Call<DataModal> call, Throwable t) {
-                // setting text to our text view when
-                // we get error response from API.
-                Log.v("ERROR", "Error found is : " + t.getMessage());
+            public void onFailure(Call<Void> call, Throwable t) {
+                Log.e(TAG, "네트워크 에러: " + t.getMessage());
+                callback.onFailure("데이터 업로드 실패: 네트워크 에러");
             }
         });
+    }
 
+    // SleepUploadPayload를 서버에 업로드하는 interface
+    public interface SleepDataAPI {
+        @POST("/sleepapp/android/")
+        Call<Void> uploadSleepData(@Body SleepUploadPayload payload);
+
+    }
+
+    // Sleep data 업로드의 성공, 실패를 알려주는 callback 함수
+    public interface UploadCallback {
+        void onSuccess();
+        void onFailure(String errorMessage);
     }
 
     //convert sleep from long value to integers array value
@@ -707,5 +724,29 @@ public class ProcessingAPI {
         double D_up = (2.46+10.2+C)/v_vh;
         double awareness = D_up - H;
         return awareness;
+    }
+}
+
+// 서버로 데이터 전송을 위한 class
+class Sleep_struct {
+    @SerializedName("sleepStart")
+    private String sleepStart;
+
+    @SerializedName("sleepEnd")
+    private String sleepEnd;
+
+    public Sleep_struct(String sleepStart, String sleepEnd) {
+        this.sleepStart = sleepStart;
+        this.sleepEnd = sleepEnd;
+    }
+}
+
+// 업로드를 위한 클래스
+class SleepUploadPayload {
+    @SerializedName("sleep")
+    private List<Sleep_struct> sleep;
+
+    public SleepUploadPayload(List<Sleep_struct> sleep) {
+        this.sleep = sleep;
     }
 }
