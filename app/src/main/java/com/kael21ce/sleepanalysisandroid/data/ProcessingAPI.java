@@ -726,27 +726,3 @@ public class ProcessingAPI {
         return awareness;
     }
 }
-
-// 서버로 데이터 전송을 위한 class
-class Sleep_struct {
-    @SerializedName("sleepStart")
-    private String sleepStart;
-
-    @SerializedName("sleepEnd")
-    private String sleepEnd;
-
-    public Sleep_struct(String sleepStart, String sleepEnd) {
-        this.sleepStart = sleepStart;
-        this.sleepEnd = sleepEnd;
-    }
-}
-
-// 업로드를 위한 클래스
-class SleepUploadPayload {
-    @SerializedName("sleep")
-    private List<Sleep_struct> sleep;
-
-    public SleepUploadPayload(List<Sleep_struct> sleep) {
-        this.sleep = sleep;
-    }
-}
