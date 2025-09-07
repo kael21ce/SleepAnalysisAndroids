@@ -199,7 +199,6 @@ public class SettingFragment extends Fragment {
         int day = calendar.get(Calendar.DAY_OF_MONTH);
 
         LinearLayout sqMoodVisitView = v.findViewById(R.id.SQMoodVisitView);
-        sqMoodVisitView.setVisibility(View.GONE);
         sqMoodVisitView.setOnClickListener(view -> {
             Bundle temp = new Bundle();
             Intent surveyIntent = new Intent(v.getContext(), SQMoodSendingActivity.class);

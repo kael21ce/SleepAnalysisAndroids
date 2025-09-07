@@ -16,7 +16,7 @@ import android.widget.Toast;
 
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
-import com.kael21ce.sleepanalysisandroid.data.DataModal;
+import com.kael21ce.sleepanalysisandroid.data.BackendAPI;
 import com.kael21ce.sleepanalysisandroid.data.DataMood;
 import com.kael21ce.sleepanalysisandroid.data.DataSurvey;
 import com.kael21ce.sleepanalysisandroid.data.RetrofitAPI;
@@ -26,9 +26,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
-import java.util.concurrent.TimeUnit;
 
-import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -203,30 +201,36 @@ public class SurveyActivity extends AppCompatActivity {
                 Calendar calendar = Calendar.getInstance();
                 int day = calendar.get(Calendar.DAY_OF_MONTH);
 
+                // Toast 메시지의 언어 설정
+                Locale currentLocale = Locale.getDefault();
+                String language = currentLocale.getLanguage();
+
                 Intent endIntent = new Intent(SurveyActivity.this, SplashActivity.class);
                 endIntent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                 Bundle moodData = sentIntent.getBundleExtra("moodData");
-                sendMood(moodData.getInt("sleep_quality"), moodData.getInt("mood_high"),
-                        moodData.getInt("mood_low"), moodData.getInt("mood_anx"),
-                        moodData.getInt("mood_irr"), moodData.getInt("latency"));
-                editor.putInt(survey_key, day).apply();
+                BackendAPI.sendDailySurvey(this, moodData.getInt("sleep_quality"), getLevel2(), moodData.getInt("mood_high"),
+                        moodData.getInt("mood_low"), moodData.getInt("mood_anx"), moodData.getInt("mood_irr"), moodData.getInt("latency"),
+                        new BackendAPI.SurveyCallback() {
+                            @Override
+                            public void onSuccess() {
+                                if (language.equals("ko")) {
+                                    Toast.makeText(SurveyActivity.this, "설문이 전송되었습니다", Toast.LENGTH_SHORT).show();
+                                } else {
+                                    Toast.makeText(SurveyActivity.this, "Survey added to API", Toast.LENGTH_SHORT).show();
+                                }
+                                succeed(day, moodData, endIntent, mainActivity);
+                            }
 
-                //Save the daily survey dataset
-                long time = System.currentTimeMillis();
-
-                DataMood mood = new DataMood(moodData.getInt("latency"),
-                        getLevel2(), moodData.getInt("sleep_quality"),
-                        moodData.getInt("mood_high"), moodData.getInt("mood_low"),
-                        moodData.getInt("mood_anx"), moodData.getInt("mood_irr"), time);
-                recordsArrayList = findDateGroup(recordsArrayList, mood);
-                Gson gson1 = new Gson();
-                moodJson = gson1.toJson(recordsArrayList);
-                editor.putString(MoodArrayKey, moodJson).apply();
-                //Need to add level to dataset
-                startActivity(endIntent);
-                for (int i = 0; i < mainActivity.surveyList().size(); i++) {
-                    mainActivity.surveyList().get(i).finish();
-                }
+                            @Override
+                            public void onFailure(String errorMsg) {
+                                if (language.equals("ko")) {
+                                    Toast.makeText(SurveyActivity.this, "설문 전송에 실패했습니다", Toast.LENGTH_SHORT).show();
+                                } else {
+                                    Toast.makeText(SurveyActivity.this, "Survey sending failed", Toast.LENGTH_SHORT).show();
+                                }
+                                succeed(day, moodData, endIntent, mainActivity);
+                            }
+                        });
             });
         }
     }
@@ -392,6 +396,28 @@ public class SurveyActivity extends AppCompatActivity {
         }
     }
 
+    // Daily survey를 서버로 전송한 후 이루어지는 작업
+    private void succeed(int day, Bundle moodData, Intent endIntent, MainActivity mainActivity) {
+        editor.putInt(survey_key, day).apply();
+
+        //Save the daily survey dataset
+        long time = System.currentTimeMillis();
+
+        DataMood mood = new DataMood(moodData.getInt("latency"),
+                getLevel2(), moodData.getInt("sleep_quality"),
+                moodData.getInt("mood_high"), moodData.getInt("mood_low"),
+                moodData.getInt("mood_anx"), moodData.getInt("mood_irr"), time);
+        recordsArrayList = findDateGroup(recordsArrayList, mood);
+        Gson gson1 = new Gson();
+        moodJson = gson1.toJson(recordsArrayList);
+        editor.putString(MoodArrayKey, moodJson).apply();
+        //Need to add level to dataset
+        startActivity(endIntent);
+        for (int i = 0; i < mainActivity.surveyList().size(); i++) {
+            mainActivity.surveyList().get(i).finish();
+        }
+    }
+
     private void sendSurvey(){
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("https://www.sleep-math.com/sleepapp/")
@@ -439,63 +465,6 @@ public class SurveyActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<DataSurvey> call, Throwable t) {
-                // setting text to our text view when
-                // we get error response from API.
-                Log.v("ERROR", "Error found is : " + t.getMessage());
-            }
-        });
-    }
-
-    private void sendMood(Integer sleep_quality, Integer mood_high, Integer mood_low, Integer mood_anx, Integer mood_irr, Integer latency) {
-        OkHttpClient client = new OkHttpClient.Builder()
-                .connectTimeout(20, TimeUnit.SECONDS)
-                .writeTimeout(20, TimeUnit.SECONDS)
-                .readTimeout(20, TimeUnit.SECONDS)
-                .build();
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("https://www.sleep-math.com/sleepapp/")
-                // as we are sending data in json format so
-                // we have to add Gson converter factory
-                .addConverterFactory(GsonConverterFactory.create())
-                .client(client)
-                // at last we are building our retrofit builder.
-                .build();
-        RetrofitAPI retrofitAPI = retrofit.create(RetrofitAPI.class);
-        long time = System.currentTimeMillis();
-
-        Locale currentLocale = Locale.getDefault();
-        String language = currentLocale.getLanguage();
-
-        DataMood mood = new DataMood(latency, getLevel2(), sleep_quality, mood_high, mood_low, mood_anx, mood_irr, time);
-        Call<DataMood> call = retrofitAPI.createMood(mood);
-        call.enqueue(new Callback<DataMood>() {
-            @Override
-            public void onResponse(Call<DataMood> call, Response<DataMood> response) {
-                // this method is called when we get response from our api.
-                if (response.code() <= 300) {
-                    if (language.equals("ko")) {
-                        Toast.makeText(SurveyActivity.this, "설문이 전송되었습니다", Toast.LENGTH_SHORT).show();
-                    } else {
-                        Toast.makeText(SurveyActivity.this, "Survey added to API", Toast.LENGTH_SHORT).show();
-                    }
-                } else {
-                    if (language.equals("ko")) {
-                        Toast.makeText(SurveyActivity.this, "설문 전송에 실패했습니다", Toast.LENGTH_SHORT).show();
-                    } else {
-                        Toast.makeText(SurveyActivity.this, "Survey sending failed", Toast.LENGTH_SHORT).show();
-                    }
-                    // we are getting response from our body
-                    // and passing it to our modal class.
-                    DataMood responseFromAPI = response.body();
-
-                    // on below line we are getting our data from modal class and adding it to our string.
-                    String responseString = "Response Code : " + response.code() + "\nName : " + "\n";
-                    Log.v("RESPONSE", responseString);
-                }
-            }
-
-            @Override
-            public void onFailure(Call<DataMood> call, Throwable t) {
                 // setting text to our text view when
                 // we get error response from API.
                 Log.v("ERROR", "Error found is : " + t.getMessage());

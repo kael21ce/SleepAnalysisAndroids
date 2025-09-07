@@ -1,7 +1,5 @@
 package com.kael21ce.sleepanalysisandroid.data;
 
-import java.util.List;
-
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
@@ -21,9 +19,8 @@ public interface RetrofitAPI {
 
     Call<DataSurvey> createSurvey(@Body DataSurvey dataSurvey);
 
-    @POST("daily_survey/")
-
-    Call<DataMood> createMood(@Body DataMood dataMood);
+    @POST("/sleepapp/daily_survey/")
+    Call<Void> createMood(@Body DataMood dataMood);
 
     @POST("/sleepapp/signup/")
     Call<Void> signup(@Body DataUser dataUser);
