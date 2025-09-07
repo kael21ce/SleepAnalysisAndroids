@@ -27,6 +27,7 @@ import com.google.gson.JsonParseException;
 import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
 import com.kael21ce.sleepanalysisandroid.data.AppDatabase;
+import com.kael21ce.sleepanalysisandroid.data.AppDatabaseSingleton;
 import com.kael21ce.sleepanalysisandroid.data.AuthInterceptor;
 import com.kael21ce.sleepanalysisandroid.data.BlockStatusResponse;
 import com.kael21ce.sleepanalysisandroid.data.DataMood;
@@ -108,8 +109,7 @@ public class WaitingActivity extends AppCompatActivity {
         Glide.with(this).load(R.raw.loading).into(waitingImage);
 
         // 1) AppDatabase 불러오기 및 API 불러오기
-        db = Room.databaseBuilder(this,
-                AppDatabase.class, "sleep_wake").allowMainThreadQueries().build();
+        db = AppDatabaseSingleton.getInstance(this);
         // 수면 데이터 및 설문을 위한 API는 method 내에서 호출
         RetrofitAPI apiService = RetrofitClient.getClient(this).create(RetrofitAPI.class); // is_blocked를 위한 API
 
@@ -149,14 +149,6 @@ public class WaitingActivity extends AppCompatActivity {
                 });
             });
         });
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if (db != null) {
-            db.close();
-        }
     }
 
     // WaitingText 뒤에 점을 주기적으로 업데이트
@@ -254,17 +246,19 @@ public class WaitingActivity extends AppCompatActivity {
             for (Sleep_struct sleep : sleepList) {
                 long sleepStart = parseServerDate(sleep.getSleepStart());
                 long sleepEnd = parseServerDate(sleep.getSleepEnd());
-                Log.d(TAG, "Loaded sleep start: " + sleepStart + " / sleep end: " + sleepEnd);
                 // Date parse error가 난 경우는 제외
-                if (sleepStart < 0 || sleepEnd < 0) continue;
+                if (sleepStart < 0 || sleepEnd < 0) {
+                    Log.v(TAG, "Filter 1");
+                    continue;
+                }
 
                 // 현재로부터 2주 내에 있는 수면 데이터만 저장
-                if (sleepStart >= twoWeeksAgo.getTime() && sleepEnd <= now.getTime()) continue;
-
-                Sleep newSleep = new Sleep();
-                newSleep.sleepStart = sleepStart;
-                newSleep.sleepEnd = sleepEnd;
-                sleeps.add(newSleep);
+                if (sleepStart >= twoWeeksAgo.getTime() && sleepEnd <= now.getTime()) {
+                    Sleep newSleep = new Sleep();
+                    newSleep.sleepStart = sleepStart;
+                    newSleep.sleepEnd = sleepEnd;
+                    sleeps.add(newSleep);
+                }
             }
         }
 

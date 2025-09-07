@@ -31,6 +31,7 @@ import com.bumptech.glide.Glide;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.tabs.TabLayout;
 import com.kael21ce.sleepanalysisandroid.data.AppDatabase;
+import com.kael21ce.sleepanalysisandroid.data.AppDatabaseSingleton;
 import com.kael21ce.sleepanalysisandroid.data.Sleep;
 import com.kael21ce.sleepanalysisandroid.data.SleepDao;
 
@@ -77,8 +78,7 @@ public class RecommendFragment extends Fragment {
         String test = sdfDateTime.format(new Date(sleepOnset));
         Log.v("tag_test", test);
 
-        AppDatabase db = Room.databaseBuilder(getActivity(),
-                AppDatabase.class, "sleep_wake").allowMainThreadQueries().build();
+        AppDatabase db = AppDatabaseSingleton.getInstance(getActivity().getApplicationContext());
         SleepDao sleepDao = db.sleepDao();
         List<Sleep> sleeps = sleepDao.getAll();
         for(Sleep sleep: sleeps){

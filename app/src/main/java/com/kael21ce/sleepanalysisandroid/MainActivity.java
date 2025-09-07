@@ -39,6 +39,7 @@ import androidx.work.WorkManager;
 import com.github.mikephil.charting.data.BarEntry;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.kael21ce.sleepanalysisandroid.data.AppDatabase;
+import com.kael21ce.sleepanalysisandroid.data.AppDatabaseSingleton;
 import com.kael21ce.sleepanalysisandroid.data.Awareness;
 import com.kael21ce.sleepanalysisandroid.data.CombineResult;
 import com.kael21ce.sleepanalysisandroid.data.HealthConnectManager;
@@ -147,8 +148,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         // Load db
-        db = Room.databaseBuilder(context,
-                AppDatabase.class, "sleep_wake").allowMainThreadQueries().build();
+        db = AppDatabaseSingleton.getInstance(this);
 
         //Create channel
         createNotificationChannel(this);
@@ -205,7 +205,7 @@ public class MainActivity extends AppCompatActivity {
         email = sharedPref.getString("User_Email", "tester33");
         username = sharedPref.getString("User_Name", "tester33");
 
-        combineResult = ProcessingAPI.run(this, db, sharedPref);
+        combineResult = ProcessingAPI.run(this, sharedPref);
         sleeps = combineResult.getSleeps();
         v0s = combineResult.getV0s();
         barEntries = combineResult.getBarEntries();
@@ -575,7 +575,7 @@ public class MainActivity extends AppCompatActivity {
                     AppDatabase.class, "sleep_wake").allowMainThreadQueries().build();
             //get the shared preferences variable
             sharedPref = getSharedPreferences("SleepWake", Context.MODE_PRIVATE);
-            combineResult = ProcessingAPI.run(getApplicationContext(), db, sharedPref);
+            combineResult = ProcessingAPI.run(getApplicationContext(), sharedPref);
         }
     }
 
@@ -584,9 +584,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onDestroy(){
         super.onDestroy();
-        if (db != null) {
-            db.close();
-        }
         sharedPref.unregisterOnSharedPreferenceChangeListener(prefListener);
         Log.v(TAG, "onDestroy() is called");
     }

@@ -40,6 +40,7 @@ import retrofit2.http.POST;
  * -> Sleep data 호출 및 정제, Alertness 계산
  */
 public class ProcessingAPI {
+    static AppDatabase db;
     static final String TAG = "ProcessingAPI";
     static long now;
     static long nineHours;
@@ -49,7 +50,7 @@ public class ProcessingAPI {
     static long fiveMinutesToMil = (1000*60*5);
     static SimpleDateFormat sdfDateTime = new SimpleDateFormat("dd/MM/yyyy" + " HH:mm", Locale.getDefault());
 
-    public static CombineResult run(Context context, AppDatabase db, SharedPreferences sharedPref) {
+    public static CombineResult run(Context context, SharedPreferences sharedPref) {
         //1) 기본 세팅
         SharedPreferences.Editor editor = sharedPref.edit();
         String email = sharedPref.getString("User_Email", "tester33");
@@ -71,6 +72,7 @@ public class ProcessingAPI {
         List<Awareness> awarenesses = Collections.synchronizedList(new ArrayList<>());
         List<Awareness> sleepAwarenesses = Collections.synchronizedList(new ArrayList<>());
 
+        db = AppDatabaseSingleton.getInstance(context);
         SleepDao sleepDao = db.sleepDao();
 
         // 3) 수면 날짜 업데이트
