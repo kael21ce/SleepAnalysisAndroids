@@ -257,8 +257,6 @@ public class HomeFragment extends Fragment {
             }
         });
 
-        SurveyUpperView.setVisibility(View.GONE);
-
         //Move to SleepOnsetActivity
         ImageButton clockOnsetButton = v.findViewById(R.id.ClockOnsetButton);
         clockOnsetButton.setOnClickListener(view -> {

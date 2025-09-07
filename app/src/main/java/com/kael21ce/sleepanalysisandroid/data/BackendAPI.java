@@ -60,6 +60,44 @@ public class BackendAPI {
     }
 
     // 각성도 설문을 서버에 업로드
+    public static void sendSurvey(Context context, long sleep_onset, long work_onset, long work_offset,
+                                  int survey_result, SurveyCallback callback) {
+        // 설문 작성 시기
+        long time = System.currentTimeMillis();
+
+        // API 불러오기
+        RetrofitAPI apiService = RetrofitClient.getClient(context).create(RetrofitAPI.class);
+
+        // Payload 데이터 준비
+        DataSurvey payload = new DataSurvey(sleep_onset, work_onset, work_offset, survey_result, time);
+
+        // 네트워크 호출
+        apiService.createSurvey(payload).enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                if (response.isSuccessful()) {
+                    Log.d(TAG, "설문 업로드 성공. Status: " + response.code());
+                    callback.onSuccess();
+                } else {
+                    try {
+                        String errorBody = response.errorBody() != null ? response.errorBody().string() : "알 수 없는 에러";
+                        Log.e(TAG, "서버 에러: " + response.code());
+                        callback.onFailure("서버 에러: " + response.code());
+                    } catch (IOException e) {
+                        Log.e(TAG, "에러 메시지 파싱 실패");
+                        callback.onFailure("에러 메시지 파싱 실패");
+                    }
+
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+                Log.e(TAG, "네트워크 에러: " + t.getMessage());
+                callback.onFailure("네트워크 에러: " + t.getMessage());
+            }
+        });
+    }
 
     // 설문 전달 후를 진행하기 위한 callback
     public interface SurveyCallback {

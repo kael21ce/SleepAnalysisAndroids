@@ -30,20 +30,13 @@ import android.widget.Toast;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.tabs.TabLayout;
-import com.kael21ce.sleepanalysisandroid.data.DataSurvey;
-import com.kael21ce.sleepanalysisandroid.data.RetrofitAPI;
+import com.kael21ce.sleepanalysisandroid.data.BackendAPI;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 
 public class WhenWorkFragment extends Fragment {
@@ -530,11 +523,32 @@ public class WhenWorkFragment extends Fragment {
 
                     Log.v("SplashActivity", "Onset: " + sleepOnsetResult + " / Onset Show: " + sleepOnsetShowResult +
                             " / Work onset: " + workOnsetResult + " / Work offset: " + workOffsetResult);
+                    Locale currentLocale = Locale.getDefault();
+                    String language = currentLocale.getLanguage();
 
-                    sendSurvey(sleepOnsetResult, workOnsetResult, workOffsetResult, selectedType[0]);
+                    BackendAPI.sendSurvey(v.getContext(), sleepOnsetResult, workOnsetResult, workOffsetResult, selectedType[0], new BackendAPI.SurveyCallback() {
+                        @Override
+                        public void onSuccess() {
+                            if (language.equals("ko")) {
+//                              Toast.makeText(getActivity(), "데이터가 전송되었습니다", Toast.LENGTH_SHORT).show();
+                            } else {
+//                              Toast.makeText(getActivity(), "Data added to API", Toast.LENGTH_SHORT).show();
+                            }
+                            mainActivity.finish();
+                            startActivity(new Intent(mainActivity, SplashActivity.class));
+                        }
 
-                    mainActivity.finish();
-                    startActivity(new Intent(mainActivity, SplashActivity.class));
+                        @Override
+                        public void onFailure(String errorMsg) {
+                            if (language.equals("ko")) {
+//                        Toast.makeText(getActivity(), "데이터 전송에 실패했습니다", Toast.LENGTH_SHORT).show();
+                            } else {
+//                        Toast.makeText(getActivity(), "Data sending failed", Toast.LENGTH_SHORT).show();
+                            }
+                            mainActivity.finish();
+                            startActivity(new Intent(mainActivity, SplashActivity.class));
+                        }
+                    });
                 }else{
                     String languageSetting = Locale.getDefault().getLanguage();
                     if (languageSetting.equals("ko")) {
@@ -564,56 +578,6 @@ public class WhenWorkFragment extends Fragment {
         int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
 
         return dayOfWeek == Calendar.SATURDAY || dayOfWeek == Calendar.SUNDAY;
-    }
-
-    private void sendSurvey(long sleep_onset, long work_onset, long work_offset, int work_type){
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("https://sleep-math.com/sleepapp/")
-                // as we are sending data in json format so
-                // we have to add Gson converter factory
-                .addConverterFactory(GsonConverterFactory.create())
-                // at last we are building our retrofit builder.
-                .build();
-        RetrofitAPI retrofitAPI = retrofit.create(RetrofitAPI.class);
-        long time = System.currentTimeMillis();
-
-        DataSurvey survey = new DataSurvey(sleep_onset, work_onset, work_offset, work_type, time);
-        Call<DataSurvey> call = retrofitAPI.createSurvey(survey);
-        call.enqueue(new Callback<DataSurvey>() {
-            @Override
-            public void onResponse(Call<DataSurvey> call, Response<DataSurvey> response) {
-                // this method is called when we get response from our api.
-                Locale currentLocale = Locale.getDefault();
-                String language = currentLocale.getLanguage();
-                if(response.code() <= 300) {
-                    if (language.equals("ko")) {
-//                        Toast.makeText(getActivity(), "데이터가 전송되었습니다", Toast.LENGTH_SHORT).show();
-                    } else {
-//                        Toast.makeText(getActivity(), "Data added to API", Toast.LENGTH_SHORT).show();
-                    }
-                }else {
-                    if (language.equals("ko")) {
-//                        Toast.makeText(getActivity(), "데이터 전송에 실패했습니다", Toast.LENGTH_SHORT).show();
-                    } else {
-//                        Toast.makeText(getActivity(), "Data sending failed", Toast.LENGTH_SHORT).show();
-                    }
-                    // we are getting response from our body
-                    // and passing it to our modal class.
-                    DataSurvey responseFromAPI = response.body();
-
-                    // on below line we are getting our data from modal class and adding it to our string.
-                    String responseString = "Response Code : " + response.code() + "\nName : " + "\n";
-                    Log.v("RESPONSE", responseString);
-                }
-            }
-
-            @Override
-            public void onFailure(Call<DataSurvey> call, Throwable t) {
-                // setting text to our text view when
-                // we get error response from API.
-                Log.v("ERROR", "Error found is : " + t.getMessage());
-            }
-        });
     }
 
     public static Long[] updateOnsetDate(long currentTime, long sleepOnset, long sleepOnsetShow, long workOnset, long workOffset) {
