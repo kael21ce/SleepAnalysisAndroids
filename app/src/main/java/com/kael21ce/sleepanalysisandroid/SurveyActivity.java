@@ -278,7 +278,7 @@ public class SurveyActivity extends AppCompatActivity {
     }
 
 
-    public ArrayList<Records> findDateGroup(ArrayList<Records> recordsList, DataMood mood) {
+    public static ArrayList<Records> findDateGroup(ArrayList<Records> recordsList, DataMood mood) {
         // Extract date information from daily survey result
         long baseTime = mood.getTime();
         Calendar baseCalendar = Calendar.getInstance();
@@ -338,7 +338,7 @@ public class SurveyActivity extends AppCompatActivity {
         }
     }
 
-    public ArrayList<Records> findAlertGroup(ArrayList<Records> recordsList, DataSurvey alert) {
+    public static ArrayList<Records> findAlertGroup(ArrayList<Records> recordsList, DataSurvey alert) {
         // Extract date information from daily survey result
         long baseTime = alert.getTime();
         Calendar baseCalendar = Calendar.getInstance();

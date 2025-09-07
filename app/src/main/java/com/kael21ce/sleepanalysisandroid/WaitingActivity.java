@@ -30,6 +30,7 @@ import com.kael21ce.sleepanalysisandroid.data.AppDatabase;
 import com.kael21ce.sleepanalysisandroid.data.AuthInterceptor;
 import com.kael21ce.sleepanalysisandroid.data.BlockStatusResponse;
 import com.kael21ce.sleepanalysisandroid.data.DataMood;
+import com.kael21ce.sleepanalysisandroid.data.DataSurvey;
 import com.kael21ce.sleepanalysisandroid.data.RetrofitAPI;
 import com.kael21ce.sleepanalysisandroid.data.RetrofitClient;
 import com.kael21ce.sleepanalysisandroid.data.Sleep;
@@ -65,8 +66,15 @@ public class WaitingActivity extends AppCompatActivity {
     private final int MAX_DOTS = 3;
     private TextView waitingText;
     private static final String TAG = "WaitingActivity";
+    SharedPreferences sharedPref;
+    private static final String MoodArrayKey = "MoodArray";
+    private static final String AlertnessArrayKey = "AlertnessArray";
     private AppDatabase db;
-    private List<SleepUploadPayload> sleepUploadPayloadList; // 메서드끼리 공유하도록 전역 변수로 설정
+    // 서버에서 불러오는 list는 메서드끼리 공유하도록 전역 변수로 설정
+    private List<SleepUploadPayload> sleepUploadPayloadList;
+    private List<DataMood> dailySurveyList;
+    private List<DataSurvey> surveyList;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,7 +94,7 @@ public class WaitingActivity extends AppCompatActivity {
 
         // Description에 user name 추가
         TextView waitingDescription = findViewById(R.id.WaitingDescription);
-        SharedPreferences sharedPref = getSharedPreferences("SleepWake", Context.MODE_PRIVATE);
+        sharedPref = getSharedPreferences("SleepWake", Context.MODE_PRIVATE);
         String user_name = sharedPref.getString("User_Name", "로딩 오류");
         String user_based_text = user_name + waitingDescription.getText().toString();
         waitingDescription.setText(user_based_text);
@@ -111,20 +119,33 @@ public class WaitingActivity extends AppCompatActivity {
             saveSleepToSleepDao(() -> {
                 Log.d(TAG, "수면 데이터를 AppDatabase에 저장 완료");
                 // 3) 설문 동기화
-                // 4) is_blocked 불러오기
-                BlockStatusResponse.checkBlockStatus(apiService, this, sharedPref, new BlockStatusResponse.BlockReadCallback() {
-                    @Override
-                    public void onBlockRead() {
-                        Log.d(TAG, "is_blocked 읽기 완료");
-                        Intent finishIntent = new Intent(WaitingActivity.this, FinishActivity.class);
-                        startActivity(finishIntent);
-                        finish();
-                    }
+                performFetchDailySurvey(false, () -> {
+                    Log.d(TAG, "일일 설문 데이터를 서버에서 읽기 완료: # - " + dailySurveyList.size());
+                    saveSurveyToSharedPref(() -> {
+                        Log.d(TAG, "일일 설문 데이터를 SharedPreference에 저장 완료");
+                        performFetchAlertSurvey(false, () -> {
+                            Log.d(TAG, "각성도 설문 데이터를 서버에서 읽기 완료: # - " + surveyList.size());
+                            saveAlertSurveyToSharedPref(() -> {
+                                Log.d(TAG, "각성도 설문 데이터를 SharedPreference에 저장 완료");
 
-                    @Override
-                    public void onFailRead() {
-                        Log.d(TAG, "is_blocked 읽기 실패");
-                    }
+                                // 4) is_blocked 불러오기
+                                BlockStatusResponse.checkBlockStatus(apiService, this, sharedPref, new BlockStatusResponse.BlockReadCallback() {
+                                    @Override
+                                    public void onBlockRead() {
+                                        Log.d(TAG, "is_blocked 읽기 완료");
+                                        Intent finishIntent = new Intent(WaitingActivity.this, FinishActivity.class);
+                                        startActivity(finishIntent);
+                                        finish();
+                                    }
+
+                                    @Override
+                                    public void onFailRead() {
+                                        Log.d(TAG, "is_blocked 읽기 실패");
+                                    }
+                                });
+                            });
+                        });
+                    });
                 });
             });
         });
@@ -212,7 +233,7 @@ public class WaitingActivity extends AppCompatActivity {
         }
     }
 
-    public void saveSleepToSleepDao(LoadSaveCallback callback) {
+    private void saveSleepToSleepDao(LoadSaveCallback callback) {
         // KST 기준 ISO 8601 형식 formatter
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX", Locale.KOREA);
         formatter.setTimeZone(TimeZone.getTimeZone("Asia/Seoul"));
@@ -221,8 +242,8 @@ public class WaitingActivity extends AppCompatActivity {
         calendar.add(Calendar.DAY_OF_YEAR, -14);
         Date twoWeeksAgo = calendar.getTime();
 
-        /**List<SleepUploadPayload> -> List<Sleep_struct> -> Sleep_struct 순으로 접근
-         *  Sleep_struct를 Sleep으로 변환, List<Sleep>을 생성
+        /*List<SleepUploadPayload> -> List<Sleep_struct> -> Sleep_struct 순으로 접근
+           Sleep_struct를 Sleep으로 변환, List<Sleep>을 생성
          */
         int payloadLength = sleepUploadPayloadList.size();
         List<Sleep> sleeps = new ArrayList<>();
@@ -233,6 +254,7 @@ public class WaitingActivity extends AppCompatActivity {
             for (Sleep_struct sleep : sleepList) {
                 long sleepStart = parseServerDate(sleep.getSleepStart());
                 long sleepEnd = parseServerDate(sleep.getSleepEnd());
+                Log.d(TAG, "Loaded sleep start: " + sleepStart + " / sleep end: " + sleepEnd);
                 // Date parse error가 난 경우는 제외
                 if (sleepStart < 0 || sleepEnd < 0) continue;
 
@@ -256,9 +278,9 @@ public class WaitingActivity extends AppCompatActivity {
         callback.onSucceed();
     }
 
-    // 설문 데이터 다운로드: 7일과 그 이상 기간을 가져오는 method를 따로 제작
-    private List<DataMood> performFetchDailySurvey(boolean isLonger) {
-        final List<DataMood>[] surveyList = new List[]{new ArrayList<>()};
+    // 일일 설문 데이터 다운로드: 7일과 그 이상 기간을 가져오는 method
+    private void performFetchDailySurvey(boolean isLonger, LoadSaveCallback callback) {
+        dailySurveyList = new ArrayList<>();
         final String type = "일일 설문";
 
         // 1. 날짜 계산 (현재, 7일 전)
@@ -285,18 +307,13 @@ public class WaitingActivity extends AppCompatActivity {
             public void onResponse(Call<DailySurveyResponse> call, Response<DailySurveyResponse> response) {
                 if (response.code() == 204) {
                     NoContentLog(type);
+                    callback.onSucceed();
                     return;
                 }
 
                 if (response.isSuccessful()) {
-                    List<DataMood> incoming = response.body().getResults();
-                    if (incoming == null || incoming.isEmpty()) {
-                        Log.d(TAG, "결과 리스트가 비어있습니다.");
-                        return;
-                    }
-
-                    SuccessfulLoadingLog(type, incoming.size());
-                    surveyList[0] = incoming;
+                    dailySurveyList = response.body().getResults();
+                    SuccessfulLoadingLog(type, dailySurveyList.size());
                 } else {
                     try {
                         String errorBody = response.errorBody() != null ? response.errorBody().string() : "알 수 없는 에러";
@@ -305,14 +322,102 @@ public class WaitingActivity extends AppCompatActivity {
                         ParsingFailureLog();
                     }
                 }
+                callback.onSucceed();
             }
 
             @Override
             public void onFailure(Call<DailySurveyResponse> call, Throwable t) {
                 NetworkLog(t.getMessage());
+                callback.onSucceed();
             }
         });
-        return surveyList[0];
+    }
+
+    // 일일 설문 데이터를 ArrayList<Records>로 변환해 SharedPreference에 저장
+    private void saveSurveyToSharedPref(LoadSaveCallback callback) {
+        // List<DataMood>를 JSON으로 변환하여 SharedPreference에 저장
+        ArrayList<Records> results = dailySurveyList.stream()
+                .reduce(new ArrayList<>(),
+                        SurveyActivity::findDateGroup,
+                        (list1, list2) -> {
+                            list1.addAll(list2);
+                            return list1;
+                        });
+        Gson gson = new Gson();
+        String json = gson.toJson(results);
+        sharedPref.edit().putString(MoodArrayKey, json).apply();
+        callback.onSucceed();
+    }
+
+    // 각성도 설문 데이터 다운로드: 7일 또는 그 이상을 가져오는 method
+    private void performFetchAlertSurvey(boolean isLonger, LoadSaveCallback callback) {
+        surveyList = new ArrayList<>();
+        final String type = "각성도 설문";
+
+        // 1. 날짜 계산 (현재, 7일 전)
+        Calendar calendar = Calendar.getInstance();
+        Date now = calendar.getTime();
+        if (isLonger) {
+            calendar.add(Calendar.DAY_OF_YEAR, -49); // 7주
+        } else {
+            calendar.add(Calendar.DAY_OF_YEAR, -7); // 7일
+        }
+        Date fromDate = calendar.getTime();
+
+        // 2. ISO8601 UTC formatter 생성: YYYY-MM-DDTHH:MM:SSZ
+        SimpleDateFormat isoFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
+        isoFormatter.setTimeZone(TimeZone.getTimeZone("UTC"));
+        String toDateStr = isoFormatter.format(now);
+        String fromDateStr = isoFormatter.format(fromDate);
+
+        // 3. API 호출
+        Retrofit retrofit = WaitingClient.getWaitingClient(this, false);
+        WaitingService apiService = retrofit.create(WaitingService.class);
+        apiService.fetchAlertSurvey(fromDateStr, toDateStr).enqueue(new Callback<AlertSurveyResponse>() {
+            @Override
+            public void onResponse(Call<AlertSurveyResponse> call, Response<AlertSurveyResponse> response) {
+                if (response.code() == 204) {
+                    NoContentLog(type);
+                    callback.onSucceed();
+                    return;
+                }
+
+                if (response.isSuccessful()) {
+                    surveyList = response.body().getResults();
+                    SuccessfulLoadingLog(type, surveyList.size());
+                } else {
+                    try {
+                        String errorBody = response.errorBody() != null ? response.errorBody().string() : "알 수 없는 에러";
+                        FailureLoadingLog(type, response.code(), errorBody);
+                    } catch (IOException e) {
+                        ParsingFailureLog();
+                    }
+                }
+                callback.onSucceed();
+            }
+
+            @Override
+            public void onFailure(Call<AlertSurveyResponse> call, Throwable t) {
+                NetworkLog(t.getMessage());
+                callback.onSucceed();
+            }
+        });
+    }
+
+    // 각성도 설문 데이터를 ArrayList<Records>로 변환해 SharedPreference에 저장
+    private void saveAlertSurveyToSharedPref(LoadSaveCallback callback) {
+        // List<DataSurvey>를 JSON으로 변환하여 SharedPreference에 저장
+        ArrayList<Records> results = surveyList.stream()
+                .reduce(new ArrayList<>(),
+                        SurveyActivity::findAlertGroup,
+                        (list1, list2) -> {
+                            list1.addAll(list2);
+                            return list1;
+                        });
+        Gson gson = new Gson();
+        String json = gson.toJson(results);
+        sharedPref.edit().putString(AlertnessArrayKey, json).apply();
+        callback.onSucceed();
     }
 
     /** 데이터를 서버에서 불러오거나 AppDatabase에 저장할 때의 callback
@@ -442,6 +547,14 @@ class DailySurveyResponse {
     public List<DataMood> getResults() { return results; }
 }
 
+class AlertSurveyResponse {
+    @SerializedName("results")
+    private List<DataSurvey> results;
+
+    // Getter
+    public List<DataSurvey> getResults() { return results; }
+}
+
 // WaitingActivity 내에서 작동하는 API
 interface WaitingService {
     @GET("/sleepapp/android/")
@@ -449,6 +562,12 @@ interface WaitingService {
 
     @GET("/sleepapp/daily_survey/")
     Call<DailySurveyResponse> fetchDailySurvey(
+            @Query("from") String fromDate,
+            @Query("to") String toDate
+    );
+
+    @GET("/sleepapp/survey/")
+    Call<AlertSurveyResponse> fetchAlertSurvey(
             @Query("from") String fromDate,
             @Query("to") String toDate
     );
