@@ -97,7 +97,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal|center_vertical"
                 app:trp_clockLabelSize="0sp"
-                app:trp_maxDurationMinutes="0"
+                app:trp_maxDurationMinutes="1440"
                 app:trp_hourFormat="FORMAT_24"
                 app:trp_sliderColor="@color/blue_2"
                 app:trp_startTime="00:00"
@@ -131,105 +131,6 @@
             </LinearLayout>
 
         </FrameLayout>
-
-        <LinearLayout
-            android:id="@+id/whenSleepCaption"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="32dp"
-            android:layout_marginTop="64dp"
-            android:layout_marginBottom="32dp"
-            android:orientation="horizontal"
-            tools:visibility="gone">
-
-            <EditText
-                android:id="@+id/whenSleepHour1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="3.5dp"
-                android:layout_weight="1"
-                android:background="@drawable/corner_16_gray"
-                android:ems="10"
-                android:fontFamily="@font/pretendardbold"
-                android:gravity="center"
-                android:inputType="number"
-                android:maxLength="1"
-                android:maxLines="1"
-                android:paddingHorizontal="10dp"
-                android:paddingVertical="18dp"
-                android:textColor="@color/black"
-                android:textSize="32sp"
-                tools:ignore="SpeakableTextPresentCheck" />
-
-            <EditText
-                android:id="@+id/whenSleepHour2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="3.5dp"
-                android:layout_weight="1"
-                android:background="@drawable/corner_16_gray"
-                android:ems="10"
-                android:fontFamily="@font/pretendardbold"
-                android:gravity="center"
-                android:inputType="number"
-                android:maxLength="1"
-                android:maxLines="1"
-                android:paddingHorizontal="10dp"
-                android:paddingVertical="18dp"
-                android:textColor="@color/black"
-                android:textSize="32sp"
-                tools:ignore="SpeakableTextPresentCheck" />
-
-            <TextView
-                android:id="@+id/whenSleepHalf"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="7dp"
-                android:fontFamily="@font/pretendardbold"
-                android:gravity="center"
-                android:text=":"
-                android:textColor="@color/black"
-                android:textSize="32sp" />
-
-            <EditText
-                android:id="@+id/whenSleepMinute1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="3.5dp"
-                android:layout_weight="1"
-                android:background="@drawable/corner_16_gray"
-                android:ems="10"
-                android:fontFamily="@font/pretendardbold"
-                android:gravity="center"
-                android:inputType="number"
-                android:maxLength="1"
-                android:maxLines="1"
-                android:paddingHorizontal="10dp"
-                android:paddingVertical="18dp"
-                android:textColor="@color/black"
-                android:textSize="32sp"
-                tools:ignore="SpeakableTextPresentCheck" />
-
-            <EditText
-                android:id="@+id/whenSleepMinute2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="3.5dp"
-                android:layout_weight="1"
-                android:background="@drawable/corner_16_gray"
-                android:ems="10"
-                android:fontFamily="@font/pretendardbold"
-                android:gravity="center"
-                android:inputType="number"
-                android:maxLength="1"
-                android:maxLines="1"
-                android:paddingHorizontal="10dp"
-                android:paddingVertical="18dp"
-                android:textColor="@color/black"
-                android:textSize="32sp"
-                tools:ignore="SpeakableTextPresentCheck" />
-
-        </LinearLayout>
 
         <LinearLayout
             android:id="@+id/sleepButtonCaption"

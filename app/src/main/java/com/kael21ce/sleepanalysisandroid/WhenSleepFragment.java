@@ -50,23 +50,44 @@ public class WhenSleepFragment extends Fragment {
         TimeRangePicker whenSleepPicker = v.findViewById(R.id.WhenSleepPicker);
         TextView whenSleepText = v.findViewById(R.id.whenSleepText);
         whenSleepPicker.setStartTimeMinutes(0);
+        whenSleepPicker.setEndTimeMinutes(0);
         whenSleepText.setText(time2String(0));
         int whenSleep = whenSleepPicker.getStartTimeMinutes();
         final String[] whenSleepStr = {time2String(whenSleep)};
         whenSleepPicker.setOnDragChangeListener(new TimeRangePicker.OnDragChangeListener() {
             @Override
             public boolean onDragStart(@NonNull TimeRangePicker.Thumb thumb) {
-                int startTimeMinutes = whenSleepPicker.getStartTimeMinutes();
-                whenSleepStr[0] = time2String(startTimeMinutes);
-                whenSleepText.setText(whenSleepStr[0]);
-                return false;
+                if (thumb.equals(TimeRangePicker.Thumb.START)) {
+                    return false; // 시작 thumb는 움직이지 못하게 하기
+                } else {
+//                    int endTimeMinutes = whenSleepPicker.getEndTimeMinutes();
+//                    whenSleepStr[0] = time2String(endTimeMinutes);
+//                    whenSleepText.setText(whenSleepStr[0]);
+                    return true;
+                }
             }
 
             @Override
             public void onDragStop(@NonNull TimeRangePicker.Thumb thumb) {
-                int startTimeMinutes = whenSleepPicker.getStartTimeMinutes();
-                whenSleepStr[0] = time2String(startTimeMinutes);
+            }
+        });
+
+        whenSleepPicker.setOnTimeChangeListener(new TimeRangePicker.OnTimeChangeListener() {
+            @Override
+            public void onStartTimeChange(@NonNull TimeRangePicker.Time time) {
+
+            }
+
+            @Override
+            public void onEndTimeChange(@NonNull TimeRangePicker.Time time) {
+                int endTimeMinutes = time.getTotalMinutes();
+                whenSleepStr[0] = time2String(endTimeMinutes);
                 whenSleepText.setText(whenSleepStr[0]);
+            }
+
+            @Override
+            public void onDurationChange(@NonNull TimeRangePicker.TimeDuration timeDuration) {
+
             }
         });
 
@@ -74,7 +95,7 @@ public class WhenSleepFragment extends Fragment {
         Button whenSleepButton = v.findViewById(R.id.whenSleepButton);
         whenSleepButton.setOnClickListener(view -> {
             Bundle onSetBundle = new Bundle();
-            onSetBundle.putString("SleepOnset", hour1 + hour2 + ":" + minute1 + minute2);
+            onSetBundle.putString("SleepOnset", whenSleepStr[0]);
             //Move to whenWorkFragment
             WhenWorkFragment whenWorkFragment = new WhenWorkFragment();
             whenWorkFragment.setArguments(onSetBundle);
