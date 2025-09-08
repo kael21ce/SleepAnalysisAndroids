@@ -1,7 +1,11 @@
 package com.kael21ce.sleepanalysisandroid;
 
 import android.content.res.Resources;
+import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.text.style.ForegroundColorSpan;
+import android.text.style.LineBackgroundSpan;
+import android.util.Log;
 
 import com.kael21ce.sleepanalysisandroid.data.Sleep;
 import com.prolificinteractive.materialcalendarview.CalendarDay;
@@ -20,15 +24,17 @@ import java.util.Locale;
 import java.util.Map;
 
 //Change the color of day if sleep is reported
-public class ReportedDecorator implements DayViewDecorator {
+public class BlankDecorator implements DayViewDecorator {
     private final Calendar calendar = Calendar.getInstance();
-    private android.content.res.Resources resources;
+    private Resources resources;
     private Map<Long, List<Sleep>> sleepsData;
+    private long todayDate = -1;
+    private long minDate = -1;
     SimpleDateFormat sdfDateTime = new SimpleDateFormat( "yyyy/MM/dd", Locale.KOREA);
     long nineHours = 1000*9*60*60;
     long oneDayToMils = 1000*60*60*24;
 
-    public ReportedDecorator() {
+    public BlankDecorator() {
     }
 
     @Override
@@ -55,7 +61,8 @@ public class ReportedDecorator implements DayViewDecorator {
             long calendarDay = (dayInMillis + nineHours) / oneDayToMils;
             //Check
             if (sleepsData.get(calendarDay) == null) {
-                return true;
+                // 수면 시작일로부터 수면 기록이 비어있을 경우
+                return minDate != -1 && minDate < calendarDay && calendarDay <= todayDate;
             } else {
                 return false;
             }
@@ -68,7 +75,7 @@ public class ReportedDecorator implements DayViewDecorator {
     @Override
     public void decorate(DayViewFacade view) {
         if (resources != null) {
-            view.addSpan(new ForegroundColorSpan(resources.getColor(R.color.gray_2, null)));
+            view.addSpan(new CustomDotSpan(resources.getColor(R.color.red_1, null)));
         }
     }
 
@@ -78,5 +85,40 @@ public class ReportedDecorator implements DayViewDecorator {
     }
     public void setResources(Resources resources) {
         this.resources = resources;
+    }
+    public void setTodayDate(long todayDate) { this.todayDate = todayDate; }
+    public void setMinDate(long minDate) { this.minDate = minDate; }
+}
+
+class CustomDotSpan implements LineBackgroundSpan {
+
+    private final float radius;
+    private final int color;
+
+    // 점의 크기 (radius)와 색상을 설정
+    public CustomDotSpan(int color) {
+        this.radius = 8;
+        this.color = color;
+    }
+
+    public CustomDotSpan(float radius, int color) {
+        this.radius = radius;
+        this.color = color;
+    }
+
+    @Override
+    public void drawBackground(
+            Canvas canvas, Paint paint,
+            int left, int right, int top, int baseline, int bottom,
+            CharSequence charSequence,
+            int start, int end, int lineNumber
+    ) {
+        int oldColor = paint.getColor();
+        if (color != 0) {
+            paint.setColor(color);
+        }
+        // 날짜 텍스트 아래에 점을 그리기
+        canvas.drawCircle((left + right) / 2, bottom + radius, radius, paint);
+        paint.setColor(oldColor);
     }
 }

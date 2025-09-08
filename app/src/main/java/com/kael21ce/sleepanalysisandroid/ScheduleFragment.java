@@ -1,19 +1,25 @@
 package com.kael21ce.sleepanalysisandroid;
 
 import android.animation.ObjectAnimator;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
+import android.widget.TextView;
 
-import androidx.core.content.res.ResourcesCompat;
+import androidx.appcompat.app.ActionBar;
 import androidx.fragment.app.Fragment;
 
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.kael21ce.sleepanalysisandroid.data.Awareness;
 import com.kael21ce.sleepanalysisandroid.data.Sleep;
 import com.prolificinteractive.materialcalendarview.CalendarDay;
@@ -44,6 +50,7 @@ public class ScheduleFragment extends Fragment {
     SimpleDateFormat sdfDateTime = new SimpleDateFormat( "yyyy/MM/dd", Locale.KOREA);
     long now, nineHours;
     private static final String TAG = "ScheduleFragment";
+    private static final String message = "수면 기록을 빠뜨리셨다면 + 버튼으로\n추가해주세요";
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -52,6 +59,12 @@ public class ScheduleFragment extends Fragment {
         MainActivity mainActivity = (MainActivity)getActivity();
 
         Log.v("FRAGMENT", "SCHEDULE FRAGMENT");
+
+        // Custom AlertDialog를 위한 dimBackground, action bar
+        View dimBackground = v.findViewById(R.id.dimBackgroundSched);
+        ActionBar actionBar = mainActivity != null ? mainActivity.getSupportActionBar() : null;
+        BottomNavigationView bottomNavigationView = getActivity().findViewById(R.id.bottomNavigationView) != null
+                ? getActivity().findViewById(R.id.bottomNavigationView) : null;
 
         ZoneId zone = ZoneId.systemDefault();
         ZonedDateTime zoneNow = ZonedDateTime.now(zone);
@@ -77,11 +90,17 @@ public class ScheduleFragment extends Fragment {
         sleepsData = new HashMap<>();
         List<Sleep> listSleep = new ArrayList<>();
         Log.v("SIZE OF SLEEP", String.valueOf(sleeps.size()));
-        if(sleeps.size() > 0) {
+        long minDate = -1;
+        if(!sleeps.isEmpty()) {
             long curDate = (sleeps.get(0).sleepStart + nineHours) / oneDayToMils;
             for (Sleep sleep : sleeps) {
                 Log.v("SLEEPSSS", String.valueOf(sleep.sleepStart));
                 long sleepStartDate = ((sleep.sleepStart + nineHours) / oneDayToMils);
+
+                // 수면 시작일을 저장해놓기
+                if (minDate == -1 || minDate > sleepStartDate) {
+                    minDate = sleepStartDate;
+                }
                 if (curDate != sleepStartDate) {
                     List<Sleep> putSleep = new ArrayList<>(listSleep);
                     sleepsData.put(curDate, putSleep);
@@ -92,22 +111,12 @@ public class ScheduleFragment extends Fragment {
                     listSleep.add(sleep);
                 }
             }
-            if(listSleep.size() > 0){
+            if(!listSleep.isEmpty()){
                 List<Sleep> putSleep = new ArrayList<>(listSleep);
                 sleepsData.put(curDate, putSleep);
                 listSleep.clear();
             }
         }
-
-        //debug map
-//        for (Map.Entry<Long, List<Sleep>> entry : sleepsData.entrySet()) {
-//            Log.v("KEY", String.valueOf(entry.getKey()));
-//            for(Sleep sleep2 : entry.getValue()){
-//                Log.v("SLEEP START D", String.valueOf(sleep2.sleepStart));
-//                Log.v("SLEEP END D", String.valueOf(sleep2.sleepEnd));
-//            }
-//        }
-//        Log.v("THE MAP", String.valueOf(sleepsData.size()));
 
         //get today's day
         long todayDate = (now+nineHours)/oneDayToMils;
@@ -218,11 +227,6 @@ public class ScheduleFragment extends Fragment {
             getChildFragmentManager().beginTransaction().replace(R.id.IntervalFrame, intervalFragment).commit();
         }
 
-        //Add decorator
-        ReportedDecorator reportedDecorator = new ReportedDecorator();
-        reportedDecorator.setResources(getResources());
-        reportedDecorator.setSleepsData(sleepsData);
-        calendarView.addDecorator(reportedDecorator);
         ImageButton handle = v.findViewById(R.id.calendarHandler);
 
         //Set the default mode of calendar
@@ -258,6 +262,24 @@ public class ScheduleFragment extends Fragment {
                 editor.apply();
             }
         });
+
+
+
+        //Add decorator
+        long finalMinDate = minDate;
+        // 시작일로부터 금일까지 수면 기록의 여부를 확인하는 decorator
+        BlankDecorator blankDecorator = new BlankDecorator();
+        blankDecorator.setSleepsData(sleepsData);
+        blankDecorator.setResources(getResources());
+        blankDecorator.setTodayDate(todayDate);
+        blankDecorator.setMinDate(minDate);
+        calendarView.addDecorator(blankDecorator);
+
+        // 수면 기록의 여부를 확인하는 decorator
+        ReportedDecorator reportedDecorator = new ReportedDecorator();
+        reportedDecorator.setResources(getResources());
+        reportedDecorator.setSleepsData(sleepsData);
+        calendarView.addDecorator(reportedDecorator);
 
         //Add sleep interval to specific date
         calendarView.setOnDateChangedListener((widget, Cdate, selected) -> {
@@ -298,8 +320,15 @@ public class ScheduleFragment extends Fragment {
             bundle1.putLong("badDuration", badDuration1);
 
             List<Sleep> initSleepData1 = sleepsData.get(selectedDay);
+
+
             if(initSleepData1 == null){
                 initSleepData1 = new ArrayList<>();
+                // 수면 데이터가 없을 시 알림 띄우기. 수면 데이터가 아예 없는 경우는 제외
+                if (finalMinDate != -1 && selectedDay > finalMinDate && selectedDay <= todayDate) {
+                    String title = selectedDay == todayDate ? "오늘 수면 기록이 없어요" : dayOfMonth + "일에 수면 기록이 없어요";
+                    showAlertDialog(dimBackground, actionBar, bottomNavigationView, title);
+                }
             }
             int count1 = 0;
             for(Sleep sleep: initSleepData1){
@@ -376,5 +405,64 @@ public class ScheduleFragment extends Fragment {
         }
 
         return new Long[]{sleepOnset, sleepOnsetShow, workOnset, workOffset};
+    }
+
+    private void showAlertDialog(View dimBackground, ActionBar actionBar,
+                                 BottomNavigationView bottomNavigationView,
+                                 String title) {
+        // Save the original color
+        // Change this part if someone tries to change the primary color
+        int originalActionBarColor = getResources().getColor(R.color.white, null);
+        int originalNavigationBarColor = getResources().getColor(R.color.white, null);
+        Window window = getActivity().getWindow();
+
+
+        // Dim effect
+        dimBackground.setVisibility(View.VISIBLE);
+        if (actionBar != null) {
+            actionBar.setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.dim, null)));
+        }
+        if (bottomNavigationView != null) {
+            bottomNavigationView.setItemBackground(new ColorDrawable(getResources().getColor(R.color.dim, null)));
+        }
+        window.setStatusBarColor(getResources().getColor(R.color.dim, null));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            window.setNavigationBarColor(getResources().getColor(R.color.dim, null));
+        }
+
+        LayoutInflater inflater = LayoutInflater.from(getActivity());
+        View viewDialog = inflater.inflate(R.layout.layout_custom_dialog, null);
+
+        TextView dialogTitle = viewDialog.findViewById(R.id.dialogTitle);
+        TextView dialogMessage = viewDialog.findViewById(R.id.dialogMessage);
+        Button dialogButton = viewDialog.findViewById(R.id.dialogButton);
+        dialogTitle.setText(title);
+        dialogMessage.setText(ScheduleFragment.message);
+        dialogButton.setText("확인");
+
+        AlertDialog dialog = new AlertDialog.Builder(getActivity(), R.style.CustomAlertDialog)
+                .setView(viewDialog)
+                .create();
+
+        dialogButton.setOnClickListener(dialogV -> {
+            dialog.dismiss();
+            dimBackground.setVisibility(View.GONE);
+            if (actionBar != null) {
+                actionBar.setBackgroundDrawable(new ColorDrawable(originalActionBarColor));
+            }
+            if (bottomNavigationView != null) {
+                bottomNavigationView.setItemBackground(new ColorDrawable(getResources().getColor(R.color.white, null)));
+            }
+            window.setStatusBarColor(getResources().getColor(R.color.white, null));
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                window.setNavigationBarColor(originalNavigationBarColor);
+            }
+        });
+        dialog.setCancelable(true);
+        dialog.show();
+
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
+        }
     }
 }
