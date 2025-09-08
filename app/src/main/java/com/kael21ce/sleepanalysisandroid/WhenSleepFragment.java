@@ -60,9 +60,6 @@ public class WhenSleepFragment extends Fragment {
                 if (thumb.equals(TimeRangePicker.Thumb.START)) {
                     return false; // 시작 thumb는 움직이지 못하게 하기
                 } else {
-//                    int endTimeMinutes = whenSleepPicker.getEndTimeMinutes();
-//                    whenSleepStr[0] = time2String(endTimeMinutes);
-//                    whenSleepText.setText(whenSleepStr[0]);
                     return true;
                 }
             }

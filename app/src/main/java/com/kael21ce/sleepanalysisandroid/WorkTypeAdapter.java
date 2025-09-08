@@ -15,6 +15,17 @@ import java.util.ArrayList;
 public class WorkTypeAdapter extends RecyclerView.Adapter<WorkTypeAdapter.ViewHolder> {
     ArrayList<WorkType> items = new ArrayList<>();
     private int selectedPosition = -1;
+
+    private OnWorkTypeSelectedListener listener;
+
+    public interface OnWorkTypeSelectedListener {
+        void onWorkTypeSelected(WorkType item); // 선택된 WorkType 객체를 전달
+    }
+
+    public WorkTypeAdapter(OnWorkTypeSelectedListener listener) {
+        this.listener = listener;
+    }
+
     public void addItem(WorkType item) {
         items.add(item);
     }
@@ -41,7 +52,9 @@ public class WorkTypeAdapter extends RecyclerView.Adapter<WorkTypeAdapter.ViewHo
             if (workType == 0) {
                 workTypeTitleText.setText("휴무");
                 workTypeTimeText.setText("시간 없음");
+                workTypeEditButton.setVisibility(View.INVISIBLE);
             } else {
+                workTypeEditButton.setVisibility(View.VISIBLE);
                 workTypeTimeText.setText(workStart + " - " + workEnd);
                 if (workType == 1) {
                     workTypeTitleText.setText("아침");
@@ -61,6 +74,8 @@ public class WorkTypeAdapter extends RecyclerView.Adapter<WorkTypeAdapter.ViewHo
             // 야간일 때는 하단의 회색 선을 제거
             if (workType == 3) {
                 workTypeItemLayout.setBackgroundResource(R.drawable.white_gray_stroke);
+            } else {
+                workTypeItemLayout.setBackgroundResource(R.drawable.bottom_line);
             }
         }
     }
@@ -83,6 +98,10 @@ public class WorkTypeAdapter extends RecyclerView.Adapter<WorkTypeAdapter.ViewHo
                 notifyItemChanged(lastSelectedPosition);
             }
             notifyItemChanged(selectedPosition);
+
+            if (listener != null) {
+                listener.onWorkTypeSelected(items.get(selectedPosition));
+            }
         });
         viewHolder.workTypeRadio.setOnClickListener(v -> {
             viewHolder.itemView.performClick();

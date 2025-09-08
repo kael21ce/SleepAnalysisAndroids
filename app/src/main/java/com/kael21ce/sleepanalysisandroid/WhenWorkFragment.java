@@ -14,22 +14,18 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.android.material.tabs.TabLayout;
 import com.kael21ce.sleepanalysisandroid.data.BackendAPI;
 
 import java.text.ParseException;
@@ -39,18 +35,15 @@ import java.util.Date;
 import java.util.Locale;
 
 
-public class WhenWorkFragment extends Fragment {
-    String onHour1, onHour2, onMinute1, onMinute2, offHour1, offHour2, offMinute1, offMinute2;
-    String sleepOnsetTime, workOnsetTime, workOffsetTime, sleepOnsetDate, workOnsetDate, workOffsetDate;
-    String sleepOnsetOutput, workOnsetOutput, workOffsetOutput;
-    SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd hh:mm aaa", Locale.getDefault());
-    SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy.MM.dd", Locale.getDefault());
-    SimpleDateFormat sdfTime = new SimpleDateFormat("hh:mm aaa", Locale.getDefault());
+public class WhenWorkFragment extends Fragment implements WorkTypeAdapter.OnWorkTypeSelectedListener {
+    String sleepOnsetTime, workOnsetTime, workOffsetTime;
     SimpleDateFormat inputSdfTime = new SimpleDateFormat("HH:mm", Locale.getDefault());
     long now = System.currentTimeMillis();
     long oneDay = (1000*60*60*24);
     long sleepOnsetResult, sleepOnsetShowResult, workOnsetResult, workOffsetResult;
     long sleepOnsetType, workOnsetType, workOffsetType;
+    int selectedWorkType = 1;
+    Button whenWorkButton;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -67,8 +60,6 @@ public class WhenWorkFragment extends Fragment {
 
         //Set the user name
         SharedPreferences sharedPref = getActivity().getSharedPreferences("SleepWake", Context.MODE_PRIVATE);
-        String user_name = sharedPref.getString("User_Name", "UserName");
-        TextView whenSleepDescription = v.findViewById(R.id.whenWorkDescription);
 
         //Back to RecommendFragment
         ImageButton sleepBackButton = v.findViewById(R.id.workBackButton);
@@ -82,7 +73,7 @@ public class WhenWorkFragment extends Fragment {
         LinearLayoutManager layoutManager = new LinearLayoutManager(v.getContext(),
                 LinearLayoutManager.VERTICAL, false);
         whenWorkTypeRecyclerView.setLayoutManager(layoutManager);
-        WorkTypeAdapter whenWorkTypeAdapter = new WorkTypeAdapter();
+        WorkTypeAdapter whenWorkTypeAdapter = new WorkTypeAdapter(this);
 
         // WorkType 아이템 설정
         // 1. SharedPreference에 workType과 각 타입에 맞는 working time 설정
@@ -105,11 +96,7 @@ public class WhenWorkFragment extends Fragment {
         Boolean isChosen;
         String workStart, workEnd;
         for (int i = 0; i < 4; i++) {
-            if (sharedPref.getInt("workType", 0) == i) {
-                isChosen = true;
-            } else {
-                isChosen = false;
-            }
+            isChosen = sharedPref.getInt("workType", 0) == i;
             if (i == 0) {
                 workTypeItem = new WorkType(i, "-", "-", isChosen);
             } else {
@@ -123,325 +110,12 @@ public class WhenWorkFragment extends Fragment {
         }
 
         whenWorkTypeRecyclerView.setAdapter(whenWorkTypeAdapter);
-
-        EditText whenWorkOnHour1 = v.findViewById(R.id.whenWorkOnHour1);
-        EditText whenWorkOnHour2 = v.findViewById(R.id.whenWorkOnHour2);
-        EditText whenWorkOnMinute1 = v.findViewById(R.id.whenWorkOnMinute1);
-        EditText whenWorkOnMinute2 = v.findViewById(R.id.whenWorkOnMinute2);
-        //Get the work offset
-        EditText whenWorkOffHour1 = v.findViewById(R.id.whenWorkOffHour1);
-        EditText whenWorkOffHour2 = v.findViewById(R.id.whenWorkOffHour2);
-        EditText whenWorkOffMinute1 = v.findViewById(R.id.whenWorkOffMinute1);
-        EditText whenWorkOffMinute2 = v.findViewById(R.id.whenWorkOffMinute2);
-        Button whenWorkButton = v.findViewById(R.id.whenWorkButton);
+        whenWorkButton = v.findViewById(R.id.whenWorkButton);
         //Initial setting
         whenWorkButton.setEnabled(false);
         whenWorkButton.setBackgroundColor(getResources().getColor(R.color.blue_2, null));
 
-        //Check validity
-        whenWorkOnHour1.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                if (whenWorkOnHour1.getText() == null || whenWorkOnHour1.getText().toString().isEmpty()) {
-                    whenWorkButton.setEnabled(false);
-                    whenWorkButton.setBackgroundColor(getResources().getColor(R.color.blue_2, null));
-                } else if (Integer.parseInt(whenWorkOnHour1.getText().toString()) >= 3) {
-                    whenWorkButton.setEnabled(false);
-                    whenWorkButton.setBackgroundColor(getResources().getColor(R.color.blue_2, null));
-                } else if (Integer.parseInt(whenWorkOnHour1.getText().toString()) == 2 && onHour2 != null) {
-                    if (Integer.parseInt(onHour2) >= 4) {
-                        whenWorkButton.setEnabled(false);
-                        whenWorkButton.setBackgroundColor(getResources().getColor(R.color.blue_2, null));
-                    }
-                } else {
-                    whenWorkButton.setEnabled(true);
-                    whenWorkButton.setBackgroundColor(getResources().getColor(R.color.blue_1, null));
-                    onHour1 = whenWorkOnHour1.getText().toString();
-                }
-                whenWorkOnHour2.requestFocus();
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-            }
-        });
-
-        whenWorkOnHour2.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                if (whenWorkOnHour2.getText() == null || whenWorkOnHour2.getText().toString().isEmpty()) {
-                    whenWorkButton.setEnabled(false);
-                    whenWorkButton.setBackgroundColor(getResources().getColor(R.color.blue_2, null));
-                } else if (onHour1 != null) {
-                    if (Integer.parseInt(whenWorkOnHour2.getText().toString()) >= 4 && Integer.parseInt(onHour1) == 2) {
-                        whenWorkButton.setEnabled(false);
-                        whenWorkButton.setBackgroundColor(getResources().getColor(R.color.blue_2, null));
-                    } else {
-                        whenWorkButton.setEnabled(true);
-                        whenWorkButton.setBackgroundColor(getResources().getColor(R.color.blue_1, null));
-                        onHour2 = whenWorkOnHour2.getText().toString();
-                    }
-                } else {
-                    whenWorkButton.setEnabled(true);
-                    whenWorkButton.setBackgroundColor(getResources().getColor(R.color.blue_1, null));
-                    onHour2 = whenWorkOnHour2.getText().toString();
-                }
-                whenWorkOnMinute1.requestFocus();
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-            }
-        });
-
-        whenWorkOnMinute1.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                if (whenWorkOnMinute1.getText() == null || whenWorkOnMinute1.getText().toString().isEmpty()) {
-                    whenWorkButton.setEnabled(false);
-                    whenWorkButton.setBackgroundColor(getResources().getColor(R.color.blue_2, null));
-                } else if (Integer.parseInt(whenWorkOnMinute1.getText().toString()) >= 6) {
-                    whenWorkButton.setEnabled(false);
-                    whenWorkButton.setBackgroundColor(getResources().getColor(R.color.blue_2, null));
-                } else {
-                    whenWorkButton.setEnabled(true);
-                    whenWorkButton.setBackgroundColor(getResources().getColor(R.color.blue_1, null));
-                    onMinute1 = whenWorkOnMinute1.getText().toString();
-                }
-                whenWorkOnMinute2.requestFocus();
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-            }
-        });
-
-        whenWorkOnMinute2.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                if (whenWorkOnMinute2.getText() == null || whenWorkOnMinute2.getText().toString().isEmpty()) {
-                    whenWorkButton.setEnabled(false);
-                    whenWorkButton.setBackgroundColor(getResources().getColor(R.color.blue_2, null));
-                } else {
-                    whenWorkButton.setEnabled(true);
-                    whenWorkButton.setBackgroundColor(getResources().getColor(R.color.blue_1, null));
-                    onMinute2 = whenWorkOnMinute2.getText().toString();
-                }
-                whenWorkOffHour1.requestFocus();
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-            }
-        });
-
-        whenWorkOffHour1.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                if (whenWorkOffHour1.getText() == null || whenWorkOffHour1.getText().toString().isEmpty()) {
-                    whenWorkButton.setEnabled(false);
-                    whenWorkButton.setBackgroundColor(getResources().getColor(R.color.blue_2, null));
-                } else if (Integer.parseInt(whenWorkOffHour1.getText().toString()) >= 3) {
-                    whenWorkButton.setEnabled(false);
-                    whenWorkButton.setBackgroundColor(getResources().getColor(R.color.blue_2, null));
-                } else if (Integer.parseInt(whenWorkOnHour1.getText().toString()) == 2 && offHour2 != null) {
-                    if (Integer.parseInt(offHour2) >= 4) {
-                        whenWorkButton.setEnabled(false);
-                        whenWorkButton.setBackgroundColor(getResources().getColor(R.color.blue_2, null));
-                    }
-                } else {
-                    whenWorkButton.setEnabled(true);
-                    whenWorkButton.setBackgroundColor(getResources().getColor(R.color.blue_1, null));
-                    offHour1 = whenWorkOffHour1.getText().toString();
-                }
-                whenWorkOffHour2.requestFocus();
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-            }
-        });
-
-        whenWorkOffHour2.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                if (whenWorkOffHour2.getText() == null || whenWorkOffHour2.getText().toString().isEmpty()) {
-                    whenWorkButton.setEnabled(false);
-                    whenWorkButton.setBackgroundColor(getResources().getColor(R.color.blue_2, null));
-                } else if (offHour1 != null) {
-                    if (Integer.parseInt(whenWorkOffHour2.getText().toString()) >= 4 && Integer.parseInt(offHour1) == 2) {
-                        whenWorkButton.setEnabled(false);
-                        whenWorkButton.setBackgroundColor(getResources().getColor(R.color.blue_2, null));
-                    } else {
-                        whenWorkButton.setEnabled(true);
-                        whenWorkButton.setBackgroundColor(getResources().getColor(R.color.blue_1, null));
-                        offHour2 = whenWorkOffHour2.getText().toString();
-                    }
-                } else {
-                    whenWorkButton.setEnabled(true);
-                    whenWorkButton.setBackgroundColor(getResources().getColor(R.color.blue_1, null));
-                    offHour2 = whenWorkOffHour2.getText().toString();
-                }
-                whenWorkOffMinute1.requestFocus();
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-            }
-        });
-
-        whenWorkOffMinute1.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                if (whenWorkOffMinute1.getText() == null || whenWorkOffMinute1.getText().toString().isEmpty()) {
-                    whenWorkButton.setEnabled(false);
-                    whenWorkButton.setBackgroundColor(getResources().getColor(R.color.blue_2, null));
-                } else if (Integer.parseInt(whenWorkOffMinute1.getText().toString()) >= 6) {
-                    whenWorkButton.setEnabled(false);
-                    whenWorkButton.setBackgroundColor(getResources().getColor(R.color.blue_2, null));
-                } else {
-                    whenWorkButton.setEnabled(true);
-                    whenWorkButton.setBackgroundColor(getResources().getColor(R.color.blue_1, null));
-                    offMinute1 = whenWorkOffMinute1.getText().toString();
-                }
-                whenWorkOffMinute2.requestFocus();
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-            }
-        });
-
-        whenWorkOffMinute2.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                if (whenWorkOffMinute2.getText() == null || whenWorkOffMinute2.getText().toString().isEmpty()) {
-                    whenWorkButton.setEnabled(false);
-                    whenWorkButton.setBackgroundColor(getResources().getColor(R.color.blue_2, null));
-                } else {
-                    whenWorkButton.setEnabled(true);
-                    whenWorkButton.setBackgroundColor(getResources().getColor(R.color.blue_1, null));
-                    offMinute2 = whenWorkOffMinute2.getText().toString();
-                }
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-            }
-        });
-
-        // Work Type Picker
-        final int[] selectedType = new int[1];
-        selectedType[0] = 0;
-        TabLayout workTypeTab = v.findViewById(R.id.workTypeTab);
-        workTypeTab.addTab(workTypeTab.newTab().setText("휴무"));
-        workTypeTab.addTab(workTypeTab.newTab().setText("아침"));
-        workTypeTab.addTab(workTypeTab.newTab().setText("저녁"));
-        workTypeTab.addTab(workTypeTab.newTab().setText("야간"));
-
-        workTypeTab.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
-            @Override
-            public void onTabSelected(TabLayout.Tab tab) {
-                int position = tab.getPosition();
-                switch (position) {
-                    case 0 -> {
-                        selectedType[0] = 0;
-                        Log.v("WhenWorkFragment", "Selected Work type: " + selectedType[0]);
-                    }
-                    case 1 -> {
-                        selectedType[0] = -1;
-                        Log.v("WhenWorkFragment", "Selected Work type: " + selectedType[0]);
-                    }
-                    case 2 -> {
-                        selectedType[0] = -2;
-                        Log.v("WhenWorkFragment", "Selected Work type: " + selectedType[0]);
-                    }
-                    case 3 -> {
-                        selectedType[0] = -3;
-                        Log.v("WhenWorkFragment", "Selected Work type: " + selectedType[0]);
-                    }
-                }
-            }
-
-            @Override
-            public void onTabUnselected(TabLayout.Tab tab) {
-                int position = tab.getPosition();
-                switch (position) {
-                    case 0 -> {
-                        selectedType[0] = 0;
-                        Log.v("RecommendFragment", "Selected Work type: " + selectedType[0]);
-                    }
-                    case 1 -> {
-                        selectedType[0] = -1;
-                        Log.v("RecommendFragment", "Selected Work type: " + selectedType[0]);
-                    }
-                    case 2 -> {
-                        selectedType[0] = -2;
-                        Log.v("RecommendFragment", "Selected Work type: " + selectedType[0]);
-                    }
-                    case 3 -> {
-                        selectedType[0] = -3;
-                        Log.v("RecommendFragment", "Selected Work type: " + selectedType[0]);
-                    }
-                }
-            }
-
-            @Override
-            public void onTabReselected(TabLayout.Tab tab) {
-                int position = tab.getPosition();
-                switch (position) {
-                    case 0 -> {
-                        selectedType[0] = 0;
-                        Log.v("RecommendFragment", "Selected Work type: " + selectedType[0]);
-                    }
-                    case 1 -> {
-                        selectedType[0] = -1;
-                        Log.v("RecommendFragment", "Selected Work type: " + selectedType[0]);
-                    }
-                    case 2 -> {
-                        selectedType[0] = -2;
-                        Log.v("RecommendFragment", "Selected Work type: " + selectedType[0]);
-                    }
-                    case 3 -> {
-                        selectedType[0] = -3;
-                        Log.v("RecommendFragment", "Selected Work type: " + selectedType[0]);
-                    }
-                }
-            }
-        });
-
+        // WhenSleepFragment에서 sleepOnset 받아오기
         Bundle sleepBundle = getArguments();
         if (sleepBundle != null) {
             sleepOnsetTime = sleepBundle.getString("SleepOnset");
@@ -450,11 +124,15 @@ public class WhenWorkFragment extends Fragment {
 
         //Save work onset and offset to database
         whenWorkButton.setOnClickListener(view -> {
-            workOnsetTime = onHour1 + onHour2 + ":" + onMinute1 + onMinute2;
-            workOffsetTime = offHour1 + offHour2 + ":" + offMinute1 + offMinute2;
+            // WorkType에 해당하는 workOnset, workOffset 가져오기
+            String selectedOnsetKey = "workOnset_" + selectedWorkType;
+            String selectedOffsetKey = "workOffset_" + selectedWorkType;
+            workOnsetTime = sharedPref.getString(selectedOnsetKey, "00:00");
+            workOffsetTime = sharedPref.getString(selectedOffsetKey, "00:00");
             Log.v("WhenWorkFragment", "SleepOnset: " + sleepOnsetTime + " /  WorkOnset: " + workOnsetTime);
+
             if (sleepOnsetTime.equals(workOnsetTime)) {
-                Toast.makeText(v.getContext(), "취침 시간과 집중 시작 시간은 일치하면 안됩니다!",Toast.LENGTH_SHORT).show();
+                Toast.makeText(v.getContext(), "취침 시간과 근무 시작 시간은 일치하면 안됩니다!",Toast.LENGTH_SHORT).show();
             } else {
                 Date sleepOnsetInput, workOnsetInput, workOffsetInput;
                 Calendar sleepOnsetCal, workOnsetCal, workOffsetCal;
@@ -518,7 +196,7 @@ public class WhenWorkFragment extends Fragment {
                     mainActivity.setSleepOnset(sleepOnsetResult);
                     mainActivity.setWorkOnset(workOnsetResult);
                     mainActivity.setWorkOffset(workOffsetResult);
-                    sharedPref.edit().putInt("workType", selectedType[0]).apply();
+                    sharedPref.edit().putInt("workType", selectedWorkType).apply();
                     sharedPref.edit().putLong("sleepOnsetShow", sleepOnsetShowResult).apply();
 
                     Log.v("SplashActivity", "Onset: " + sleepOnsetResult + " / Onset Show: " + sleepOnsetShowResult +
@@ -526,7 +204,7 @@ public class WhenWorkFragment extends Fragment {
                     Locale currentLocale = Locale.getDefault();
                     String language = currentLocale.getLanguage();
 
-                    BackendAPI.sendSurvey(v.getContext(), sleepOnsetResult, workOnsetResult, workOffsetResult, selectedType[0], new BackendAPI.SurveyCallback() {
+                    BackendAPI.sendSurvey(v.getContext(), sleepOnsetResult, workOnsetResult, workOffsetResult, selectedWorkType, new BackendAPI.SurveyCallback() {
                         @Override
                         public void onSuccess() {
                             if (language.equals("ko")) {
@@ -561,6 +239,19 @@ public class WhenWorkFragment extends Fragment {
 
         });
         return v;
+    }
+
+    @Override
+    public void onWorkTypeSelected(WorkType item) {
+        // 어댑터에서 선택된 WorkType을 받기
+        selectedWorkType = item.getWorkType();
+        Log.d("WhenWorkFragment", "선택된 work Type: " + selectedWorkType);
+
+        // 버튼을 활성화
+        if (whenWorkButton != null) {
+            whenWorkButton.setEnabled(true);
+            whenWorkButton.setBackgroundColor(getResources().getColor(R.color.blue_1, null));
+        }
     }
 
     public boolean isValid(long sleepOnset1, long workOnset1, long workOffset1) {
@@ -656,10 +347,10 @@ public class WhenWorkFragment extends Fragment {
         window.setStatusBarColor(getResources().getColor(R.color.dim, null));
 
         View viewDialog = LayoutInflater.from(getActivity()).inflate(R.layout.layout_custom_dialog,
-                (LinearLayout) getActivity().findViewById(R.id.DialogLayout));
-        TextView dialogTitle = (TextView) viewDialog.findViewById(R.id.dialogTitle);
-        TextView dialogMessage = (TextView) viewDialog.findViewById(R.id.dialogMessage);
-        Button dialogButton = (Button) viewDialog.findViewById(R.id.dialogButton);
+                getActivity().findViewById(R.id.DialogLayout));
+        TextView dialogTitle = viewDialog.findViewById(R.id.dialogTitle);
+        TextView dialogMessage = viewDialog.findViewById(R.id.dialogMessage);
+        Button dialogButton = viewDialog.findViewById(R.id.dialogButton);
         dialogTitle.setText(title);
         dialogMessage.setText(message);
         dialogButton.setText(buttonText);

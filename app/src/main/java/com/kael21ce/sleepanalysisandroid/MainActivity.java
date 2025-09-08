@@ -34,6 +34,7 @@ import android.widget.Toast;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -246,22 +247,25 @@ public class MainActivity extends AppCompatActivity {
 
 
         // 오후 12시 이후 mood와 sleep quality 관련 설문 진행
+        Calendar calendar_12 = Calendar.getInstance();
+        int hour_12 = calendar_12.get(Calendar.HOUR_OF_DAY);
+        int day_12 = calendar_12.get(Calendar.DAY_OF_MONTH);
+
+        if (!sharedPref.contains(survey_key)) {
+            editor.putInt(survey_key, 0).apply();
+        }
+        int surveyDay = sharedPref.getInt(survey_key, 0);
+        boolean survey_1 = surveyDay != day_12 && (sharedPref.contains("User_Name") && sharedPref.contains("User_Email"));
+        boolean survey_2 = !sharedPref.getString("User_Name","UserName").equals("UserName");
+        boolean survey_3 = hour_12 >= 12;
         Runnable afterTransaction = () -> {
-            Calendar calendar = Calendar.getInstance();
-            int hour = calendar.get(Calendar.HOUR_OF_DAY);
-            int day = calendar.get(Calendar.DAY_OF_MONTH);
-
-            if (!sharedPref.contains(survey_key)) {
-                editor.putInt(survey_key, 0).apply();
-            }
-            int surveyDay = sharedPref.getInt(survey_key, 0);
-
-        if (surveyDay != day && (sharedPref.contains("User_Name") && sharedPref.contains("User_Email"))) {
-            if (!sharedPref.getString("User_Name","UserName").equals("UserName")) {
-                if (hour >= 12) {
+        if (survey_1) {
+            if (survey_2) {
+                if (survey_3) {
                     // 근무 일정 변경 관련 alert dialog 띄우기 -> 설문 진행
                     View dimBackground = findViewById(R.id.dimBackgroundMain);
-                    showAlertDialog(dimBackground, bottomNavigationView);
+                    ActionBar actionBar = getSupportActionBar();
+                    showAlertDialog(dimBackground, actionBar, bottomNavigationView);
                 }
             }
         }
@@ -356,52 +360,52 @@ public class MainActivity extends AppCompatActivity {
     public void replaceFragment(int fragmentNumber, boolean setTitle, boolean setBottom, Runnable runnable) {
         if (fragmentNumber == 0) {
             // HomeFragment
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.mainFrame, homeFragment)
+                    .runOnCommit(runnable)
+                    .commit();
             if (setTitle) {
                 getSupportActionBar().setTitle(Html.fromHtml("<font color='#223047'>SleepWake</font>"));
             }
             if (setBottom) {
                 setBottomNaviItem(R.id.tabHome);
             }
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.mainFrame, homeFragment)
-                    .runOnCommit(runnable)
-                    .commit();
         } else if (fragmentNumber == 1) {
             // ScheduleFragment
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.mainFrame, scheduleFragment)
+                    .runOnCommit(runnable)
+                    .commit();
             if (setTitle) {
                 getSupportActionBar().setTitle(Html.fromHtml("<font color='#223047'>수면 기록</font>"));
             }
             if (setBottom) {
                 setBottomNaviItem(R.id.tabSchedule);
             }
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.mainFrame, scheduleFragment)
-                    .runOnCommit(runnable)
-                    .commit();
         } else if (fragmentNumber == 2) {
             // RecommendFragment
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.mainFrame, recommendFragment)
+                    .runOnCommit(runnable)
+                    .commit();
             if (setTitle) {
                 getSupportActionBar().setTitle(Html.fromHtml("<font color='#223047'>일정 변경</font>"));
             }
             if (setBottom) {
                 setBottomNaviItem(R.id.tabRecommend);
             }
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.mainFrame, recommendFragment)
-                    .runOnCommit(runnable)
-                    .commit();
         } else if (fragmentNumber == 3) {
             // SettingFragment
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.mainFrame, settingFragment)
+                    .runOnCommit(runnable)
+                    .commit();
             if (setTitle) {
                 getSupportActionBar().setTitle(Html.fromHtml("<font color='#223047'>설정</font>"));
             }
             if (setBottom) {
                 setBottomNaviItem(R.id.tabSetting);
             }
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.mainFrame, settingFragment)
-                    .runOnCommit(runnable)
-                    .commit();
         }
     }
 
@@ -622,9 +626,6 @@ public class MainActivity extends AppCompatActivity {
     public void onDestroy(){
         super.onDestroy();
         sharedPref.unregisterOnSharedPreferenceChangeListener(prefListener);
-        if (db != null) {
-            db.close();
-        }
         Log.v(TAG, "onDestroy() is called");
     }
 
@@ -875,18 +876,20 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // CustomAlertDialog
-    private void showAlertDialog(View dimBackground, BottomNavigationView bottomNavigationView) {
+    private void showAlertDialog(View dimBackground, ActionBar actionBar, BottomNavigationView bottomNavigationView) {
         // Save the original color
         // Change this part if someone tries to change the primary color
         int originalActionBarColor = getResources().getColor(R.color.white, null);
         int originalNavigationBarColor = getResources().getColor(R.color.white, null);
         Window window = getWindow();
 
-
         // Dim effect
         dimBackground.setVisibility(View.VISIBLE);
         if (bottomNavigationView != null) {
             bottomNavigationView.setItemBackground(new ColorDrawable(getResources().getColor(R.color.dim, null)));
+        }
+        if (actionBar != null) {
+            actionBar.setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.dim, null)));
         }
         window.setStatusBarColor(getResources().getColor(R.color.dim, null));
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -920,6 +923,9 @@ public class MainActivity extends AppCompatActivity {
             dimBackground.setVisibility(View.GONE);
             if (bottomNavigationView != null) {
                 bottomNavigationView.setItemBackground(new ColorDrawable(getResources().getColor(R.color.white, null)));
+            }
+            if (actionBar != null) {
+                actionBar.setBackgroundDrawable(new ColorDrawable(originalActionBarColor));
             }
             window.setStatusBarColor(getResources().getColor(R.color.white, null));
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {

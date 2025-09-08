@@ -5,7 +5,7 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal"
     android:background="@drawable/bottom_line"
-    android:layout_marginBottom="8dp">
+    android:layout_marginBottom="12dp">
 
     <RadioButton
         android:id="@+id/workTypeRadio"
@@ -27,7 +27,8 @@
             android:layout_height="wrap_content"
             android:fontFamily="@font/pretendardvariable"
             android:text="아침"
-            android:textColor="@color/black"/>
+            android:textColor="@color/black"
+            android:textSize="16sp"/>
 
         <TextView
             android:id="@+id/workTypeTimeText"
@@ -35,7 +36,8 @@
             android:layout_height="wrap_content"
             android:text="09:00 - 18:00"
             android:fontFamily="@font/pretendardvariable"
-            android:textColor="@color/gray_4"/>
+            android:textColor="@color/gray_4"
+            android:textSize="14sp"/>
 
     </LinearLayout>
 
