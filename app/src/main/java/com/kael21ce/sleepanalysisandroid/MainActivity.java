@@ -4,6 +4,7 @@ package com.kael21ce.sleepanalysisandroid;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
@@ -19,15 +20,20 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.text.Html;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.Button;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -220,21 +226,35 @@ public class MainActivity extends AppCompatActivity {
         isenoughsleep = sharedPref.getBoolean("enoughSleep", false);
         isearlysleep = sharedPref.getBoolean("earlySleep", false);
 
-        /*
-        //Hide navigation bar
-        View decorView = getWindow().getDecorView();
-        int uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_FULLSCREEN;
-        decorView.setSystemUiVisibility(uiOptions);
-         */
 
+        // 오후 12시 이후 mood와 sleep quality 관련 설문 진행
+        Runnable afterTransaction = () -> {
+            Calendar calendar = Calendar.getInstance();
+            int hour = calendar.get(Calendar.HOUR_OF_DAY);
+            int day = calendar.get(Calendar.DAY_OF_MONTH);
+
+            if (!sharedPref.contains(survey_key)) {
+                editor.putInt(survey_key, 0).apply();
+            }
+            int surveyDay = sharedPref.getInt(survey_key, 0);
+
+        if (surveyDay != day && (sharedPref.contains("User_Name") && sharedPref.contains("User_Email"))) {
+            if (!sharedPref.getString("User_Name","UserName").equals("UserName")) {
+                if (hour >= 12) {
+                    // 근무 일정 변경 관련 alert dialog 띄우기 -> 설문 진행
+                    View dimBackground = findViewById(R.id.dimBackgroundMain);
+                    showAlertDialog(dimBackground, bottomNavigationView);
+                }
+            }
+        }
+        };
 
         bottomNavigationView = findViewById(R.id.bottomNavigationView);
         boolean isSchedule = sharedPref.getBoolean("isSchedule", false);
         if(isSchedule){
             editor.putBoolean("isSchedule", false);
             editor.apply();
-            getSupportFragmentManager().beginTransaction().replace(R.id.mainFrame, scheduleFragment).commit();
-            setBottomNaviItem(R.id.tabSchedule);
+            replaceFragment(1, false, true, afterTransaction);
 
             if (getIntent() != null) {
                 Intent scheduleIntent = getIntent();
@@ -254,8 +274,7 @@ public class MainActivity extends AppCompatActivity {
                 scheduleFragment.setArguments(scheduleBundle);
             }
         }else {
-            getSupportFragmentManager().beginTransaction().replace(R.id.mainFrame, homeFragment).commit();
-            setBottomNaviItem(R.id.tabHome);
+            replaceFragment(0, false, true, afterTransaction);
         }
         getSupportActionBar().setTitle(Html.fromHtml("<font color='#223047'>SleepWake</font>"));
 
@@ -264,24 +283,16 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                         if (item.getItemId() == R.id.tabHome) {
-                            getSupportFragmentManager().beginTransaction()
-                                    .replace(R.id.mainFrame, homeFragment).commit();
-                            getSupportActionBar().setTitle(Html.fromHtml("<font color='#223047'>SleepWake</font>"));
+                            replaceFragment(0, true, false, afterTransaction);
                             return true;
                         } else if (item.getItemId() == R.id.tabSchedule) {
-                            getSupportFragmentManager().beginTransaction()
-                                    .replace(R.id.mainFrame, scheduleFragment).commit();
-                            getSupportActionBar().setTitle(Html.fromHtml("<font color='#223047'>수면 기록</font>"));
+                            replaceFragment(1, true, false, afterTransaction);
                             return true;
                         } else if (item.getItemId() == R.id.tabRecommend) {
-                            getSupportFragmentManager().beginTransaction()
-                                    .replace(R.id.mainFrame, recommendFragment).commit();
-                            getSupportActionBar().setTitle(Html.fromHtml("<font color='#223047'>일정 변경</font>"));
+                            replaceFragment(2, true, false, afterTransaction);
                             return true;
                         } else if (item.getItemId() == R.id.tabSetting) {
-                            getSupportFragmentManager().beginTransaction()
-                                    .replace(R.id.mainFrame, settingFragment).commit();
-                            getSupportActionBar().setTitle(Html.fromHtml("<font color='#223047'>설정</font>"));
+                            replaceFragment(3, true, false, afterTransaction);
                             return true;
                         } else {
                             return false;
@@ -321,30 +332,59 @@ public class MainActivity extends AppCompatActivity {
             }
         };
         sharedPref.registerOnSharedPreferenceChangeListener(prefListener);
+    }
 
-        //Open the mood and sleep quality survey if the app is open after 12 p.m.
-        /*
-        Calendar calendar = Calendar.getInstance();
-        int hour = calendar.get(Calendar.HOUR_OF_DAY);
-        int day = calendar.get(Calendar.DAY_OF_MONTH);
-
-        if (!sharedPref.contains(survey_key)) {
-            editor.putInt(survey_key, 0).apply();
-        }
-        int surveyDay = sharedPref.getInt(survey_key, 0);
-
-        if (surveyDay != day && (sharedPref.contains("User_Name") && sharedPref.contains("User_Email"))) {
-            if (!sharedPref.getString("User_Name","UserName").equals("UserName")) {
-                if (hour >= 12) {
-                    Bundle temp = new Bundle();
-                    Intent surveyIntent = new Intent(this, SQMoodSendingActivity.class);
-                    surveyIntent.putExtra(survey_name, 0);
-                    surveyIntent.putExtra("moodData", temp);
-                    startActivity(surveyIntent);
-                }
+    // Fragment replace method -> await callback
+    public void replaceFragment(int fragmentNumber, boolean setTitle, boolean setBottom, Runnable runnable) {
+        if (fragmentNumber == 0) {
+            // HomeFragment
+            if (setTitle) {
+                getSupportActionBar().setTitle(Html.fromHtml("<font color='#223047'>SleepWake</font>"));
             }
+            if (setBottom) {
+                setBottomNaviItem(R.id.tabHome);
+            }
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.mainFrame, homeFragment)
+                    .runOnCommit(runnable)
+                    .commit();
+        } else if (fragmentNumber == 1) {
+            // ScheduleFragment
+            if (setTitle) {
+                getSupportActionBar().setTitle(Html.fromHtml("<font color='#223047'>수면 기록</font>"));
+            }
+            if (setBottom) {
+                setBottomNaviItem(R.id.tabSchedule);
+            }
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.mainFrame, scheduleFragment)
+                    .runOnCommit(runnable)
+                    .commit();
+        } else if (fragmentNumber == 2) {
+            // RecommendFragment
+            if (setTitle) {
+                getSupportActionBar().setTitle(Html.fromHtml("<font color='#223047'>일정 변경</font>"));
+            }
+            if (setBottom) {
+                setBottomNaviItem(R.id.tabRecommend);
+            }
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.mainFrame, recommendFragment)
+                    .runOnCommit(runnable)
+                    .commit();
+        } else if (fragmentNumber == 3) {
+            // SettingFragment
+            if (setTitle) {
+                getSupportActionBar().setTitle(Html.fromHtml("<font color='#223047'>설정</font>"));
+            }
+            if (setBottom) {
+                setBottomNaviItem(R.id.tabSetting);
+            }
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.mainFrame, settingFragment)
+                    .runOnCommit(runnable)
+                    .commit();
         }
-        */
     }
 
     //Create channel for notification of recommendation
@@ -388,7 +428,6 @@ public class MainActivity extends AppCompatActivity {
         WorkManager.getInstance(this).enqueueUniquePeriodicWork(RecommendName,
                 ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE, pushRequest);
 
-        /*
         //Send notification for survey in four time
         long surveyTime, surveyDelay1, surveyDelay2, surveyDelay3;
         //1. work onset
@@ -477,7 +516,6 @@ public class MainActivity extends AppCompatActivity {
         WorkManager.getInstance(this).enqueueUniquePeriodicWork(SurveyName3,
                 ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE, surveyRequest3);
         Log.v(TAG, "Survey delay 3: " + surveyDelay3);
-        */
     }
 
     //Change "HH:mm" to milliseconds
@@ -834,21 +872,63 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    // CustomAlertDialog
+    private void showAlertDialog(View dimBackground, BottomNavigationView bottomNavigationView) {
+        // Save the original color
+        // Change this part if someone tries to change the primary color
+        int originalActionBarColor = getResources().getColor(R.color.white, null);
+        int originalNavigationBarColor = getResources().getColor(R.color.white, null);
+        Window window = getWindow();
+
+
+        // Dim effect
+        dimBackground.setVisibility(View.VISIBLE);
+        if (bottomNavigationView != null) {
+            bottomNavigationView.setItemBackground(new ColorDrawable(getResources().getColor(R.color.dim, null)));
+        }
+        window.setStatusBarColor(getResources().getColor(R.color.dim, null));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            window.setNavigationBarColor(getResources().getColor(R.color.dim, null));
+        }
+
+        LayoutInflater inflater = LayoutInflater.from(this);
+        View viewDialog = inflater.inflate(R.layout.layout_custom_dialog, null);
+
+        TextView dialogTitle = viewDialog.findViewById(R.id.dialogTitle);
+        TextView dialogMessage = viewDialog.findViewById(R.id.dialogMessage);
+        Button dialogButton = viewDialog.findViewById(R.id.dialogButton);
+        dialogTitle.setText("알림");
+        dialogMessage.setText("내일 근무 형태나 활동 시간이 변경되었나요?\n그렇다면 일정 변경 탭에서 수정해주세요");
+        dialogButton.setText("확인");
+
+        AlertDialog dialog = new AlertDialog.Builder(this, R.style.CustomAlertDialog)
+                .setView(viewDialog)
+                .create();
+
+        dialogButton.setOnClickListener(dialogV -> {
+            dialog.dismiss();
+
+            // 설문으로 이동
+            Bundle temp = new Bundle();
+            Intent surveyIntent = new Intent(this, SQMoodSendingActivity.class);
+            surveyIntent.putExtra(survey_name, 0);
+            surveyIntent.putExtra("moodData", temp);
+            startActivity(surveyIntent);
+
+            dimBackground.setVisibility(View.GONE);
+            if (bottomNavigationView != null) {
+                bottomNavigationView.setItemBackground(new ColorDrawable(getResources().getColor(R.color.white, null)));
+            }
+            window.setStatusBarColor(getResources().getColor(R.color.white, null));
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                window.setNavigationBarColor(originalNavigationBarColor);
+            }
+        });
+        dialog.setCancelable(true);
+        dialog.show();
+
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
+        }
+    }
 }
-
-
-//        long sleepOnset = AppDatabase.sleepOnset;
-//        String test = sdfDateTime.format(new Date(sleepOnset));
-//        Log.v("tagMain", test);
-//
-//        AppDatabase.sleepOnset = System.currentTimeMillis()- 1000*60*60*24;
-
-//        Sleep test = new Sleep();
-//        test.sleep_id = 1;
-//        test.sleepStart = System.currentTimeMillis()- 1000*60*60*24;
-//        test.sleepEnd = System.currentTimeMillis();
-//        String testInit = sdfDateTime.format(new Date(test.sleepStart));
-//        userDao.insertAll(test);
-
-//        String newTime = sdfDateTime.format(new Date(System.currentTimeMillis()));
-//        Log.v("time", newTime);

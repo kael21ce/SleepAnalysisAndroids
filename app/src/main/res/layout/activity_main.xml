@@ -4,34 +4,46 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-
     <FrameLayout
-        android:id="@+id/mainFrame"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        >
+        app:layout_constraintTop_toTopOf="parent">
 
-        <RelativeLayout
-            android:id="@+id/loadingScreenLayout"
+        <FrameLayout
+            android:id="@+id/mainFrame"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="#80000000"
-            android:gravity="center"
-            android:visibility="gone">
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            >
 
-            <ProgressBar
-                android:id="@+id/loadingProgressBar"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:layout_alignParentEnd="true"
-                android:layout_marginStart="136dp"
-                android:layout_marginEnd="136dp" />
-        </RelativeLayout>
+            <RelativeLayout
+                android:id="@+id/loadingScreenLayout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#80000000"
+                android:gravity="center"
+                android:visibility="gone">
+
+                <ProgressBar
+                    android:id="@+id/loadingProgressBar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginStart="136dp"
+                    android:layout_marginEnd="136dp" />
+            </RelativeLayout>
+        </FrameLayout>
+
+        <View
+            android:id="@+id/dimBackgroundMain"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/dim"
+            android:visibility="gone" />
+
     </FrameLayout>
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
