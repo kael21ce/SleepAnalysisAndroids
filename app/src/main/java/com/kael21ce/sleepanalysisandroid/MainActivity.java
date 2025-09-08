@@ -32,8 +32,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -93,6 +93,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String RecommendName = "Recommend";
     private static final String SurveyName1 = "Survey1", SurveyName2 = "Survey2", SurveyName3 = "Survey3", SurveyName4 = "Survey4";
     //Time after click back button
+    private OnBackPressedCallback callback;
     private boolean doubleBackToExitPressedOnce = false;
 
     private static final int PERMISSION_REQUEST_READ_LOCATION = 0x00000001;
@@ -135,6 +136,23 @@ public class MainActivity extends AppCompatActivity {
         context = getApplicationContext();
 
         Log.v("MainActivity", "onCreate() is called");
+
+        // 뒤로가기 callback 생성
+        callback = new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                if (doubleBackToExitPressedOnce) {
+                    finishAffinity();
+                    return;
+                }
+                doubleBackToExitPressedOnce = true;
+                Toast.makeText(MainActivity.this, "'뒤로' 버튼을 한 번 더 누르시면 종료됩니다",
+                        Toast.LENGTH_SHORT).show();
+
+                new Handler().postDelayed(() -> doubleBackToExitPressedOnce = false, 2000);
+            }
+        };
+        getOnBackPressedDispatcher().addCallback(this, callback);
 
         healthConnectManager = new HealthConnectManager(getApplicationContext());
         awarenesses = Collections.synchronizedList(new ArrayList<>());
@@ -582,25 +600,6 @@ public class MainActivity extends AppCompatActivity {
         unregisterReceiver(receiver);
     }
 
-    //If back button is clicked twice, move out from application
-    @Override
-    public void onBackPressed() {
-        if (doubleBackToExitPressedOnce) {
-            finishAffinity();
-            return;
-        }
-        this.doubleBackToExitPressedOnce = true;
-        Toast.makeText(this, "'뒤로' 버튼을 한 번 더 누르시면 종료됩니다",
-                Toast.LENGTH_SHORT).show();
-
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                doubleBackToExitPressedOnce = false;
-            }
-        }, 2000);
-    }
-
     @Override
     protected void onStart() {
         super.onStart();
@@ -623,6 +622,9 @@ public class MainActivity extends AppCompatActivity {
     public void onDestroy(){
         super.onDestroy();
         sharedPref.unregisterOnSharedPreferenceChangeListener(prefListener);
+        if (db != null) {
+            db.close();
+        }
         Log.v(TAG, "onDestroy() is called");
     }
 
