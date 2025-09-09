@@ -77,10 +77,12 @@ public class ProcessingAPI {
 
         // 3) 수면 날짜 업데이트
         long sleepOnset, workOnset, workOffset, sleepOnsetShow;
+        int workType;
         sleepOnset = sharedPref.getLong("sleepOnset", now);
         workOnset = sharedPref.getLong("workOnset", now);
         workOffset = sharedPref.getLong("workOffset", now);
         sleepOnsetShow = sharedPref.getLong("sleepOnsetShow", now);
+        workType = sharedPref.getInt("workType", 0);
         Long[] updatedDates = updateOnsetDate(now, sleepOnset, sleepOnsetShow, workOnset, workOffset);
         editor.putLong("sleepOnset", updatedDates[0]);
         editor.putLong("sleepOnsetShow", updatedDates[1]);
@@ -92,7 +94,7 @@ public class ProcessingAPI {
         List<Sleep> sleeps = getSleepData(sharedPref, sleepDao, lastDataUpdate, lastSleepUpdate, ILastSleepUpdate);
 
         if (!sleeps.isEmpty()) {
-            CombineResult combineResult = do_simulation(db, sharedPref, sleeps, barEntries, onsetOffsets, lastDataUpdate);
+            CombineResult combineResult = do_simulation(db, sharedPref, sleeps, barEntries, onsetOffsets, lastDataUpdate, workType);
             v0s = combineResult.getV0s();
             barEntries = combineResult.getBarEntries();
             awarenesses = calculateAwareness(db, sleeps, v0s);
@@ -231,7 +233,7 @@ public class ProcessingAPI {
 
     public static CombineResult do_simulation(AppDatabase db, SharedPreferences sharedPref, List<Sleep> sleeps,
                                      ArrayList<BarEntry> barEntries, ArrayList<Long> onsetOffsets,
-                                     long lastDataUpdate){
+                                     long lastDataUpdate, int workType){
         SharedPreferences.Editor editor = sharedPref.edit();
         //get V0 data
         V0Dao v0Dao = db.v0Dao();
@@ -360,8 +362,13 @@ public class ProcessingAPI {
         //process sleep prediction
         boolean isearlysleep, isenoughsleep;
         boolean isNight = sleepOnset == sleepOnsetShow;
-        int[] sleepSuggestion = sleepModel.Sleep_pattern_suggestion(initV0, (int)(sleepOnset-now)/(1000*60*5),
-                (int)(workOnset-now)/(1000*60*5), (int)(workOffset-now)/(1000*60*5), 5/60.0, isNight);
+        int[] sleepSuggestion;
+        if (workType == 0) {
+            sleepSuggestion = sleepModel.Sleep_pattern_suggestion_off(initV0, (int)(sleepOnset-now)/(1000*60*5), 5/60.0);
+        } else {
+             sleepSuggestion = sleepModel.Sleep_pattern_suggestion(initV0, (int)(sleepOnset-now)/(1000*60*5),
+                    (int)(workOnset-now)/(1000*60*5), (int)(workOffset-now)/(1000*60*5), 5/60.0, isNight);
+        }
         Log.v("SLEEP SUGGESTION", "is night? : " + isNight);
         Log.v("SLEEP SUGGESTION", String.valueOf(sleepSuggestion[0]));
         Log.v("MAIN SLEEP START", sdfDateTime.format(new Date(sleepSuggestion[0]*(1000*60*5)+now)));
