@@ -21,7 +21,6 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -30,6 +29,9 @@ import com.kael21ce.sleepanalysisandroid.data.BackendAPI;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -44,6 +46,7 @@ public class WhenWorkFragment extends Fragment implements WorkTypeAdapter.OnWork
     long sleepOnsetType, workOnsetType, workOffsetType;
     int selectedWorkType = 1;
     Button whenWorkButton;
+    TextView previewTitle, previewContent;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -114,6 +117,10 @@ public class WhenWorkFragment extends Fragment implements WorkTypeAdapter.OnWork
         //Initial setting
         whenWorkButton.setEnabled(false);
         whenWorkButton.setBackgroundColor(getResources().getColor(R.color.blue_2, null));
+        previewTitle = v.findViewById(R.id.previewTitle);
+        previewContent = v.findViewById(R.id.previewContent);
+        previewTitle.setVisibility(View.INVISIBLE);
+        previewContent.setVisibility(View.INVISIBLE);
 
         // WhenSleepFragment에서 sleepOnset 받아오기
         Bundle sleepBundle = getArguments();
@@ -251,6 +258,31 @@ public class WhenWorkFragment extends Fragment implements WorkTypeAdapter.OnWork
         if (whenWorkButton != null) {
             whenWorkButton.setEnabled(true);
             whenWorkButton.setBackgroundColor(getResources().getColor(R.color.blue_1, null));
+        }
+
+        // 프리뷰 활성화
+        if (previewTitle != null && previewContent != null) {
+            if (selectedWorkType == 0) {
+                previewTitle.setVisibility(View.INVISIBLE);
+                previewContent.setVisibility(View.INVISIBLE);
+            } else {
+                previewTitle.setVisibility(View.VISIBLE);
+                previewContent.setVisibility(View.VISIBLE);
+                previewContent.setText(convertTimeFormat(item.getWorkStart()) + " - " + convertTimeFormat(item.getWorkEnd()));
+            }
+        }
+    }
+
+    private String convertTimeFormat(String timeHHMM) {
+        DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("HH:mm");
+        DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("a h:mm", Locale.KOREA);
+
+        try {
+            LocalTime time = LocalTime.parse(timeHHMM, inputFormatter);
+            return time.format(outputFormatter);
+        } catch (DateTimeParseException e) {
+            System.out.println("잘못된 시간 형식입니다: " + timeHHMM);
+            return timeHHMM;
         }
     }
 

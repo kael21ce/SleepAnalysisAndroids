@@ -1,7 +1,10 @@
 package com.kael21ce.sleepanalysisandroid;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,10 +16,16 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
+
 import nl.joery.timerangepicker.TimeRangePicker;
 
 public class WhenSleepFragment extends Fragment {
-    String hour1, hour2, minute1, minute2;
+    SimpleDateFormat sdfTime = new SimpleDateFormat("HH:mm", Locale.KOREA);
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -46,22 +55,35 @@ public class WhenSleepFragment extends Fragment {
             }
         });
 
-        //Get the sleep onset
+        // TimeRangePicker 불러오기
         TimeRangePicker whenSleepPicker = v.findViewById(R.id.WhenSleepPicker);
         TextView whenSleepText = v.findViewById(R.id.whenSleepText);
-        whenSleepPicker.setStartTimeMinutes(0);
-        whenSleepPicker.setEndTimeMinutes(0);
-        whenSleepText.setText(time2String(0));
+
+        // Set the initial time
+        int minuteTotal;
+        SharedPreferences sharedPref = getActivity().getSharedPreferences("SleepWake", Context.MODE_PRIVATE);
+        if (sharedPref.contains("sleepOnset")) {
+            long sleepOnset = sharedPref.getLong("sleepOnset", 0);
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTimeInMillis(sleepOnset);
+            int hour = calendar.get(Calendar.HOUR_OF_DAY);
+            int minute = calendar.get(Calendar.MINUTE);
+            Log.d("WhenSleepFragment", "Saved hour: " + hour + " / minute: " + minute);
+            minuteTotal = hour * 60 + minute;
+        } else {
+            minuteTotal = 0;
+        }
+        whenSleepPicker.setStartTimeMinutes(minuteTotal);
+        whenSleepPicker.setEndTimeMinutes(minuteTotal);
+        whenSleepText.setText(time2String(minuteTotal));
+
+        // 단일 thumb를 가지는 timeRangePicker를 위해 listener 설정
         int whenSleep = whenSleepPicker.getStartTimeMinutes();
         final String[] whenSleepStr = {time2String(whenSleep)};
         whenSleepPicker.setOnDragChangeListener(new TimeRangePicker.OnDragChangeListener() {
             @Override
             public boolean onDragStart(@NonNull TimeRangePicker.Thumb thumb) {
-                if (thumb.equals(TimeRangePicker.Thumb.START)) {
-                    return false; // 시작 thumb는 움직이지 못하게 하기
-                } else {
-                    return true;
-                }
+                return !thumb.equals(TimeRangePicker.Thumb.START); // 시작 thumb는 움직이지 못하게 하기
             }
 
             @Override

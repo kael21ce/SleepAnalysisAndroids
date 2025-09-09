@@ -76,6 +76,44 @@
             android:layout_marginHorizontal="32dp"/>
 
         <LinearLayout
+            android:id="@+id/previewTextCaption"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="32dp"
+            android:layout_marginTop="32dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/previewTitle"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:fontFamily="@font/pretendardvariable"
+                android:maxLines="1"
+                android:text="오늘 적용 미리 보기"
+                android:textColor="@color/gray_4"
+                android:textSize="14sp"
+                android:autoSizeMaxTextSize="14sp"
+                android:autoSizeMinTextSize="6sp"
+                android:autoSizeStepGranularity="2sp"
+                android:autoSizeTextType="uniform"/>
+
+            <TextView
+                android:id="@+id/previewContent"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="8dp"
+                android:fontFamily="@font/pretendardvariable"
+                android:maxLines="1"
+                android:text="오전 9:00 - 오후 6:00"
+                android:textColor="@color/gray_4"
+                android:textSize="18sp"
+                android:autoSizeMaxTextSize="20sp"
+                android:autoSizeMinTextSize="12sp"
+                android:autoSizeStepGranularity="2sp"
+                android:autoSizeTextType="uniform"/>
+        </LinearLayout>
+
+        <LinearLayout
             android:id="@+id/workButtonCaption"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -89,11 +127,13 @@
                 android:backgroundTint="@color/blue_1"
                 android:fontFamily="@font/pretendardvariable"
                 android:maxLines="1"
-                android:paddingHorizontal="10dp"
+                android:paddingHorizontal="16dp"
                 android:paddingVertical="16dp"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginBottom="16dp"
                 android:text="다음"
                 android:textSize="16sp"
-                app:cornerRadius="8dp" />
+                app:cornerRadius="28dp" />
         </LinearLayout>
     </LinearLayout>
 

@@ -209,10 +209,11 @@ public class RecommendFragment extends Fragment {
             startActivity(infoIntent);
         });
 
-        //Move to setting if infoButton is clicked
+        // InfoButton을 클릭하면 WhenSleepFragment -> WhenWorkFragment로 이동
         infoButton.setOnClickListener(view -> {
-            Intent sleepOnsetIntent = new Intent(v.getContext(), SleepOnsetActivity.class);
-            startActivity(sleepOnsetIntent);
+            WhenSleepFragment whenSleepFragment = new WhenSleepFragment();
+            getParentFragmentManager().beginTransaction().replace(R.id.mainFrame, whenSleepFragment).commit();
+            mainActivity.setGoneBottomNavi();
         });
 
         //Initial Button Setting

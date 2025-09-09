@@ -184,12 +184,6 @@ public class SettingFragment extends Fragment {
             startActivity(hideIntent);
         });
 
-        LinearLayout onsetView = v.findViewById(R.id.OnsetView);
-        onsetView.setOnClickListener(view -> {
-            Intent sleepOnsetIntent = new Intent(v.getContext(), SleepOnsetActivity.class);
-            startActivity(sleepOnsetIntent);
-        });
-
         //Do SQMood survey again
         if (!sharedPref.contains(survey_key)) {
             editor.putInt(survey_key, 0).apply();

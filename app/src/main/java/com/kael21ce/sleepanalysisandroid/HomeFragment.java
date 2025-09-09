@@ -40,7 +40,6 @@ import com.kael21ce.sleepanalysisandroid.data.Awareness;
 import com.kael21ce.sleepanalysisandroid.data.DataMood;
 import com.kael21ce.sleepanalysisandroid.data.DataSurvey;
 import com.kael21ce.sleepanalysisandroid.data.ProcessingAPI;
-import com.kael21ce.sleepanalysisandroid.data.RetrofitAPI;
 import com.kael21ce.sleepanalysisandroid.data.Sleep;
 
 import java.lang.reflect.Type;
@@ -56,14 +55,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
-import java.util.concurrent.TimeUnit;
-
-import okhttp3.OkHttpClient;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 public class HomeFragment extends Fragment {
     SimpleDateFormat sdfDateTime = new SimpleDateFormat( "hh:mm a", Locale.KOREA);
@@ -74,7 +65,6 @@ public class HomeFragment extends Fragment {
     long now;
     private boolean creation = true;
     String mainSleepStartString, mainSleepEndString, workOnsetString, workOffsetString, napSleepStartString, napSleepEndString, sleepOnsetString;
-    private List<Awareness> awarenesses, sleepAwarenesses;
     private static final String MoodArrayKey = "MoodArray";
     private static final String AlertnessArrayKey = "AlertnessArray";
 
@@ -143,7 +133,7 @@ public class HomeFragment extends Fragment {
         ImageView no_data = v.findViewById(R.id.no_data_home);
         Glide.with(v.getContext()).load(R.raw.no_data).into(no_data);
 
-        if (sleeps != null && sleeps.size() > 0) {
+        if (sleeps != null && !sleeps.isEmpty()) {
             toRecommendButton.setOnClickListener(view -> {
                 RecommendFragment recommendFragment = new RecommendFragment();
                 getParentFragmentManager().beginTransaction().replace(R.id.mainFrame, recommendFragment).commit();
@@ -190,7 +180,7 @@ public class HomeFragment extends Fragment {
                 ChartHomeView.setVisibility(View.GONE);
                 SleepChartHomeView.setVisibility(View.GONE);
             } else {
-                if (sleeps != null && sleeps.size() > 0) {
+                if (sleeps != null && !sleeps.isEmpty()) {
                     if (!isHidden) {
                         homeNoDataView.setVisibility(View.GONE);
                         SurveyUpperView.setVisibility(View.VISIBLE);
@@ -257,11 +247,12 @@ public class HomeFragment extends Fragment {
             }
         });
 
-        //Move to SleepOnsetActivity
+        // WhenSleepFragment -> WhenWorkFragment로 이동
         ImageButton clockOnsetButton = v.findViewById(R.id.ClockOnsetButton);
         clockOnsetButton.setOnClickListener(view -> {
-            Intent onsetIntent = new Intent(v.getContext(), SleepOnsetActivity.class);
-            startActivity(onsetIntent);
+            WhenSleepFragment whenSleepFragment = new WhenSleepFragment();
+            getParentFragmentManager().beginTransaction().replace(R.id.mainFrame, whenSleepFragment).commit();
+            mainActivity.setGoneBottomNavi();
         });
 
         Intent infoIntent = new Intent(v.getContext(), InfoActivity.class);
@@ -331,19 +322,17 @@ public class HomeFragment extends Fragment {
 
         Button buttonSendData = v.findViewById(R.id.sendDataButton);
 
-        buttonSendData.setOnClickListener(view -> {
-            ProcessingAPI.sendData(v.getContext(), mainActivity.getSleeps(), new ProcessingAPI.UploadCallback() {
-                @Override
-                public void onSuccess() {
-                    Toast.makeText(v.getContext(), "데이터가 전송되었습니다", Toast.LENGTH_SHORT).show();
-                }
+        buttonSendData.setOnClickListener(view -> ProcessingAPI.sendData(v.getContext(), mainActivity.getSleeps(), new ProcessingAPI.UploadCallback() {
+            @Override
+            public void onSuccess() {
+                Toast.makeText(v.getContext(), "데이터가 전송되었습니다", Toast.LENGTH_SHORT).show();
+            }
 
-                @Override
-                public void onFailure(String errorMessage) {
-                    Toast.makeText(v.getContext(), errorMessage, Toast.LENGTH_SHORT).show();
-                }
-            });
-        });
+            @Override
+            public void onFailure(String errorMessage) {
+                Toast.makeText(v.getContext(), errorMessage, Toast.LENGTH_SHORT).show();
+            }
+        }));
 
         //Graph showing alertness
         //Alertness information
@@ -391,8 +380,8 @@ public class HomeFragment extends Fragment {
         float rOnsetF = mv.timeToX(recommendedOnset);
         float rOffsetF = mv.timeToX(recommendedOffset);
         float rMidF = (rOnsetF + rOffsetF) / 2f;
-        ArrayList sleepIntervalEntries1 = new ArrayList<BarEntry>();
-        ArrayList sleepIntervalEntries2 = new ArrayList<BarEntry>();
+        ArrayList<BarEntry> sleepIntervalEntries1 = new ArrayList<>();
+        ArrayList<BarEntry> sleepIntervalEntries2 = new ArrayList<>();
         int[] rBarColors = new int[barEntries.size()];
         for (int i = 0; i < barEntries.size(); i++) {
             if (barEntries.get(i).getX() >= rOnsetF && barEntries.get(i).getX() <= rOffsetF) {
@@ -420,8 +409,8 @@ public class HomeFragment extends Fragment {
         } else {
             wMidF = (wOnsetF + wOffsetF) / 2f;
         }
-        ArrayList workIntervalEntries1 = new ArrayList<BarEntry>();
-        ArrayList workIntervalEntries2 = new ArrayList<BarEntry>();
+        ArrayList<BarEntry> workIntervalEntries1 = new ArrayList<>();
+        ArrayList<BarEntry> workIntervalEntries2 = new ArrayList<>();
         int[] wBarColors = new int[barEntries.size()];
         for (int i = 0; i < barEntries.size(); i++) {
             if (barEntries.get(i).getX() >= wOnsetF) {
@@ -457,7 +446,7 @@ public class HomeFragment extends Fragment {
         float alertnessPhaseChange = 49f;
         boolean calculateMore = true;
         float lMidF = 0f;
-        if (sleeps.size() > 0) {
+        if (!sleeps.isEmpty()) {
             Sleep lastSleep = sleeps.get(sleeps.size() - 1);
             Date lastOnset = new Date(lastSleep.sleepStart);
             Date lastOffset = new Date(lastSleep.sleepEnd);
@@ -465,8 +454,8 @@ public class HomeFragment extends Fragment {
             float lOffsetF = mv.timeToX(lastOffset);
             lMidF = (lOnsetF + lOffsetF) / 2f;
             Log.v("LastSleep", "Onset: " + lOnsetF + " / Offset: " + lOffsetF);
-            ArrayList lastIntervalEntries1 = new ArrayList<BarEntry>();
-            ArrayList lastIntervalEntries2 = new ArrayList<BarEntry>();
+            ArrayList<BarEntry> lastIntervalEntries1 = new ArrayList<>();
+            ArrayList<BarEntry> lastIntervalEntries2 = new ArrayList<>();
             int[] lBarColors = new int[barEntries.size()];
             for (int i = 0; i < barEntries.size(); i++) {
                 if (barEntries.get(i).getX() >= lOnsetF && barEntries.get(i).getX() <= lOffsetF) {
@@ -504,8 +493,8 @@ public class HomeFragment extends Fragment {
         float nOnsetF = mv.timeToX(napOnset);
         float nOffsetF = mv.timeToX(napOffset);
         float nMidF = (nOnsetF + nOffsetF) / 2f;
-        ArrayList napIntervalEntries1 = new ArrayList<BarEntry>();
-        ArrayList napIntervalEntries2 = new ArrayList<BarEntry>();
+        ArrayList<BarEntry> napIntervalEntries1 = new ArrayList<>();
+        ArrayList<BarEntry> napIntervalEntries2 = new ArrayList<>();
         int[] nBarColors = new int[barEntries.size()];
         for (int i = 0; i < barEntries.size(); i++) {
             if (barEntries.get(i).getX() >= nOnsetF && barEntries.get(i).getX() <= nOffsetF) {
@@ -573,21 +562,9 @@ public class HomeFragment extends Fragment {
         //Set MarkerView
         Date inputOnset = new Date(mainActivity.getSleepOnset());
         boolean isHardToSleep, isHardToNap, isHardToWork;
-        if (mainActivity.getMainSleepStart() == mainActivity.getMainSleepEnd() || rOnsetF == 48f) {
-            isHardToSleep = true;
-        } else {
-            isHardToSleep = false;
-        }
-        if (mainActivity.getNapSleepStart() == mainActivity.getNapSleepEnd() || nOnsetF == 48f) {
-            isHardToNap = true;
-        } else {
-            isHardToNap = false;
-        }
-        if (wOnsetF == 48f) {
-            isHardToWork = true;
-        } else {
-            isHardToWork = false;
-        }
+        isHardToSleep = mainActivity.getMainSleepStart() == mainActivity.getMainSleepEnd() || rOnsetF == 48f;
+        isHardToNap = mainActivity.getNapSleepStart() == mainActivity.getNapSleepEnd() || nOnsetF == 48f;
+        isHardToWork = wOnsetF == 48f;
         mv.setRecommendedTime(recommendedOnset);
         mv.setInputTime(inputOnset);
         mv.setIntervalFloat(rMidF, wMidF, lMidF, nMidF);
@@ -606,8 +583,8 @@ public class HomeFragment extends Fragment {
 
         //Change the description depending on current alertness
         float currentAlertness = 0f;
-        if (barEntries.size() > 0) {
-            currentAlertness = barEntries.get((int) barEntries.size()/2).getY();
+        if (!barEntries.isEmpty()) {
+            currentAlertness = barEntries.get(barEntries.size() /2).getY();
             if (currentAlertness >= 0) {
                 alertnessTitle.setText("집중하기 좋은 상태에요");
                 alertnessDescription.setText(user_name + "님의 각성도가 높아요");
@@ -667,7 +644,7 @@ public class HomeFragment extends Fragment {
         chartRecycler.setLayoutManager(chartLinearLayoutManager);
         BarAdapter barAdapter = new BarAdapter();
 
-        awarenesses = mainActivity.getAwarenesses();
+        List<Awareness> awarenesses = mainActivity.getAwarenesses();
         List<Awareness> weeklyAwareness = new ArrayList<>();
         long oneDayToMils = 1000*60*60*24;
         long curTime = now;
@@ -774,7 +751,7 @@ public class HomeFragment extends Fragment {
 
         List<Awareness> weeklyDuration = new ArrayList<>();
 
-        sleepAwarenesses = mainActivity.getSleepAwarenesses();
+        List<Awareness> sleepAwarenesses = mainActivity.getSleepAwarenesses();
         int idx = 0;
         for(Awareness awareness: sleepAwarenesses){
             Log.v("SLEEP AWARENESS VALUE IN SCHEDULE", sdfDate.format(new Date(awareness.awarenessDay*oneDayToMils+oneDayToMils)));
@@ -859,7 +836,7 @@ public class HomeFragment extends Fragment {
 
         // Daily alertness summary
         Gson alertGson = new Gson();
-        ArrayList<Records> baseArrayList = new ArrayList();
+        ArrayList<Records> baseArrayList = new ArrayList<>();
         ArrayList<Records> alertArrayList;
         String baseJson = alertGson.toJson(baseArrayList);
 
