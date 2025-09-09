@@ -87,7 +87,9 @@ public class AddIntervalFragment extends Fragment implements ButtonTextUpdater {
         Bundle bundle = this.getArguments();
         scheduleFragment = new ScheduleFragment();
         ImageButton backButton = v.findViewById(R.id.backButton);
-        backButton.setOnClickListener(view -> getParentFragmentManager().beginTransaction().replace(R.id.mainFrame, scheduleFragment).commit());
+        backButton.setOnClickListener(view -> getParentFragmentManager().beginTransaction()
+                .setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right)
+                .replace(R.id.mainFrame, scheduleFragment).commit());
 
         sdf = new SimpleDateFormat("yyyy.MM.dd HH:mm", Locale.KOREA);
         sdf.setTimeZone(timeZone);

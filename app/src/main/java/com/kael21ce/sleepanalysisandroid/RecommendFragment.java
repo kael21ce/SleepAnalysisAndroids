@@ -212,7 +212,10 @@ public class RecommendFragment extends Fragment {
         // InfoButton을 클릭하면 WhenSleepFragment -> WhenWorkFragment로 이동
         infoButton.setOnClickListener(view -> {
             WhenSleepFragment whenSleepFragment = new WhenSleepFragment();
-            getParentFragmentManager().beginTransaction().replace(R.id.mainFrame, whenSleepFragment).commit();
+            getParentFragmentManager().beginTransaction()
+                    .setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left)
+                    .addToBackStack(null)
+                    .replace(R.id.mainFrame, whenSleepFragment).commit();
             mainActivity.setGoneBottomNavi();
         });
 

@@ -47,7 +47,9 @@ public class WhenSleepFragment extends Fragment {
             mainActivity.setVisibleBottomNavi();
             mainActivity.setBottomNaviItem(R.id.tabRecommend);
             RecommendFragment recommendFragment = new RecommendFragment();
-            getParentFragmentManager().beginTransaction().replace(R.id.mainFrame, recommendFragment).commit();
+            getParentFragmentManager().beginTransaction()
+                    .setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right)
+                    .replace(R.id.mainFrame, recommendFragment).commit();
 
             //Show action bar
             if (((AppCompatActivity) getActivity()).getSupportActionBar() != null) {

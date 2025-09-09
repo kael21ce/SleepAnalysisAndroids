@@ -143,6 +143,7 @@ public class IntervalFragment extends Fragment {
         addIntervalFragment = new AddIntervalFragment();
         addIntervalFragment.setArguments(bundle);
         intervalPlusButton.setOnClickListener(view -> requireActivity().getSupportFragmentManager().beginTransaction()
+                .setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left)
                 .replace(R.id.mainFrame, addIntervalFragment).addToBackStack(null).commit());
         return v;
     }

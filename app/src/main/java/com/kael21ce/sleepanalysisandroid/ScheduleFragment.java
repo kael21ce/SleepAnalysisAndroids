@@ -63,6 +63,9 @@ public class ScheduleFragment extends Fragment {
         // Custom AlertDialog를 위한 dimBackground, action bar
         View dimBackground = v.findViewById(R.id.dimBackgroundSched);
         ActionBar actionBar = mainActivity != null ? mainActivity.getSupportActionBar() : null;
+        if (actionBar != null) {
+            actionBar.show();
+        }
         BottomNavigationView bottomNavigationView = getActivity().findViewById(R.id.bottomNavigationView) != null
                 ? getActivity().findViewById(R.id.bottomNavigationView) : null;
 
