@@ -44,9 +44,6 @@
             android:name=".InfoActivity"
             android:exported="false" />
         <activity
-            android:name=".SleepOnsetActivity"
-            android:exported="false" />
-        <activity
             android:name=".SQMoodSendingActivity"
             android:exported="false" />
         <activity

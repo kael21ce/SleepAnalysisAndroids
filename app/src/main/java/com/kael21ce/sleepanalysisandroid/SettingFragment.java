@@ -79,6 +79,23 @@ public class SettingFragment extends Fragment {
         TextView accountSessionDescription = v.findViewById(R.id.accountSessionDescription);
         getAuthStatus(accountSessionDescription, accessExp, refreshExp);
 
+        // 서버 마지막 업로드 가져오기
+        long now = System.currentTimeMillis();
+        long lastBackendUpdate = sharedPref.getLong("lastBackendUpdate", now);
+        TextView accountUploadDescription = v.findViewById(R.id.accountUploadDescription);
+        accountUploadDescription.setText(ymdhm(new Date(lastBackendUpdate)));
+
+        // 마지막 수면 종료 시점 가져오기
+        long lastSleepUpdate = sharedPref.getLong("lastSleepUpdate", now);
+        TextView accountEndDescription = v.findViewById(R.id.accountEndDescription);
+        accountEndDescription.setText(ymdhm(new Date(lastSleepUpdate)));
+
+        // 마지막 업데이트 가져오기
+        long lastDataUpdate = sharedPref.getLong("lastDataUpdate", now);
+        TextView accountUpdateDescription = v.findViewById(R.id.accountUpdateDescription);
+        accountUpdateDescription.setText(ymdhm(new Date(lastDataUpdate)));
+
+
         // 새로고침 버튼 클릭 시 계정 정보 업데이트
         ImageButton accountRefreshButton = v.findViewById(R.id.accountRefreshButton);
         accountRefreshButton.setOnClickListener(vRef -> {
