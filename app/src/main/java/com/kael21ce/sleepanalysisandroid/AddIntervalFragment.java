@@ -1,5 +1,6 @@
 package com.kael21ce.sleepanalysisandroid;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -9,6 +10,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
@@ -29,29 +31,42 @@ import com.kael21ce.sleepanalysisandroid.data.Sleep;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import nl.joery.timerangepicker.TimeRangePicker;
+
 public class AddIntervalFragment extends Fragment implements ButtonTextUpdater {
 
-    private Button startDateButton, startTimeButton, endDateButton, endTimeButton;
+    private Button startDateButton;
     private IntervalFragment intervalFragment;
+    private ScheduleFragment scheduleFragment;
     private DatePickerDialog datePickerDialog;
     private TimePickerDialog timePickerDialog;
+    private TimeRangePicker sleepTimePicker;
+    private TextView sleepRangeText;
     SimpleDateFormat sdf;
     SimpleDateFormat sdfDateTimeSchedule = new SimpleDateFormat( "yyyy/MM/dd", Locale.KOREA);
     private static final String TAG = "AddIntervalFragment";
-    private String languageSetting = Locale.getDefault().getLanguage();
+    private final String languageSetting = Locale.getDefault().getLanguage();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+        // Actionbar 숨기기
+        if (((AppCompatActivity) getActivity()).getSupportActionBar() != null) {
+            ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
+        }
+
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_add_interval, container, false);
 
@@ -66,27 +81,15 @@ public class AddIntervalFragment extends Fragment implements ButtonTextUpdater {
         TimeZone timeZone = TimeZone.getDefault();
 
         startDateButton = v.findViewById(R.id.startDateButton);
-        startTimeButton = v.findViewById(R.id.startTimeButton);
-        endDateButton = v.findViewById(R.id.endDateButton);
-        endTimeButton = v.findViewById(R.id.endTimeButton);
         Button addButton = v.findViewById(R.id.addButton);
 
-        //Return to IntervalFragment if backButton is clicked
-        intervalFragment = new IntervalFragment();
-        //get bundle and give it back
+        // backButton이 눌렸을 때, scheduleFragment로 이동
         Bundle bundle = this.getArguments();
-        if(bundle == null){
-            Log.v("bundle", "bundle failed to be fetched");
-        }
-        intervalFragment.setArguments(bundle);
+        scheduleFragment = new ScheduleFragment();
         ImageButton backButton = v.findViewById(R.id.backButton);
-        backButton.setOnClickListener(view -> getParentFragmentManager().beginTransaction().replace(R.id.IntervalFrame, intervalFragment).commit());
-        
-        if (languageSetting.equals("ko")) {
-            sdf = new SimpleDateFormat("yyyy.MM.dd a h:mm", Locale.KOREA);
-        } else {
-            sdf = new SimpleDateFormat("yyyy.MM.dd h:mm a", Locale.getDefault());
-        }
+        backButton.setOnClickListener(view -> getParentFragmentManager().beginTransaction().replace(R.id.mainFrame, scheduleFragment).commit());
+
+        sdf = new SimpleDateFormat("yyyy.MM.dd HH:mm", Locale.KOREA);
         sdf.setTimeZone(timeZone);
 
 
@@ -99,39 +102,27 @@ public class AddIntervalFragment extends Fragment implements ButtonTextUpdater {
         } catch (ParseException e) {
             throw new RuntimeException(e);
         }
-        String current_time;
-        SimpleDateFormat sdfCurrent, sdfDate;
-        if (languageSetting.equals("ko")) {
-            sdfCurrent = new SimpleDateFormat("a h:mm", Locale.KOREA);
-        } else {
-            sdfCurrent = new SimpleDateFormat("h:mm a", Locale.getDefault());
-        }
-        sdfCurrent.setTimeZone(timeZone);
-        current_time = sdfCurrent.format(getMidnight());
 
-        sdfDate = new SimpleDateFormat("yyyy.MM.dd", Locale.getDefault());
+        SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy.MM.dd", Locale.getDefault());
         sdfDate.setTimeZone(timeZone);
         String current_date = sdfDate.format(ref.curDate);
 
+        // 기본 날짜 및 시간 설정
+        Calendar calendar = Calendar.getInstance();
+        int currentHour = calendar.get(Calendar.HOUR_OF_DAY);
+        int currentMinute = calendar.get(Calendar.MINUTE);
+        // 설정할 시간
+        final String[] sleepOnsetTime = {time2String(currentHour * 60 + currentMinute)};
+        final String[] sleepOffsetTime = {time2String(currentHour * 60 + currentMinute)};
         startDateButton.setText(current_date);
-        endDateButton.setText(current_date);
-        startTimeButton.setText(current_time);
-        endTimeButton.setText(current_time);
+        sleepTimePicker = v.findViewById(R.id.SleepTimePicker);
+        sleepTimePicker.setStartTimeMinutes(currentHour * 60 + currentMinute);
+        sleepTimePicker.setEndTimeMinutes(currentHour * 60 + currentMinute);
+        sleepRangeText = v.findViewById(R.id.sleepRangeText);
+        sleepRangeText.setText(sleepOnsetTime[0] + " → " + sleepOffsetTime[0]);
 
-        // String of noon time
-        String noonInput = "0:0";
-        DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("H:m", Locale.getDefault());
-        DateTimeFormatter outputFormatter;
-        if (languageSetting.equals("ko")) {
-            outputFormatter = DateTimeFormatter.ofPattern("a h:mm", Locale.getDefault());
-        } else {
-            outputFormatter = DateTimeFormatter.ofPattern("h:mm a", Locale.getDefault());
-        }
-        LocalTime noonTime = LocalTime.parse(noonInput, inputFormatter);
-        String noonOutput = noonTime.format(outputFormatter);
-        Log.v("AddIntervalFragment", "Locale: " + Locale.getDefault());
 
-        //Open Picker when buttons about date are clicked
+        // Date button이 클릭될 때 DatePickerDialog를 띄우기
         AddIntervalFragment addIntervalFragment = this;
         startDateButton.setOnClickListener(view -> {
             datePickerDialog = new DatePickerDialog(v.getContext(), addIntervalFragment);
@@ -139,31 +130,38 @@ public class AddIntervalFragment extends Fragment implements ButtonTextUpdater {
             datePickerDialog.setDatePicker((String) startDateButton.getText());
             datePickerDialog.show();
         });
-        endDateButton.setOnClickListener(view -> {
-            datePickerDialog = new DatePickerDialog(v.getContext(), addIntervalFragment);
-            datePickerDialog.setData(0);
-            datePickerDialog.setDatePicker((String) endDateButton.getText());
-            datePickerDialog.show();
+
+        // TimeRangePicker에 대한 설정: Start thumb가 offset, end thumb가 onset
+        sleepTimePicker.setOnTimeChangeListener(new TimeRangePicker.OnTimeChangeListener() {
+            @Override
+            public void onStartTimeChange(@NonNull TimeRangePicker.Time time) {
+                sleepOffsetTime[0] = time2String(time.getTotalMinutes());
+                String results = sleepOnsetTime[0] + " → " + sleepOffsetTime[0];
+                sleepRangeText.setText(results);
+            }
+
+            @Override
+            public void onEndTimeChange(@NonNull TimeRangePicker.Time time) {
+                sleepOnsetTime[0] = time2String(time.getTotalMinutes());
+                String results = sleepOnsetTime[0] + " → " + sleepOffsetTime[0];
+                sleepRangeText.setText(results);
+            }
+
+            @Override
+            public void onDurationChange(@NonNull TimeRangePicker.TimeDuration timeDuration) {
+
+            }
         });
-        startTimeButton.setOnClickListener(view -> {
-            timePickerDialog = new TimePickerDialog(v.getContext(), addIntervalFragment);
-            timePickerDialog.setData(1);
-            timePickerDialog.setTimePicker(noonOutput);
-            timePickerDialog.show();
-        });
-        endTimeButton.setOnClickListener(view -> {
-            timePickerDialog = new TimePickerDialog(v.getContext(), addIntervalFragment);
-            timePickerDialog.setData(0);
-            timePickerDialog.setTimePicker(noonOutput);
-            timePickerDialog.show();
-        });
+
         addButton.setOnClickListener(view -> {
             Sleep add_sleep = new Sleep();
             String startDate = (String) startDateButton.getText();
-            String startTime = (String) startTimeButton.getText();
+            String startTime = sleepOnsetTime[0];
             String startSDF = startDate + ' ' + startTime;
-            String endDate = (String) endDateButton.getText();
-            String endTime = (String) endTimeButton.getText();
+            String endTime = sleepOffsetTime[0];
+
+            // startTime과 endTime을 기반으로 endDate를 계산
+            String endDate = calculateSleepEndDate(startDate, startTime, endTime);
             String endSDF = endDate + ' ' + endTime;
             Log.v("START SDF", startSDF);
             Log.v("END SDF", endSDF);
@@ -177,26 +175,6 @@ public class AddIntervalFragment extends Fragment implements ButtonTextUpdater {
                 startCalendar.setTime(sleepStartDate);
                 Calendar endCalendar = Calendar.getInstance();
                 endCalendar.setTime(sleepEndDate);
-
-                if (languageSetting.equals("ko")) {
-                    if (startTime.startsWith("오전") && startTime.contains("12:")) {
-                        startCalendar.set(Calendar.HOUR_OF_DAY, 0);
-                        Log.v("AddIntervalFragment", "1");
-                    }
-                    if (endTime.startsWith("오전") && endTime.contains("12:")) {
-                        endCalendar.set(Calendar.HOUR_OF_DAY, 0);
-                        Log.v("AddIntervalFragment", "2");
-                    }
-                } else {
-                    if (startTime.endsWith("AM") && startTime.contains("12:")) {
-                        startCalendar.set(Calendar.HOUR_OF_DAY, 0);
-                        Log.v("AddIntervalFragment", "3");
-                    }
-                    if (endTime.endsWith("AM") && endTime.contains("12:")) {
-                        endCalendar.set(Calendar.HOUR_OF_DAY, 0);
-                        Log.v("AddIntervalFragment", "4");
-                    }
-                }
 
                 //translate to local date time
                 LocalDateTime ldt1 = LocalDateTime.ofInstant(sleepStartDate.toInstant(), ZoneId.systemDefault());
@@ -234,11 +212,11 @@ public class AddIntervalFragment extends Fragment implements ButtonTextUpdater {
                     Intent scheduleIntent = new Intent(mainActivity, SplashActivity.class);
 
                     //Send the information of the selected date
-                    Calendar calendar = Calendar.getInstance();
-                    calendar.setTime(ref.curDate);
-                    int year = calendar.get(Calendar.YEAR);
-                    int month = calendar.get(Calendar.MONTH);
-                    int day = calendar.get(Calendar.DAY_OF_MONTH);
+                    Calendar intentCalendar = Calendar.getInstance();
+                    intentCalendar.setTime(ref.curDate);
+                    int year = intentCalendar.get(Calendar.YEAR);
+                    int month = intentCalendar.get(Calendar.MONTH);
+                    int day = intentCalendar.get(Calendar.DAY_OF_MONTH);
 
                     Log.v(TAG, "Selected: " + year + "-" + (month + 1) + "-" + day);
 
@@ -268,23 +246,10 @@ public class AddIntervalFragment extends Fragment implements ButtonTextUpdater {
             if (startDateButton != null) {
                 startDateButton.setText(text);
             }
-        } else {
-            if (endDateButton != null) {
-                endDateButton.setText(text);
-            }
         }
     }
 
     public void setTimeButtonText(String text, int isStartButton) {
-        if (isStartButton==1) {
-            if (startTimeButton != null) {
-                startTimeButton.setText(text);
-            }
-        } else {
-            if (endTimeButton != null) {
-                endTimeButton.setText(text);
-            }
-        }
     }
 
     public String getDateButtonText(int isStartButton) {
@@ -295,24 +260,8 @@ public class AddIntervalFragment extends Fragment implements ButtonTextUpdater {
             } else {
                 return nullString;
             }
-        } else {
-            if (endDateButton != null) {
-                return (String) endDateButton.getText();
-            } else {
-                return nullString;
-            }
         }
-    }
-
-    public Date getMidnight() {
-        Calendar calendar = Calendar.getInstance();
-
-        calendar.set(Calendar.HOUR_OF_DAY, 0);
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.SECOND, 0);
-        calendar.set(Calendar.MILLISECOND, 0);
-
-        return calendar.getTime();
+        return nullString;
     }
 
     private void showAlertDialog(View dimBackground, ActionBar actionBar,
@@ -334,10 +283,10 @@ public class AddIntervalFragment extends Fragment implements ButtonTextUpdater {
         window.setStatusBarColor(getResources().getColor(R.color.dim, null));
 
         View viewDialog = LayoutInflater.from(getActivity()).inflate(R.layout.layout_custom_dialog,
-                (LinearLayout) getActivity().findViewById(R.id.DialogLayout));
-        TextView dialogTitle = (TextView) viewDialog.findViewById(R.id.dialogTitle);
-        TextView dialogMessage = (TextView) viewDialog.findViewById(R.id.dialogMessage);
-        Button dialogButton = (Button) viewDialog.findViewById(R.id.dialogButton);
+                getActivity().findViewById(R.id.DialogLayout));
+        TextView dialogTitle = viewDialog.findViewById(R.id.dialogTitle);
+        TextView dialogMessage = viewDialog.findViewById(R.id.dialogMessage);
+        Button dialogButton = viewDialog.findViewById(R.id.dialogButton);
         dialogTitle.setText(title);
         dialogMessage.setText(message);
         dialogButton.setText(buttonText);
@@ -362,6 +311,44 @@ public class AddIntervalFragment extends Fragment implements ButtonTextUpdater {
 
         if (dialog.getWindow() != null) {
             dialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
+        }
+    }
+
+    // Change minutes from TimeRangePicker to String HH:MM
+    public String time2String(int minutes) {
+        int hour = minutes / 60;
+        int minute = minutes % 60;
+        @SuppressLint("DefaultLocale") String hourStr = String.format("%02d", hour);
+        @SuppressLint("DefaultLocale") String minuteStr = String.format("%02d", minute);
+        return hourStr + ":" + minuteStr;
+    }
+
+    // 수면 시작 날짜, 수면 시작 시간, 수면 종료 시간이 String으로 주어져있을 때, 수면 종료 날짜를 String으로 출력
+    private static String calculateSleepEndDate(String startDateString, String startTimeString, String endTimeString) {
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
+
+        try {
+            LocalDate startDate = LocalDate.parse(startDateString, dateFormatter);
+            LocalTime startTime = LocalTime.parse(startTimeString, timeFormatter);
+            LocalTime endTime = LocalTime.parse(endTimeString, timeFormatter);
+
+            LocalDate endDate;
+
+            // 종료 시간이 시작 시간보다 이전이거나 같으면, 날짜가 바뀐 것으로 간주
+            // 예: 시작 23:00, 종료 07:00 -> 다음날
+            // 예: 시작 01:00, 종료 08:00 -> 같은날
+            if (!endTime.isAfter(startTime)) {
+                endDate = startDate.plusDays(1);
+            } else {
+                endDate = startDate;
+            }
+
+            return endDate.format(dateFormatter);
+
+        } catch (DateTimeParseException e) {
+            System.err.println("입력된 날짜 또는 시간의 형식이 잘못되었습니다. (yyyy.MM.dd, HH:mm)");
+            return startDateString;
         }
     }
 }
