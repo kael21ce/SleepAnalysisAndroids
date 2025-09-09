@@ -91,6 +91,12 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="64dp">
 
+            <View
+                android:layout_width="280dp"
+                android:layout_height="280dp"
+                android:layout_gravity="center"
+                android:background="@drawable/clock_picker_background"/>
+
             <nl.joery.timerangepicker.TimeRangePicker
                 android:id="@+id/WhenSleepPicker"
                 android:layout_width="300dp"
@@ -99,7 +105,8 @@
                 app:trp_clockLabelSize="0sp"
                 app:trp_maxDurationMinutes="1440"
                 app:trp_hourFormat="FORMAT_24"
-                app:trp_sliderColor="@color/blue_2"
+                app:trp_sliderWidth="0dp"
+                app:trp_sliderColor="@color/gray_1"
                 app:trp_startTime="00:00"
                 app:trp_thumbColor="@color/blue_1" />
 
@@ -130,6 +137,8 @@
                     android:textSize="12sp" />
             </LinearLayout>
 
+
+
         </FrameLayout>
 
         <LinearLayout
@@ -147,9 +156,11 @@
                 android:fontFamily="@font/pretendardvariable"
                 android:paddingHorizontal="10dp"
                 android:paddingVertical="16dp"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginBottom="16dp"
                 android:text="다음"
                 android:textSize="16sp"
-                app:cornerRadius="8dp" />
+                app:cornerRadius="28dp" />
         </LinearLayout>
     </LinearLayout>
 

@@ -78,13 +78,17 @@ public class WhenSleepFragment extends Fragment {
             @Override
             public void onEndTimeChange(@NonNull TimeRangePicker.Time time) {
                 int endTimeMinutes = time.getTotalMinutes();
+                // Start thumb가 end thumb와 일치하도록 수정
+                whenSleepPicker.setStartTimeMinutes(endTimeMinutes);
+
+                // 시간 변화를 화면에 표시
                 whenSleepStr[0] = time2String(endTimeMinutes);
                 whenSleepText.setText(whenSleepStr[0]);
+
             }
 
             @Override
             public void onDurationChange(@NonNull TimeRangePicker.TimeDuration timeDuration) {
-
             }
         });
 
