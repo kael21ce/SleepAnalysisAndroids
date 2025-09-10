@@ -57,4 +57,15 @@
         <item name="android:textCursorDrawable">@color/gray_4</item>
         <item name="android:textColorHint">@color/gray_4</item>
     </style>
+
+    <!--BottomSheet-->
+    <style name="CustomBottomSheet" parent="Widget.Design.BottomSheet.Modal">
+        <item name="colorPrimary">@color/white</item>
+        <item name="colorPrimaryVariant">@color/white</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="android:background">@drawable/corner_half_up_16</item>
+    </style>
+    <style name="CustomBottomSheetDialogTheme" parent="Theme.MaterialComponents.Light.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/CustomBottomSheet</item>
+    </style>
 </resources>

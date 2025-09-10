@@ -104,7 +104,8 @@
                 app:trp_sliderWidth="8dp"
                 app:trp_sliderColor="@color/blue_2"
                 app:trp_startTime="00:00"
-                app:trp_thumbColor="@color/white" />
+                app:trp_thumbColor="@color/white"
+                app:trp_sliderRangeColor="@color/white"/>
 
             <LinearLayout
                 android:id="@+id/EditNoticeCaption"

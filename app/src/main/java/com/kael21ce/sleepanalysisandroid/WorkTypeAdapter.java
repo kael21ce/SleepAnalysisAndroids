@@ -1,5 +1,6 @@
 package com.kael21ce.sleepanalysisandroid;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -7,19 +8,34 @@ import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 
 public class WorkTypeAdapter extends RecyclerView.Adapter<WorkTypeAdapter.ViewHolder> {
-    ArrayList<WorkType> items = new ArrayList<>();
-    private int selectedPosition = -1;
 
-    private OnWorkTypeSelectedListener listener;
+
+
+    public interface OnEditClickListener {
+        void onItemClick(int position, WorkType item);
+    }
 
     public interface OnWorkTypeSelectedListener {
         void onWorkTypeSelected(WorkType item); // 선택된 WorkType 객체를 전달
+    }
+
+    ArrayList<WorkType> items = new ArrayList<>();
+    private int selectedPosition = -1;
+    private OnWorkTypeSelectedListener listener;
+    private OnEditClickListener clickListener;
+    private Context context;
+
+    public void setOnItemClickListener(OnEditClickListener listener) {
+        this.clickListener = listener;
     }
 
     public WorkTypeAdapter(OnWorkTypeSelectedListener listener) {
@@ -66,10 +82,6 @@ public class WorkTypeAdapter extends RecyclerView.Adapter<WorkTypeAdapter.ViewHo
                     workTypeTitleText.setText("오류");
                 }
             }
-            // 편집 버튼 누르면 시간 수정하는 칸으로 이동
-            workTypeEditButton.setOnClickListener(v -> {
-
-            });
 
             // 야간일 때는 하단의 회색 선을 제거
             if (workType == 3) {
@@ -79,6 +91,7 @@ public class WorkTypeAdapter extends RecyclerView.Adapter<WorkTypeAdapter.ViewHo
             }
         }
     }
+    @NonNull
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
         View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.worktype, viewGroup, false);
@@ -89,6 +102,13 @@ public class WorkTypeAdapter extends RecyclerView.Adapter<WorkTypeAdapter.ViewHo
     public void onBindViewHolder(ViewHolder viewHolder, final int position) {
         WorkType item = items.get(position);
         viewHolder.workTypeRadio.setChecked(selectedPosition == position);
+
+        // workTypeEditButton을 누르면 ClickListener를 할당
+        viewHolder.workTypeEditButton.setOnClickListener(v -> {
+            if (clickListener != null) {
+                clickListener.onItemClick(position, item);
+            }
+        });
 
         // Item에 click listener 설정
         viewHolder.itemView.setOnClickListener(v -> {
@@ -108,6 +128,14 @@ public class WorkTypeAdapter extends RecyclerView.Adapter<WorkTypeAdapter.ViewHo
         });
         viewHolder.setItem(item);
     }
+
+    public void updateItem(int position, WorkType newItem) {
+        if (position >= 0 && position < items.size()) {
+            items.set(position, newItem);
+            notifyItemChanged(position);
+        }
+    }
+
     @Override
     public int getItemCount() {
         return items.size();

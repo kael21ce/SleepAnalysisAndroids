@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".WorkPresetFragment">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@+id/ControlTextLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_marginHorizontal="16dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/cancelEditText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/pretendardvariable"
+                android:text="취소"
+                android:textColor="@color/blue_1"
+                android:textSize="16sp" />
+
+            <LinearLayout
+                android:id="@+id/ControlCaption"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/saveEditText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/pretendardvariable"
+                    android:gravity="right"
+                    android:text="저장"
+                    android:textColor="@color/blue_1"
+                    android:textSize="16sp" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/presetTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:fontFamily="@font/pretendardbold"
+            android:layout_marginTop="32dp"
+            android:text="저녁 근무 일정 편집"
+            android:textSize="20sp"
+            android:textColor="@color/black"/>
+
+        <!-- TimeRangePicker -->
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="32dp"
+            android:background="@color/white">
+            <nl.joery.timerangepicker.TimeRangePicker
+                android:id="@+id/PresetTimePicker"
+                android:layout_width="300dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal|center_vertical"
+                android:background="@color/white"
+                app:trp_thumbIconSize="28dp"
+                app:trp_thumbIconStart="@drawable/circle_start_thumb"
+                app:trp_thumbIconEnd="@drawable/circle_end_thumb"
+                app:trp_clockLabelSize="0sp"
+                app:trp_maxDurationMinutes="1440"
+                app:trp_hourFormat="FORMAT_24"
+                app:trp_sliderWidth="8dp"
+                app:trp_sliderColor="@color/blue_2"
+                app:trp_startTime="00:00"
+                app:trp_thumbColor="@color/white"
+                app:trp_sliderRangeColor="@color/white"/>
+
+            <LinearLayout
+                android:id="@+id/PresetNoticeCaption"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center_horizontal|center_vertical"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/presetRangeText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:fontFamily="@font/pretendardbold"
+                    android:text="00:00 → 00:00"
+                    android:textSize="20sp" />
+
+                <TextView
+                    android:id="@+id/presetGuidance"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:fontFamily="@font/pretendardvariable"
+                    android:text="(드래그하여 시작/끝을 조절)"
+                    android:textColor="@color/gray_4"
+                    android:textSize="12sp" />
+            </LinearLayout>
+        </FrameLayout>
+    </LinearLayout>
+
+    <View
+        android:id="@+id/dimBackgroundPreset"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/dim"
+        android:visibility="gone" />
+
+</FrameLayout>

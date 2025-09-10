@@ -25,6 +25,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.kael21ce.sleepanalysisandroid.data.BackendAPI;
 
 import java.text.ParseException;
@@ -37,7 +38,8 @@ import java.util.Date;
 import java.util.Locale;
 
 
-public class WhenWorkFragment extends Fragment implements WorkTypeAdapter.OnWorkTypeSelectedListener {
+public class WhenWorkFragment extends Fragment
+        implements WorkTypeAdapter.OnWorkTypeSelectedListener, WorkPresetFragment.OnItemUpdateListener {
     String sleepOnsetTime, workOnsetTime, workOffsetTime;
     SimpleDateFormat inputSdfTime = new SimpleDateFormat("HH:mm", Locale.getDefault());
     long now = System.currentTimeMillis();
@@ -47,6 +49,7 @@ public class WhenWorkFragment extends Fragment implements WorkTypeAdapter.OnWork
     int selectedWorkType = 1;
     Button whenWorkButton;
     TextView previewTitle, previewContent;
+    WorkTypeAdapter whenWorkTypeAdapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -76,7 +79,7 @@ public class WhenWorkFragment extends Fragment implements WorkTypeAdapter.OnWork
         LinearLayoutManager layoutManager = new LinearLayoutManager(v.getContext(),
                 LinearLayoutManager.VERTICAL, false);
         whenWorkTypeRecyclerView.setLayoutManager(layoutManager);
-        WorkTypeAdapter whenWorkTypeAdapter = new WorkTypeAdapter(this);
+        whenWorkTypeAdapter = new WorkTypeAdapter(this);
 
         // WorkType 아이템 설정
         // 1. SharedPreference에 workType과 각 타입에 맞는 working time 설정
@@ -111,6 +114,12 @@ public class WhenWorkFragment extends Fragment implements WorkTypeAdapter.OnWork
             }
             whenWorkTypeAdapter.addItem(workTypeItem);
         }
+
+        // WorkPresetFragment를 호출할 수 있도록 Adapter를 설정
+        whenWorkTypeAdapter.setOnItemClickListener((position, item) -> {
+            WorkPresetFragment bottomSheet = WorkPresetFragment.newInstance(position, item);
+            bottomSheet.show(getChildFragmentManager(), "WorkPresetFragment");
+        });
 
         whenWorkTypeRecyclerView.setAdapter(whenWorkTypeAdapter);
         whenWorkButton = v.findViewById(R.id.whenWorkButton);
@@ -246,6 +255,12 @@ public class WhenWorkFragment extends Fragment implements WorkTypeAdapter.OnWork
 
         });
         return v;
+    }
+
+    // Adapter에 데이터 갱신 및 UI 새로고침 요청
+    @Override
+    public void onItemUpdated(int position, WorkType updatedItem) {
+        whenWorkTypeAdapter.updateItem(position, updatedItem);
     }
 
     @Override
