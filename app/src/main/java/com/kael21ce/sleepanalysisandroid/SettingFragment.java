@@ -18,10 +18,13 @@ import android.view.Window;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.Switch;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -46,6 +49,7 @@ public class SettingFragment extends Fragment {
     Boolean isFolded = true;
     private static final String NotifyKey = "Notify_At";
     Button notifyButton;
+    Switch notifySwitch;
     SharedPreferences sharedPref;
     SharedPreferences.Editor editor;
     OneTimeWorkRequest requested;
@@ -123,6 +127,7 @@ public class SettingFragment extends Fragment {
             editor.putString(NotifyKey, "21:00").apply();
         }
         notifyButton = v.findViewById(R.id.notifyButton);
+        notifySwitch = v.findViewById(R.id.notifySwitch);
 
         //initial setting of notifySetting
         if (!sharedPref.contains("isNotifyOn")) {
@@ -136,12 +141,17 @@ public class SettingFragment extends Fragment {
 
         if (ActivityCompat.checkSelfPermission(context, android.Manifest.permission.POST_NOTIFICATIONS)
                 != PackageManager.PERMISSION_GRANTED) {
+            notifySwitch.setVisibility(View.INVISIBLE);
+            notifyDescription.setVisibility(View.VISIBLE);
             notifyDescription.setText("권한 없음");
-            notifyButton.setVisibility(View.INVISIBLE);
+//            notifyButton.setVisibility(View.INVISIBLE);
             noNotifyDescription.setVisibility(View.VISIBLE);
         } else {
-            notifyDescription.setText("알림 켜짐");
-            notifyButton.setVisibility(View.VISIBLE);
+            notifySwitch.setVisibility(View.VISIBLE);
+            notifySwitch.setChecked(true);
+            notifyDescription.setVisibility(View.GONE);
+//            notifyDescription.setText("알림 켜짐");
+//            notifyButton.setVisibility(View.VISIBLE);
             noNotifyDescription.setVisibility(View.GONE);
         }
 
@@ -150,39 +160,53 @@ public class SettingFragment extends Fragment {
         if (ActivityCompat.checkSelfPermission(context, android.Manifest.permission.POST_NOTIFICATIONS)
                 == PackageManager.PERMISSION_GRANTED) {
             if (sharedPref.getBoolean("isNotifyOn", true)) {
-                notifyDescription.setText("알림 켜짐");
-                notifyButton.setVisibility(View.VISIBLE);
+//                notifyDescription.setText("알림 켜짐");
+                notifySwitch.setChecked(true);
+//                notifyButton.setVisibility(View.VISIBLE);
             } else {
-                notifyDescription.setText("알림 꺼짐");
-                notifyButton.setVisibility(View.INVISIBLE);
+//                notifyDescription.setText("알림 꺼짐");
+                notifySwitch.setChecked(false);
+//                notifyButton.setVisibility(View.INVISIBLE);
             }
         }
 
         //On/Off the notification
-        notifyView.setOnClickListener(view -> {
+        notifySwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (ActivityCompat.checkSelfPermission(context, android.Manifest.permission.POST_NOTIFICATIONS)
                     == PackageManager.PERMISSION_GRANTED) {
-                if (sharedPref.getBoolean("isNotifyOn", true)) {
+                if (!isChecked) {
+                    Log.v("SettingFragment", "Notify OFF");
                     editor.putBoolean("isNotifyOn", false).apply();
-                    notifyDescription.setText("알림 꺼짐");
-                    notifyButton.setVisibility(View.INVISIBLE);
                 } else {
+                    Log.v("SettingFragment", "Notify ON");
                     editor.putBoolean("isNotifyOn", true).apply();
-                    notifyDescription.setText("알림 켜짐");
-                    notifyButton.setVisibility(View.VISIBLE);
                 }
             }
         });
+//        notifyView.setOnClickListener(view -> {
+//            if (ActivityCompat.checkSelfPermission(context, android.Manifest.permission.POST_NOTIFICATIONS)
+//                    == PackageManager.PERMISSION_GRANTED) {
+//                if (sharedPref.getBoolean("isNotifyOn", true)) {
+//                    editor.putBoolean("isNotifyOn", false).apply();
+//                    notifyDescription.setText("알림 꺼짐");
+//                    notifyButton.setVisibility(View.INVISIBLE);
+//                } else {
+//                    editor.putBoolean("isNotifyOn", true).apply();
+//                    notifyDescription.setText("알림 켜짐");
+//                    notifyButton.setVisibility(View.VISIBLE);
+//                }
+//            }
+//        });
 
 
-        notifyButton.setOnClickListener(view -> {
+//        notifyButton.setOnClickListener(view -> {
 //            TimePickerDialog timePickerDialog = new TimePickerDialog(v.getContext(), settingFragment);
 //            timePickerDialog.setData(1);
 //            timePickerDialog.setTimePicker(notifyAt_complex);
 //            timePickerDialog.show();
-            Intent notifyIntent = new Intent(v.getContext(), NotifyActivity.class);
-            startActivity(notifyIntent);
-        });
+//            Intent notifyIntent = new Intent(v.getContext(), NotifyActivity.class);
+//            startActivity(notifyIntent);
+//        });
 
         //Move to HideActivity
         TextView hideDescription = v.findViewById(R.id.HideDescription);

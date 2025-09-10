@@ -450,6 +450,7 @@ public class MainActivity extends AppCompatActivity {
         WorkManager.getInstance(this).enqueueUniquePeriodicWork(RecommendName,
                 ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE, pushRequest);
 
+        /*
         //Send notification for survey in four time
         long surveyTime, surveyDelay1, surveyDelay2, surveyDelay3;
         //1. work onset
@@ -538,6 +539,8 @@ public class MainActivity extends AppCompatActivity {
         WorkManager.getInstance(this).enqueueUniquePeriodicWork(SurveyName3,
                 ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE, surveyRequest3);
         Log.v(TAG, "Survey delay 3: " + surveyDelay3);
+
+         */
     }
 
     //Change "HH:mm" to milliseconds

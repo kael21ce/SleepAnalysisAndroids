@@ -332,7 +332,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/pretendardbold"
-                            android:text="알림 시간 설정"
+                            android:text="푸쉬 알림 설정"
                             android:textColor="@color/black"
                             android:textSize="18sp" />
 
@@ -365,6 +365,14 @@
                     android:gravity="right"
                     android:orientation="horizontal">
 
+                    <Switch
+                        android:id="@+id/notifySwitch"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginRight="16dp"
+                        android:text="" />
+
                     <Button
                         android:id="@+id/notifyButton"
                         android:layout_width="wrap_content"
@@ -375,7 +383,8 @@
                         android:fontFamily="@font/pretendardvariable"
                         android:text="09:00 PM"
                         android:textColor="@color/black"
-                        android:textSize="14sp" />
+                        android:textSize="14sp"
+                        android:visibility="gone" />
                 </LinearLayout>
             </LinearLayout>
 
