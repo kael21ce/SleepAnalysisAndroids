@@ -56,7 +56,7 @@ public class IntervalFragment extends Fragment {
         LinearLayoutManager layoutManager = new LinearLayoutManager(v.getContext(),
                 LinearLayoutManager.VERTICAL, false);
         intervalRecyclerView.setLayoutManager(layoutManager);
-        IntervalAdapter intervalAdapter = new IntervalAdapter(getParentFragmentManager());
+        IntervalAdapter intervalAdapter = new IntervalAdapter(requireActivity().getSupportFragmentManager());
 
         //get the bundle arguments
         Bundle bundle = this.getArguments();

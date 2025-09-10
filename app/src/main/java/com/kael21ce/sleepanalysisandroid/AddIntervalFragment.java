@@ -317,7 +317,7 @@ public class AddIntervalFragment extends Fragment implements ButtonTextUpdater {
     }
 
     // Change minutes from TimeRangePicker to String HH:MM
-    public String time2String(int minutes) {
+    public static String time2String(int minutes) {
         int hour = minutes / 60;
         int minute = minutes % 60;
         @SuppressLint("DefaultLocale") String hourStr = String.format("%02d", hour);

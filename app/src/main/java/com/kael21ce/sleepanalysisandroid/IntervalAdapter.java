@@ -59,8 +59,10 @@ public class IntervalAdapter extends RecyclerView.Adapter<IntervalAdapter.ViewHo
                 bundle.putBundle("bundle", bundle1);
                 editIntervalFragment.setArguments(bundle);
 
-                FragmentTransaction transaction = fragmentManager.beginTransaction();
-                transaction.replace(R.id.IntervalFrame, editIntervalFragment).commit();
+                // MainActivity에서 Container를 가지는 FragmentManager를 가져옴 -> EditIntervalFragment로 이동
+                FragmentTransaction transaction = fragmentManager.beginTransaction()
+                        .setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left);
+                transaction.replace(R.id.mainFrame, editIntervalFragment).commit();
             });
             return new ViewHolder(itemView);
         } else {

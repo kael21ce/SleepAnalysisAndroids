@@ -9,7 +9,7 @@
     <LinearLayout
         android:id="@+id/EditIntervalLayout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_gravity="center"
         android:orientation="vertical">
 
@@ -29,23 +29,23 @@
                 android:src="@drawable/chevron_left"
                 tools:ignore="SpeakableTextPresentCheck" />
 
-            <TextView
-                android:id="@+id/editTitle"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_gravity="center"
-                android:fontFamily="@font/pretendardbold"
-                android:gravity="center"
-                android:maxLines="1"
-                android:text="수면 정보"
-                android:textColor="@color/black"
-                android:textSize="20sp"
-                android:autoSizeMaxTextSize="20sp"
-                android:autoSizeMinTextSize="10sp"
-                android:autoSizeStepGranularity="2sp"
-                android:autoSizeTextType="uniform"/>
-
         </LinearLayout>
+
+        <TextView
+            android:id="@+id/editTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:autoSizeMaxTextSize="20sp"
+            android:autoSizeMinTextSize="10sp"
+            android:autoSizeStepGranularity="2sp"
+            android:autoSizeTextType="uniform"
+            android:fontFamily="@font/pretendardbold"
+            android:gravity="center"
+            android:maxLines="1"
+            android:text="수면 정보"
+            android:textColor="@color/black"
+            android:textSize="20sp" />
 
         <LinearLayout
             android:id="@+id/EditSleepTextCaption"
@@ -59,160 +59,107 @@
                 android:id="@+id/editSleepTitle"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:maxLines="1"
-                android:text="수면 시작 및 종료 시각"
-                android:textSize="16sp"
                 android:autoSizeMaxTextSize="16sp"
                 android:autoSizeMinTextSize="8sp"
                 android:autoSizeStepGranularity="2sp"
-                android:autoSizeTextType="uniform"/>
+                android:autoSizeTextType="uniform"
+                android:gravity="center_horizontal"
+                android:maxLines="1"
+                android:text="수면 시작 및 종료 시각"
+                android:textSize="16sp" />
 
             <TextView
                 android:id="@+id/editSleepDescription"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginTop="4dp"
-                android:fontFamily="@font/pretendardvariable"
-                android:maxLines="1"
-                android:text="기존 수면의 시작 및 종료 시각을 변경할 수 있습니다"
-                android:textColor="@color/gray_4"
-                android:textSize="12sp"
                 android:autoSizeMaxTextSize="12sp"
                 android:autoSizeMinTextSize="6sp"
                 android:autoSizeStepGranularity="2sp"
-                android:autoSizeTextType="uniform"/>
+                android:autoSizeTextType="uniform"
+                android:fontFamily="@font/pretendardvariable"
+                android:gravity="center_horizontal"
+                android:maxLines="1"
+                android:text="기존 수면의 시작 및 종료 시각을 변경할 수 있습니다"
+                android:textColor="@color/gray_4"
+                android:textSize="12sp" />
         </LinearLayout>
 
-        <LinearLayout
-            android:id="@+id/editLayout"
+        <!-- TimeRangePicker -->
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="160dp"
-            android:layout_marginVertical="16dp"
-            android:orientation="vertical">
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp">
+            <nl.joery.timerangepicker.TimeRangePicker
+                android:id="@+id/EditTimePicker"
+                android:layout_width="300dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal|center_vertical"
+                app:trp_thumbIconSize="28dp"
+                app:trp_thumbIconStart="@drawable/circle_start_thumb"
+                app:trp_thumbIconEnd="@drawable/circle_end_thumb"
+                app:trp_clockLabelSize="0sp"
+                app:trp_maxDurationMinutes="1440"
+                app:trp_hourFormat="FORMAT_24"
+                app:trp_sliderWidth="8dp"
+                app:trp_sliderColor="@color/blue_2"
+                app:trp_startTime="00:00"
+                app:trp_thumbColor="@color/white" />
 
             <LinearLayout
-                android:id="@+id/timeEditingView"
+                android:id="@+id/EditNoticeCaption"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom"
+                android:layout_height="match_parent"
+                android:layout_gravity="center_horizontal|center_vertical"
                 android:orientation="vertical">
 
-                <LinearLayout
-                    android:id="@+id/startTimeEditView"
-                    android:layout_width="match_parent"
+                <TextView
+                    android:id="@+id/editRangeText"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="16dp"
-                    android:gravity="right"
-                    android:orientation="horizontal">
+                    android:layout_gravity="center_horizontal"
+                    android:fontFamily="@font/pretendardbold"
+                    android:text="00:00 → 00:00"
+                    android:textSize="20sp" />
 
-
-                    <TextView
-                        android:id="@+id/editSmallStartText"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_gravity="top"
-                        android:layout_marginLeft="16dp"
-                        android:layout_weight="1"
-                        android:autoSizeMaxTextSize="16sp"
-                        android:autoSizeMinTextSize="8sp"
-                        android:autoSizeStepGranularity="2sp"
-                        android:autoSizeTextType="uniform"
-                        android:fontFamily="@font/pretendardvariable"
-                        android:gravity="center_vertical"
-                        android:maxLines="1"
-                        android:text="시작:"
-                        android:textColor="@color/black"
-                        android:textSize="16sp" />
-
-                    <Button
-                        android:id="@+id/startTimeEditButton"
-                        android:layout_width="100dp"
-                        android:layout_height="match_parent"
-                        android:layout_marginRight="16dp"
-                        android:autoSizeMaxTextSize="14sp"
-                        android:autoSizeMinTextSize="6sp"
-                        android:autoSizeStepGranularity="2sp"
-                        android:autoSizeTextType="uniform"
-                        android:backgroundTint="@color/gray_1"
-                        android:fontFamily="@font/pretendardvariable"
-                        android:maxLines="1"
-                        android:text="18:30 PM"
-                        android:textColor="@color/black"
-                        android:textSize="14sp" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/endTimeEditingView"
-                    android:layout_width="match_parent"
+                <TextView
+                    android:id="@+id/editGuidance"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:gravity="right"
-                    android:orientation="horizontal">
-
-
-                    <TextView
-                        android:id="@+id/editSmallEndText"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_gravity="top"
-                        android:layout_marginLeft="16dp"
-                        android:layout_weight="1"
-                        android:autoSizeMaxTextSize="16sp"
-                        android:autoSizeMinTextSize="8sp"
-                        android:autoSizeStepGranularity="2sp"
-                        android:autoSizeTextType="uniform"
-                        android:fontFamily="@font/pretendardvariable"
-                        android:gravity="center_vertical"
-                        android:maxLines="1"
-                        android:text="종료:"
-                        android:textColor="@color/black"
-                        android:textSize="16sp" />
-
-                    <Button
-                        android:id="@+id/endTimeEditButton"
-                        android:layout_width="100dp"
-                        android:layout_height="match_parent"
-                        android:layout_marginRight="16dp"
-                        android:autoSizeMaxTextSize="14sp"
-                        android:autoSizeMinTextSize="6sp"
-                        android:autoSizeStepGranularity="2sp"
-                        android:autoSizeTextType="uniform"
-                        android:backgroundTint="@color/gray_1"
-                        android:fontFamily="@font/pretendardvariable"
-                        android:maxLines="1"
-                        android:text="21:45 PM"
-                        android:textColor="@color/black"
-
-                        android:textSize="14sp" />
-                </LinearLayout>
+                    android:layout_gravity="center_horizontal"
+                    android:fontFamily="@font/pretendardvariable"
+                    android:text="(드래그하여 시작/끝을 조절)"
+                    android:textColor="@color/gray_4"
+                    android:textSize="12sp" />
             </LinearLayout>
-        </LinearLayout>
+        </FrameLayout>
 
         <TextView
             android:id="@+id/editIntervalText"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_gravity="top"
             android:layout_marginLeft="16dp"
+            android:autoSizeMaxTextSize="16sp"
+            android:autoSizeMinTextSize="8sp"
+            android:autoSizeStepGranularity="2sp"
+            android:autoSizeTextType="uniform"
             android:fontFamily="@font/pretendardvariable"
             android:maxLines="1"
             android:text="수면 시간: 7시간 51분"
             android:textColor="@color/black"
-            android:textSize="16sp"
-            android:autoSizeMaxTextSize="16sp"
-            android:autoSizeMinTextSize="8sp"
-            android:autoSizeStepGranularity="2sp"
-            android:autoSizeTextType="uniform"/>
+            android:textSize="16sp" />
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:gravity="center_horizontal"
             android:orientation="horizontal">
 
             <Button
                 android:id="@+id/editButton"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_marginLeft="16dp"
                 android:layout_marginTop="24dp"
                 android:layout_marginRight="8dp"
@@ -233,7 +180,7 @@
             <Button
                 android:id="@+id/deleteButton"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_marginLeft="8dp"
                 android:layout_marginTop="24dp"
                 android:layout_marginRight="16dp"

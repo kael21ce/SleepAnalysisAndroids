@@ -17,6 +17,7 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
@@ -34,10 +35,10 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import nl.joery.timerangepicker.TimeRangePicker;
+
 public class EditIntervalFragment extends Fragment implements ButtonTextUpdater {
 
-    public Button startTimeEditButton;
-    public Button endTimeEditButton;
     private TextView intervalTextView;
     SimpleDateFormat sdfDateTime = new SimpleDateFormat( "yyyy/MM/dd H:mm", Locale.KOREA);
     SimpleDateFormat sdf;
@@ -59,14 +60,14 @@ public class EditIntervalFragment extends Fragment implements ButtonTextUpdater 
         intervalTextView = v.findViewById(R.id.editIntervalText);
         Button deleteButton = v.findViewById(R.id.deleteButton);
         Button editButton = v.findViewById(R.id.editButton);
-        startTimeEditButton = v.findViewById(R.id.startTimeEditButton);
-        endTimeEditButton = v.findViewById(R.id.endTimeEditButton);
-
         MainActivity mainActivity = (MainActivity)getActivity();
 
         // Setup for alert dialog
         View dimBackground = getParentFragment() != null ? getParentFragment().getView().findViewById(R.id.dimBackgroundSched) : v.findViewById(R.id.dimBackgroundEditIntv);
         ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.hide();
+        }
         BottomNavigationView bottomNavigationView = getActivity().findViewById(R.id.bottomNavigationView);
 
         TimeZone timeZone = TimeZone.getDefault();
@@ -74,15 +75,15 @@ public class EditIntervalFragment extends Fragment implements ButtonTextUpdater 
         sdf24H.setTimeZone(timeZone);
         sdfSimple.setTimeZone(timeZone);
 
-        IntervalFragment intervalFragment = new IntervalFragment();
-        //Back to intervalFragment if backButtonEdit is clicked
+        // backButton이 눌렸을 때, scheduleFragment로 이동
+        ScheduleFragment scheduleFragment = new ScheduleFragment();
         Bundle bundle = this.getArguments();
         assert bundle != null;
-        intervalFragment.setArguments(bundle.getBundle("bundle"));
-        backButtonEdit.setOnClickListener(view -> getParentFragmentManager().beginTransaction().replace(R.id.IntervalFrame, intervalFragment).commit());
-
-        //Set the time picker to each timeEditButton
-        EditIntervalFragment editIntervalFragment = this;
+        // scheduleFragment.setArguments(bundle.getBundle("bundle"));
+        backButtonEdit.setOnClickListener(view -> getParentFragmentManager()
+                .beginTransaction()
+                .setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right)
+                .replace(R.id.mainFrame, scheduleFragment).commit());
 
         SharedPreferences sharedPref = getActivity().getSharedPreferences("SleepWake", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
@@ -117,52 +118,67 @@ public class EditIntervalFragment extends Fragment implements ButtonTextUpdater 
             }
         }
 
-        if (languageSetting.equals("ko")) {
-            sdf = new SimpleDateFormat("yyyy/MM/dd a h:mm", Locale.KOREA);
-            sdfAMPM = new SimpleDateFormat("a h:mm", Locale.KOREA);
-        } else {
-            sdf = new SimpleDateFormat("yyyy/MM/dd h:mm a", Locale.getDefault());
-            sdfAMPM = new SimpleDateFormat("h:mm a", Locale.getDefault());
-        }
+        sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm", Locale.KOREA);
+        sdfAMPM = new SimpleDateFormat("HH:mm", Locale.KOREA);
         sdf.setTimeZone(timeZone);
         sdfAMPM.setTimeZone(timeZone);
 
         Log.v("AM PM FORMAT", sdfAMPM.format(startHourD));
         Log.v("AM PM FORMAT", sdfAMPM.format(endHourD));
 
-        startTimeEditButton.setText(sdfAMPM.format(startHourD));
-        endTimeEditButton.setText(sdfAMPM.format(endHourD));
-        //Set the text of editIntervalText
-        try {
-            intervalTextView.setText("수면 시간: "
-                   + getInterval(sdfAMPM.format(startHourD), sdfAMPM.format(endHourD)));
-        } catch (ParseException e) {
-            Log.e("EditIntervalFragment", e.toString());
+        // TimeRangePicker 초기 설정
+        TimeRangePicker editTimePicker = v.findViewById(R.id.EditTimePicker);
+        TextView editRangeText = v.findViewById(R.id.editRangeText);
+        Calendar initialCalendar = Calendar.getInstance();
+        // 시작 시간
+        initialCalendar.setTimeInMillis(startSleep);
+        int startHourInt = initialCalendar.get(Calendar.HOUR_OF_DAY);
+        int startMinuteInt = initialCalendar.get(Calendar.MINUTE);
+        editTimePicker.setEndTimeMinutes(startHourInt * 60 + startMinuteInt);
+        // 끝 시간
+        initialCalendar = Calendar.getInstance();
+        initialCalendar.setTimeInMillis(endSleep);
+        int endHourInt = initialCalendar.get(Calendar.HOUR_OF_DAY);
+        int endMinuteInt = initialCalendar.get(Calendar.MINUTE);
+        editTimePicker.setStartTimeMinutes(endHourInt * 60 + endMinuteInt);
+        final String[] startSleepTime = {AddIntervalFragment.time2String(startHourInt * 60 + startMinuteInt)};
+        final String[] endSleepTime = {AddIntervalFragment.time2String(endHourInt * 60 + endMinuteInt)};
+        editRangeText.setText(startSleepTime[0] + " → " + endSleepTime[0]);
 
-            // Display alert message
-            if (languageSetting.equals("ko")) {
-                showAlertDialog(dimBackground, actionBar, bottomNavigationView,
-                        "시스템 에러",
-                        "앱을 잠시 후 다시 시작해주세요. 문제가 계속되면 개발자에게 연락바랍니다.", "확인");
-            } else {
-                showAlertDialog(dimBackground, actionBar, bottomNavigationView,
-                        "System Error",
-                        "Please restart the app after a moment. If the problem persists, please contact the developer.", "OK");
+        // editIntervalText에 들어갈 시간 계산
+        intervalTextView.setText("수면 시간: "
+                + getInterval(sdfAMPM.format(startHourD), sdfAMPM.format(endHourD)));
+
+        // TimeRangePicker에 대한 설정: Start thumb가 offset, end thumb가 onset
+        editTimePicker.setOnTimeChangeListener(new TimeRangePicker.OnTimeChangeListener() {
+            @Override
+            public void onStartTimeChange(@NonNull TimeRangePicker.Time time) {
+                endSleepTime[0] = AddIntervalFragment.time2String(time.getTotalMinutes());
+                String results = startSleepTime[0] + " → " + endSleepTime[0];
+                editRangeText.setText(results);
+
+                // 시간 간격 계산
+                String resultInterval = getInterval(startSleepTime[0], endSleepTime[0]);
+                intervalTextView.setText("수면 시간: " + resultInterval);
             }
-        }
 
-        startTimeEditButton.setOnClickListener(view -> {
-            TimePickerDialog timePickerDialog = new TimePickerDialog(v.getContext(), editIntervalFragment);
-            timePickerDialog.setData(1);
-            timePickerDialog.setTimePicker((String) startTimeEditButton.getText());
-            timePickerDialog.show();
+            @Override
+            public void onEndTimeChange(@NonNull TimeRangePicker.Time time) {
+                startSleepTime[0] = AddIntervalFragment.time2String(time.getTotalMinutes());
+                String results = startSleepTime[0] + " → " + endSleepTime[0];
+                editRangeText.setText(results);
+
+                // 시간 간격 계산
+                String resultInterval = getInterval(startSleepTime[0], endSleepTime[0]);
+                intervalTextView.setText("수면 시간: " + resultInterval);
+            }
+
+            @Override
+            public void onDurationChange(@NonNull TimeRangePicker.TimeDuration timeDuration) {
+
+            }
         });
-        endTimeEditButton.setOnClickListener(view -> {
-            TimePickerDialog timePickerDialog = new TimePickerDialog(v.getContext(), editIntervalFragment);
-            timePickerDialog.setData(0);
-            timePickerDialog.setTimePicker((String) endTimeEditButton.getText());
-            timePickerDialog.show();
-        });
+
 
         //Delete interval if deleteButton is clicked
         long finalStartSleep = startSleep;
@@ -201,8 +217,8 @@ public class EditIntervalFragment extends Fragment implements ButtonTextUpdater 
         editButton.setOnClickListener(view -> {
             Log.v("EDITED", "EDITED");
             Sleep edit_sleep = new Sleep();
-            String startTime = (String) startTimeEditButton.getText();
-            String endTime = (String) endTimeEditButton.getText();
+            String startTime = startSleepTime[0];
+            String endTime = endSleepTime[0];
             String startSDF = date + ' ' + startTime;
             String endSDF = date + ' ' + endTime;
             Log.v("START SDF", startSDF);
@@ -278,7 +294,7 @@ public class EditIntervalFragment extends Fragment implements ButtonTextUpdater 
 
                 //Send the information of the selected date
                 Calendar calendar = Calendar.getInstance();
-                int year = -1, month = -1, day = -1;
+                int year, month, day;
                 calendar.setTime(curDate);
                 year = calendar.get(Calendar.YEAR);
                 month = calendar.get(Calendar.MONTH);
@@ -313,86 +329,6 @@ public class EditIntervalFragment extends Fragment implements ButtonTextUpdater 
     }
 
     public void setTimeButtonText(String text, int isStartButton) {
-        if (isStartButton==1) {
-            if (startTimeEditButton != null && endTimeEditButton != null) {
-                startTimeEditButton.setText(text);
-
-                Date startHourD = new Date();
-                Date endHourD = new Date();
-                try {
-                    startHourD = sdfAMPM.parse(text);
-                    endHourD = sdfAMPM.parse(endTimeEditButton.getText().toString());
-                } catch (ParseException e) {
-                    Log.e("EditIntervalFragment", e.toString());
-
-                    // Display alert message
-                    if (languageSetting.equals("ko")) {
-                        showAlertDialogNoDim("시스템 에러",
-                                "앱을 잠시 후 다시 시작해주세요. 문제가 계속되면 개발자에게 연락바랍니다.", "확인");
-                    } else {
-                        showAlertDialogNoDim("System Error",
-                                "Please restart the app after a moment. If the problem persists, please contact the developer.", "OK");
-                    }
-                }
-
-                try {
-                    intervalTextView.setText("수면 시간: "
-                            + getInterval(sdfAMPM.format(startHourD),
-                            sdfAMPM.format(endHourD)));
-                } catch (ParseException e) {
-                    Log.e("EditIntervalFragment", e.toString());
-
-                    // Display alert message
-                    if (languageSetting.equals("ko")) {
-                        showAlertDialogNoDim("시스템 에러",
-                                "앱을 잠시 후 다시 시작해주세요. 문제가 계속되면 개발자에게 연락바랍니다.", "확인");
-                    } else {
-                        showAlertDialogNoDim("System Error",
-                                "Please restart the app after a moment. If the problem persists, please contact the developer.", "OK");
-                    }
-                }
-            }
-        } else {
-            if (startTimeEditButton != null && endTimeEditButton != null) {
-                endTimeEditButton.setText(text);
-
-                Date startHourD = new Date();
-                Date endHourD = new Date();
-
-                try {
-                    startHourD = sdfAMPM.parse(startTimeEditButton.getText().toString());
-                    endHourD = sdfAMPM.parse(text);
-                } catch (ParseException e) {
-                    Log.e("EditIntervalFragment", e.toString());
-
-                    // Display alert message
-                    if (languageSetting.equals("ko")) {
-                        showAlertDialogNoDim("시스템 에러",
-                                "앱을 잠시 후 다시 시작해주세요. 문제가 계속되면 개발자에게 연락바랍니다.", "확인");
-                    } else {
-                        showAlertDialogNoDim("System Error",
-                                "Please restart the app after a moment. If the problem persists, please contact the developer.", "OK");
-                    }
-                }
-
-                try {
-                    intervalTextView.setText("수면 시간: "
-                            + getInterval(sdfAMPM.format(startHourD),
-                            sdfAMPM.format(endHourD)));
-                } catch (ParseException e) {
-                    Log.e("EditIntervalFragment", e.toString());
-
-                    // Display alert message
-                    if (languageSetting.equals("ko")) {
-                        showAlertDialogNoDim("시스템 에러",
-                                "앱을 잠시 후 다시 시작해주세요. 문제가 계속되면 개발자에게 연락바랍니다.", "확인");
-                    } else {
-                        showAlertDialogNoDim("System Error",
-                                "Please restart the app after a moment. If the problem persists, please contact the developer.", "OK");
-                    }
-                }
-            }
-        }
     }
 
     public String getDateButtonText(int isStartButton) {return "";}
@@ -403,28 +339,27 @@ public class EditIntervalFragment extends Fragment implements ButtonTextUpdater 
         return sdf24H.format(date);
     }
 
-    //Calculate the interval between two time in format of "HH:mm"
-    public String getInterval(String start, String end) throws ParseException {
-        String languageSetting = Locale.getDefault().getLanguage();
+    // "HH:mm" 형태의 시간을 받아서 시간 간격을 계산
+    public String getInterval(String start, String end) {
         DateTimeFormatter formatter;
-        if (languageSetting.equals("ko")) {
-            formatter = DateTimeFormatter.ofPattern("a h:mm", Locale.KOREA);
-        } else {
-            formatter = DateTimeFormatter.ofPattern("h:mm a");
+        formatter = DateTimeFormatter.ofPattern("HH:mm", Locale.KOREA);
+
+        try {
+            LocalTime startTime = LocalTime.parse(start, formatter);
+            LocalTime endTime = LocalTime.parse(end, formatter);
+            long differenceInMinutes = ChronoUnit.MINUTES.between(startTime, endTime);
+            if (differenceInMinutes < 0) {
+                differenceInMinutes = differenceInMinutes + 24*60;
+            }
+
+            long intervalHour = differenceInMinutes / 60;
+            long intervalMinute = differenceInMinutes % 60;
+
+            return intervalHour + "시간 " + intervalMinute + "분";
+        } catch (Exception e) {
+            Log.e("EditIntervalFragment", e.toString());
+            return "0분";
         }
-
-        LocalTime startTime = LocalTime.parse(start, formatter);
-        LocalTime endTime = LocalTime.parse(end, formatter);
-
-        long differenceInMinutes = ChronoUnit.MINUTES.between(startTime, endTime);
-        if (differenceInMinutes < 0) {
-            differenceInMinutes = differenceInMinutes + 24*60;
-        }
-
-        long intervalHour = differenceInMinutes / 60;
-        long intervalMinute = differenceInMinutes % 60;
-
-        return intervalHour + "시간 " + intervalMinute + "분";
     }
 
     private void showAlertDialog(View dimBackground, ActionBar actionBar,
@@ -446,10 +381,10 @@ public class EditIntervalFragment extends Fragment implements ButtonTextUpdater 
         window.setStatusBarColor(getResources().getColor(R.color.dim, null));
 
         View viewDialog = LayoutInflater.from(getActivity()).inflate(R.layout.layout_custom_dialog,
-                (LinearLayout) getActivity().findViewById(R.id.DialogLayout));
-        TextView dialogTitle = (TextView) viewDialog.findViewById(R.id.dialogTitle);
-        TextView dialogMessage = (TextView) viewDialog.findViewById(R.id.dialogMessage);
-        Button dialogButton = (Button) viewDialog.findViewById(R.id.dialogButton);
+                getActivity().findViewById(R.id.DialogLayout));
+        TextView dialogTitle = viewDialog.findViewById(R.id.dialogTitle);
+        TextView dialogMessage = viewDialog.findViewById(R.id.dialogMessage);
+        Button dialogButton = viewDialog.findViewById(R.id.dialogButton);
         dialogTitle.setText(title);
         dialogMessage.setText(message);
         dialogButton.setText(buttonText);
@@ -479,10 +414,10 @@ public class EditIntervalFragment extends Fragment implements ButtonTextUpdater 
 
     private void showAlertDialogNoDim(String title, String message, String buttonText) {
         View viewDialog = LayoutInflater.from(getActivity()).inflate(R.layout.layout_custom_dialog,
-                (LinearLayout) getActivity().findViewById(R.id.DialogLayout));
-        TextView dialogTitle = (TextView) viewDialog.findViewById(R.id.dialogTitle);
-        TextView dialogMessage = (TextView) viewDialog.findViewById(R.id.dialogMessage);
-        Button dialogButton = (Button) viewDialog.findViewById(R.id.dialogButton);
+                getActivity().findViewById(R.id.DialogLayout));
+        TextView dialogTitle = viewDialog.findViewById(R.id.dialogTitle);
+        TextView dialogMessage = viewDialog.findViewById(R.id.dialogMessage);
+        Button dialogButton = viewDialog.findViewById(R.id.dialogButton);
         dialogTitle.setText(title);
         dialogMessage.setText(message);
         dialogButton.setText(buttonText);
