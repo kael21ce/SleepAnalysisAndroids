@@ -141,13 +141,21 @@ public class WhenWorkFragment extends Fragment
         //Save work onset and offset to database
         whenWorkButton.setOnClickListener(view -> {
             // WorkType에 해당하는 workOnset, workOffset 가져오기
-            String selectedOnsetKey = "workOnset_" + selectedWorkType;
-            String selectedOffsetKey = "workOffset_" + selectedWorkType;
-            workOnsetTime = sharedPref.getString(selectedOnsetKey, "00:00");
-            workOffsetTime = sharedPref.getString(selectedOffsetKey, "00:00");
+            if (selectedWorkType != 0) {
+                String selectedOnsetKey = "workOnset_" + selectedWorkType;
+                String selectedOffsetKey = "workOffset_" + selectedWorkType;
+                workOnsetTime = sharedPref.getString(selectedOnsetKey, "00:00");
+                workOffsetTime = sharedPref.getString(selectedOffsetKey, "00:00");
+            } else {
+                // 현재 시점을 가져오기
+                Calendar calendar = Calendar.getInstance();
+                workOnsetTime = inputSdfTime.format(calendar.getTime());
+                workOffsetTime = workOnsetTime;
+            }
             Log.v("WhenWorkFragment", "SleepOnset: " + sleepOnsetTime + " /  WorkOnset: " + workOnsetTime);
 
-            if (sleepOnsetTime.equals(workOnsetTime)) {
+
+            if (selectedWorkType != 0 && sleepOnsetTime.equals(workOnsetTime)) {
                 Toast.makeText(v.getContext(), "취침 시간과 근무 시작 시간은 일치하면 안됩니다!",Toast.LENGTH_SHORT).show();
             } else {
                 Date sleepOnsetInput, workOnsetInput, workOffsetInput;
@@ -214,6 +222,7 @@ public class WhenWorkFragment extends Fragment
                     mainActivity.setWorkOffset(workOffsetResult);
                     sharedPref.edit().putInt("workType", selectedWorkType).apply();
                     sharedPref.edit().putLong("sleepOnsetShow", sleepOnsetShowResult).apply();
+                    sharedPref.edit().putBoolean("isRecommended", true).apply();
 
                     Log.v("SplashActivity", "Onset: " + sleepOnsetResult + " / Onset Show: " + sleepOnsetShowResult +
                             " / Work onset: " + workOnsetResult + " / Work offset: " + workOffsetResult);

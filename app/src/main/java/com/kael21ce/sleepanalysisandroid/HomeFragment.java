@@ -170,8 +170,15 @@ public class HomeFragment extends Fragment {
         // System time
         now = System.currentTimeMillis();
 
+        // 일정이 입력되었는지 저장 및 확인
+        if (!sharedPref.contains("isRecommended")) {
+            editor.putBoolean("isRecommended", false).apply();
+        }
+
+        boolean isRecommended = sharedPref.getBoolean("isRecommended", false);
+
         if (sharedPref.contains("sleepOnset") && sharedPref.contains("workOnset") && sharedPref.contains("workOffset")) {
-            if (sharedPref.getLong("workOnset",now) == sharedPref.getLong("workOffset",now)) {
+            if (!isRecommended) {
                 homeNoDataView.setVisibility(View.VISIBLE);
                 SurveyUpperView.setVisibility(View.VISIBLE);
                 alertnessNoDataView.setVisibility(View.GONE);

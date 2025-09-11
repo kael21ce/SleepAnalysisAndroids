@@ -107,15 +107,14 @@ public class RecommendFragment extends Fragment {
         TextView noDataDescription = v.findViewById(R.id.noDataDescription);
         noDataDescription.setText(user_name + "님에게 딱 맞는 수면 패턴을 추천해 드릴게요");
 
-        //Check whether recommendation is hidden
-        if (!sharedPref2.contains("isHidden")) {
-            editor.putBoolean("isHidden", true).apply();
+        // 일정이 입력되었는지 저장 및 확인
+        if (!sharedPref2.contains("isRecommended")) {
+            editor.putBoolean("isRecommended", false).apply();
         }
-        boolean isHidden = sharedPref2.getBoolean("isHidden", true);
-        long K1 = sharedPref2.getLong("workOnset",now);
-        long K2 = sharedPref2.getLong("workOffset",now);
+
+        boolean isRecommended = sharedPref2.getBoolean("isRecommended", false);
         if (sharedPref2.contains("sleepOnset") && sharedPref2.contains("workOnset") && sharedPref2.contains("workOffset")) {
-            if (K1 == K2) {
+            if (!isRecommended) {
                 noDataLayout.setVisibility(View.VISIBLE);
                 infoView.setVisibility(View.GONE);
             } else {
