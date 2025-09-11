@@ -86,12 +86,18 @@ public class ProcessingAPI {
         cutOffCal.set(Calendar.MILLISECOND, 0);
         long cutoff = cutOffCal.getTimeInMillis();
         Log.v(TAG, "Filtering criterion: " + now);
+        long firstSleepStart = now;
+        long earliestV0 = now;
 
         // 오래된 수면 데이터 삭제 (sleepEnd < cutoff)
         for (Sleep sleep : sleepDao.getAll()) {
             if (sleep.sleepEnd < cutoff) {
                 sleepDao.delete(sleep);
                 Log.v(TAG, "This sleep data was recorded before two weeks");
+                continue;
+            }
+            if (sleep.sleepStart < firstSleepStart) {
+                firstSleepStart = sleep.sleepStart;
             }
         }
         // 오래된 V0 데이터 삭제 (time < cutoff)
@@ -99,7 +105,16 @@ public class ProcessingAPI {
             if (v0.time < cutoff) {
                 v0Dao.delete(v0);
                 Log.v(TAG, "This V0 data was recorded before two weeks");
+                continue;
             }
+            if (v0.time < earliestV0) {
+                earliestV0 = v0.time;
+            }
+        }
+
+        // V0의 시작점이 첫 수면보다 48시간 이전일 경우 저장된 V0를 모두 제거
+        if (earliestV0 - firstSleepStart >= 2 * oneDay) {
+            v0Dao.deleteRange(earliestV0, now);
         }
 
 
