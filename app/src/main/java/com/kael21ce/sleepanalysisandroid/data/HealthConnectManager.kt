@@ -1,8 +1,8 @@
 package com.kael21ce.sleepanalysisandroid.data
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Build
-import android.provider.Settings.Global
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContract
@@ -27,17 +27,10 @@ import androidx.health.connect.client.time.TimeRangeFilter
 import androidx.health.connect.client.units.Energy
 import androidx.health.connect.client.units.Mass
 import androidx.room.Room
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.async
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.future.future
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 import java.io.IOException
 import java.text.SimpleDateFormat
 import java.time.Instant
@@ -153,9 +146,6 @@ class HealthConnectManager(private val context: Context) {
                 timeRangeFilter = TimeRangeFilter.between(start, end)
         )
 
-        val timeZone = TimeZone.getDefault();
-        val nineHours = timeZone.getOffset(System.currentTimeMillis());
-
         val response = healthConnectClient.readRecords(request)
         val db = Room.databaseBuilder(context, AppDatabase::class.java, "sleep_wake").build()
         val userDao = db.sleepDao()
@@ -165,18 +155,6 @@ class HealthConnectManager(private val context: Context) {
             val sleepEnd = Date.from(sleepRecord.endTime).time
             Log.v("THE RECORD START", sdfDateTime.format(Date.from(sleepRecord.startTime)))
             Log.v("THE RECORD END", sdfDateTime.format(Date.from(sleepRecord.endTime)))
-            //check whether we need to divide the sleep to two
-            val sleepStartDay = ((sleepStart + nineHours) / (1000 * 60 * 60 * 24))
-            val sleepEndDay = ((sleepEnd + nineHours)/ (1000 * 60 * 60 * 24))
-            if (sleepStartDay != sleepEndDay) {
-                var midnight = sleepEndDay * (1000 * 60 * 60 * 24)
-                midnight = midnight - nineHours
-                val additionalSleep = Sleep()
-                additionalSleep.sleepStart = sleepStart
-                additionalSleep.sleepEnd = midnight - 1000 * 60
-                sleepList.add(additionalSleep)
-                sleepStart = midnight
-            }
             //save everything in the database
             val sleep = Sleep()
             sleep.sleepStart = sleepStart
