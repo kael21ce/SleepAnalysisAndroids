@@ -8,6 +8,24 @@
     tools:context=".SQMoodSendingActivity">
 
     <LinearLayout
+        android:id="@+id/SkipCaption"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/skipTextButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:fontFamily="@font/pretendardvariable"
+            android:gravity="right"
+            android:text="건너뛰기"
+            android:textColor="@color/black"
+            android:textSize="16sp" />
+    </LinearLayout>
+
+    <LinearLayout
         android:id="@+id/SQMoodCaption"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

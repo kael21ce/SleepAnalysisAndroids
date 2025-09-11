@@ -54,7 +54,7 @@
     <style name="CustomTextInputLayout" parent="Widget.Design.TextInputLayout">
         <item name="colorControlNormal">@color/white</item>
         <item name="boxStrokeColor">@color/white</item>
-        <item name="android:textCursorDrawable">@color/gray_4</item>
+        <item name="android:textCursorDrawable">@drawable/custom_cursor</item>
         <item name="android:textColorHint">@color/gray_4</item>
     </style>
 

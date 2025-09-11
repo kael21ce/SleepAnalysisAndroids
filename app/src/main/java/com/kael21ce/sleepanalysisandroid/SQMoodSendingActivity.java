@@ -60,6 +60,14 @@ public class SQMoodSendingActivity extends AppCompatActivity {
             getSupportActionBar().hide();
         }
 
+        // 건너뛰기 누르면 activity 종료
+        TextView skipTextButton = findViewById(R.id.skipTextButton);
+        skipTextButton.setOnClickListener(view -> {
+            Intent skipIntent = new Intent(SQMoodSendingActivity.this, SplashActivity.class);
+            skipIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(skipIntent);
+        });
+
         //Button click
         firstButton.setOnClickListener(view -> {
             position = 4;

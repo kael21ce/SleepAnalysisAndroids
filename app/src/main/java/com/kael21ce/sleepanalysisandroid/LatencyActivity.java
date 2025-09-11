@@ -9,6 +9,7 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.text.ParseException;
@@ -28,6 +29,14 @@ public class LatencyActivity extends AppCompatActivity {
         if (getSupportActionBar() != null) {
             getSupportActionBar().hide();
         }
+
+        // 건너뛰기 누르면 activity 종료
+        TextView skipTextButton = findViewById(R.id.latencySkipTextButton);
+        skipTextButton.setOnClickListener(view -> {
+            Intent skipIntent = new Intent(LatencyActivity.this, SplashActivity.class);
+            skipIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(skipIntent);
+        });
 
         EditText latencyMinutes = findViewById(R.id.latencyMinutes);
         Button latencyButton = findViewById(R.id.latencyButton);

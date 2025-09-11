@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -53,6 +54,14 @@ public class SurveyActivity extends AppCompatActivity {
         if (getSupportActionBar() != null) {
             getSupportActionBar().hide();
         }
+
+        // 건너뛰기 누르면 activity 종료
+        TextView skipTextButton = findViewById(R.id.moodSkipTextButton);
+        skipTextButton.setOnClickListener(view -> {
+            Intent skipIntent = new Intent(SurveyActivity.this, SplashActivity.class);
+            skipIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(skipIntent);
+        });
 
         sharedPref = getSharedPreferences("SleepWake", Context.MODE_PRIVATE);
         editor = sharedPref.edit();
@@ -100,36 +109,16 @@ public class SurveyActivity extends AppCompatActivity {
         setSeekColor(buttonArrayList, 5, awarenessEmoji, emojiDescription);
 
         //Seek Button
-        seek1.setOnClickListener(view -> {
-            setSeekColor(buttonArrayList, 1, awarenessEmoji, emojiDescription);
-        });
-        seek2.setOnClickListener(view -> {
-            setSeekColor(buttonArrayList, 2, awarenessEmoji, emojiDescription);
-        });
-        seek3.setOnClickListener(view -> {
-            setSeekColor(buttonArrayList, 3, awarenessEmoji, emojiDescription);
-        });
-        seek4.setOnClickListener(view -> {
-            setSeekColor(buttonArrayList, 4, awarenessEmoji, emojiDescription);
-        });
-        seek5.setOnClickListener(view -> {
-            setSeekColor(buttonArrayList, 5, awarenessEmoji, emojiDescription);
-        });
-        seek6.setOnClickListener(view -> {
-            setSeekColor(buttonArrayList, 6, awarenessEmoji, emojiDescription);
-        });
-        seek7.setOnClickListener(view -> {
-            setSeekColor(buttonArrayList, 7, awarenessEmoji, emojiDescription);
-        });
-        seek8.setOnClickListener(view -> {
-            setSeekColor(buttonArrayList, 8, awarenessEmoji, emojiDescription);
-        });
-        seek9.setOnClickListener(view -> {
-            setSeekColor(buttonArrayList, 9, awarenessEmoji, emojiDescription);
-        });
-        seek10.setOnClickListener(view -> {
-            setSeekColor(buttonArrayList, 10, awarenessEmoji, emojiDescription);
-        });
+        seek1.setOnClickListener(view -> setSeekColor(buttonArrayList, 1, awarenessEmoji, emojiDescription));
+        seek2.setOnClickListener(view -> setSeekColor(buttonArrayList, 2, awarenessEmoji, emojiDescription));
+        seek3.setOnClickListener(view -> setSeekColor(buttonArrayList, 3, awarenessEmoji, emojiDescription));
+        seek4.setOnClickListener(view -> setSeekColor(buttonArrayList, 4, awarenessEmoji, emojiDescription));
+        seek5.setOnClickListener(view -> setSeekColor(buttonArrayList, 5, awarenessEmoji, emojiDescription));
+        seek6.setOnClickListener(view -> setSeekColor(buttonArrayList, 6, awarenessEmoji, emojiDescription));
+        seek7.setOnClickListener(view -> setSeekColor(buttonArrayList, 7, awarenessEmoji, emojiDescription));
+        seek8.setOnClickListener(view -> setSeekColor(buttonArrayList, 8, awarenessEmoji, emojiDescription));
+        seek9.setOnClickListener(view -> setSeekColor(buttonArrayList, 9, awarenessEmoji, emojiDescription));
+        seek10.setOnClickListener(view -> setSeekColor(buttonArrayList, 10, awarenessEmoji, emojiDescription));
 
         //endSurveyButton
         Intent sentIntent = getIntent();
@@ -144,6 +133,7 @@ public class SurveyActivity extends AppCompatActivity {
         // Make mood survey list
         baseJson = gson.toJson(baseArrayList);
         if (surveyLevel == 1) {
+            skipTextButton.setVisibility(View.INVISIBLE);
             if (!sharedPref.contains(AlertnessArrayKey)) {
                 sharedPref.edit().putString(AlertnessArrayKey, baseJson).apply();
             } else {
@@ -154,6 +144,7 @@ public class SurveyActivity extends AppCompatActivity {
                 recordsArrayList = loadGson.fromJson(alertJson, type);
             }
         } else {
+            skipTextButton.setVisibility(View.VISIBLE);
             if (!sharedPref.contains(MoodArrayKey)) {
                 sharedPref.edit().putString(MoodArrayKey, baseJson).apply();
             } else {
