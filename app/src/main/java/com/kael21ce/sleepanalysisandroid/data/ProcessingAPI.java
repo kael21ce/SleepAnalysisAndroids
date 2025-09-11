@@ -74,8 +74,36 @@ public class ProcessingAPI {
 
         db = AppDatabaseSingleton.getInstance(context);
         SleepDao sleepDao = db.sleepDao();
+        V0Dao v0Dao = db.v0Dao();
 
-        // 3) 수면 날짜 업데이트
+        // 3) 14일 이전 데이터 정리
+        // 14일 전의 자정 시간을 필터링 기준으로 설정
+        Calendar cutOffCal = Calendar.getInstance();
+        cutOffCal.setTimeInMillis(now - twoWeeks);
+        cutOffCal.set(Calendar.HOUR_OF_DAY, 0);
+        cutOffCal.set(Calendar.MINUTE, 0);
+        cutOffCal.set(Calendar.SECOND, 0);
+        cutOffCal.set(Calendar.MILLISECOND, 0);
+        long cutoff = cutOffCal.getTimeInMillis();
+        Log.v(TAG, "Filtering criterion: " + now);
+
+        // 오래된 수면 데이터 삭제 (sleepEnd < cutoff)
+        for (Sleep sleep : sleepDao.getAll()) {
+            if (sleep.sleepEnd < cutoff) {
+                sleepDao.delete(sleep);
+                Log.v(TAG, "This sleep data was recorded before two weeks");
+            }
+        }
+        // 오래된 V0 데이터 삭제 (time < cutoff)
+        for (V0 v0 : v0Dao.getAll()) {
+            if (v0.time < cutoff) {
+                v0Dao.delete(v0);
+                Log.v(TAG, "This V0 data was recorded before two weeks");
+            }
+        }
+
+
+        // 4) 수면 날짜 업데이트
         long sleepOnset, workOnset, workOffset, sleepOnsetShow;
         int workType;
         sleepOnset = sharedPref.getLong("sleepOnset", now);
@@ -189,12 +217,13 @@ public class ProcessingAPI {
         long befSleepStart = 0;
         long befSleepEnd = 0;
         ArrayList<Sleep> deleteTheSleeps = new ArrayList<>();
-        for(Sleep sleep: new ArrayList<Sleep>(sleeps)){
+
+        for(Sleep sleep: new ArrayList<>(sleeps)){
             // 동일한 수면 데이터는 삭제
             if(befSleepStart == sleep.sleepStart && befSleepEnd == sleep.sleepEnd) {
                 sleepDao.delete(sleep);
                 sleeps.remove(sleep);
-                Log.v("same data", "same data");
+                Log.v(TAG, "same data");
                 befSleepStart = sleep.sleepStart;
                 befSleepEnd = sleep.sleepEnd;
                 continue;
@@ -211,7 +240,7 @@ public class ProcessingAPI {
             Log.v("SLEEP REAL", sleepEnd);
             if(ILastSleepUpdate.isBefore(Instant.ofEpochMilli(sleep.sleepStart))){
                 if(!check){
-                    lastDataUpdate = Long.min(lastDataUpdate, sleep.sleepStart - (1000*60*60*24));
+                    lastDataUpdate = Long.min(lastDataUpdate, sleep.sleepStart - oneDay);
                     editor.putLong("lastDataUpdate", lastDataUpdate);
                     editor.apply();
                 }
@@ -239,6 +268,16 @@ public class ProcessingAPI {
         V0Dao v0Dao = db.v0Dao();
         List<V0> v0s = Collections.synchronizedList(v0Dao.getAll());
 
+        // 14일 전의 자정 시간을 필터링 기준으로 설정
+        Calendar cutOffCal = Calendar.getInstance();
+        cutOffCal.setTimeInMillis(now - twoWeeks);
+        cutOffCal.set(Calendar.HOUR_OF_DAY, 0);
+        cutOffCal.set(Calendar.MINUTE, 0);
+        cutOffCal.set(Calendar.SECOND, 0);
+        cutOffCal.set(Calendar.MILLISECOND, 0);
+        long cutoff = cutOffCal.getTimeInMillis();
+        Log.v(TAG, "Filtering criterion: " + now);
+
         Boolean deleteException = sharedPref.getBoolean("deleteException", false);
         if (!deleteException) {
             Log.v("MainActivity", "Conventional");
@@ -251,7 +290,7 @@ public class ProcessingAPI {
         }
 
         //do pcr simulation
-        long yesterday = now - (1000*60*60*24);
+        long yesterday = now - oneDay;
         Log.v("LAST DATA UPDATE", lastDataUpdate + " " + sdfDateTime.format(new Date(lastDataUpdate)));
         long startProcess = Long.min(yesterday, lastDataUpdate);
         if(!sleeps.isEmpty()) {
@@ -287,15 +326,15 @@ public class ProcessingAPI {
         //or it is the first time we get sleep data, recalculate everything from the first sleep
         if(!gotInitV0 && !sleeps.isEmpty()){
             Sleep firstSleep = sleeps.get(0);
-            long firstSleepDayStart = (firstSleep.sleepStart + nineHours)/ (1000*60*60*24);
-            long firstSleepNoon = (firstSleepDayStart*(1000*60*60*24)) + (1000*60*60*12);
+            long firstSleepDayStart = (firstSleep.sleepStart + nineHours)/ oneDay;
+            long firstSleepNoon = (firstSleepDayStart*oneDay) + (1000*60*60*12);
             Log.v("FIRST SLEEP DAY START", String.valueOf(firstSleepNoon));
             Log.v("FIRST SLEEP", String.valueOf(firstSleep.sleepStart));
             if(firstSleep.sleepStart+nineHours >= firstSleepNoon){
                 startProcess = firstSleepNoon-nineHours;
                 initV0=new double[]{0.8958, 0.5219, 0.5792, 12.4225};
             }else{
-                startProcess = (firstSleepDayStart * (1000*60*60*24))-nineHours;
+                startProcess = (firstSleepDayStart * oneDay)-nineHours;
             }
         }
         Log.v("START PROCESS", sdfDateTime.format(new Date(startProcess)));
@@ -405,7 +444,7 @@ public class ProcessingAPI {
         newSleep.add(newMainSleep);
         newSleep.add(newNapSleep);
 
-        sleepPattern = sleepToArray(now, now+1000*60*60*24, newSleep);
+        sleepPattern = sleepToArray(now, now+oneDay, newSleep);
         for(int i = 0; i < sleepPattern.length; i ++){
             Log.v("SLEEP PATTERN: ", i + " " + sleepPattern[i]);
         }
