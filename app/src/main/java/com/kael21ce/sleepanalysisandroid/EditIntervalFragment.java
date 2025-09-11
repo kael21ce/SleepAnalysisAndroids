@@ -13,8 +13,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Button;
-import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -24,6 +22,7 @@ import androidx.fragment.app.Fragment;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.kael21ce.sleepanalysisandroid.data.Sleep;
+import com.kael21ce.sleepanalysisandroid.databinding.FragmentEditIntervalBinding;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -32,6 +31,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
@@ -39,31 +39,26 @@ import nl.joery.timerangepicker.TimeRangePicker;
 
 public class EditIntervalFragment extends Fragment implements ButtonTextUpdater {
 
-    private TextView intervalTextView;
-    SimpleDateFormat sdfDateTime = new SimpleDateFormat( "yyyy/MM/dd H:mm", Locale.KOREA);
     SimpleDateFormat sdf;
-    SimpleDateFormat sdfSimple = new SimpleDateFormat("yyyy/MM/dd", Locale.getDefault());
-
-    SimpleDateFormat sdf24H = new SimpleDateFormat("H:mm", Locale.getDefault());
+    SimpleDateFormat sdfSimple = new SimpleDateFormat("yyyy.MM.dd", Locale.getDefault());
+    SimpleDateFormat sdfBundle = new SimpleDateFormat("yyyy/MM/dd", Locale.getDefault());
     SimpleDateFormat sdfAMPM;
 
     private static final String TAG = "EditIntervalFragment";
     private static final long oneDay = 1000*60*60*24;
     private final String languageSetting = Locale.getDefault().getLanguage();
+    Sleep targetSleep;
+    FragmentEditIntervalBinding binding;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View v = inflater.inflate(R.layout.fragment_edit_interval, container, false);
-        ImageButton backButtonEdit = v.findViewById(R.id.backButtonEdit);
-        intervalTextView = v.findViewById(R.id.editIntervalText);
-        Button deleteButton = v.findViewById(R.id.deleteButton);
-        Button editButton = v.findViewById(R.id.editButton);
+        binding = FragmentEditIntervalBinding.inflate(inflater, container, false);
         MainActivity mainActivity = (MainActivity)getActivity();
 
         // Setup for alert dialog
-        View dimBackground = getParentFragment() != null ? getParentFragment().getView().findViewById(R.id.dimBackgroundSched) : v.findViewById(R.id.dimBackgroundEditIntv);
+        View dimBackground = getParentFragment() != null ? getParentFragment().getView().findViewById(R.id.dimBackgroundSched) : binding.dimBackgroundEditIntv;
         ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
         if (actionBar != null) {
             actionBar.hide();
@@ -71,16 +66,15 @@ public class EditIntervalFragment extends Fragment implements ButtonTextUpdater 
         BottomNavigationView bottomNavigationView = getActivity().findViewById(R.id.bottomNavigationView);
 
         TimeZone timeZone = TimeZone.getDefault();
-        sdfDateTime.setTimeZone(timeZone);
-        sdf24H.setTimeZone(timeZone);
         sdfSimple.setTimeZone(timeZone);
+        sdfBundle.setTimeZone(timeZone);
 
         // backButton이 눌렸을 때, scheduleFragment로 이동
         ScheduleFragment scheduleFragment = new ScheduleFragment();
         Bundle bundle = this.getArguments();
         assert bundle != null;
         // scheduleFragment.setArguments(bundle.getBundle("bundle"));
-        backButtonEdit.setOnClickListener(view -> getParentFragmentManager()
+        binding.backButtonEdit.setOnClickListener(view -> getParentFragmentManager()
                 .beginTransaction()
                 .setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right)
                 .replace(R.id.mainFrame, scheduleFragment).commit());
@@ -91,86 +85,88 @@ public class EditIntervalFragment extends Fragment implements ButtonTextUpdater 
         editor.putBoolean("isSchedule", true);
         editor.apply();
 
-        //get the bundle
-        String date = bundle.getString("date");
-        String startHour = bundle.getString("startHour");
-        String endHour = bundle.getString("endHour");
-        long startSleep = 0;
-        long endSleep = 0;
-        Date startHourD = new Date();
-        Date endHourD = new Date();
-        try {
-            startSleep = sdfDateTime.parse(date + " " + startHour).getTime();
-            endSleep = sdfDateTime.parse(date + " " + endHour).getTime();
-            startHourD = sdf24H.parse(startHour);
-            endHourD = sdf24H.parse(endHour);
-        } catch (ParseException e) {
-            Log.e("EditIntervalFragment", e.toString());
-
-            if (languageSetting.equals("ko")) {
-                showAlertDialog(dimBackground, actionBar, bottomNavigationView,
-                        "시스템 에러",
-                        "앱을 잠시 후 다시 시작해주세요. 문제가 계속되면 개발자에게 연락바랍니다.", "확인");
-            } else {
-                showAlertDialog(dimBackground, actionBar, bottomNavigationView,
-                        "System Error",
-                        "Please restart the app after a moment. If the problem persists, please contact the developer.", "OK");
+        // Sleep data의 sleep_id를 받아오기 -> sleeps에서 ID와 일치하는 수면 가져오기
+        long sleep_id = bundle.getLong("sleep_id");
+        assert mainActivity != null;
+        List<Sleep> sleeps = mainActivity.getSleeps();
+        targetSleep = sleeps.get(0);
+        for (Sleep sleep : sleeps) {
+            if (sleep.sleep_id == sleep_id) {
+                targetSleep = sleep;
+                break;
             }
         }
 
-        sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm", Locale.KOREA);
+        // Target sleep의 날짜 계산
+        long targetStart = targetSleep.sleepStart;
+        Date targetDate = new Date(targetStart);
+        String targetDateStr = sdfSimple.format(targetDate);
+
+        String date = bundle.getString("date");
+
+        sdf = new SimpleDateFormat("yyyy.MM.dd HH:mm", Locale.KOREA);
         sdfAMPM = new SimpleDateFormat("HH:mm", Locale.KOREA);
         sdf.setTimeZone(timeZone);
         sdfAMPM.setTimeZone(timeZone);
 
-        Log.v("AM PM FORMAT", sdfAMPM.format(startHourD));
-        Log.v("AM PM FORMAT", sdfAMPM.format(endHourD));
+        // 기본 날짜 설정
+        binding.startDateButton.setText(targetDateStr);
+
+        // Date button이 클릭될 때 DatePickerDialog를 띄우기
+        EditIntervalFragment editIntervalFragment = this;
+        binding.startDateButton.setOnClickListener(v -> {
+            DatePickerDialog datePickerDialog = new DatePickerDialog(binding.getRoot().getContext(), editIntervalFragment);
+            datePickerDialog.setData(1);
+            datePickerDialog.setDatePicker((String) binding.startDateButton.getText());
+            datePickerDialog.show();
+        });
+
 
         // TimeRangePicker 초기 설정
-        TimeRangePicker editTimePicker = v.findViewById(R.id.EditTimePicker);
-        TextView editRangeText = v.findViewById(R.id.editRangeText);
         Calendar initialCalendar = Calendar.getInstance();
         // 시작 시간
-        initialCalendar.setTimeInMillis(startSleep);
+        initialCalendar.setTimeInMillis(targetSleep.sleepStart);
         int startHourInt = initialCalendar.get(Calendar.HOUR_OF_DAY);
         int startMinuteInt = initialCalendar.get(Calendar.MINUTE);
-        editTimePicker.setEndTimeMinutes(startHourInt * 60 + startMinuteInt);
+        binding.EditTimePicker.setEndTimeMinutes(startHourInt * 60 + startMinuteInt);
         // 끝 시간
         initialCalendar = Calendar.getInstance();
-        initialCalendar.setTimeInMillis(endSleep);
+        initialCalendar.setTimeInMillis(targetSleep.sleepEnd);
         int endHourInt = initialCalendar.get(Calendar.HOUR_OF_DAY);
         int endMinuteInt = initialCalendar.get(Calendar.MINUTE);
-        editTimePicker.setStartTimeMinutes(endHourInt * 60 + endMinuteInt);
+        binding.EditTimePicker.setStartTimeMinutes(endHourInt * 60 + endMinuteInt);
         final String[] startSleepTime = {AddIntervalFragment.time2String(startHourInt * 60 + startMinuteInt)};
         final String[] endSleepTime = {AddIntervalFragment.time2String(endHourInt * 60 + endMinuteInt)};
-        editRangeText.setText(startSleepTime[0] + " → " + endSleepTime[0]);
+        binding.editRangeText.setText(startSleepTime[0] + " → " + endSleepTime[0]);
 
         // editIntervalText에 들어갈 시간 계산
-        intervalTextView.setText("수면 시간: "
+        Date startHourD = new Date(targetSleep.sleepStart);
+        Date endHourD = new Date(targetSleep.sleepEnd);
+        binding.editIntervalText.setText("수면 시간: "
                 + getInterval(sdfAMPM.format(startHourD), sdfAMPM.format(endHourD)));
 
         // TimeRangePicker에 대한 설정: Start thumb가 offset, end thumb가 onset
-        editTimePicker.setOnTimeChangeListener(new TimeRangePicker.OnTimeChangeListener() {
+        binding.EditTimePicker.setOnTimeChangeListener(new TimeRangePicker.OnTimeChangeListener() {
             @Override
             public void onStartTimeChange(@NonNull TimeRangePicker.Time time) {
                 endSleepTime[0] = AddIntervalFragment.time2String(time.getTotalMinutes());
                 String results = startSleepTime[0] + " → " + endSleepTime[0];
-                editRangeText.setText(results);
+                binding.editRangeText.setText(results);
 
                 // 시간 간격 계산
                 String resultInterval = getInterval(startSleepTime[0], endSleepTime[0]);
-                intervalTextView.setText("수면 시간: " + resultInterval);
+                binding.editIntervalText.setText("수면 시간: " + resultInterval);
             }
 
             @Override
             public void onEndTimeChange(@NonNull TimeRangePicker.Time time) {
                 startSleepTime[0] = AddIntervalFragment.time2String(time.getTotalMinutes());
                 String results = startSleepTime[0] + " → " + endSleepTime[0];
-                editRangeText.setText(results);
+                binding.editRangeText.setText(results);
 
                 // 시간 간격 계산
                 String resultInterval = getInterval(startSleepTime[0], endSleepTime[0]);
-                intervalTextView.setText("수면 시간: " + resultInterval);
+                binding.editIntervalText.setText("수면 시간: " + resultInterval);
             }
 
             @Override
@@ -181,21 +177,16 @@ public class EditIntervalFragment extends Fragment implements ButtonTextUpdater 
 
 
         //Delete interval if deleteButton is clicked
-        long finalStartSleep = startSleep;
-        long finalEndSleep = endSleep;
-        Sleep initSleep = new Sleep();
-        initSleep.sleepStart = finalStartSleep;
-        initSleep.sleepEnd = finalEndSleep;
-        deleteButton.setOnClickListener(view -> {
+        binding.deleteButton.setOnClickListener(view -> {
             Log.v("DELETED", "DELETED");
-            mainActivity.deleteSleep(initSleep);
+            mainActivity.deleteSleep(targetSleep);
 
             Intent scheduleIntent = new Intent(mainActivity, SplashActivity.class);
 
             //Send the information of the selected date
             Calendar calendar = Calendar.getInstance();
             try {
-                Date curDate = sdfSimple.parse(date);
+                Date curDate = sdfBundle.parse(date);
                 calendar.setTime(curDate);
                 int year = calendar.get(Calendar.YEAR);
                 int month = calendar.get(Calendar.MONTH);
@@ -214,13 +205,16 @@ public class EditIntervalFragment extends Fragment implements ButtonTextUpdater 
         });
 
         //Edit interval if editButton is clicked
-        editButton.setOnClickListener(view -> {
+        binding.editButton.setOnClickListener(view -> {
             Log.v("EDITED", "EDITED");
             Sleep edit_sleep = new Sleep();
             String startTime = startSleepTime[0];
             String endTime = endSleepTime[0];
-            String startSDF = date + ' ' + startTime;
-            String endSDF = date + ' ' + endTime;
+
+            String endDate = AddIntervalFragment.calculateSleepEndDate(targetDateStr, startTime, endTime);
+
+            String startSDF = targetDateStr + ' ' + startTime;
+            String endSDF = endDate + ' ' + endTime;
             Log.v("START SDF", startSDF);
             Log.v("END SDF", endSDF);
 
@@ -229,6 +223,8 @@ public class EditIntervalFragment extends Fragment implements ButtonTextUpdater 
             try {
                 sleepStartDate = sdf.parse(startSDF);
                 sleepEndDate = sdf.parse(endSDF);
+                Log.v("START DATE", sleepStartDate.toString());
+                Log.v("END DATE", sleepEndDate.toString());
             } catch (ParseException e) {
                 Log.e("EditIntervalFragment", e.toString());
 
@@ -243,12 +239,10 @@ public class EditIntervalFragment extends Fragment implements ButtonTextUpdater 
                             "Please restart the app after a moment. If the problem persists, please contact the developer.", "OK");
                 }
             }
-            Log.v("START DATE", sleepStartDate.toString());
-            Log.v("END DATE", sleepEndDate.toString());
 
             Date curDate = new Date();
             try {
-                curDate = sdfSimple.parse(date);
+                curDate = sdfBundle.parse(date);
             } catch (ParseException e) {
                 Log.e("EditIntervalFragment", e.toString());
 
@@ -267,28 +261,9 @@ public class EditIntervalFragment extends Fragment implements ButtonTextUpdater 
             long sleepStartMillis = sleepStartDate.getTime();
             long sleepEndMillis = sleepEndDate.getTime();
 
-            Calendar midnightCalendar = Calendar.getInstance();
-            midnightCalendar.setTime(curDate);
-
-            midnightCalendar.set(Calendar.HOUR_OF_DAY, 0);
-            midnightCalendar.set(Calendar.MINUTE, 0);
-            midnightCalendar.set(Calendar.SECOND, 0);
-            midnightCalendar.set(Calendar.MILLISECOND, 0);
-
-            long midnight = midnightCalendar.getTimeInMillis();
-            boolean isMidnight = false;
-
-            if (sleepEndDate.getTime() == midnight) {
-                sleepEndMillis += oneDay;
-                isMidnight = true;
-            }
             if(sleepStartMillis <= sleepEndMillis) {
                 edit_sleep.sleepStart = sleepStartMillis;
                 edit_sleep.sleepEnd = sleepEndMillis;
-
-                if (isMidnight) {
-                    initSleep.sleepEnd += oneDay;
-                }
 
                 Intent scheduleIntent = new Intent(mainActivity, SplashActivity.class);
 
@@ -305,7 +280,7 @@ public class EditIntervalFragment extends Fragment implements ButtonTextUpdater 
                 scheduleIntent.putExtra("Year", year);
                 scheduleIntent.putExtra("Month", month);
                 scheduleIntent.putExtra("Day", day);
-                mainActivity.editSleep(initSleep, edit_sleep);
+                mainActivity.editSleep(targetSleep, edit_sleep);
 
                 startActivity(scheduleIntent);
             }else{
@@ -321,22 +296,24 @@ public class EditIntervalFragment extends Fragment implements ButtonTextUpdater 
             }
         });
 
-        return v;
+        return binding.getRoot();
     }
 
     public void setDateButtonText(String text, int isStartButton) {
-
+        if (isStartButton == 1) {
+            binding.startDateButton.setText(text);
+        }
     }
 
     public void setTimeButtonText(String text, int isStartButton) {
     }
 
-    public String getDateButtonText(int isStartButton) {return "";}
-
-    //Convert Format of "aaa HH:mm" to "HH:mm"
-    public String convertAToFormat(String time) throws ParseException {
-        Date date = sdfAMPM.parse(time);
-        return sdf24H.format(date);
+    public String getDateButtonText(int isStartButton) {
+        String nullString = "2024.01.01";
+        if (isStartButton == 1) {
+            return (String) binding.startDateButton.getText();
+        }
+        return nullString;
     }
 
     // "HH:mm" 형태의 시간을 받아서 시간 간격을 계산
@@ -426,9 +403,7 @@ public class EditIntervalFragment extends Fragment implements ButtonTextUpdater 
                 .setView(viewDialog)
                 .create();
 
-        dialogButton.setOnClickListener(dialogV -> {
-            dialog.dismiss();
-        });
+        dialogButton.setOnClickListener(dialogV -> dialog.dismiss());
         dialog.setCancelable(true);
         dialog.show();
 

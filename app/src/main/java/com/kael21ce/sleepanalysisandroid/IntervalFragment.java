@@ -122,10 +122,11 @@ public class IntervalFragment extends Fragment {
         for(int i = 0; i < count; i ++){
             long sleepStart = bundle.getLong("sleepStart"+i);
             long sleepEnd = bundle.getLong("sleepEnd"+i);
+            long sleep_id = bundle.getLong("sleep_id" + i);
             long duration = (sleepEnd - sleepStart)/1000;
             Log.v("DURATION", String.valueOf(sleepStart));
             Log.v("DURATION2", String.valueOf(sleepEnd));
-            intervalAdapter.addItem(new Interval(sdf.format(new Date(sleepStart)) + " - " + sdf.format(new Date(sleepEnd)), 3));
+            intervalAdapter.addItem(new Interval(sdf.format(new Date(sleepStart)) + " - " + sdf.format(new Date(sleepEnd)), 3, sleep_id));
         }
 
         String date = bundle.getString("date");

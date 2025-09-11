@@ -7,14 +7,12 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -22,12 +20,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Button;
-import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.kael21ce.sleepanalysisandroid.data.Sleep;
+import com.kael21ce.sleepanalysisandroid.databinding.FragmentAddIntervalBinding;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -45,18 +42,14 @@ import java.util.TimeZone;
 import nl.joery.timerangepicker.TimeRangePicker;
 
 public class AddIntervalFragment extends Fragment implements ButtonTextUpdater {
-
-    private Button startDateButton;
     private IntervalFragment intervalFragment;
     private ScheduleFragment scheduleFragment;
     private DatePickerDialog datePickerDialog;
-    private TimePickerDialog timePickerDialog;
-    private TimeRangePicker sleepTimePicker;
-    private TextView sleepRangeText;
     SimpleDateFormat sdf;
     SimpleDateFormat sdfDateTimeSchedule = new SimpleDateFormat( "yyyy/MM/dd", Locale.KOREA);
     private static final String TAG = "AddIntervalFragment";
     private final String languageSetting = Locale.getDefault().getLanguage();
+    FragmentAddIntervalBinding binding;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -68,7 +61,7 @@ public class AddIntervalFragment extends Fragment implements ButtonTextUpdater {
         }
 
         // Inflate the layout for this fragment
-        View v = inflater.inflate(R.layout.fragment_add_interval, container, false);
+        binding = FragmentAddIntervalBinding.inflate(inflater, container, false);
 
         MainActivity mainActivity = (MainActivity)getActivity();
 
@@ -80,14 +73,10 @@ public class AddIntervalFragment extends Fragment implements ButtonTextUpdater {
 
         TimeZone timeZone = TimeZone.getDefault();
 
-        startDateButton = v.findViewById(R.id.startDateButton);
-        Button addButton = v.findViewById(R.id.addButton);
-
         // backButton이 눌렸을 때, scheduleFragment로 이동
         Bundle bundle = this.getArguments();
         scheduleFragment = new ScheduleFragment();
-        ImageButton backButton = v.findViewById(R.id.backButton);
-        backButton.setOnClickListener(view -> getParentFragmentManager().beginTransaction()
+        binding.backButton.setOnClickListener(view -> getParentFragmentManager().beginTransaction()
                 .setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right)
                 .replace(R.id.mainFrame, scheduleFragment).commit());
 
@@ -116,37 +105,35 @@ public class AddIntervalFragment extends Fragment implements ButtonTextUpdater {
         // 설정할 시간
         final String[] sleepOnsetTime = {time2String(currentHour * 60 + currentMinute)};
         final String[] sleepOffsetTime = {time2String(currentHour * 60 + currentMinute)};
-        startDateButton.setText(current_date);
-        sleepTimePicker = v.findViewById(R.id.SleepTimePicker);
-        sleepTimePicker.setStartTimeMinutes(currentHour * 60 + currentMinute);
-        sleepTimePicker.setEndTimeMinutes(currentHour * 60 + currentMinute);
-        sleepRangeText = v.findViewById(R.id.sleepRangeText);
-        sleepRangeText.setText(sleepOnsetTime[0] + " → " + sleepOffsetTime[0]);
+        binding.startDateButton.setText(current_date);
+        binding.SleepTimePicker.setStartTimeMinutes(currentHour * 60 + currentMinute);
+        binding.SleepTimePicker.setEndTimeMinutes(currentHour * 60 + currentMinute);
+        binding.sleepRangeText.setText(sleepOnsetTime[0] + " → " + sleepOffsetTime[0]);
 
 
         // Date button이 클릭될 때 DatePickerDialog를 띄우기
         AddIntervalFragment addIntervalFragment = this;
-        startDateButton.setOnClickListener(view -> {
-            datePickerDialog = new DatePickerDialog(v.getContext(), addIntervalFragment);
+        binding.startDateButton.setOnClickListener(view -> {
+            datePickerDialog = new DatePickerDialog(binding.getRoot().getContext(), addIntervalFragment);
             datePickerDialog.setData(1);
-            datePickerDialog.setDatePicker((String) startDateButton.getText());
+            datePickerDialog.setDatePicker((String) binding.startDateButton.getText());
             datePickerDialog.show();
         });
 
         // TimeRangePicker에 대한 설정: Start thumb가 offset, end thumb가 onset
-        sleepTimePicker.setOnTimeChangeListener(new TimeRangePicker.OnTimeChangeListener() {
+        binding.SleepTimePicker.setOnTimeChangeListener(new TimeRangePicker.OnTimeChangeListener() {
             @Override
             public void onStartTimeChange(@NonNull TimeRangePicker.Time time) {
                 sleepOffsetTime[0] = time2String(time.getTotalMinutes());
                 String results = sleepOnsetTime[0] + " → " + sleepOffsetTime[0];
-                sleepRangeText.setText(results);
+                binding.sleepRangeText.setText(results);
             }
 
             @Override
             public void onEndTimeChange(@NonNull TimeRangePicker.Time time) {
                 sleepOnsetTime[0] = time2String(time.getTotalMinutes());
                 String results = sleepOnsetTime[0] + " → " + sleepOffsetTime[0];
-                sleepRangeText.setText(results);
+                binding.sleepRangeText.setText(results);
             }
 
             @Override
@@ -155,9 +142,9 @@ public class AddIntervalFragment extends Fragment implements ButtonTextUpdater {
             }
         });
 
-        addButton.setOnClickListener(view -> {
+        binding.addButton.setOnClickListener(view -> {
             Sleep add_sleep = new Sleep();
-            String startDate = (String) startDateButton.getText();
+            String startDate = (String) binding.startDateButton.getText();
             String startTime = sleepOnsetTime[0];
             String startSDF = startDate + ' ' + startTime;
             String endTime = sleepOffsetTime[0];
@@ -193,7 +180,7 @@ public class AddIntervalFragment extends Fragment implements ButtonTextUpdater {
             add_sleep.sleepStart = sleepStartDate.getTime();
             add_sleep.sleepEnd = sleepEndDate.getTime();
 
-            View dimBackground = getParentFragment() != null ? getParentFragment().getView().findViewById(R.id.dimBackgroundSched) : v.findViewById(R.id.dimBackgroundAddIntv);
+            View dimBackground = getParentFragment() != null ? getParentFragment().getView().findViewById(R.id.dimBackgroundSched) : binding.dimBackgroundAddIntv;
             ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
             BottomNavigationView bottomNavigationView = getActivity().findViewById(R.id.bottomNavigationView);
 
@@ -239,15 +226,13 @@ public class AddIntervalFragment extends Fragment implements ButtonTextUpdater {
             }
         });
 
-        return  v;
+        return binding.getRoot();
     }
 
     //Change the text of Button
     public void setDateButtonText(String text, int isStartButton) {
         if (isStartButton==1) {
-            if (startDateButton != null) {
-                startDateButton.setText(text);
-            }
+            binding.startDateButton.setText(text);
         }
     }
 
@@ -257,11 +242,7 @@ public class AddIntervalFragment extends Fragment implements ButtonTextUpdater {
     public String getDateButtonText(int isStartButton) {
         String nullString = "2024.01.01";
         if (isStartButton==1) {
-            if (startDateButton != null) {
-                return (String) startDateButton.getText();
-            } else {
-                return nullString;
-            }
+            return (String) binding.startDateButton.getText();
         }
         return nullString;
     }
@@ -326,7 +307,7 @@ public class AddIntervalFragment extends Fragment implements ButtonTextUpdater {
     }
 
     // 수면 시작 날짜, 수면 시작 시간, 수면 종료 시간이 String으로 주어져있을 때, 수면 종료 날짜를 String으로 출력
-    private static String calculateSleepEndDate(String startDateString, String startTimeString, String endTimeString) {
+    public static String calculateSleepEndDate(String startDateString, String startTimeString, String endTimeString) {
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
         DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
 

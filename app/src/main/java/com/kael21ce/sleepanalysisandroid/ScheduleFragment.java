@@ -89,21 +89,49 @@ public class ScheduleFragment extends Fragment {
 
         //get sleep data and calculate map values
         List<Sleep> sleeps = mainActivity.getSleeps();
+        List<Sleep> sleepsCopy = new ArrayList<>();
         long oneDayToMils = 1000*60*60*24;
         sleepsData = new HashMap<>();
         List<Sleep> listSleep = new ArrayList<>();
         Log.v("SIZE OF SLEEP", String.valueOf(sleeps.size()));
         long minDate = -1;
         if(!sleeps.isEmpty()) {
-            long curDate = (sleeps.get(0).sleepStart + nineHours) / oneDayToMils;
+            long sleepStartDate, sleepEndDate;
+            // 수면 시작일과 종료일이 다를 경우 ID를 동일하게 해서 쪼개서 복사본 만들기
             for (Sleep sleep : sleeps) {
-                Log.v("SLEEPSSS", String.valueOf(sleep.sleepStart));
-                long sleepStartDate = ((sleep.sleepStart + nineHours) / oneDayToMils);
+                sleepStartDate = ((sleep.sleepStart + nineHours) / oneDayToMils);
+                sleepEndDate = (sleep.sleepEnd + nineHours) / oneDayToMils;
 
                 // 수면 시작일을 저장해놓기
                 if (minDate == -1 || minDate > sleepStartDate) {
                     minDate = sleepStartDate;
                 }
+
+                if (sleepStartDate != sleepEndDate) {
+                    Sleep sleep1 = new Sleep();
+                    Sleep sleep2 = new Sleep();
+                    Log.v("DIFFERENT DAY", "DIFFERENT DAY");
+                    long midnight = sleepEndDate * 1000*60*60*24;
+                    midnight = midnight - nineHours;
+                    sleep1.sleepStart = sleep.sleepStart;
+                    sleep1.sleepEnd = midnight - 1000*60;
+                    sleep1.sleep_id = sleep.sleep_id;
+                    sleep2.sleepStart = midnight;
+                    sleep2.sleepEnd = sleep.sleepEnd;
+                    sleep2.sleep_id = sleep.sleep_id;
+                    sleepsCopy.add(sleep1);
+                    sleepsCopy.add(sleep2);
+                } else {
+                    sleepsCopy.add(sleep);
+                }
+            }
+
+            // 복사본을 가지고 hashmap 형성
+            long curDate = (sleepsCopy.get(0).sleepStart + nineHours) / oneDayToMils;
+            for (Sleep sleep : sleepsCopy) {
+                Log.v("SLEEPSSS", String.valueOf(sleep.sleepStart));
+                sleepStartDate = ((sleep.sleepStart + nineHours) / oneDayToMils);
+
                 if (curDate != sleepStartDate) {
                     List<Sleep> putSleep = new ArrayList<>(listSleep);
                     sleepsData.put(curDate, putSleep);
@@ -113,6 +141,7 @@ public class ScheduleFragment extends Fragment {
                 }else{
                     listSleep.add(sleep);
                 }
+
             }
             if(!listSleep.isEmpty()){
                 List<Sleep> putSleep = new ArrayList<>(listSleep);
@@ -336,6 +365,7 @@ public class ScheduleFragment extends Fragment {
             int count1 = 0;
             for(Sleep sleep: initSleepData1){
                 Log.v("THE INTERVAL'S SLEEP", String.valueOf(sleep.sleepStart));
+                bundle1.putLong("sleep_id" + count1, sleep.sleep_id);
                 bundle1.putLong("sleepStart"+ count1, sleep.sleepStart);
                 bundle1.putLong("sleepEnd"+ count1, sleep.sleepEnd);
                 count1++;

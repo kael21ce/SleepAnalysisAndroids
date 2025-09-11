@@ -2,14 +2,16 @@ package com.kael21ce.sleepanalysisandroid;
 
 public class Interval {
     String interval;
-    Integer isNap;
+    int isNap;
+    long id;
     public static final int Nap_Type = 1;
     public static final int Activity_Type = 2;
     public static final int Sleep_Type = 3;
 
-    public Interval(String interval, Integer isNap) {
+    public Interval(String interval, int isNap, long id) {
         this.interval = interval;
         this.isNap = isNap;
+        this.id = id;
     }
 
     public String getInterval() {
@@ -26,5 +28,13 @@ public class Interval {
 
     public void setIsNap(Integer isNap) {
         this.isNap = isNap;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 }

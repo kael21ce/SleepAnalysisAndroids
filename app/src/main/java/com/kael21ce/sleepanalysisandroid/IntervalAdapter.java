@@ -42,28 +42,6 @@ public class IntervalAdapter extends RecyclerView.Adapter<IntervalAdapter.ViewHo
         LayoutInflater inflater = LayoutInflater.from(viewGroup.getContext());
         if (viewType != Interval.Activity_Type) {
             View itemView = inflater.inflate(R.layout.interval_edit_card, viewGroup, false);
-            EditIntervalFragment editIntervalFragment = new EditIntervalFragment();
-
-            //Click listener of editButton
-            ImageButton editButton = itemView.findViewById(R.id.editIntervalButton);
-            editButton.setOnClickListener(view -> {
-                //Move to the edit page
-                TextView itemTextView = itemView.findViewById(R.id.intervalTextEdit);
-                String itemText = itemTextView.getText().toString();
-                String[] hours = itemText.split(" - ");
-                //Make a bundle
-                Bundle bundle = new Bundle();
-                bundle.putString("date", date);
-                bundle.putString("startHour", hours[0]);
-                bundle.putString("endHour", hours[1]);
-                bundle.putBundle("bundle", bundle1);
-                editIntervalFragment.setArguments(bundle);
-
-                // MainActivity에서 Container를 가지는 FragmentManager를 가져옴 -> EditIntervalFragment로 이동
-                FragmentTransaction transaction = fragmentManager.beginTransaction()
-                        .setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left);
-                transaction.replace(R.id.mainFrame, editIntervalFragment).commit();
-            });
             return new ViewHolder(itemView);
         } else {
             View itemView = inflater.inflate(R.layout.interval_card, viewGroup, false);
@@ -74,6 +52,28 @@ public class IntervalAdapter extends RecyclerView.Adapter<IntervalAdapter.ViewHo
     @Override
     public void onBindViewHolder(@NonNull ViewHolder viewHolder, int position) {
         Interval item = items.get(position);
+        EditIntervalFragment editIntervalFragment = new EditIntervalFragment();
+        ImageButton editIntervalButton = viewHolder.itemView.findViewById(R.id.editIntervalButton);
+        if (editIntervalButton != null && item.getIsNap() != 2) {
+            editIntervalButton.setOnClickListener(view -> {
+                String itemText = item.getInterval();
+                String[] hours = itemText.split(" - ");
+
+                Bundle bundle = new Bundle();
+                bundle.putString("date", date);
+                bundle.putString("startHour", hours[0]);
+                bundle.putString("endHour", hours[1]);
+                bundle.putLong("sleep_id", item.getId());
+                bundle.putBundle("bundle", bundle1);
+                editIntervalFragment.setArguments(bundle);
+
+                // MainActivity에서 Container를 가지는 FragmentManager를 가져옴 -> EditIntervalFragment로 이동
+                FragmentTransaction transaction = fragmentManager.beginTransaction()
+                        .setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left);
+                transaction.replace(R.id.mainFrame, editIntervalFragment).commit();
+            });
+        }
+
         viewHolder.setItem(item);
     }
 

@@ -664,38 +664,19 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void addSleep(Sleep sleep){
-        //check if the sleep is already there
-//        Log.v("lastSleepUpdate", String.valueOf(this.lastSleepUpdate));
-//        Log.v("sleep.sleepStart", String.valueOf(sleep.sleepStart));
-//        if(sleep.sleepStart < this.lastSleepUpdate) {
         List<Sleep> listSleep = new ArrayList<>();
-        long sleepDayStart = (sleep.sleepStart + nineHours)/(1000*60*60*24);
-        long sleepDayEnd = (sleep.sleepEnd + nineHours)/(1000*60*60*24);
-        if(sleepDayStart != sleepDayEnd){
-            Log.v("DIFFERENT DAY", "DIFFERENT DAY");
-            long midnight = sleepDayEnd * 1000*60*60*24;
-            midnight = midnight - nineHours;
-            Sleep sleep2 = new Sleep();
-            sleep2.sleepStart = sleep.sleepStart;
-            sleep2.sleepEnd = midnight - 1000*60;
-            sleep.sleepStart = midnight;
-            listSleep.add(sleep2);
-            listSleep.add(sleep);
-        }else {
-            listSleep.add(sleep);
-        }
+        listSleep.add(sleep);
         Log.v("SLEEP DATA ADDED", String.valueOf(sleep.sleepStart));
         sleepDao = db.sleepDao();
         sleepDao.insertAll(listSleep);
-//        }
-        lastDataUpdate = sleep.sleepStart - (1000*60*60*24);
+        lastDataUpdate = sleep.sleepStart - oneDay;
         editor.putLong("lastDataUpdate", lastDataUpdate);
         editor.apply();
         healthConnectManager.javWriteSleepInput(sleep.sleepStart, sleep.sleepEnd);
 
     }
 
-    public boolean editSleep(Sleep prevSleep, Sleep updatedSleep){
+    public void editSleep(Sleep prevSleep, Sleep updatedSleep){
         sleepDao = db.sleepDao();
 
         int count = 0;
@@ -712,15 +693,14 @@ public class MainActivity extends AppCompatActivity {
                     updatedSleep.sleep_id = sleepId;
                     sleepDao.updateSleep(sleepId, updatedSleep.sleepStart, updatedSleep.sleepEnd);
                     this.sleeps.set(count, updatedSleep);
-                    return true;
+                    return;
                 }else{
                     Log.v("UPDATED", "PREVIOUS SLEEP IS NOT UPDATED");
-                    return false;
+                    return;
                 }
             }
             count += 1;
         }
-        return false;
     }
 
     public boolean deleteSleep(Sleep sleepDel){
