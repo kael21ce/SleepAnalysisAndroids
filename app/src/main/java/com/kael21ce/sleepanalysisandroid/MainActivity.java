@@ -194,10 +194,10 @@ public class MainActivity extends AppCompatActivity {
 
         // isOnboarding을 SharedPreference에서 확인하여 로그인 여부 확인
         if (sharedPref.contains("User_Name") && sharedPref.contains("User_Email")) {
-            editor.putBoolean("isOnboarding", false); // 이전 버전의 사용자가 갑자기 로그아웃되는 경우 방지
+            editor.putBoolean("isOnboarding", false).apply(); // 이전 버전의 사용자가 갑자기 로그아웃되는 경우 방지
         }
         if (!sharedPref.contains("isOnboarding")) {
-            editor.putBoolean("isOnboarding", true);
+            editor.putBoolean("isOnboarding", true).apply();
         }
         if (sharedPref.getBoolean("isOnboarding", true)) {
             Intent signIntent = new Intent(MainActivity.this, BeginRegisterActivity.class);
