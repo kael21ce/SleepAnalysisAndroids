@@ -58,6 +58,11 @@ public class SurveyActivity extends AppCompatActivity {
         // 건너뛰기 누르면 activity 종료
         TextView skipTextButton = findViewById(R.id.moodSkipTextButton);
         skipTextButton.setOnClickListener(view -> {
+            // 설문이 띄워진 것을 저장 -> 계속 설문을 요청하지 않도록 하기
+            Calendar calendar = Calendar.getInstance();
+            int day = calendar.get(Calendar.DAY_OF_MONTH);
+            editor.putInt(survey_key, day).apply();
+
             Intent skipIntent = new Intent(SurveyActivity.this, SplashActivity.class);
             skipIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(skipIntent);
