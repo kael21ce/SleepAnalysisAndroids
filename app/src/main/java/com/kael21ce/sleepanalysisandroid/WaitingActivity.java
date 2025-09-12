@@ -100,6 +100,9 @@ public class WaitingActivity extends AppCompatActivity {
         String user_based_text = user_name + waitingDescription.getText().toString();
         waitingDescription.setText(user_based_text);
 
+        // 로그인 되어있음을 sharedPreference에 저장
+        sharedPref.edit().putBoolean("isOnboarding", false).apply();
+
         // WaitingText 뒤에 dot 추가
         waitingText = findViewById(R.id.WaitingText);
         updateDots();
