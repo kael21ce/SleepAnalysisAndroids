@@ -78,15 +78,12 @@ public class MainActivity extends AppCompatActivity {
     ScheduleFragment scheduleFragment = new ScheduleFragment();
     RecommendFragment recommendFragment = new RecommendFragment();
     SettingFragment settingFragment = new SettingFragment();
-    private RelativeLayout loadingScreenLayout;
     private boolean creation = true;
     SimpleDateFormat sdfDateTime = new SimpleDateFormat("dd/MM/yyyy" + " HH:mm", Locale.getDefault());
-    SimpleDateFormat sdfSimple = new SimpleDateFormat("H:mm", Locale.getDefault());
     private static final String TAG = "MainActivity";
     private static final String CHECK_CHANNEL_ID = "check_recommend", SURVEY_CHANNEL_ID = "alertness_survey";
     HealthConnectManager healthConnectManager;
     //health connect
-    private static Context context;
     SharedPreferences sharedPref;
     SharedPreferences.Editor editor;
     private static final String NotifyKey = "Notify_At";
@@ -108,7 +105,6 @@ public class MainActivity extends AppCompatActivity {
     AppDatabase db;
     private List<Sleep> sleeps;
     private List<Awareness> awarenesses, sleepAwarenesses;
-    private List<V0> v0s;
     private CombineResult combineResult;
     String email, username;
     long now, nineHours;
@@ -133,8 +129,6 @@ public class MainActivity extends AppCompatActivity {
 
         super.onCreate(saveInstanceState);
         setContentView(R.layout.activity_main);
-
-        context = getApplicationContext();
 
         Log.v("MainActivity", "onCreate() is called");
 
@@ -233,18 +227,24 @@ public class MainActivity extends AppCompatActivity {
 
         combineResult = ProcessingAPI.run(this, sharedPref);
         sleeps = combineResult.getSleeps();
-        v0s = combineResult.getV0s();
+        List<V0> v0s = combineResult.getV0s();
         barEntries = combineResult.getBarEntries();
         awarenesses = combineResult.getAwarenesses();
         sleepAwarenesses = combineResult.getSleepAwarenesses();
 
-        //user sleep variables
+        // 사용자의 근무 및 수면 설정값 가져오기
         sleepOnset = sharedPref.getLong("sleepOnset", now);
         workOnset = sharedPref.getLong("workOnset", now);
         workOffset = sharedPref.getLong("workOffset", now);
         sleepOnsetShow = sharedPref.getLong("sleepOnsetShow", now);
         isenoughsleep = sharedPref.getBoolean("enoughSleep", false);
         isearlysleep = sharedPref.getBoolean("earlySleep", false);
+
+        // 계산된 추천 수면값을 불러오기
+        mainSleepStart = sharedPref.getLong("mainSleepStart", now);
+        mainSleepEnd = sharedPref.getLong("mainSleepEnd", now);
+        napSleepStart = sharedPref.getLong("napSleepStart", now);
+        napSleepEnd = sharedPref.getLong("napSleepEnd", now);
 
 
         // 오후 12시 이후 mood와 sleep quality 관련 설문 진행
@@ -575,7 +575,7 @@ public class MainActivity extends AppCompatActivity {
                 handler.postDelayed(() -> {
                     //refresh through calling splashActivity
                     finish();
-                    Intent refreshIntent = new Intent(context, SplashActivity.class);
+                    Intent refreshIntent = new Intent(MainActivity.this, SplashActivity.class);
                     startActivity(refreshIntent);
                 }, 400);
             }
@@ -616,7 +616,7 @@ public class MainActivity extends AppCompatActivity {
             creation = false;
         } else {
             Log.v("RESUMING", "RESUMING");
-            db = Room.databaseBuilder(context,
+            db = Room.databaseBuilder(getApplicationContext(),
                     AppDatabase.class, "sleep_wake").allowMainThreadQueries().build();
             //get the shared preferences variable
             sharedPref = getSharedPreferences("SleepWake", Context.MODE_PRIVATE);
@@ -785,8 +785,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void setSleepOnset(long sleepOnset) {
         this.sleepOnset = sleepOnset;
-        Context context = MainActivity.context;
-        sharedPref = context.getSharedPreferences("SleepWake", Context.MODE_PRIVATE);
+        sharedPref = getSharedPreferences("SleepWake", Context.MODE_PRIVATE);
         editor = sharedPref.edit();
         editor.putLong("sleepOnset", sleepOnset);
         editor.apply();
@@ -799,8 +798,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void setWorkOnset(long workOnset){
         this.workOnset = workOnset;
-        Context context = MainActivity.context;
-        sharedPref = context.getSharedPreferences("SleepWake", Context.MODE_PRIVATE);
+        sharedPref = getSharedPreferences("SleepWake", Context.MODE_PRIVATE);
         editor = sharedPref.edit();
         editor.putLong("workOnset", workOnset);
         editor.apply();
@@ -813,8 +811,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void setWorkOffset(long workOffset) {
         this.workOffset = workOffset;
-        Context context = MainActivity.context;
-        sharedPref = context.getSharedPreferences("SleepWake", Context.MODE_PRIVATE);
+        sharedPref = getSharedPreferences("SleepWake", Context.MODE_PRIVATE);
         editor = sharedPref.edit();
         editor.putLong("workOffset", workOffset);
         editor.apply();
