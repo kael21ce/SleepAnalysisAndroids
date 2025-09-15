@@ -59,9 +59,8 @@ import java.util.TimeZone;
 public class HomeFragment extends Fragment {
     SimpleDateFormat sdfDateTime = new SimpleDateFormat( "hh:mm a", Locale.KOREA);
     SimpleDateFormat sdfDateTime2 = new SimpleDateFormat( "dd/MM/yyyy hh:mm a", Locale.KOREA);
-    SimpleDateFormat sdfDateTimeRecomm = new SimpleDateFormat("H:mm", Locale.KOREA);
     SimpleDateFormat sdfDate = new SimpleDateFormat("MM/dd", Locale.KOREA);
-    SimpleDateFormat sdfTime = new SimpleDateFormat("HH:mm", Locale.KOREA);
+    SimpleDateFormat sdfTime = new SimpleDateFormat("H:mm", Locale.KOREA);
     long now;
     private boolean creation = true;
     String mainSleepStartString, mainSleepEndString, workOnsetString, workOffsetString, napSleepStartString, napSleepEndString, sleepOnsetString;
@@ -272,7 +271,6 @@ public class HomeFragment extends Fragment {
         });
 
         TimeZone timeZone = TimeZone.getDefault();
-        sdfDateTimeRecomm.setTimeZone(timeZone);
         sdfTime.setTimeZone(timeZone);
         sdfDateTime.setTimeZone(timeZone);
         sdfDate.setTimeZone(timeZone);
@@ -289,9 +287,11 @@ public class HomeFragment extends Fragment {
         sleepOnsetString = sdfDateTime.format(new Date(sharedPref.getLong("sleepOnset", now)));
         int workType = sharedPref.getInt("workType", 0);
 
-        Log.v("sleep onset", sdfDateTime2.format(new Date(sharedPref.getLong("sleepOnset", now))));
-        Log.v("work onset", sdfDateTime2.format(new Date(sharedPref.getLong("workOnset", now))));
-        Log.v("work offset", sdfDateTime2.format(new Date(sharedPref.getLong("workOffset", now))));
+        Log.v("MainActivity", "sleep onset: " + sdfDateTime2.format(new Date(sharedPref.getLong("sleepOnset", now))));
+        Log.v("MainActivity", "work onset: " + sdfDateTime2.format(new Date(sharedPref.getLong("workOnset", now))));
+        Log.v("MainActivity", "work offset: " + sdfDateTime2.format(new Date(sharedPref.getLong("workOffset", now))));
+        Log.v("MainActivity", "Main sleep start: " + mainSleepStartString);
+        Log.v("MainActivity", "Main sleep end: " + mainSleepEndString);
 
         sleepButton.setBackground(ResourcesCompat
                 .getDrawable(getResources(), R.drawable.corner_8_clicked, null));
@@ -328,8 +328,8 @@ public class HomeFragment extends Fragment {
             startTime.setText("--:--");
             endTime.setText("--:--");
         } else {
-            startTime.setText(sdfDateTimeRecomm.format(new Date(mainActivity.getMainSleepStart())));
-            endTime.setText(sdfDateTimeRecomm.format(new Date(mainActivity.getMainSleepEnd())));
+            startTime.setText(sdfTime.format(new Date(mainActivity.getMainSleepStart())));
+            endTime.setText(sdfTime.format(new Date(mainActivity.getMainSleepEnd())));
         }
 
         Button buttonSendData = v.findViewById(R.id.sendDataButton);
@@ -1024,6 +1024,8 @@ public class HomeFragment extends Fragment {
         timeArrow.setVisibility(View.VISIBLE);
         long sleepStart = mainActivity.getMainSleepStart();
         long sleepEnd = mainActivity.getMainSleepEnd();
+        String sleepStartStr = sdfTime.format(new Date(sleepStart));
+        String sleepEndStr = sdfTime.format(new Date(sleepEnd));
         boolean isearly = mainActivity.getIsEarlySleep();
         boolean isenough = mainActivity.getIsEnoughSleep();
 
@@ -1058,8 +1060,8 @@ public class HomeFragment extends Fragment {
                 }
             }
         } else {
-            startTime.setText(sdfDateTimeRecomm.format(new Date(sleepStart)));
-            endTime.setText(sdfDateTimeRecomm.format(new Date(sleepEnd)));
+            startTime.setText(sleepStartStr);
+            endTime.setText(sleepEndStr);
             if (isenough) {
                 stateDescriptionText.setText("오늘의 추천 밤잠 일정이에요");
                 stateDescriptionSmallText.setText("추천 기상 시간 이후에 일어나야 일과중에 졸리지 않아요");
@@ -1079,9 +1081,9 @@ public class HomeFragment extends Fragment {
         //Change the clock angle using setAngle and color using setTypeOfInterval
         clockView.setTypeOfInterval(1);
         //Just example
-        if(!mainSleepStartString.equals(mainSleepEndString)) {
+        if(!sleepStartStr.equals(sleepEndStr)) {
             clockView.setIsRecommended(true);
-            clockView.setAngleFromTime(mainSleepStartString, mainSleepEndString);
+            clockView.setAngleFromTime(sleepStartStr, sleepEndStr);
         }else{
             clockView.setIsRecommended(false);
         }
@@ -1099,8 +1101,10 @@ public class HomeFragment extends Fragment {
         timeArrow.setVisibility(View.VISIBLE);
         long napStart = mainActivity.getNapSleepStart();
         long napEnd = mainActivity.getNapSleepEnd();
-        startTime.setText(sdfDateTimeRecomm.format(new Date(napStart)));
-        endTime.setText(sdfDateTimeRecomm.format(new Date(napEnd)));
+        String napStartStr = sdfTime.format(new Date(napStart));
+        String napEndStr = sdfTime.format(new Date(napEnd));
+        startTime.setText(napStartStr);
+        endTime.setText(napEndStr);
         boolean isearly = mainActivity.getIsEarlySleep();
         boolean isenough = mainActivity.getIsEnoughSleep();
 
@@ -1117,9 +1121,9 @@ public class HomeFragment extends Fragment {
         sleepImportanceText.setBackground(ResourcesCompat
                 .getDrawable(getResources(), R.drawable.recommend_caption, null));
         clockView.setTypeOfInterval(2);
-        if(!napSleepStartString.equals(napSleepEndString)) {
+        if(!napStartStr.equals(napEndStr)) {
             clockView.setIsRecommended(true);
-            clockView.setAngleFromTime(napSleepStartString, napSleepEndString);
+            clockView.setAngleFromTime(napStartStr, napEndStr);
             if (isenough) {
                 stateDescriptionText.setText("내일 근무 직전 추천 낮잠 일정이에요");
                 stateDescriptionSmallText.setText("맑은 정신을 위해선 내일 근무 직전에 낮잠이 필요해요");
@@ -1151,6 +1155,10 @@ public class HomeFragment extends Fragment {
                                 TextView stateDescriptionText, TextView stateDescriptionSmallText,
                                 ImageView stateDescriptionImage, ClockView clockView)
     {
+        long workOnset = mainActivity.getWorkOnset();
+        long workOffseet = mainActivity.getWorkOffset();
+        String workOnsetStr = sdfTime.format(new Date(workOnset));
+        String workOffsetStr = sdfTime.format(new Date(workOffseet));
         if (workType == 0) {
             startTime.setText("휴무");
             timeArrow.setVisibility(View.INVISIBLE);
@@ -1159,8 +1167,8 @@ public class HomeFragment extends Fragment {
         } else {
             timeArrow.setVisibility(View.VISIBLE);
             endTime.setVisibility(View.VISIBLE);
-            startTime.setText(sdfDateTimeRecomm.format(new Date(mainActivity.getWorkOnset())));
-            endTime.setText(sdfDateTimeRecomm.format(new Date(mainActivity.getWorkOffset())));
+            startTime.setText(workOnsetStr);
+            endTime.setText(workOffsetStr);
             clockView.setIsRecommended(true);
         }
         boolean isearly = mainActivity.getIsEarlySleep();
@@ -1187,7 +1195,7 @@ public class HomeFragment extends Fragment {
             stateDescriptionImage.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.puke, null));
         }
         clockView.setTypeOfInterval(3);
-        clockView.setAngleFromTime(workOnsetString, workOffsetString);
+        clockView.setAngleFromTime(workOnsetStr, workOffsetStr);
     }
 
     //Customize the grid line
@@ -1244,7 +1252,7 @@ public class HomeFragment extends Fragment {
             float delta = value - currentValue;
             long target = (long) (now + delta*60*60*1000);
             Date date = new Date(target);
-            return sdfDateTimeRecomm.format(date);
+            return sdfTime.format(date);
         } else {
             return "";
         }

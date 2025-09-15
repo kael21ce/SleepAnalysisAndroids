@@ -506,7 +506,7 @@ public class SleepModel {
         }
 
         result[0] = sleep_onset + sleep_start;
-        result[1] = result[1] + sleep_amount;
+        result[1] = result[0] + sleep_amount;
         result[4] = 1;
         result[5] = type2;
         return result;
