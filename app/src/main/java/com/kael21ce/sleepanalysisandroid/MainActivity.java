@@ -237,8 +237,8 @@ public class MainActivity extends AppCompatActivity {
         workOnset = sharedPref.getLong("workOnset", now);
         workOffset = sharedPref.getLong("workOffset", now);
         sleepOnsetShow = sharedPref.getLong("sleepOnsetShow", now);
-        isenoughsleep = sharedPref.getBoolean("enoughSleep", false);
-        isearlysleep = sharedPref.getBoolean("earlySleep", false);
+        isenoughsleep = sharedPref.getBoolean("isenoughsleep", false);
+        isearlysleep = sharedPref.getBoolean("isearlysleep", false);
 
         // 계산된 추천 수면값을 불러오기
         mainSleepStart = sharedPref.getLong("mainSleepStart", now);
