@@ -89,7 +89,7 @@ public class SignupActivity extends AppCompatActivity {
                 boolean emptyEmail = email.isEmpty();
                 boolean emptyPassword = password.isEmpty();
                 boolean emptyPasswordCheck = passwordCheck.isEmpty();
-                boolean passwordLength = password.length() >= 6; // 비밀번호 글자 수 확인
+                boolean passwordLength = password.length() >= 8; // 비밀번호 글자 수 확인
 
                 // Text 입력 시 text 색 변경
                 if (!emailText.getText().toString().isEmpty()) {
