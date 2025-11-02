@@ -723,11 +723,8 @@ public class MainActivity extends AppCompatActivity {
                 sleepDao.delete(sleep);
                 this.sleeps.remove(sleep);
                 return;
-            } else {
-                Log.v("MainActivity", "Sleep not deleted");
             }
         }
-        return;
     }
 
     public long getMainSleepStart() {

@@ -183,6 +183,7 @@ public class ScheduleFragment extends Fragment {
         }
         int count = 0;
         for(Sleep sleep: initSleepData){
+            bundle.putLong("sleep_id" + count, sleep.sleep_id);
             bundle.putLong("sleepStart"+count, sleep.sleepStart);
             bundle.putLong("sleepEnd"+count, sleep.sleepEnd);
             count++;
@@ -205,7 +206,9 @@ public class ScheduleFragment extends Fragment {
             int month = selectedBundle.getInt("Month");
             int day = selectedBundle.getInt("Day");
             Log.v(TAG, "Selected: " + year + "-" + (month + 1) + "-" + day);
-            calendarView.setSelectedDate(CalendarDay.from(year, month + 1, day));
+            CalendarDay selectedDate = CalendarDay.from(year, month + 1, day);
+            calendarView.setCurrentDate(selectedDate);
+            calendarView.setSelectedDate(selectedDate);
 
             //Load IntervalFragment
             String myDate = year + "/" + (month + 1) + "/" + day;
@@ -246,6 +249,7 @@ public class ScheduleFragment extends Fragment {
             int count1 = 0;
             for(Sleep sleep: initSleepData1){
                 Log.v("THE INTERVAL'S SLEEP", String.valueOf(sleep.sleepStart));
+                bundle1.putLong("sleep_id" + count1, sleep.sleep_id);
                 bundle1.putLong("sleepStart"+ count1, sleep.sleepStart);
                 bundle1.putLong("sleepEnd"+ count1, sleep.sleepEnd);
                 count1++;

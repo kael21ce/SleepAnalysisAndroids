@@ -55,16 +55,6 @@ public class SplashActivity extends AppCompatActivity {
         Instant ILastSleepUpdate = Instant.ofEpochMilli(lastSleepUpdate);
 
         healthConnectManager.javReadSleepInputs(ILastSleepUpdate, now);
-//        Instant curTime = Instant.now();
-
-//        while(!healthConnectManager.getIsSleepDone() || !healthConnectManager.getIsAddSleepDone()){
-//            Instant curTimeUpdated = Instant.now();
-//            if(curTime.plusMillis(1000*2).isAfter(curTimeUpdated)){
-//                break;
-//            }
-////            Log.v("loading", "loading");
-//
-//        }
         healthConnectManager.setIsSleepDone(false);
         healthConnectManager.setAddSleepDone(false);
 
@@ -129,13 +119,9 @@ public class SplashActivity extends AppCompatActivity {
 
     private void updateDots() {
         dotHandler.postDelayed(() -> {
-            dotCount++;
-            if (dotCount > MAX_DOTS) {
-                loadingText.setText("Processing");
-            } else {
-                loadingText.setText("Processing"
-                        + new String(new char[dotCount]).replace("\0", "."));
-            }
+            dotCount = (dotCount + 1) % (MAX_DOTS + 1);
+            loadingText.setText("Processing"
+                    + new String(new char[dotCount]).replace("\0", "."));
             updateDots();
         },500);
     }
