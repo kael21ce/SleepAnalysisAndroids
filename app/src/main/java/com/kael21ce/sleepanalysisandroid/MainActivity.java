@@ -202,6 +202,7 @@ public class MainActivity extends AppCompatActivity {
         if (sharedPref.getBoolean("isOnboarding", true)) {
             Intent signIntent = new Intent(MainActivity.this, BeginRegisterActivity.class);
             startActivity(signIntent);
+            finish();
         }
 
         //Show action bar

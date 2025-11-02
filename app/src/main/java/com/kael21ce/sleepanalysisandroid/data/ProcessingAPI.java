@@ -64,7 +64,10 @@ public class ProcessingAPI {
         // 2) HealthConnect 읽기
         HealthConnectManager healthConnectManager = new HealthConnectManager(context);
         Instant nowI = Instant.now();
+        Log.v(TAG, ILastSleepUpdate.toString());
         healthConnectManager.javReadSleepInputs(ILastSleepUpdate, nowI);
+        healthConnectManager.setIsSleepDone(false);
+        healthConnectManager.setAddSleepDone(false);
         List<Awareness> awarenesses = Collections.synchronizedList(new ArrayList<>());
         List<Awareness> sleepAwarenesses = Collections.synchronizedList(new ArrayList<>());
 

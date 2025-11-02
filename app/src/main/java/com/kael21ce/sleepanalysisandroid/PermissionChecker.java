@@ -55,7 +55,6 @@ public class PermissionChecker extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_permission_checker);
-
         Log.v("CREATED", "CREATED");
 
         healthConnectManager = new HealthConnectManager(getApplicationContext());
