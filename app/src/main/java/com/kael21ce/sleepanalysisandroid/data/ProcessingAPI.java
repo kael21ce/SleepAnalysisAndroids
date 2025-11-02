@@ -538,7 +538,7 @@ public class ProcessingAPI {
                     badDuration = 0;
                     startDay = v0StartDay;
                 }
-                Log.v("AWARENESS CALCULATION", (sdfDateTime.format(new Date(v0.time)))+": " + awareness);
+//                Log.v("AWARENESS CALCULATION", (sdfDateTime.format(new Date(v0.time)))+": " + awareness);
                 if(awareness >= 0.0){
                     goodDuration += 5;
                 }else{
@@ -634,7 +634,7 @@ public class ProcessingAPI {
                     badDuration = 0;
                     startDay = v0StartDay;
                 }
-                Log.v("AWARENESS CALCULATION", (sdfDateTime.format(new Date(v0.time)))+": " + awareness);
+//                Log.v("AWARENESS CALCULATION", (sdfDateTime.format(new Date(v0.time)))+": " + awareness);
                 if(awareness <= 0.0){
                     goodDuration += 5;
                 }else{

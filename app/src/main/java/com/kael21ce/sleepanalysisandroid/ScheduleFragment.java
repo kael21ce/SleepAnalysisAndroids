@@ -198,7 +198,7 @@ public class ScheduleFragment extends Fragment {
         calendarView.setSelectedDate(CalendarDay.today());
         getChildFragmentManager().beginTransaction().replace(R.id.IntervalFrame, intervalFragment).commit();
 
-        //Get the selected date after editing, adding and deleting the sleep data
+        // 수정, 추가, 삭제 이후 선택한 날짜의 수면 기록을 보여주기 위함
         Bundle selectedBundle = getArguments();
         if (selectedBundle != null) {
             int year = selectedBundle.getInt("Year");
@@ -313,7 +313,7 @@ public class ScheduleFragment extends Fragment {
         reportedDecorator.setSleepsData(sleepsData);
         calendarView.addDecorator(reportedDecorator);
 
-        //Add sleep interval to specific date
+        // 캘린더에서 선택한 날의 기록 보여주기
         calendarView.setOnDateChangedListener((widget, Cdate, selected) -> {
             //Load save data for specific time
             int year = Cdate.getYear();

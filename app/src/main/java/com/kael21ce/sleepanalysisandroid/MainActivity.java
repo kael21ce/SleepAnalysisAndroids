@@ -704,26 +704,16 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public boolean deleteSleep(Sleep sleepDel){
+    public void deleteSleep(Sleep sleepDel){
         sleepDao = db.sleepDao();
 
         now = System.currentTimeMillis();
-        long sleepDelStart = sleepDel.sleepStart/60000;
-        long sleepDelEnd = sleepDel.sleepEnd/60000;
         Log.v("SLEEP DELETE START", String.valueOf(sleepDel.sleepStart));
         Log.v("SLEEP DELETE END", String.valueOf(sleepDel.sleepEnd));
 
-        if (sleepDelStart > sleepDelEnd) {
-            sleepDelEnd += oneDay/60000;
-        }
-
         for(Sleep sleep: this.sleeps){
-            long sSleepStart = sleep.sleepStart/60000;
-            long sSleepEnd = sleep.sleepEnd/60000;
-            Log.v("SLEEP DELETE START", String.valueOf(sleep.sleepStart));
-            Log.v("SLEEP DELETE END", String.valueOf(sleep.sleepEnd));
-            if(sSleepStart == sleepDelStart && sSleepEnd == sleepDelEnd){
-                Log.v("deleted broooo", "broooo");
+            if (sleepDel.sleep_id == sleep.sleep_id) {
+                Log.v("MainActivity", "Sleep deleted");
                 lastDataUpdate = sleep.sleepStart - (1000*60*60*24);
                 if (lastDataUpdate < now - twoWeeks) {
                     editor.putBoolean("deleteException", true).apply();
@@ -732,10 +722,12 @@ public class MainActivity extends AppCompatActivity {
                 editor.apply();
                 sleepDao.delete(sleep);
                 this.sleeps.remove(sleep);
-                return true;
+                return;
+            } else {
+                Log.v("MainActivity", "Sleep not deleted");
             }
         }
-        return false;
+        return;
     }
 
     public long getMainSleepStart() {
