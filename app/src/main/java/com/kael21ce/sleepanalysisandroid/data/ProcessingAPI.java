@@ -13,6 +13,7 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -62,6 +63,8 @@ public class ProcessingAPI {
 
         // 2) HealthConnect 읽기
         HealthConnectManager healthConnectManager = new HealthConnectManager(context);
+        Instant nowI = Instant.now();
+        healthConnectManager.javReadSleepInputs(ILastSleepUpdate, nowI);
         List<Awareness> awarenesses = Collections.synchronizedList(new ArrayList<>());
         List<Awareness> sleepAwarenesses = Collections.synchronizedList(new ArrayList<>());
 
@@ -390,7 +393,7 @@ public class ProcessingAPI {
                 //Normalization
                 barEntries.add(new BarEntry(barIdx, value*100f/3f));
                 barIdx += addBarIdx;
-                Log.v("Each bar", "x: " + barIdx + " / y: " + value*100f/3.0f);
+//                Log.v("Each bar", "x: " + barIdx + " / y: " + value*100f/3.0f);
             }
         }
         v0Dao.insertAll(newV0);
@@ -454,7 +457,7 @@ public class ProcessingAPI {
 
         sleepPattern = sleepToArray(now, now+oneDay, newSleep);
         for(int i = 0; i < sleepPattern.length; i ++){
-            Log.v("SLEEP PATTERN: ", i + " " + sleepPattern[i]);
+//            Log.v("SLEEP PATTERN: ", i + " " + sleepPattern[i]);
         }
         Log.v("SLEEP SIZE", String.valueOf(sleepPattern.length));
         simulationResult = sleepModel.pcr_simulation(initV0, sleepPattern, 5/60.0);
@@ -465,7 +468,7 @@ public class ProcessingAPI {
             float fAwarenessVal = (float) awarenessVal;
             barEntries.add(new BarEntry(barIdx, fAwarenessVal*100f/3.0f));
             barIdx += addBarIdx;
-            Log.v("Each bar", "x: " + barIdx + " / y: " + fAwarenessVal*100f/3.0f);
+//            Log.v("Each bar", "x: " + barIdx + " / y: " + fAwarenessVal*100f/3.0f);
         }
 
         Log.v("BAR ENTRIES SIZE", String.valueOf(barEntries.size()));
