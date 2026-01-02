@@ -31,14 +31,10 @@ import com.kael21ce.sleepanalysisandroid.data.TokenPair;
 import com.kael21ce.sleepanalysisandroid.data.TokenStorage;
 
 import java.io.IOException;
-import java.util.concurrent.TimeUnit;
 
-import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 public class CheckActivity extends AppCompatActivity {
 
@@ -212,12 +208,13 @@ public class CheckActivity extends AppCompatActivity {
                     try {
                         String errorBody = response.errorBody() != null ? response.errorBody().string() : "Unknown error";
                         Log.e(TAG, "Log in fail: " + response.code() + " - " + errorBody);
-                        View dimBackground = findViewById(R.id.dimBackgroundCheck);
-                        ActionBar actionBar = getSupportActionBar();
-                        String title = "로그인 실패";
-                        String message = "이메일 또는 비밀번호를 확인해주세요.";
-                        String buttonText = "확인";
-                        showAlertDialog(dimBackground, actionBar, title, message, buttonText);
+                        Toast.makeText(getApplicationContext(), "로그인 실패: 이메일 또는 비밀번호를 확인해주세요.", Toast.LENGTH_SHORT).show();
+//                        View dimBackground = findViewById(R.id.dimBackgroundCheck);
+//                        ActionBar actionBar = getSupportActionBar();
+//                        String title = "로그인 실패";
+//                        String message = "이메일 또는 비밀번호를 확인해주세요.";
+//                        String buttonText = "확인";
+//                        showAlertDialog(dimBackground, actionBar, title, message, buttonText);
                     } catch (IOException e) {
                         Log.e(TAG, "Error parsing is failed", e);
                     }
