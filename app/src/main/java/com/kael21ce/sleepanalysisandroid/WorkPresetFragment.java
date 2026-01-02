@@ -39,6 +39,19 @@ public class WorkPresetFragment extends BottomSheetDialogFragment {
         return fragment;
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        View view = getView();
+        if (view != null) {
+            View parent = (View) view.getParent();
+            com.google.android.material.bottomsheet.BottomSheetBehavior<View> behavior
+                    = com.google.android.material.bottomsheet.BottomSheetBehavior.from(parent);
+            // Bottomsheet 드래그 비활성화
+            behavior.setDraggable(false);
+        }
+    }
+
     // 자신을 호출한 Activity/Fragment가 인터페이스를 구현했는지 확인
     @Override
     public void onAttach(@NonNull Context context) {
