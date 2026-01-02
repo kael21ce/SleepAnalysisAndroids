@@ -129,7 +129,7 @@ public class CheckActivity extends AppCompatActivity {
 
     //Check validity of email-form
     public Boolean isValidEmail(EditText emailText) {
-        String testStr = emailText.getText().toString();
+        String testStr = emailText.getText().toString().trim();
         if (!testStr.isEmpty() && Patterns.EMAIL_ADDRESS.matcher(testStr).matches()) {
             return true;
         } else {
