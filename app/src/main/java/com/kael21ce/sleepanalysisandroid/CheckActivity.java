@@ -182,6 +182,18 @@ public class CheckActivity extends AppCompatActivity {
                 window.setNavigationBarColor(originalNavigationBarColor);
             }
         });
+
+        // Dialog가 화면 바깥이나 뒤로 가기 버튼을 눌러 종료되었을 때 dimbackground 처리
+        dialog.setOnCancelListener(dialogInterface -> {
+            dimBackground.setVisibility(View.GONE);
+            if (actionBar != null) {
+                actionBar.setBackgroundDrawable(new ColorDrawable(originalActionBarColor));
+            }
+            window.setStatusBarColor(getResources().getColor(R.color.white, null));
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                window.setNavigationBarColor(originalNavigationBarColor);
+            }
+        });
         dialog.setCancelable(true);
         dialog.show();
 

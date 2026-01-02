@@ -426,6 +426,17 @@ public class WhenWorkFragment extends Fragment
             }
             window.setStatusBarColor(getResources().getColor(R.color.white, null));
         });
+
+        dialog.setOnCancelListener(dialogInterface -> {
+            dimBackground.setVisibility(View.GONE);
+            if (actionBar != null) {
+                actionBar.setBackgroundDrawable(new ColorDrawable(originalActionBarColor));
+            }
+            if (bottomNavigationView != null) {
+                bottomNavigationView.setItemBackground(new ColorDrawable(Color.parseColor("#FFFFFF")));
+            }
+            window.setStatusBarColor(getResources().getColor(R.color.white, null));
+        });
         dialog.setCancelable(true);
         dialog.show();
 

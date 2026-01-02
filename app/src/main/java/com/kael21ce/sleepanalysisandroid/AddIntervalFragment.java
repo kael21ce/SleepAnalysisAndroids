@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -286,6 +287,18 @@ public class AddIntervalFragment extends Fragment implements ButtonTextUpdater {
             }
             if (bottomNavigationView != null) {
                 bottomNavigationView.setItemBackground(new ColorDrawable(Color.parseColor("#FFFFFF")));
+            }
+            window.setStatusBarColor(getResources().getColor(R.color.white, null));
+        });
+
+        // Dialog가 화면 바깥이나 뒤로 가기 버튼을 눌러 종료되었을 때 dimbackground 처리
+        dialog.setOnCancelListener(dialogInterface -> {
+            dimBackground.setVisibility(View.GONE);
+            if (bottomNavigationView != null) {
+                bottomNavigationView.setItemBackground(new ColorDrawable(getResources().getColor(R.color.white, null)));
+            }
+            if (actionBar != null) {
+                actionBar.setBackgroundDrawable(new ColorDrawable(originalActionBarColor));
             }
             window.setStatusBarColor(getResources().getColor(R.color.white, null));
         });
