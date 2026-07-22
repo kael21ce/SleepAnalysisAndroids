@@ -23,6 +23,7 @@ import android.widget.Toast;
 
 import com.google.android.material.tabs.TabLayout;
 import com.kael21ce.sleepanalysisandroid.data.DataSurvey;
+import com.kael21ce.sleepanalysisandroid.data.ApiClient;
 import com.kael21ce.sleepanalysisandroid.data.RetrofitAPI;
 
 import java.sql.Time;
@@ -37,8 +38,6 @@ import java.util.TimeZone;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 public class SleepOnsetActivity extends AppCompatActivity implements ButtonTextUpdater{
 
@@ -374,14 +373,7 @@ public class SleepOnsetActivity extends AppCompatActivity implements ButtonTextU
 
     //Send info to server about changing schedule
     private void sendSurvey(long sleep_onset, long work_onset, long work_offset, int work_type){
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("https://sleep-math.com/sleepapp/")
-                // as we are sending data in json format so
-                // we have to add Gson converter factory
-                .addConverterFactory(GsonConverterFactory.create())
-                // at last we are building our retrofit builder.
-                .build();
-        RetrofitAPI retrofitAPI = retrofit.create(RetrofitAPI.class);
+        RetrofitAPI retrofitAPI = ApiClient.api(this);
         SharedPreferences sharedPref = getSharedPreferences("SleepWake", Context.MODE_PRIVATE);
         String userEmail = sharedPref.getString("User_Email", "tester33");
         long time = System.currentTimeMillis();

@@ -43,6 +43,7 @@ import com.kael21ce.sleepanalysisandroid.data.Awareness;
 import com.kael21ce.sleepanalysisandroid.data.AwarenessDao;
 import com.kael21ce.sleepanalysisandroid.data.DataModal;
 import com.kael21ce.sleepanalysisandroid.data.HealthConnectManager;
+import com.kael21ce.sleepanalysisandroid.data.ApiClient;
 import com.kael21ce.sleepanalysisandroid.data.RetrofitAPI;
 import com.kael21ce.sleepanalysisandroid.data.Sleep;
 import com.kael21ce.sleepanalysisandroid.data.SleepDao;
@@ -68,12 +69,9 @@ import java.util.Locale;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
-import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -123,8 +121,6 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<BarEntry> barEntries;
 
 
-    private static final String survey_name = "SurveyType";
-    private static final String survey_key = "SQMood";
     private SharedPreferences.OnSharedPreferenceChangeListener prefListener;
     public static ArrayList<Activity> surveyList = new ArrayList<>();
     public ArrayList<Activity> surveyList() {
@@ -357,30 +353,6 @@ public class MainActivity extends AppCompatActivity {
             }
         };
         sharedPref.registerOnSharedPreferenceChangeListener(prefListener);
-
-        //Open the mood and sleep quality survey if the app is open after 12 p.m.
-        /*
-        Calendar calendar = Calendar.getInstance();
-        int hour = calendar.get(Calendar.HOUR_OF_DAY);
-        int day = calendar.get(Calendar.DAY_OF_MONTH);
-
-        if (!sharedPref.contains(survey_key)) {
-            editor.putInt(survey_key, 0).apply();
-        }
-        int surveyDay = sharedPref.getInt(survey_key, 0);
-
-        if (surveyDay != day && (sharedPref.contains("User_Name") && sharedPref.contains("User_Email"))) {
-            if (!sharedPref.getString("User_Name","UserName").equals("UserName")) {
-                if (hour >= 12) {
-                    Bundle temp = new Bundle();
-                    Intent surveyIntent = new Intent(this, SQMoodSendingActivity.class);
-                    surveyIntent.putExtra(survey_name, 0);
-                    surveyIntent.putExtra("moodData", temp);
-                    startActivity(surveyIntent);
-                }
-            }
-        }
-        */
     }
 
     //Create channel for notification of recommendation
@@ -1190,21 +1162,7 @@ public class MainActivity extends AppCompatActivity {
 
     protected void sendV0(String userEmail) {
 
-        OkHttpClient client = new OkHttpClient.Builder()
-                .connectTimeout(20, TimeUnit.SECONDS)
-                .writeTimeout(20, TimeUnit.SECONDS)
-                .readTimeout(20, TimeUnit.SECONDS)
-                .build();
-
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("https://www.sleep-math.com/sleepapp/")
-                // as we are sending data in json format so
-                // we have to add Gson converter factory
-                .addConverterFactory(GsonConverterFactory.create())
-                .client(client)
-                // at last we are building our retrofit builder.
-                .build();
-        RetrofitAPI retrofitAPI = retrofit.create(RetrofitAPI.class);
+        RetrofitAPI retrofitAPI = ApiClient.api(this);
 
         List<Sleep> tempSleep = new ArrayList<>();
         List<V0> tempV0 = new ArrayList<>();
@@ -1306,7 +1264,7 @@ public class MainActivity extends AppCompatActivity {
             midnight = midnight - nineHours;
             Sleep sleep2 = new Sleep();
             sleep2.sleepStart = sleep.sleepStart;
-            sleep2.sleepEnd = midnight - 1000*60;
+            sleep2.sleepEnd = midnight;
             sleep.sleepStart = midnight;
             listSleep.add(sleep2);
             listSleep.add(sleep);

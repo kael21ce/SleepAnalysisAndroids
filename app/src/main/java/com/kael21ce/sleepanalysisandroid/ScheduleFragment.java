@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 
@@ -70,6 +71,13 @@ public class ScheduleFragment extends Fragment {
         editor.putLong("sleepOnsetShow", updatedDates[1]).apply();
         mainActivity.setWorkOnset(updatedDates[2]);
         mainActivity.setWorkOffset(updatedDates[3]);
+
+        //Send data: 홈 화면에서 이 탭으로 이동해 옴
+        Button buttonSendData = v.findViewById(R.id.sendDataButton);
+        String email = sharedPref.getString("User_Email", "tester33");
+        buttonSendData.setOnClickListener(view -> {
+            mainActivity.sendV0(email);
+        });
 
         //get sleep data and calculate map values
         List<Sleep> sleeps = mainActivity.getSleeps();

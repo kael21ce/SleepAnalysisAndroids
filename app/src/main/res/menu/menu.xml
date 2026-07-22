@@ -19,10 +19,12 @@
         android:title="수면 기록"
         />
 
+    <!-- 설문/수면 데이터 수집 전용 브랜치에서는 불필요해서 임시로 숨김 (코드/Fragment는 그대로 둠) -->
     <item
         android:id="@+id/tabRecommend"
         app:showAsAction="ifRoom"
         android:enabled="true"
+        android:visible="false"
         android:icon="@drawable/moon"
         android:fontFamily="@font/pretendardvariable"
         android:title="일정 변경"

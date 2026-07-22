@@ -14,17 +14,15 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.kael21ce.sleepanalysisandroid.data.ApiClient;
 import com.kael21ce.sleepanalysisandroid.data.DataUser;
 import com.kael21ce.sleepanalysisandroid.data.RetrofitAPI;
+import com.kael21ce.sleepanalysisandroid.data.TokenPair;
+import com.kael21ce.sleepanalysisandroid.data.TokenStorage;
 
-import java.util.concurrent.TimeUnit;
-
-import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 public class CheckActivity extends AppCompatActivity {
 
@@ -124,50 +122,31 @@ public class CheckActivity extends AppCompatActivity {
     }
 
     private void sendUser(){
-        OkHttpClient client = new OkHttpClient.Builder()
-                .connectTimeout(20, TimeUnit.SECONDS)
-                .writeTimeout(20, TimeUnit.SECONDS)
-                .readTimeout(20, TimeUnit.SECONDS)
-                .build();
-
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("https://www.sleep-math.com/sleepapp/")
-                // as we are sending data in json format so
-                // we have to add Gson converter factory
-                .addConverterFactory(GsonConverterFactory.create())
-                .client(client)
-                // at last we are building our retrofit builder.
-                .build();
-        RetrofitAPI retrofitAPI = retrofit.create(RetrofitAPI.class);
+        // "user/"는 더 이상 존재하지 않는 라우트라서 로그인이 계속 실패했음.
+        // 실제 로그인은 JWT를 발급하는 token/ 이다 (iOS AuthAPI.login과 동일).
+        RetrofitAPI retrofitAPI = ApiClient.api(this);
 
         DataUser dataUser = new DataUser(user_email, user_password);
-        Call<DataUser> call = retrofitAPI.createUser(dataUser);
-        call.enqueue(new Callback<DataUser>() {
+        Call<TokenPair> call = retrofitAPI.login(dataUser);
+        call.enqueue(new Callback<TokenPair>() {
             @Override
-            public void onResponse(Call<DataUser> call, Response<DataUser> response) {
-                // this method is called when we get response from our api.
-//                Toast.makeText(StartActivity.this, "Data added to API", Toast.LENGTH_SHORT).show();
+            public void onResponse(Call<TokenPair> call, Response<TokenPair> response) {
+                Log.v("RESPONSE", "Response Code : " + response.code());
 
-                // we are getting response from our body
-                // and passing it to our modal class.
-                DataUser responseFromAPI = response.body();
-
-                // on below line we are getting our data from modal class and adding it to our string.
-                String responseString = "Response Code : " + response.code() + "\nName : "  + "\n" ;
-                Log.v("RESPONSE", responseString);
-
-                if(response.code() <= 300) {
+                TokenPair pair = response.body();
+                if (response.code() <= 300 && pair != null && pair.getAccess() != null) {
+                    TokenStorage.save(CheckActivity.this, pair.getAccess(), pair.getRefresh());
                     Intent startIntent = new Intent(CheckActivity.this, StartActivity.class);
                     startIntent.putExtra("User_Email", user_email);
                     startActivity(startIntent);
                     finish();
                 }else{
-                    Toast.makeText(CheckActivity.this, "비밀번호가 다릅니다", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(CheckActivity.this, "이메일 또는 비밀번호가 일치하지 않습니다", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
-            public void onFailure(Call<DataUser> call, Throwable t) {
+            public void onFailure(Call<TokenPair> call, Throwable t) {
                 // setting text to our text view when
                 // we get error response from API.
                 Log.v("ERROR", "Error found is : " + t.getMessage());

@@ -8,6 +8,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,6 +27,13 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.kael21ce.sleepanalysisandroid.data.ApiClient;
+import com.kael21ce.sleepanalysisandroid.data.DataUser;
+import com.kael21ce.sleepanalysisandroid.data.RetrofitAPI;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class SignupActivity extends AppCompatActivity {
     String user_email, user_password, user_name, password_check;
@@ -115,6 +123,7 @@ public class SignupActivity extends AppCompatActivity {
             if (user_password.equals(password_check)) {
                 user_email = emailText.getText().toString();
                 user_name = user_email.substring(0, user_email.indexOf("@"));
+                sendUser();
             } else {
                 // 경고 띄우기
                 View dimBackground = findViewById(R.id.dimBackgroundSignup);
@@ -132,6 +141,65 @@ public class SignupActivity extends AppCompatActivity {
     public Boolean isValidEmail(EditText emailText) {
         String testStr = emailText.getText().toString();
         return !testStr.isEmpty() && Patterns.EMAIL_ADDRESS.matcher(testStr).matches();
+    }
+
+    // 회원가입 요청 전송. signup/은 토큰을 안 주기 때문에(iOS AuthAPI.signup과 동일한 응답
+    // 형태), 성공하면 이어서 로그인까지 호출해 토큰을 받아둔다. 안 그러면 회원가입은 되는데
+    // 토큰이 없어서 이후 인증이 필요한 API 호출이 전부 401로 실패하게 된다.
+    private void sendUser() {
+        RetrofitAPI retrofitAPI = ApiClient.api(this);
+
+        DataUser dataUser = new DataUser(user_email, user_password);
+        Call<DataUser> call = retrofitAPI.createSignupUser(dataUser);
+        call.enqueue(new Callback<DataUser>() {
+            @Override
+            public void onResponse(Call<DataUser> call, Response<DataUser> response) {
+                Log.v("RESPONSE", "Response Code : " + response.code());
+
+                if (response.code() <= 300) {
+                    loginAfterSignup();
+                } else {
+                    View dimBackground = findViewById(R.id.dimBackgroundSignup);
+                    ActionBar actionBar = getSupportActionBar();
+                    showAlertDialog(dimBackground, actionBar, "알림", "이미 가입된 이메일이거나 회원가입에 실패했습니다.", "확인");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<DataUser> call, Throwable t) {
+                Log.v("ERROR", "Error found is : " + t.getMessage());
+            }
+        });
+    }
+
+    // 가입 직후 자동 로그인해서 토큰을 저장
+    private void loginAfterSignup() {
+        RetrofitAPI retrofitAPI = ApiClient.api(this);
+        DataUser dataUser = new DataUser(user_email, user_password);
+        Call<com.kael21ce.sleepanalysisandroid.data.TokenPair> call = retrofitAPI.login(dataUser);
+        call.enqueue(new Callback<com.kael21ce.sleepanalysisandroid.data.TokenPair>() {
+            @Override
+            public void onResponse(Call<com.kael21ce.sleepanalysisandroid.data.TokenPair> call,
+                                    Response<com.kael21ce.sleepanalysisandroid.data.TokenPair> response) {
+                com.kael21ce.sleepanalysisandroid.data.TokenPair pair = response.body();
+                if (pair != null && pair.getAccess() != null) {
+                    com.kael21ce.sleepanalysisandroid.data.TokenStorage.save(
+                            SignupActivity.this, pair.getAccess(), pair.getRefresh());
+                }
+                Intent startIntent = new Intent(SignupActivity.this, StartActivity.class);
+                startIntent.putExtra("User_Email", user_email);
+                startActivity(startIntent);
+                finish();
+            }
+
+            @Override
+            public void onFailure(Call<com.kael21ce.sleepanalysisandroid.data.TokenPair> call, Throwable t) {
+                Log.v("ERROR", "Error found is : " + t.getMessage());
+                // 로그인 자동화가 실패해도 가입 자체는 됐으니 로그인 화면으로 보낸다
+                startActivity(new Intent(SignupActivity.this, CheckActivity.class));
+                finish();
+            }
+        });
     }
 
     private void showAlertDialog(View dimBackground, ActionBar actionBar,

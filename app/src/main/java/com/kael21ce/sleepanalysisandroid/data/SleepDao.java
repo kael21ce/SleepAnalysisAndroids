@@ -19,6 +19,12 @@ public interface SleepDao {
             "sleep_end LIKE :last LIMIT 1")
     Sleep findByName(String first, String last);
 
+    @Query("SELECT * FROM sleep WHERE sleep_start = :sleepStart AND sleep_end = :sleepEnd LIMIT 1")
+    Sleep findBySleepStartAndEnd(long sleepStart, long sleepEnd);
+
+    @Query("DELETE FROM sleep WHERE sleep_start <= :maxEnd AND sleep_end >= :minStart")
+    void deleteOverlapping(long maxEnd, long minStart);
+
     @Query("UPDATE sleep SET sleep_start = :sleepStart, sleep_end = :sleepEnd "+
             "WHERE sleep_id = :sleepId")
     void updateSleep(long sleepId, long sleepStart, long sleepEnd);

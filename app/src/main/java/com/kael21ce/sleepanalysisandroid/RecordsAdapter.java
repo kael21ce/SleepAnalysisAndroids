@@ -49,9 +49,9 @@ public class RecordsAdapter extends RecyclerView.Adapter<RecordsAdapter.ViewHold
     }
     static class ViewHolder extends RecyclerView.ViewHolder {
 
-        TextView recordsDate, progressText, recordsText1, recordsDate1, recordsText2, recordsDate2, recordsText3, recordsDate3;
+        TextView recordsDate, progressText, recordsText1, recordsDate1, recordsText2, recordsDate2, recordsText3, recordsDate3, recordsText4, recordsDate4;
         ProgressBar progressBar;
-        ImageView bullet2, bullet3;
+        ImageView bullet2, bullet3, bullet4;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -63,22 +63,31 @@ public class RecordsAdapter extends RecyclerView.Adapter<RecordsAdapter.ViewHold
             recordsDate2 = itemView.findViewById(R.id.recordsDate2);
             recordsText3 = itemView.findViewById(R.id.recordsText3);
             recordsDate3 = itemView.findViewById(R.id.recordsDate3);
+            recordsText4 = itemView.findViewById(R.id.recordsText4);
+            recordsDate4 = itemView.findViewById(R.id.recordsDate4);
             progressBar = itemView.findViewById(R.id.progressBar);
             bullet2 = itemView.findViewById(R.id.bullet2);
             bullet3 = itemView.findViewById(R.id.bullet3);
+            bullet4 = itemView.findViewById(R.id.bullet4);
         }
         public void setItem(Records item) {
             boolean type = item.isAlertness();
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy. M. d.", Locale.KOREA);
             SimpleDateFormat timeFormat = new SimpleDateFormat("a h:mm", Locale.KOREA);
+            // 4번째 줄(recordsText4 등)은 Hooper 설문 전용이라, KSS 쪽에서는 뷰 재활용 시
+            // 이전 값이 남지 않도록 항상 숨긴다.
+            bullet4.setVisibility(View.INVISIBLE);
+            recordsText4.setVisibility(View.INVISIBLE);
+            recordsDate4.setVisibility(View.INVISIBLE);
+
             if (type) {
                 // Text: recent 3 alertness survey
                 Log.v("RecordsAdapter", "Size: " + item.dataSurvey.size());
                 if (item.dataSurvey.size() == 0) {
                     Date latestDate = item.getRecordDate();
                     recordsDate.setText(dateFormat.format(latestDate));
-                    progressText.setText("일일 목표 달성률: 0/3");
-                    recordsText1.setText("일일 각성도 설문을 진행해주세요");
+                    progressText.setText("일일 목표 달성률: 0/2");
+                    recordsText1.setText("졸림도(KSS) 설문을 진행해주세요");
                     recordsDate1.setVisibility(View.INVISIBLE);
                     bullet2.setVisibility(View.INVISIBLE);
                     recordsText2.setVisibility(View.INVISIBLE);
@@ -98,22 +107,22 @@ public class RecordsAdapter extends RecyclerView.Adapter<RecordsAdapter.ViewHold
                     }
                     Date latestDate = new Date(alertsShow.get(0).getTime());
                     recordsDate.setText(dateFormat.format(latestDate));
-                    progressText.setText("일일 목표 달성률: " + alertsShow.size() + "/3");
-                    progressBar.setProgress(100*alertsShow.size()/3);
-                    recordsText1.setText("각성도: " + alertsShow.get(0).getSurvey_result());
+                    progressText.setText("일일 목표 달성률: " + alertsShow.size() + "/2");
+                    progressBar.setProgress(100*alertsShow.size()/2);
+                    recordsText1.setText("졸림도(KSS): " + alertsShow.get(0).getSurvey_result());
                     if (alertsShow.size() == 3) {
                         latestDate1 = new Date(alertsShow.get(0).getTime());
                         recordsDate1.setText(timeFormat.format(latestDate1));
-                        recordsText2.setText("각성도: " + alertsShow.get(1).getSurvey_result());
+                        recordsText2.setText("졸림도(KSS): " + alertsShow.get(1).getSurvey_result());
                         latestDate2 = new Date(alertsShow.get(1).getTime());
                         recordsDate2.setText(timeFormat.format(latestDate2));
-                        recordsText3.setText("각성도: " + alertsShow.get(2).getSurvey_result());
+                        recordsText3.setText("졸림도(KSS): " + alertsShow.get(2).getSurvey_result());
                         latestDate3 = new Date(alertsShow.get(2).getTime());
                         recordsDate3.setText(timeFormat.format(latestDate3));
                     } else if (alertsShow.size() == 2) {
                         latestDate1 = new Date(alertsShow.get(0).getTime());
                         recordsDate1.setText(timeFormat.format(latestDate1));
-                        recordsText2.setText("각성도: " + alertsShow.get(1).getSurvey_result());
+                        recordsText2.setText("졸림도(KSS): " + alertsShow.get(1).getSurvey_result());
                         latestDate2 = new Date(alertsShow.get(1).getTime());
                         recordsDate2.setText(timeFormat.format(latestDate2));
                         recordsText3.setVisibility(View.INVISIBLE);
@@ -132,30 +141,43 @@ public class RecordsAdapter extends RecyclerView.Adapter<RecordsAdapter.ViewHold
                     }
                 }
             } else {
-                // Text: daily alertness, daily sleep quality
+                // Text: Hooper Index 4항목(피로도/수면의질/스트레스/근육통) 전부 표시.
+                // daily_alertness<-피로도, mood_anx<-스트레스, mood_irr<-근육통으로 매핑돼 저장된다.
+                bullet2.setVisibility(View.VISIBLE);
+                recordsText2.setVisibility(View.VISIBLE);
+                bullet3.setVisibility(View.VISIBLE);
+                recordsText3.setVisibility(View.VISIBLE);
+                bullet4.setVisibility(View.VISIBLE);
+                recordsText4.setVisibility(View.VISIBLE);
+                recordsDate2.setVisibility(View.INVISIBLE);
+                recordsDate3.setVisibility(View.INVISIBLE);
+                recordsDate4.setVisibility(View.INVISIBLE);
+
                 if (item.dataMood.size() == 0) {
                     Date latestDate = item.getRecordDate();
                     recordsDate.setText(dateFormat.format(latestDate));
                     progressText.setText("일일 목표 달성률: 0/1");
-                    recordsText1.setText("오후 12시 이후 일일 설문을 진행해주세요");
+                    recordsText1.setText("일일 설문(Hooper Index)을 진행해주세요");
                     recordsDate1.setVisibility(View.INVISIBLE);
-                    bullet2.setVisibility(View.INVISIBLE);
                     recordsText2.setVisibility(View.INVISIBLE);
+                    bullet2.setVisibility(View.INVISIBLE);
+                    recordsText3.setVisibility(View.INVISIBLE);
+                    bullet3.setVisibility(View.INVISIBLE);
+                    recordsText4.setVisibility(View.INVISIBLE);
+                    bullet4.setVisibility(View.INVISIBLE);
                     progressBar.setProgress(0);
                 } else {
                     DataMood latestMood = getLatestMood(item.getDataMood());
                     Date latestDate = new Date(latestMood.getTime());
                     recordsDate.setText(dateFormat.format(latestDate));
                     progressText.setText("일일 목표 달성률: " + item.getDataMood().size() + "/1");
-                    recordsText1.setText("일별 각성도: " + latestMood.getDaily_alertness());
+                    recordsText1.setText("피로도: " + latestMood.getDaily_alertness());
                     recordsDate1.setText(timeFormat.format(latestDate));
-                    recordsText2.setText("일별 수면의 질: " + latestMood.getSleep_quality());
+                    recordsText2.setText("수면의 질: " + latestMood.getSleep_quality());
+                    recordsText3.setText("스트레스: " + latestMood.getMood_anx());
+                    recordsText4.setText("근육통: " + latestMood.getMood_irr());
                     progressBar.setProgress(100);
                 }
-                recordsDate2.setVisibility(View.INVISIBLE);
-                recordsText3.setVisibility(View.INVISIBLE);
-                recordsDate3.setVisibility(View.INVISIBLE);
-                bullet3.setVisibility(View.INVISIBLE);
             }
         }
 

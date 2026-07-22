@@ -52,7 +52,7 @@
                         android:autoSizeMinTextSize="12sp"
                         android:gravity="center_horizontal"
                         android:maxLines="1"
-                        android:text="알림 시간 설정"
+                        android:text="설문 알림"
                         android:textSize="24sp" />
 
                     <LinearLayout
@@ -70,9 +70,9 @@
                             android:layout_marginLeft="16dp"
                             android:autoSizeMaxTextSize="16sp"
                             android:autoSizeMinTextSize="8sp"
-                            android:fontFamily="@font/pretendardbold"
-                            android:maxLines="1"
-                            android:text="추천 수면 확인"
+                            android:fontFamily="@font/pretendardvariable"
+                            android:maxLines="2"
+                            android:text="매일 이 시간마다 설문 조사를 해달라는 알림이 나타납니다"
                             android:textColor="@color/black"
                             android:textSize="16sp" />
 
@@ -102,81 +102,6 @@
                                     android:textColor="@color/black"
                                     android:textSize="14sp" />
                             </LinearLayout>
-
-                        </LinearLayout>
-
-                        <TextView
-                            android:id="@+id/alertSmallText"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:layout_gravity="top"
-                            android:layout_marginLeft="16dp"
-                            android:autoSizeMaxTextSize="16sp"
-                            android:autoSizeMinTextSize="8sp"
-                            android:fontFamily="@font/pretendardbold"
-                            android:maxLines="1"
-                            android:text="각성도 일일 설문"
-                            android:textColor="@color/black"
-                            android:textSize="16sp" />
-
-                        <LinearLayout
-                            android:id="@+id/alert1SettingView"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:layout_marginBottom="16dp"
-                            android:gravity="right"
-                            android:orientation="horizontal"
-                            android:paddingRight="16dp">
-
-                            <Button
-                                android:id="@+id/alert1TimeButton"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:backgroundTint="@color/gray_1"
-                                android:fontFamily="@font/pretendardvariable"
-                                android:text="오후 6:30"
-                                android:textColor="@color/black"
-                                android:textSize="14sp" />
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:id="@+id/alert2SettingView"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginBottom="16dp"
-                            android:gravity="right"
-                            android:orientation="horizontal"
-                            android:paddingRight="16dp">
-
-                            <Button
-                                android:id="@+id/alert2TimeButton"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:backgroundTint="@color/gray_1"
-                                android:fontFamily="@font/pretendardvariable"
-                                android:text="오후 9:45"
-                                android:textColor="@color/black"
-                                android:textSize="14sp" />
-
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:id="@+id/alert3SettingView"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:gravity="right"
-                            android:orientation="horizontal"
-                            android:paddingRight="16dp">
-
-                            <Button
-                                android:id="@+id/alert3TimeButton"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:backgroundTint="@color/gray_1"
-                                android:fontFamily="@font/pretendardvariable"
-                                android:text="오후 9:45"
-                                android:textColor="@color/black"
-                                android:textSize="14sp" />
 
                         </LinearLayout>
 

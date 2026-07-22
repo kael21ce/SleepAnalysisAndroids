@@ -65,6 +65,19 @@
         android:gravity="bottom"
         android:orientation="vertical">
 
+        <TextView
+            android:id="@+id/startSyncStatusText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginBottom="8dp"
+            android:fontFamily="@font/pretendardvariable"
+            android:gravity="center"
+            android:text="데이터를 불러오는 중..."
+            android:textColor="@color/gray_4"
+            android:textSize="14sp"
+            android:visibility="gone" />
+
         <Button
             android:id="@+id/startButton"
             android:layout_width="match_parent"

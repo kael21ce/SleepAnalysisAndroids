@@ -25,6 +25,8 @@ import java.util.Date;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
+import kotlin.Unit;
+
 public class SplashActivity extends AppCompatActivity {
 
     private static final String TAG = "SplashActivity";
@@ -60,17 +62,7 @@ public class SplashActivity extends AppCompatActivity {
         Instant now = Instant.now();
         Instant ILastSleepUpdate = Instant.ofEpochMilli(lastSleepUpdate);
 
-        healthConnectManager.javReadSleepInputs(ILastSleepUpdate, now);
-//        Instant curTime = Instant.now();
-
-//        while(!healthConnectManager.getIsSleepDone() || !healthConnectManager.getIsAddSleepDone()){
-//            Instant curTimeUpdated = Instant.now();
-//            if(curTime.plusMillis(1000*2).isAfter(curTimeUpdated)){
-//                break;
-//            }
-////            Log.v("loading", "loading");
-//
-//        }
+        CompletableFuture<Unit> sleepSyncFuture = healthConnectManager.javReadSleepInputs(ILastSleepUpdate, now);
         healthConnectManager.setIsSleepDone(false);
         healthConnectManager.setAddSleepDone(false);
 
@@ -94,32 +86,38 @@ public class SplashActivity extends AppCompatActivity {
                 " / Work onset: " + updatedDates[2] + " / Work offset: " + updatedDates[3]);
 
         Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if (getIntent() != null) {
-                    Date date = new Date();
-                    Calendar calendar = Calendar.getInstance();
+        Runnable navigateToMain = () -> {
+            if (getIntent() != null) {
+                Date date = new Date();
+                Calendar calendar = Calendar.getInstance();
 
-                    Intent scheduleIntent = getIntent();
-                    int year = scheduleIntent.getIntExtra("Year", calendar.get(Calendar.YEAR));
-                    int month = scheduleIntent.getIntExtra("Month", calendar.get(Calendar.MONTH));
-                    int day = scheduleIntent.getIntExtra("Day", calendar.get(Calendar.DAY_OF_MONTH));
+                Intent scheduleIntent = getIntent();
+                int year = scheduleIntent.getIntExtra("Year", calendar.get(Calendar.YEAR));
+                int month = scheduleIntent.getIntExtra("Month", calendar.get(Calendar.MONTH));
+                int day = scheduleIntent.getIntExtra("Day", calendar.get(Calendar.DAY_OF_MONTH));
 
-                    Log.v(TAG, "Selected: " + year + "-" + (month + 1) + "-" + day);
+                Log.v(TAG, "Selected: " + year + "-" + (month + 1) + "-" + day);
 
-                    Intent mainIntent = new Intent(SplashActivity.this, MainActivity.class);
-                    mainIntent.putExtra("Year", year);
-                    mainIntent.putExtra("Month", month);
-                    mainIntent.putExtra("Day", day);
-                    startActivity(mainIntent);
-                    finish();
-                } else {
-                    startActivity(new Intent(SplashActivity.this, MainActivity.class));
-                    finish();
-                }
+                Intent mainIntent = new Intent(SplashActivity.this, MainActivity.class);
+                mainIntent.putExtra("Year", year);
+                mainIntent.putExtra("Month", month);
+                mainIntent.putExtra("Day", day);
+                startActivity(mainIntent);
+                finish();
+            } else {
+                startActivity(new Intent(SplashActivity.this, MainActivity.class));
+                finish();
             }
-        }, 1000);
+        };
+
+        //Wait for the Health Connect sync to finish before leaving the splash screen,
+        //otherwise MainActivity can read the sleep table before the import completes.
+        sleepSyncFuture.whenComplete((result, throwable) -> {
+            if (throwable != null) {
+                Log.e(TAG, "Health Connect sync failed", throwable);
+            }
+            runOnUiThread(() -> handler.postDelayed(navigateToMain, 1000));
+        });
     }
 
     private void updateDots() {

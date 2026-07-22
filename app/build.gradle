@@ -41,11 +41,14 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_17
-        targetCompatibility JavaVersion.VERSION_17
+        sourceCompatibility JavaVersion.VERSION_19
+        targetCompatibility JavaVersion.VERSION_19
     }
     kotlinOptions {
-        jvmTarget = '17'
+        jvmTarget = '19'
+    }
+    kotlin {
+        jvmToolchain(19)
     }
     buildFeatures {
         compose true
@@ -86,6 +89,9 @@ dependencies {
     // To use Kotlin annotation processing tool (kapt)
     // To use Kotlin Symbol Processing (KSP)
     ksp "androidx.room:room-compiler:$room_version"
+
+    // To use time range picker, which is not in Android as default
+    implementation 'nl.joery.timerangepicker:timerangepicker:1.0.0'
 
     // optional - RxJava2 support for Room
     implementation "androidx.room:room-rxjava2:$room_version"

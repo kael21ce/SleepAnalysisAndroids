@@ -1,6 +1,7 @@
 package com.kael21ce.sleepanalysisandroid;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.room.Room;
 
 import android.content.Context;
 import android.content.Intent;
@@ -10,6 +11,8 @@ import android.os.Handler;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.Toast;
+
+import com.kael21ce.sleepanalysisandroid.data.AppDatabase;
 
 public class BeginRegisterActivity extends AppCompatActivity {
     private boolean doubleBackToExitPressedOnce = false;
@@ -32,6 +35,13 @@ public class BeginRegisterActivity extends AppCompatActivity {
             SharedPreferences.Editor editor = sharedPref.edit();
             editor.clear();
             editor.apply();
+
+            //로컬에 저장된 수면/설문 기록(Room)도 전부 삭제
+            AppDatabase db = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "sleep_wake")
+                    .allowMainThreadQueries().build();
+            db.clearAllTables();
+            db.close();
+
             Log.v("BeginRegister", "Log out and all data were deleted");
         }
 

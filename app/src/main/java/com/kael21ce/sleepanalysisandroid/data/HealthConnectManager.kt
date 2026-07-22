@@ -159,39 +159,45 @@ class HealthConnectManager(private val context: Context) {
         val response = healthConnectClient.readRecords(request)
         val db = Room.databaseBuilder(context, AppDatabase::class.java, "sleep_wake").build()
         val userDao = db.sleepDao()
-        val sleepList = mutableListOf<Sleep>()
-        for (sleepRecord in response.records) {
-            var sleepStart = Date.from(sleepRecord.startTime).time
-            val sleepEnd = Date.from(sleepRecord.endTime).time
-            Log.v("THE RECORD START", sdfDateTime.format(Date.from(sleepRecord.startTime)))
-            Log.v("THE RECORD END", sdfDateTime.format(Date.from(sleepRecord.endTime)))
-            //check whether we need to divide the sleep to two
-            val sleepStartDay = ((sleepStart + nineHours) / (1000 * 60 * 60 * 24))
-            val sleepEndDay = ((sleepEnd + nineHours)/ (1000 * 60 * 60 * 24))
-            if (sleepStartDay != sleepEndDay) {
-                var midnight = sleepEndDay * (1000 * 60 * 60 * 24)
-                midnight = midnight - nineHours
-                val additionalSleep = Sleep()
-                additionalSleep.sleepStart = sleepStart
-                additionalSleep.sleepEnd = midnight - 1000 * 60
-                sleepList.add(additionalSleep)
-                sleepStart = midnight
+        try {
+            val sleepList = mutableListOf<Sleep>()
+            for (sleepRecord in response.records) {
+                var sleepStart = Date.from(sleepRecord.startTime).time
+                val sleepEnd = Date.from(sleepRecord.endTime).time
+                Log.v("THE RECORD START", sdfDateTime.format(Date.from(sleepRecord.startTime)))
+                Log.v("THE RECORD END", sdfDateTime.format(Date.from(sleepRecord.endTime)))
+                //check whether we need to divide the sleep to two
+                val sleepStartDay = ((sleepStart + nineHours) / (1000 * 60 * 60 * 24))
+                val sleepEndDay = ((sleepEnd + nineHours)/ (1000 * 60 * 60 * 24))
+                if (sleepStartDay != sleepEndDay) {
+                    var midnight = sleepEndDay * (1000 * 60 * 60 * 24)
+                    midnight = midnight - nineHours
+                    val additionalSleep = Sleep()
+                    additionalSleep.sleepStart = sleepStart
+                    additionalSleep.sleepEnd = midnight
+                    if (userDao.findBySleepStartAndEnd(additionalSleep.sleepStart, additionalSleep.sleepEnd) == null) {
+                        sleepList.add(additionalSleep)
+                    }
+                    sleepStart = midnight
+                }
+                //save everything in the database, skipping records already imported
+                val sleep = Sleep()
+                sleep.sleepStart = sleepStart
+                sleep.sleepEnd = sleepEnd
+                Log.v("sleeprecord", sdfDateTime.format(Date(sleep.sleepStart)))
+                Log.v("sleeprecord2", sdfDateTime.format(Date(sleep.sleepEnd)))
+                if (userDao.findBySleepStartAndEnd(sleep.sleepStart, sleep.sleepEnd) == null) {
+                    sleepList.add(sleep)
+                }
             }
-            //save everything in the database
-            val sleep = Sleep()
-            sleep.sleepStart = sleepStart
-            sleep.sleepEnd = sleepEnd
-            Log.v("sleeprecord", sdfDateTime.format(Date(sleep.sleepStart)))
-            Log.v("sleeprecord2", sdfDateTime.format(Date(sleep.sleepEnd)))
-            sleepList.add(sleep)
+            userDao.insertAll(sleepList)
+        } finally {
+            db.close()
         }
-        userDao.insertAll(sleepList)
         isSleepDone = true
     }
 
-    fun javReadSleepInputs(start: Instant, end: Instant){
-        GlobalScope.future{readSleepInputs(start, end)}
-    }
+    fun javReadSleepInputs(start: Instant, end: Instant): CompletableFuture<Unit> = GlobalScope.future { readSleepInputs(start, end) }
 
     /**
      * TODO: Returns the weekly average of [WeightRecord]s.

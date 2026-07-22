@@ -4,7 +4,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,6 +16,9 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.work.ExistingWorkPolicy;
@@ -36,14 +42,26 @@ public class SettingFragment extends Fragment {
     Boolean isFolded = true;
     private static final String NotifyKey = "Notify_At";
     Button notifyButton;
+    TextView notifyDescription;
+    TextView noNotifyDescription;
+    LinearLayout notifyView;
     SharedPreferences sharedPref;
     SharedPreferences.Editor editor;
     OneTimeWorkRequest requested;
     Context context;
     long oneDay = 1000*60*60*24;
-    private static final String RecommendName = "Recommend";
-    private static final String survey_name = "SurveyType";
-    private static final String survey_key = "SQMood";
+
+    // 알림 토글을 눌러도 반응이 없어 보이던 문제 수정: 권한이 없으면 여기서 실제로
+    // 시스템 권한 요청을 띄우고, 거부되면 별도 안내를 보여준다.
+    private final ActivityResultLauncher<String> requestNotificationPermissionLauncher =
+            registerForActivityResult(new ActivityResultContracts.RequestPermission(), granted -> {
+                if (granted) {
+                    editor.putBoolean("isNotifyOn", true).apply();
+                    refreshNotifyUi();
+                } else {
+                    showNotificationPermissionDeniedDialog();
+                }
+            });
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -71,47 +89,23 @@ public class SettingFragment extends Fragment {
         }
 
         notifyButton.setText("설정");
-        TextView notifyDescription = v.findViewById(R.id.NotifyDescription);
-        TextView noNotifyDescription = v.findViewById(R.id.NoNotifyDescription);
-        LinearLayout notifyView = v.findViewById(R.id.NotifyView);
+        notifyDescription = v.findViewById(R.id.NotifyDescription);
+        noNotifyDescription = v.findViewById(R.id.NoNotifyDescription);
+        notifyView = v.findViewById(R.id.NotifyView);
 
-        if (ActivityCompat.checkSelfPermission(context, android.Manifest.permission.POST_NOTIFICATIONS)
-                != PackageManager.PERMISSION_GRANTED) {
-            notifyDescription.setText("권한 없음");
-            notifyButton.setVisibility(View.INVISIBLE);
-            noNotifyDescription.setVisibility(View.VISIBLE);
-        } else {
-            notifyDescription.setText("알림 켜짐");
-            notifyButton.setVisibility(View.VISIBLE);
-            noNotifyDescription.setVisibility(View.GONE);
-        }
-
-        //Initial setting
         Log.v("SettingFragment", String.valueOf(sharedPref.getBoolean("isNotifyOn", true)));
-        if (ActivityCompat.checkSelfPermission(context, android.Manifest.permission.POST_NOTIFICATIONS)
-                == PackageManager.PERMISSION_GRANTED) {
-            if (sharedPref.getBoolean("isNotifyOn", true)) {
-                notifyDescription.setText("알림 켜짐");
-                notifyButton.setVisibility(View.VISIBLE);
-            } else {
-                notifyDescription.setText("알림 꺼짐");
-                notifyButton.setVisibility(View.INVISIBLE);
-            }
-        }
+        refreshNotifyUi();
 
         //On/Off the notification
         notifyView.setOnClickListener(view -> {
             if (ActivityCompat.checkSelfPermission(context, android.Manifest.permission.POST_NOTIFICATIONS)
                     == PackageManager.PERMISSION_GRANTED) {
-                if (sharedPref.getBoolean("isNotifyOn", true)) {
-                    editor.putBoolean("isNotifyOn", false).apply();
-                    notifyDescription.setText("알림 꺼짐");
-                    notifyButton.setVisibility(View.INVISIBLE);
-                } else {
-                    editor.putBoolean("isNotifyOn", true).apply();
-                    notifyDescription.setText("알림 켜짐");
-                    notifyButton.setVisibility(View.VISIBLE);
-                }
+                boolean turnOn = !sharedPref.getBoolean("isNotifyOn", true);
+                editor.putBoolean("isNotifyOn", turnOn).apply();
+                refreshNotifyUi();
+            } else {
+                // 이전엔 권한이 없으면 그냥 아무 일도 안 일어났음(탭해도 반응 없음)
+                requestNotificationPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS);
             }
         });
 
@@ -125,47 +119,6 @@ public class SettingFragment extends Fragment {
             startActivity(notifyIntent);
         });
 
-        //Move to HideActivity
-        TextView hideDescription = v.findViewById(R.id.HideDescription);
-        LinearLayout hideView = v.findViewById(R.id.HideView);
-        if (!sharedPref.contains("isHidden")) {
-            editor.putBoolean("isHidden", true).apply();
-        }
-        boolean isHidden = sharedPref.getBoolean("isHidden", true);
-        if (!isHidden) {
-            hideDescription.setText("켜짐");
-        } else {
-            hideDescription.setText("꺼짐");
-        }
-        hideView.setOnClickListener(view -> {
-            Intent hideIntent = new Intent(v.getContext(), HideActivity.class);
-            startActivity(hideIntent);
-        });
-
-        LinearLayout onsetView = v.findViewById(R.id.OnsetView);
-        onsetView.setOnClickListener(view -> {
-            Intent sleepOnsetIntent = new Intent(v.getContext(), SleepOnsetActivity.class);
-            startActivity(sleepOnsetIntent);
-        });
-
-        //Do SQMood survey again
-        if (!sharedPref.contains(survey_key)) {
-            editor.putInt(survey_key, 0).apply();
-        }
-        int surveyDay = sharedPref.getInt(survey_key, 0);
-        Calendar calendar = Calendar.getInstance();
-        int day = calendar.get(Calendar.DAY_OF_MONTH);
-
-        LinearLayout sqMoodVisitView = v.findViewById(R.id.SQMoodVisitView);
-        sqMoodVisitView.setVisibility(View.GONE);
-        sqMoodVisitView.setOnClickListener(view -> {
-            Bundle temp = new Bundle();
-            Intent surveyIntent = new Intent(v.getContext(), SQMoodSendingActivity.class);
-            surveyIntent.putExtra(survey_name, 0);
-            surveyIntent.putExtra("moodData", temp);
-            startActivity(surveyIntent);
-        });
-
         // Log out
         LinearLayout logOutView = v.findViewById(R.id.LogOutView);
         logOutView.setOnClickListener(v1 -> {
@@ -177,5 +130,52 @@ public class SettingFragment extends Fragment {
         });
 
         return v;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // 시스템 설정 앱에서 알림 권한을 바꾸고 돌아온 경우도 반영
+        if (context != null && notifyView != null) {
+            refreshNotifyUi();
+        }
+    }
+
+    private void refreshNotifyUi() {
+        boolean granted = ActivityCompat.checkSelfPermission(context, android.Manifest.permission.POST_NOTIFICATIONS)
+                == PackageManager.PERMISSION_GRANTED;
+        if (!granted) {
+            notifyDescription.setText("권한 없음");
+            notifyButton.setVisibility(View.INVISIBLE);
+            noNotifyDescription.setVisibility(View.VISIBLE);
+            return;
+        }
+        noNotifyDescription.setVisibility(View.GONE);
+        if (sharedPref.getBoolean("isNotifyOn", true)) {
+            notifyDescription.setText("알림 켜짐");
+            notifyButton.setVisibility(View.VISIBLE);
+        } else {
+            notifyDescription.setText("알림 꺼짐");
+            notifyButton.setVisibility(View.INVISIBLE);
+        }
+    }
+
+    private void showNotificationPermissionDeniedDialog() {
+        new AlertDialog.Builder(context)
+                .setTitle("알림 권한이 꺼져 있습니다")
+                .setMessage("기기 설정 > 알림에서 SleepWake 알림을 허용해주세요.")
+                .setPositiveButton("설정 열기", (dialog, which) -> {
+                    Intent intent;
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        intent = new Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+                                .putExtra(Settings.EXTRA_APP_PACKAGE, context.getPackageName());
+                    } else {
+                        intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                                .setData(Uri.fromParts("package", context.getPackageName(), null));
+                    }
+                    startActivity(intent);
+                })
+                .setNegativeButton("취소", null)
+                .show();
     }
 }

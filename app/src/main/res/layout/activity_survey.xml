@@ -49,7 +49,7 @@
             android:autoSizeTextType="uniform"
             android:fontFamily="@font/pretendardbold"
             android:maxLines="1"
-            android:text="지금 얼마나 개운하신가요?"
+            android:text="지금 얼마나 졸리신가요?"
             android:textColor="@color/black"
             android:textSize="24dp" />
 
@@ -64,147 +64,255 @@
             android:autoSizeTextType="uniform"
             android:fontFamily="@font/pretendardvariable"
             android:maxLines="1"
-            android:text="지금의 각성도를 잘 메모해둘게요 :)"
+            android:text="현재 상태를 가장 잘 나타내는 항목을 선택해주세요"
             android:textColor="@color/gray_4"
             android:textSize="14sp" />
 
     </LinearLayout>
 
-    <LinearLayout
-        android:id="@+id/surveyLayout"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="32dp"
-        android:orientation="vertical">
-
-        <ImageView
-            android:id="@+id/AwarenessEmoji"
-            android:layout_width="200dp"
-            android:layout_height="200dp"
-            android:layout_gravity="center_horizontal"
-            android:layout_margin="20dp"
-            android:src="@drawable/puke" />
-
-        <TextView
-            android:id="@+id/EmojiDescription"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginTop="24dp"
-            android:autoSizeMaxTextSize="20sp"
-            android:autoSizeMinTextSize="10sp"
-            android:autoSizeStepGranularity="2sp"
-            android:autoSizeTextType="uniform"
-            android:fontFamily="@font/pretendardbold"
-            android:gravity="center"
-            android:maxLines="1"
-            android:text="개운한 정도: 1 / 10"
-            android:textColor="@color/black"
-            android:textSize="20sp" />
+        android:layout_height="0dp"
+        android:layout_weight="1">
 
         <LinearLayout
-            android:id="@+id/seekButtonLayout"
+            android:id="@+id/surveyLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="40dp"
-            android:orientation="horizontal">
+            android:layout_marginHorizontal="24dp"
+            android:orientation="vertical">
 
-            <Button
-                android:id="@+id/seek1"
-                android:layout_width="0dp"
+            <LinearLayout
+                android:id="@+id/kssOption1"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginRight="2dp"
-                android:layout_weight="1"
-                android:backgroundTint="@color/black"
-                tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck" />
+                android:background="@drawable/corner_8_black_stroke"
+                android:orientation="vertical">
 
-            <Button
-                android:id="@+id/seek2"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="2dp"
-                android:layout_weight="1"
-                android:backgroundTint="@color/gray_3"
-                tools:ignore="SpeakableTextPresentCheck" />
+                <TextView
+                    android:id="@+id/kssContent1"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:autoSizeMaxTextSize="16sp"
+                    android:autoSizeMinTextSize="8sp"
+                    android:autoSizeStepGranularity="2sp"
+                    android:autoSizeTextType="uniform"
+                    android:fontFamily="@font/pretendardbold"
+                    android:gravity="center_horizontal"
+                    android:maxLines="1"
+                    android:padding="14dp"
+                    android:text="1. 매우 또렷함"
+                    android:textColor="@color/black"
+                    android:textSize="15sp" />
+            </LinearLayout>
 
-            <Button
-                android:id="@+id/seek3"
-                android:layout_width="0dp"
+            <LinearLayout
+                android:id="@+id/kssOption2"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginRight="2dp"
-                android:layout_weight="1"
-                android:backgroundTint="@color/gray_3"
-                tools:ignore="SpeakableTextPresentCheck" />
+                android:layout_marginTop="10dp"
+                android:background="@drawable/corner_8_gray_stroke"
+                android:orientation="vertical">
 
-            <Button
-                android:id="@+id/seek4"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="2dp"
-                android:layout_weight="1"
-                android:backgroundTint="@color/gray_3"
-                tools:ignore="SpeakableTextPresentCheck" />
+                <TextView
+                    android:id="@+id/kssContent2"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:autoSizeMaxTextSize="16sp"
+                    android:autoSizeMinTextSize="8sp"
+                    android:autoSizeStepGranularity="2sp"
+                    android:autoSizeTextType="uniform"
+                    android:fontFamily="@font/pretendardbold"
+                    android:gravity="center_horizontal"
+                    android:maxLines="1"
+                    android:padding="14dp"
+                    android:text="2. 또렷함"
+                    android:textColor="@color/gray_4"
+                    android:textSize="15sp" />
+            </LinearLayout>
 
-            <Button
-                android:id="@+id/seek5"
-                android:layout_width="0dp"
+            <LinearLayout
+                android:id="@+id/kssOption3"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginRight="2dp"
-                android:layout_weight="1"
-                android:backgroundTint="@color/gray_3"
-                tools:ignore="SpeakableTextPresentCheck" />
+                android:layout_marginTop="10dp"
+                android:background="@drawable/corner_8_gray_stroke"
+                android:orientation="vertical">
 
-            <Button
-                android:id="@+id/seek6"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="2dp"
-                android:layout_weight="1"
-                android:backgroundTint="@color/gray_3"
-                tools:ignore="TouchTargetSizeCheck" />
+                <TextView
+                    android:id="@+id/kssContent3"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:autoSizeMaxTextSize="16sp"
+                    android:autoSizeMinTextSize="8sp"
+                    android:autoSizeStepGranularity="2sp"
+                    android:autoSizeTextType="uniform"
+                    android:fontFamily="@font/pretendardbold"
+                    android:gravity="center_horizontal"
+                    android:maxLines="1"
+                    android:padding="14dp"
+                    android:text="3. 또렷한 편임"
+                    android:textColor="@color/gray_4"
+                    android:textSize="15sp" />
+            </LinearLayout>
 
-            <Button
-                android:id="@+id/seek7"
-                android:layout_width="0dp"
+            <LinearLayout
+                android:id="@+id/kssOption4"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginRight="2dp"
-                android:layout_weight="1"
-                android:backgroundTint="@color/gray_3"
-                tools:ignore="SpeakableTextPresentCheck" />
+                android:layout_marginTop="10dp"
+                android:background="@drawable/corner_8_gray_stroke"
+                android:orientation="vertical">
 
-            <Button
-                android:id="@+id/seek8"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="2dp"
-                android:layout_weight="1"
-                android:backgroundTint="@color/gray_3"
-                tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck" />
+                <TextView
+                    android:id="@+id/kssContent4"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:autoSizeMaxTextSize="16sp"
+                    android:autoSizeMinTextSize="8sp"
+                    android:autoSizeStepGranularity="2sp"
+                    android:autoSizeTextType="uniform"
+                    android:fontFamily="@font/pretendardbold"
+                    android:gravity="center_horizontal"
+                    android:maxLines="1"
+                    android:padding="14dp"
+                    android:text="4. 다소 또렷함"
+                    android:textColor="@color/gray_4"
+                    android:textSize="15sp" />
+            </LinearLayout>
 
-            <Button
-                android:id="@+id/seek9"
-                android:layout_width="0dp"
+            <LinearLayout
+                android:id="@+id/kssOption5"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginRight="2dp"
-                android:layout_weight="1"
-                android:backgroundTint="@color/gray_3"
-                android:text=""
-                tools:ignore="SpeakableTextPresentCheck" />
+                android:layout_marginTop="10dp"
+                android:background="@drawable/corner_8_gray_stroke"
+                android:orientation="vertical">
 
-            <Button
-                android:id="@+id/seek10"
-                android:layout_width="0dp"
+                <TextView
+                    android:id="@+id/kssContent5"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:autoSizeMaxTextSize="16sp"
+                    android:autoSizeMinTextSize="8sp"
+                    android:autoSizeStepGranularity="2sp"
+                    android:autoSizeTextType="uniform"
+                    android:fontFamily="@font/pretendardbold"
+                    android:gravity="center_horizontal"
+                    android:maxLines="1"
+                    android:padding="14dp"
+                    android:text="5. 또렷하지도 졸리지도 않음"
+                    android:textColor="@color/gray_4"
+                    android:textSize="15sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/kssOption6"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginRight="2dp"
-                android:layout_weight="1"
-                android:backgroundTint="@color/gray_3"
-                tools:ignore="SpeakableTextPresentCheck" />
+                android:layout_marginTop="10dp"
+                android:background="@drawable/corner_8_gray_stroke"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/kssContent6"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:autoSizeMaxTextSize="16sp"
+                    android:autoSizeMinTextSize="8sp"
+                    android:autoSizeStepGranularity="2sp"
+                    android:autoSizeTextType="uniform"
+                    android:fontFamily="@font/pretendardbold"
+                    android:gravity="center_horizontal"
+                    android:maxLines="1"
+                    android:padding="14dp"
+                    android:text="6. 졸음 기미가 있음"
+                    android:textColor="@color/gray_4"
+                    android:textSize="15sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/kssOption7"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/corner_8_gray_stroke"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/kssContent7"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:autoSizeMaxTextSize="16sp"
+                    android:autoSizeMinTextSize="8sp"
+                    android:autoSizeStepGranularity="2sp"
+                    android:autoSizeTextType="uniform"
+                    android:fontFamily="@font/pretendardbold"
+                    android:gravity="center_horizontal"
+                    android:maxLines="1"
+                    android:padding="14dp"
+                    android:text="7. 졸림, 깨어있으려 애쓰지 않음"
+                    android:textColor="@color/gray_4"
+                    android:textSize="15sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/kssOption8"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/corner_8_gray_stroke"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/kssContent8"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:autoSizeMaxTextSize="16sp"
+                    android:autoSizeMinTextSize="8sp"
+                    android:autoSizeStepGranularity="2sp"
+                    android:autoSizeTextType="uniform"
+                    android:fontFamily="@font/pretendardbold"
+                    android:gravity="center_horizontal"
+                    android:maxLines="1"
+                    android:padding="14dp"
+                    android:text="8. 졸림, 깨어있으려 약간 노력함"
+                    android:textColor="@color/gray_4"
+                    android:textSize="15sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/kssOption9"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="16dp"
+                android:background="@drawable/corner_8_gray_stroke"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/kssContent9"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:autoSizeMaxTextSize="16sp"
+                    android:autoSizeMinTextSize="8sp"
+                    android:autoSizeStepGranularity="2sp"
+                    android:autoSizeTextType="uniform"
+                    android:fontFamily="@font/pretendardbold"
+                    android:gravity="center_horizontal"
+                    android:maxLines="1"
+                    android:padding="14dp"
+                    android:text="9. 매우 졸림, 깨어있으려 힘겹게 노력함(졸음과 싸움)"
+                    android:textColor="@color/gray_4"
+                    android:textSize="15sp" />
+            </LinearLayout>
 
         </LinearLayout>
-    </LinearLayout>
+    </ScrollView>
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:gravity="bottom"
         android:orientation="vertical">
 
@@ -213,11 +321,12 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="16dp"
-            android:layout_marginBottom="48dp"
+            android:layout_marginBottom="24dp"
             android:backgroundTint="@color/blue_1"
             android:fontFamily="@font/pretendardvariable"
             android:padding="16dp"
             android:text="기록하기"
+            android:textColor="@color/white"
             android:textSize="16sp"
             app:cornerRadius="28dp" />
     </LinearLayout>

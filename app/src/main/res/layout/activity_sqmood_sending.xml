@@ -8,6 +8,24 @@
     tools:context=".SQMoodSendingActivity">
 
     <LinearLayout
+        android:id="@+id/backButtonSQMoodCaption"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <ImageButton
+            android:id="@+id/SQMoodBackButton"
+            style="@style/NoClickEffect"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/white"
+            android:padding="8dp"
+            android:src="@drawable/chevron_left"
+            tools:ignore="SpeakableTextPresentCheck" />
+
+    </LinearLayout>
+
+    <LinearLayout
         android:id="@+id/SQMoodCaption"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -24,7 +42,7 @@
             android:autoSizeTextType="uniform"
             android:fontFamily="@font/pretendardbold"
             android:maxLines="1"
-            android:text="얼마나 우울한 감정이 들었나요?"
+            android:text="현재 얼마나 피로하다고 느끼십니까?"
             android:textSize="24sp" />
 
         <TextView
@@ -38,149 +56,204 @@
             android:autoSizeTextType="uniform"
             android:fontFamily="@font/pretendardvariable"
             android:maxLines="1"
-            android:text="오늘 느낀 가장 우울한 정도를 입력해주세요"
+            android:text="피로도 (Fatigue)"
             android:textColor="@color/gray_4"
             android:textSize="16sp" />
     </LinearLayout>
 
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <LinearLayout
+            android:id="@+id/SQMoodButtonCaption"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="24dp"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:id="@+id/firstButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/corner_8_gray_stroke"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/firstContent"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:autoSizeMaxTextSize="16sp"
+                    android:autoSizeMinTextSize="8sp"
+                    android:autoSizeStepGranularity="2sp"
+                    android:autoSizeTextType="uniform"
+                    android:fontFamily="@font/pretendardbold"
+                    android:gravity="center_horizontal"
+                    android:maxLines="1"
+                    android:padding="14dp"
+                    android:text="1. 매우 상쾌함"
+                    android:textColor="@color/gray_4"
+                    android:textSize="15sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/secondButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/corner_8_gray_stroke"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/secondContent"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:autoSizeMaxTextSize="16sp"
+                    android:autoSizeMinTextSize="8sp"
+                    android:autoSizeStepGranularity="2sp"
+                    android:autoSizeTextType="uniform"
+                    android:fontFamily="@font/pretendardbold"
+                    android:gravity="center_horizontal"
+                    android:maxLines="1"
+                    android:padding="14dp"
+                    android:text="2. 상쾌함"
+                    android:textColor="@color/gray_4"
+                    android:textSize="15sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/thirdButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/corner_8_gray_stroke"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/thirdContent"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:autoSizeMaxTextSize="16sp"
+                    android:autoSizeMinTextSize="8sp"
+                    android:autoSizeStepGranularity="2sp"
+                    android:autoSizeTextType="uniform"
+                    android:fontFamily="@font/pretendardbold"
+                    android:gravity="center_horizontal"
+                    android:maxLines="1"
+                    android:padding="14dp"
+                    android:text="3. 약간 피곤함"
+                    android:textColor="@color/gray_4"
+                    android:textSize="15sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/fourthButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/corner_8_gray_stroke"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/fourthContent"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:autoSizeMaxTextSize="16sp"
+                    android:autoSizeMinTextSize="8sp"
+                    android:autoSizeStepGranularity="2sp"
+                    android:autoSizeTextType="uniform"
+                    android:fontFamily="@font/pretendardbold"
+                    android:gravity="center_horizontal"
+                    android:maxLines="1"
+                    android:padding="14dp"
+                    android:text="4. 보통"
+                    android:textColor="@color/gray_4"
+                    android:textSize="15sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/fifthButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/corner_8_gray_stroke"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/fifthContent"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:autoSizeMaxTextSize="16sp"
+                    android:autoSizeMinTextSize="8sp"
+                    android:autoSizeStepGranularity="2sp"
+                    android:autoSizeTextType="uniform"
+                    android:fontFamily="@font/pretendardbold"
+                    android:gravity="center_horizontal"
+                    android:maxLines="1"
+                    android:padding="14dp"
+                    android:text="5. 다소 피곤함"
+                    android:textColor="@color/gray_4"
+                    android:textSize="15sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/sixthButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/corner_8_gray_stroke"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/sixthContent"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:autoSizeMaxTextSize="16sp"
+                    android:autoSizeMinTextSize="8sp"
+                    android:autoSizeStepGranularity="2sp"
+                    android:autoSizeTextType="uniform"
+                    android:fontFamily="@font/pretendardbold"
+                    android:gravity="center_horizontal"
+                    android:maxLines="1"
+                    android:padding="14dp"
+                    android:text="6. 피곤함"
+                    android:textColor="@color/gray_4"
+                    android:textSize="15sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/seventhButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="16dp"
+                android:background="@drawable/corner_8_gray_stroke"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/seventhContent"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:autoSizeMaxTextSize="16sp"
+                    android:autoSizeMinTextSize="8sp"
+                    android:autoSizeStepGranularity="2sp"
+                    android:autoSizeTextType="uniform"
+                    android:fontFamily="@font/pretendardbold"
+                    android:gravity="center_horizontal"
+                    android:maxLines="1"
+                    android:padding="14dp"
+                    android:text="7. 매우 피곤함"
+                    android:textColor="@color/gray_4"
+                    android:textSize="15sp" />
+            </LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
+
     <LinearLayout
-        android:id="@+id/SQMoodButtonCaption"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="24dp"
-        android:layout_marginTop="48dp"
-        android:orientation="vertical">
-
-        <LinearLayout
-            android:id="@+id/firstButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/corner_8_gray_stroke"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/firstContent"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:autoSizeMaxTextSize="16sp"
-                android:autoSizeMinTextSize="8sp"
-                android:autoSizeStepGranularity="2sp"
-                android:autoSizeTextType="uniform"
-                android:fontFamily="@font/pretendardbold"
-                android:gravity="center_horizontal"
-                android:maxLines="1"
-                android:padding="16dp"
-                android:text="매우 심하다"
-                android:textColor="@color/gray_4"
-                android:textSize="16sp" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/secondButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:background="@drawable/corner_8_gray_stroke"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/secondContent"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:autoSizeMaxTextSize="16sp"
-                android:autoSizeMinTextSize="8sp"
-                android:autoSizeStepGranularity="2sp"
-                android:autoSizeTextType="uniform"
-                android:fontFamily="@font/pretendardbold"
-                android:gravity="center_horizontal"
-                android:maxLines="1"
-                android:padding="16dp"
-                android:text="매우 심하다"
-                android:textColor="@color/gray_4"
-                android:textSize="16sp" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/thirdButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:background="@drawable/corner_8_gray_stroke"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/thirdContent"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:autoSizeMaxTextSize="16sp"
-                android:autoSizeMinTextSize="8sp"
-                android:autoSizeStepGranularity="2sp"
-                android:autoSizeTextType="uniform"
-                android:fontFamily="@font/pretendardbold"
-                android:gravity="center_horizontal"
-                android:maxLines="1"
-                android:padding="16dp"
-                android:text="매우 심하다"
-                android:textColor="@color/gray_4"
-                android:textSize="16sp" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/fourthButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:background="@drawable/corner_8_gray_stroke"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/fourthContent"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:autoSizeMaxTextSize="16sp"
-                android:autoSizeMinTextSize="8sp"
-                android:autoSizeStepGranularity="2sp"
-                android:autoSizeTextType="uniform"
-                android:fontFamily="@font/pretendardbold"
-                android:gravity="center_horizontal"
-                android:maxLines="1"
-                android:padding="16dp"
-                android:text="매우 심하다"
-                android:textColor="@color/gray_4"
-                android:textSize="16sp" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/fifthButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:background="@drawable/corner_8_gray_stroke"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/fifthContent"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:autoSizeMaxTextSize="16sp"
-                android:autoSizeMinTextSize="8sp"
-                android:autoSizeStepGranularity="2sp"
-                android:autoSizeTextType="uniform"
-                android:fontFamily="@font/pretendardbold"
-                android:gravity="center_horizontal"
-                android:maxLines="1"
-                android:padding="16dp"
-                android:text="매우 심하다"
-                android:textColor="@color/gray_4"
-                android:textSize="16sp" />
-        </LinearLayout>
-
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
         android:gravity="bottom"
         android:orientation="vertical">
 

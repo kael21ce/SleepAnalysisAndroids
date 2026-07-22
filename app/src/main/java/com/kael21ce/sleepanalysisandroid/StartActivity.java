@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.kael21ce.sleepanalysisandroid.data.DataSurvey;
@@ -40,6 +41,7 @@ public class StartActivity extends AppCompatActivity {
         //Get intent from CheckActivity
         Intent emailIntent = getIntent();
         Button startButton = findViewById(R.id.startButton);
+        TextView syncStatusText = findViewById(R.id.startSyncStatusText);
 
         //Change the user name and user email in MainActivity
         String user_email = emailIntent.getStringExtra("User_Email");
@@ -51,12 +53,15 @@ public class StartActivity extends AppCompatActivity {
             editor.putString("User_Name", user_name);
             editor.apply();
 
-            //Move to MainActivity
-
-            Intent mainIntent = new Intent(StartActivity.this, MainActivity.class);
-            mainIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(mainIntent);
-            finish();
+            //로그인 직후 서버에 저장된 수면/설문 데이터를 읽어와 로컬에 복원한 뒤 MainActivity로 이동
+            startButton.setEnabled(false);
+            syncStatusText.setVisibility(android.view.View.VISIBLE);
+            DataSyncManager.restoreFromServer(StartActivity.this, () -> {
+                Intent mainIntent = new Intent(StartActivity.this, MainActivity.class);
+                mainIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(mainIntent);
+                finish();
+            });
         });
     }
 }
