@@ -203,7 +203,7 @@ class HealthConnectManager(private val context: Context) {
      */
     suspend fun writeExerciseSession(start: ZonedDateTime, end: ZonedDateTime) {
         healthConnectClient.insertRecords(
-                listOf(
+                listOf<Record>(
                         ExerciseSessionRecord(
                                 startTime = start.toInstant(),
                                 startZoneOffset = start.offset,
@@ -225,8 +225,9 @@ class HealthConnectManager(private val context: Context) {
                                 endTime = end.toInstant(),
                                 endZoneOffset = end.offset,
                                 energy = Energy.calories((140 + Random.nextInt(20)) * 0.01)
-                        )
-                ) + buildHeartRateSeries(start, end)
+                        ),
+                        buildHeartRateSeries(start, end)
+                )
         )
     }
 

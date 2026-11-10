@@ -186,7 +186,15 @@ public class AddIntervalFragment extends Fragment implements ButtonTextUpdater {
             BottomNavigationView bottomNavigationView = getActivity().findViewById(R.id.bottomNavigationView);
 
             if(sleepStartDate.getTime() < sleepEndDate.getTime() && !mainActivity.isOverlap(mainActivity.getSleeps(), add_sleep, -1)) {
-                if (Math.abs(sleepStartDate.getTime()-sleepEndDate.getTime()) > 24*60*60*1000) {
+                if (sleepStartDate.getTime() > System.currentTimeMillis() || sleepEndDate.getTime() > System.currentTimeMillis()) {
+                    if (languageSetting.equals("ko")) {
+                        showAlertDialog(dimBackground, actionBar, bottomNavigationView,
+                                "경고", "현재 시각 이후의 수면은 입력할 수 없습니다", "확인");
+                    } else {
+                        showAlertDialog(dimBackground, actionBar, bottomNavigationView,
+                                "ERROR", "Cannot enter sleep time after the current time", "OK");
+                    }
+                } else if (Math.abs(sleepStartDate.getTime()-sleepEndDate.getTime()) > 24*60*60*1000) {
                     if (languageSetting.equals("ko")) {
                         showAlertDialog(dimBackground, actionBar, bottomNavigationView,
                                 "경고", "24시간 미만으로 수면을 입력해주세요", "확인");
